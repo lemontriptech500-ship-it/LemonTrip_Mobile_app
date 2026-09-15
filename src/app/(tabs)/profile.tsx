@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { router } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,7 +19,7 @@ export default function ProfileScreen() {
           <Text style={styles.avatarText}>T</Text>
         </View>
         <Text style={styles.name}>Guest User</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/login')}>
           <Text style={styles.loginLink}>Login / Sign Up</Text>
         </TouchableOpacity>
       </View>
