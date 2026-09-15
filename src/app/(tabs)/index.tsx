@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { destinations } from '@/data/destinations';
+import { travelPackages } from '@/data/packages';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -52,6 +53,23 @@ export default function HomeScreen() {
             </View>
           ))}
         </ScrollView>
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Popular Holiday Packages</Text>
+        </View>
+
+        <View style={styles.packagesSection}>
+          {travelPackages.map((pkg) => (
+            <View key={pkg.id} style={styles.packageCard}>
+              <Image source={{ uri: pkg.image }} style={styles.packageImage} />
+              <View style={styles.packageInfo}>
+                <Text style={styles.packageDuration}>{pkg.duration}</Text>
+                <Text style={styles.packageTitle}>{pkg.title}</Text>
+                <Text style={styles.packagePrice}>From {pkg.price}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -151,5 +169,39 @@ const styles = StyleSheet.create({
   destinationPrice: {
     fontSize: 12,
     color: Colors.textLight,
+  },
+  packagesSection: {
+    paddingHorizontal: 16,
+    gap: 14,
+  },
+  packageCard: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  packageImage: {
+    width: '100%',
+    height: 160,
+  },
+  packageInfo: {
+    padding: 14,
+  },
+  packageDuration: {
+    fontSize: 12,
+    color: Colors.textLight,
+    marginBottom: 4,
+  },
+  packageTitle: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: Colors.textDark,
+    marginBottom: 4,
+  },
+  packagePrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: Colors.primary,
   },
 });
