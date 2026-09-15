@@ -4,11 +4,11 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const menuItems = [
-  'My Bookings',
-  'Saved / Wishlist',
-  'Payment Methods',
-  'Help & Support',
-  'Settings',
+  { label: 'My Bookings', route: '/(tabs)/bookings' },
+  { label: 'Saved / Wishlist', route: '/(tabs)/wishlist' },
+  { label: 'Payment Methods', route: null },
+  { label: 'Help & Support', route: null },
+  { label: 'Settings', route: null },
 ];
 
 export default function ProfileScreen() {
@@ -26,8 +26,11 @@ export default function ProfileScreen() {
 
       <View style={styles.menu}>
         {menuItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.menuItem}>
-            <Text style={styles.menuText}>{item}</Text>
+          <TouchableOpacity
+            key={index}
+            style={styles.menuItem}
+            onPress={() => item.route && router.push(item.route as any)}>
+            <Text style={styles.menuText}>{item.label}</Text>
           </TouchableOpacity>
         ))}
       </View>

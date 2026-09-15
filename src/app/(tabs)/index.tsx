@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors';
 import { destinations } from '@/data/destinations';
 import { travelPackages } from '@/data/packages';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const features = [
@@ -12,6 +13,8 @@ const features = [
 ];
 
 export default function HomeScreen() {
+  useWishlist(); // subscribes to re-render on wishlist changes
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -43,15 +46,30 @@ export default function HomeScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.destinationsRow}>
-          {destinations.map((dest) => (
-            <View key={dest.id} style={styles.destinationCard}>
-              <Image source={{ uri: dest.image }} style={styles.destinationImage} />
-              <View style={styles.destinationInfo}>
-                <Text style={styles.destinationName}>{dest.name}</Text>
-                <Text style={styles.destinationPrice}>From {dest.priceFrom}</Text>
+          {destinations.map((dest) => {
+            const saved = isInWishlist(dest.id);
+            return (
+              <View key={dest.id} style={styles.destinationCard}>
+                <Image source={{ uri: dest.image }} style={styles.destinationImage} />
+                <TouchableOpacity
+                  style={styles.heartButton}
+                  onPress={() =>
+                    toggleWishlist({
+                      id: dest.id,
+                      name: dest.name,
+                      image: dest.image,
+                      price: dest.priceFrom,
+                    })
+                  }>
+                  <Text style={styles.heartIcon}>{saved ? '❤️' : '🤍'}</Text>
+                </TouchableOpacity>
+                <View style={styles.destinationInfo}>
+                  <Text style={styles.destinationName}>{dest.name}</Text>
+                  <Text style={styles.destinationPrice}>From {dest.priceFrom}</Text>
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </ScrollView>
 
         <View style={styles.sectionHeader}>
@@ -156,6 +174,20 @@ const styles = StyleSheet.create({
   destinationImage: {
     width: '100%',
     height: 110,
+  },
+  heartButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heartIcon: {
+    fontSize: 15,
   },
   destinationInfo: {
     padding: 10,
