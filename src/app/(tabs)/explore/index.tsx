@@ -1,15 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
-
-const services = [
-  { title: 'Flights', subtitle: 'Book domestic & international flights' },
-  { title: 'Hotels', subtitle: 'Handpicked stays across the globe' },
-  { title: 'Buses', subtitle: 'Comfortable bus travel' },
-  { title: 'Trains', subtitle: 'IRCTC bookings made easy' },
-  { title: 'Tours & Packages', subtitle: 'Curated holiday experiences' },
-  { title: 'Visa Services', subtitle: 'Expert visa assistance' },
-];
+import { services } from '@/data/services';
+import { router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExploreScreen() {
   return (
@@ -21,10 +14,16 @@ export default function ExploreScreen() {
         </View>
 
         <View style={styles.servicesGrid}>
-          {services.map((item, index) => (
-            <TouchableOpacity key={index} style={styles.serviceCard}>
-              <Text style={styles.serviceTitle}>{item.title}</Text>
-              <Text style={styles.serviceSubtitle}>{item.subtitle}</Text>
+          {services.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.serviceCard}
+              onPress={() => router.push(`/(tabs)/explore/${item.id}`)}>
+              <Text style={styles.serviceIcon}>{item.icon}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.serviceTitle}>{item.title}</Text>
+                <Text style={styles.serviceSubtitle}>{item.subtitle}</Text>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -61,11 +60,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   serviceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: 12,
     padding: 18,
+  },
+  serviceIcon: {
+    fontSize: 28,
   },
   serviceTitle: {
     color: Colors.textDark,
