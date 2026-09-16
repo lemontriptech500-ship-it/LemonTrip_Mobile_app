@@ -2,6 +2,7 @@ import { Colors } from '@/constants/colors';
 import { destinations } from '@/data/destinations';
 import { travelPackages } from '@/data/packages';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
+import { router } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,7 +14,7 @@ const features = [
 ];
 
 export default function HomeScreen() {
-  useWishlist(); // subscribes to re-render on wishlist changes
+  useWishlist();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,6 +38,10 @@ export default function HomeScreen() {
             </View>
           ))}
         </View>
+
+        <TouchableOpacity style={styles.offersButton} onPress={() => router.push('/offers')}>
+          <Text style={styles.offersButtonText}>🎁 View Exclusive Offers</Text>
+        </TouchableOpacity>
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Popular Destinations</Text>
@@ -148,6 +153,19 @@ const styles = StyleSheet.create({
   featureSubtitle: {
     color: Colors.textLight,
     fontSize: 13,
+  },
+  offersButton: {
+    marginHorizontal: 16,
+    marginBottom: 20,
+    backgroundColor: Colors.accent,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  offersButtonText: {
+    color: Colors.primaryDark,
+    fontSize: 15,
+    fontWeight: 'bold',
   },
   sectionHeader: {
     paddingHorizontal: 16,
