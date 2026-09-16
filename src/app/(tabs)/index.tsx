@@ -94,6 +94,14 @@ export default function HomeScreen() {
           ))}
         </View>
 
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Travel Inspiration</Text>
+        </View>
+
+        <TouchableOpacity style={styles.blogButton} onPress={() => router.push('/blog')}>
+          <Text style={styles.blogButtonText}>📖 Read Travel Tips & Guides</Text>
+        </TouchableOpacity>
+
         <View style={{ height: 24 }} />
       </ScrollView>
     </SafeAreaView>
@@ -253,5 +261,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: Colors.primary,
+  },
+  blogButton: {
+    marginHorizontal: 16,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  blogButtonText: {
+    color: Colors.primary,
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 });
