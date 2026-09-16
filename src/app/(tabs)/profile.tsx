@@ -8,7 +8,7 @@ const menuItems = [
   { label: 'Saved / Wishlist', route: '/(tabs)/wishlist' },
   { label: 'Payment Methods', route: null },
   { label: 'Help & Support', route: null },
-  { label: 'Settings', route: null },
+  { label: 'Settings', route: '/settings' },
 ];
 
 export default function ProfileScreen() {
