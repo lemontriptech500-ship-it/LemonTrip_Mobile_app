@@ -1,16 +1,22 @@
-import { Colors } from '@/constants/colors';
-import { dummyListings, services } from '@/data/services';
-import { addBooking } from '@/utils/bookingStore';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
+import { Colors } from '@/constants/colors';
+import { services, dummyListings } from '@/data/services';
+import { addBooking } from '@/utils/bookingStore';
 
 export default function ServiceListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const service = services.find((s) => s.id === id);
   const listings = dummyListings[id ?? ''] ?? [];
   const [bookedIds, setBookedIds] = useState<string[]>([]);
+  const [searched, setSearched] = useState(false);
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [date, setDate] = useState('');
+
+  const showSearchForm = id === 'flights' || id === 'buses' || id === 'trains';
 
   const handleBook = (listingId: string, name: string, price: string) => {
     addBooking({
@@ -36,34 +42,78 @@ export default function ServiceListingScreen() {
         <Text style={styles.headerSubtitle}>{service?.subtitle}</Text>
       </View>
 
-      <FlatList
-        data={listings}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => {
-          const isBooked = bookedIds.includes(item.id);
-          return (
-            <View style={styles.card}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardName}>{item.name}</Text>
-                <Text style={styles.cardDetail}>{item.detail}</Text>
-                <Text style={styles.cardPrice}>{item.price}</Text>
-              </View>
-              <TouchableOpacity
-                style={[styles.bookButton, isBooked && styles.bookedButton]}
-                disabled={isBooked}
-                onPress={() => handleBook(item.id, item.name, item.price)}>
-                <Text style={[styles.bookButtonText, isBooked && styles.bookedButtonText]}>
-                  {isBooked ? 'Booked ✓' : 'Book Now'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        }}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No listings available right now.</Text>
-        }
-      />
+      {showSearchForm && !searched ? (
+        <View style={styles.searchForm}>
+          <Text style={styles.label}>From</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Departure city"
+            placeholderTextColor={Colors.textLight}
+            value={from}
+            onChangeText={setFrom}
+          />
+
+          <Text style={styles.label}>To</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Destination city"
+            placeholderTextColor={Colors.textLight}
+            value={to}
+            onChangeText={setTo}
+          />
+
+          <Text style={styles.label}>Travel Date</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="DD/MM/YYYY"
+            placeholderTextColor={Colors.textLight}
+            value={date}
+            onChangeText={setDate}
+          />
+
+          <TouchableOpacity style={styles.searchButton} onPress={() => setSearched(true)}>
+            <Text style={styles.searchButtonText}>Search {service?.title}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          {showSearchForm && (
+            <TouchableOpacity style={styles.editSearchBar} onPress={() => setSearched(false)}>
+              <Text style={styles.editSearchText}>
+                {from || 'Anywhere'} → {to || 'Anywhere'} · Edit Search
+              </Text>
+            </TouchableOpacity>
+          )}
+          <FlatList
+            data={listings}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            renderItem={({ item }) => {
+              const isBooked = bookedIds.includes(item.id);
+              return (
+                <View style={styles.card}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.cardName}>{item.name}</Text>
+                    <Text style={styles.cardDetail}>{item.detail}</Text>
+                    <Text style={styles.cardPrice}>{item.price}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.bookButton, isBooked && styles.bookedButton]}
+                    disabled={isBooked}
+                    onPress={() => handleBook(item.id, item.name, item.price)}>
+                    <Text style={[styles.bookButtonText, isBooked && styles.bookedButtonText]}>
+                      {isBooked ? 'Booked ✓' : 'Book Now'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No listings available right now.</Text>
+            }
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 }
@@ -92,6 +142,49 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     color: Colors.white,
     fontSize: 13,
+  },
+  searchForm: {
+    padding: 20,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.textDark,
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: Colors.textDark,
+    marginBottom: 16,
+  },
+  searchButton: {
+    backgroundColor: Colors.accent,
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  searchButtonText: {
+    color: Colors.primaryDark,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  editSearchBar: {
+    backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  editSearchText: {
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '600',
   },
   list: {
     padding: 16,
