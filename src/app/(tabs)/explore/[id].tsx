@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { Colors } from '@/constants/colors';
-import { services, dummyListings } from '@/data/services';
+import { dummyListings, services } from '@/data/services';
 import { addBooking } from '@/utils/bookingStore';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ServiceListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,6 +17,14 @@ export default function ServiceListingScreen() {
   const [date, setDate] = useState('');
 
   const showSearchForm = id === 'flights' || id === 'buses' || id === 'trains';
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/explore');
+    }
+  };
 
   const handleBook = (listingId: string, name: string, price: string) => {
     addBooking({
@@ -35,7 +43,7 @@ export default function ServiceListingScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={handleBack}>
           <Text style={styles.backArrow}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{service?.title ?? 'Listings'}</Text>

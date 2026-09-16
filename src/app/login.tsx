@@ -33,8 +33,15 @@ export default function LoginScreen() {
 
     if (hasError) return;
 
-    // Backend not connected yet — placeholder success
     Alert.alert('Login', 'Login successful! (Demo — backend not connected yet)');
+  };
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
   };
 
   return (
@@ -88,7 +95,7 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
+          <TouchableOpacity onPress={handleBack} style={styles.backLink}>
             <Text style={styles.backText}>← Back</Text>
           </TouchableOpacity>
         </View>

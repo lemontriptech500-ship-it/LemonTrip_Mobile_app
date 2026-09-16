@@ -41,8 +41,15 @@ export default function SignupScreen() {
 
     if (hasError) return;
 
-    // Backend not connected yet — placeholder success
     Alert.alert('Account Created', 'Sign up successful! (Demo — backend not connected yet)');
+  };
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
   };
 
   return (
@@ -110,7 +117,7 @@ export default function SignupScreen() {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
+            <TouchableOpacity onPress={handleBack} style={styles.backLink}>
               <Text style={styles.backText}>← Back</Text>
             </TouchableOpacity>
           </View>
