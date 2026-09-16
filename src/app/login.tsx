@@ -1,12 +1,41 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateAndLogin = () => {
+    let hasError = false;
+    setEmailError('');
+    setPasswordError('');
+
+    if (!email.trim()) {
+      setEmailError('Email or phone is required');
+      hasError = true;
+    } else if (email.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    }
+
+    if (!password.trim()) {
+      setPasswordError('Password is required');
+      hasError = true;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    // Backend not connected yet — placeholder success
+    Alert.alert('Login', 'Login successful! (Demo — backend not connected yet)');
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -23,25 +52,33 @@ export default function LoginScreen() {
 
           <Text style={styles.label}>Email or Phone</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, emailError ? styles.inputError : null]}
             placeholder="Enter your email or phone"
             placeholderTextColor={Colors.textLight}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+              if (emailError) setEmailError('');
+            }}
             autoCapitalize="none"
           />
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
           <Text style={styles.label}>Password</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, passwordError ? styles.inputError : null]}
             placeholder="Enter your password"
             placeholderTextColor={Colors.textLight}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (passwordError) setPasswordError('');
+            }}
             secureTextEntry
           />
+          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={validateAndLogin}>
             <Text style={styles.loginButtonText}>Login</Text>
           </TouchableOpacity>
 
@@ -106,14 +143,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 15,
     color: Colors.textDark,
-    marginBottom: 18,
+    marginBottom: 6,
+  },
+  inputError: {
+    borderColor: Colors.error,
+  },
+  errorText: {
+    color: Colors.error,
+    fontSize: 12,
+    marginBottom: 12,
   },
   loginButton: {
     backgroundColor: Colors.accent,
     borderRadius: 10,
     paddingVertical: 15,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 12,
   },
   loginButtonText: {
     color: Colors.primaryDark,
