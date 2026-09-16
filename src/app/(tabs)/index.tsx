@@ -83,14 +83,17 @@ export default function HomeScreen() {
 
         <View style={styles.packagesSection}>
           {travelPackages.map((pkg) => (
-            <View key={pkg.id} style={styles.packageCard}>
+            <TouchableOpacity
+              key={pkg.id}
+              style={styles.packageCard}
+              onPress={() => router.push(`/packages/${pkg.id}`)}>
               <Image source={{ uri: pkg.image }} style={styles.packageImage} />
               <View style={styles.packageInfo}>
                 <Text style={styles.packageDuration}>{pkg.duration}</Text>
                 <Text style={styles.packageTitle}>{pkg.title}</Text>
                 <Text style={styles.packagePrice}>From {pkg.price}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
