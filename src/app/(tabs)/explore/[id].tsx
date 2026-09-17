@@ -1,16 +1,16 @@
 import { Colors } from '@/constants/colors';
 import { dummyListings, services } from '@/data/services';
-import { addBooking } from '@/utils/bookingStore';
+import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ServiceListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const service = services.find((s) => s.id === id);
   const listings = dummyListings[id ?? ''] ?? [];
-  const [bookedIds, setBookedIds] = useState<string[]>([]);
+  useCart(); // subscribe to re-render
   const [searched, setSearched] = useState(false);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -26,16 +26,13 @@ export default function ServiceListingScreen() {
     }
   };
 
-  const handleBook = (listingId: string, name: string, price: string) => {
-    addBooking({
-      id: `${id}-${listingId}-${Date.now()}`,
+  const handleAddToCart = (listingId: string, name: string, price: string) => {
+    addToCart({
+      id: `${id}-${listingId}`,
       serviceName: service?.title ?? '',
       itemName: name,
       price,
-      bookedAt: new Date().toLocaleDateString(),
     });
-    setBookedIds((prev) => [...prev, listingId]);
-    Alert.alert('Booked!', `${name} has been added to your bookings.`);
   };
 
   return (
@@ -97,7 +94,7 @@ export default function ServiceListingScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             renderItem={({ item }) => {
-              const isBooked = bookedIds.includes(item.id);
+              const inCart = isInCart(`${id}-${item.id}`);
               return (
                 <View style={styles.card}>
                   <View style={{ flex: 1 }}>
@@ -106,11 +103,11 @@ export default function ServiceListingScreen() {
                     <Text style={styles.cardPrice}>{item.price}</Text>
                   </View>
                   <TouchableOpacity
-                    style={[styles.bookButton, isBooked && styles.bookedButton]}
-                    disabled={isBooked}
-                    onPress={() => handleBook(item.id, item.name, item.price)}>
-                    <Text style={[styles.bookButtonText, isBooked && styles.bookedButtonText]}>
-                      {isBooked ? 'Booked ✓' : 'Book Now'}
+                    style={[styles.bookButton, inCart && styles.addedButton]}
+                    disabled={inCart}
+                    onPress={() => handleAddToCart(item.id, item.name, item.price)}>
+                    <Text style={[styles.bookButtonText, inCart && styles.addedButtonText]}>
+                      {inCart ? 'Added ✓' : 'Add to Cart'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -228,7 +225,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  bookedButton: {
+  addedButton: {
     backgroundColor: Colors.success,
   },
   bookButtonText: {
@@ -236,7 +233,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-  bookedButtonText: {
+  addedButtonText: {
     color: Colors.white,
   },
   emptyText: {
