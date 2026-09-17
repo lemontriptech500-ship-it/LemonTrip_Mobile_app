@@ -1,13 +1,15 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { services } from '@/data/services';
+import { router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExploreScreen() {
   const handlePress = (serviceId: string) => {
     if (serviceId === 'visa') {
       router.push('/(tabs)/explore/visa');
+    } else if (serviceId === 'hotels') {
+      router.push('/(tabs)/explore/hotels');
     } else {
       router.push(`/(tabs)/explore/${serviceId}`);
     }
