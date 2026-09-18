@@ -3,6 +3,8 @@ export interface TravelPackage {
   title: string;
   image: string;
   duration: string;
+  rating: string;
+  badge: string;
   price: string;
   description: string;
   highlights: string[];
@@ -11,29 +13,35 @@ export interface TravelPackage {
 export const travelPackages: TravelPackage[] = [
   {
     id: 'pkg-1',
-    title: 'Swiss Alps Explorer',
-    image: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=1200&q=85',
-    duration: '7 Days, 6 Nights',
-    price: '₹1,29,900',
-    description: 'Experience the breathtaking beauty of the Swiss Alps with scenic train rides and cozy stays.',
-    highlights: ['Scenic Train Rides', 'Mountain Tours', 'Breakfast Included'],
+    title: 'Dubai Luxury Escape',
+    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=85',
+    duration: '5 Nights / 6 Days',
+    rating: '★ 4.9',
+    badge: 'BEST SELLER',
+    price: '₹24,999',
+    description: 'Experience the glitz and glamour of Dubai with luxury stays, desert safaris, and iconic skyline views.',
+    highlights: ['Desert Safari', 'Burj Khalifa Visit', 'Luxury Hotel Stay'],
   },
   {
     id: 'pkg-2',
-    title: 'Tropical Maldives',
-    image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1200&q=85',
-    duration: '5 Days, 4 Nights',
-    price: '₹89,900',
-    description: 'Relax in overwater villas and enjoy the crystal-clear waters of the Indian Ocean.',
-    highlights: ['Overwater Villa', 'Snorkeling', 'All-Inclusive'],
+    title: 'Bali Signature Journey',
+    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=85',
+    duration: '6 Nights / 7 Days',
+    rating: '★ 4.8',
+    badge: 'POPULAR',
+    price: '₹32,999',
+    description: 'Explore the tropical paradise of Bali with its stunning beaches, ancient temples, and vibrant culture.',
+    highlights: ['Temple Tours', 'Beach Resorts', 'Cultural Experiences'],
   },
   {
     id: 'pkg-3',
-    title: 'Cultural Japan',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=85',
-    duration: '10 Days, 9 Nights',
-    price: '₹1,89,900',
-    description: 'Discover the perfect blend of ancient traditions and modern technology in Japan.',
-    highlights: ['Tokyo City Tour', 'Kyoto Temples', 'Bullet Train Pass'],
+    title: 'Kashmir Scenic Retreat',
+    image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=85',
+    duration: '5 Nights / 6 Days',
+    rating: '★ 4.9',
+    badge: 'LUXURY',
+    price: '₹15,999',
+    description: 'Discover the breathtaking beauty of Kashmir with houseboats, snow-capped mountains, and lush gardens.',
+    highlights: ['Houseboat Stay', 'Shikara Ride', 'Mountain Views'],
   },
 ];
