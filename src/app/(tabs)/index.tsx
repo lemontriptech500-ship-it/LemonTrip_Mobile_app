@@ -7,10 +7,11 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const features = [
-  { title: 'Best Price', subtitle: 'Guaranteed deals on every booking' },
+  { title: 'Handpicked Hotels', subtitle: 'Quality stays across the globe' },
+  { title: 'Best Price Guarantee', subtitle: 'Great deals on every booking' },
+  { title: 'Exclusive Packages', subtitle: 'Curated experiences for you' },
   { title: 'Easy Bookings', subtitle: 'Book in minutes with ease' },
   { title: '24/7 Support', subtitle: 'We are here for you always' },
-  { title: 'Exclusive Packages', subtitle: 'Curated experiences just for you' },
 ];
 
 export default function HomeScreen() {
@@ -20,13 +21,14 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.logoText}>LemonTrip</Text>
+          <Text style={styles.logoText}>LEMON TRIP</Text>
+          <Text style={styles.logoTag}>Travel • Tourism • Technology</Text>
         </View>
 
         <View style={styles.hero}>
-          <Text style={styles.heroTitle}>Travel Smarter.{'\n'}Travel Better.</Text>
+          <Text style={styles.heroTitle}>Travel Beyond{'\n'}Expectations.</Text>
           <Text style={styles.heroSubtitle}>
-            Book flights, hotels, buses, trains and packages — all in one place.
+            Discover the world with reliable travel solutions, curated experiences and technology-driven service.
           </Text>
         </View>
 
@@ -78,7 +80,7 @@ export default function HomeScreen() {
         </ScrollView>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Popular Holiday Packages</Text>
+          <Text style={styles.sectionTitle}>Featured Experiences</Text>
         </View>
 
         <View style={styles.packagesSection}>
@@ -87,10 +89,18 @@ export default function HomeScreen() {
               key={pkg.id}
               style={styles.packageCard}
               onPress={() => router.push(`/packages/${pkg.id}`)}>
-              <Image source={{ uri: pkg.image }} style={styles.packageImage} />
+              <View>
+                <Image source={{ uri: pkg.image }} style={styles.packageImage} />
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{pkg.badge}</Text>
+                </View>
+              </View>
               <View style={styles.packageInfo}>
-                <Text style={styles.packageDuration}>{pkg.duration}</Text>
                 <Text style={styles.packageTitle}>{pkg.title}</Text>
+                <View style={styles.metaRow}>
+                  <Text style={styles.packageDuration}>{pkg.duration}</Text>
+                  <Text style={styles.packageRating}>{pkg.rating}</Text>
+                </View>
                 <Text style={styles.packagePrice}>From {pkg.price}</Text>
               </View>
             </TouchableOpacity>
@@ -112,171 +122,41 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  logoText: {
-    color: Colors.accent,
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  hero: {
-    backgroundColor: Colors.primaryDark,
-    padding: 24,
-  },
-  heroTitle: {
-    color: Colors.accent,
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  heroSubtitle: {
-    color: Colors.white,
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  featuresSection: {
-    padding: 16,
-    gap: 12,
-  },
-  featureCard: {
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 16,
-  },
-  featureTitle: {
-    color: Colors.textDark,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  featureSubtitle: {
-    color: Colors.textLight,
-    fontSize: 13,
-  },
-  offersButton: {
-    marginHorizontal: 16,
-    marginBottom: 20,
-    backgroundColor: Colors.accent,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  offersButtonText: {
-    color: Colors.primaryDark,
-    fontSize: 15,
-    fontWeight: 'bold',
-  },
-  sectionHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 19,
-    fontWeight: 'bold',
-    color: Colors.textDark,
-  },
-  destinationsRow: {
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  destinationCard: {
-    width: 160,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  destinationImage: {
-    width: '100%',
-    height: 110,
-  },
-  heartButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  heartIcon: {
-    fontSize: 15,
-  },
-  destinationInfo: {
-    padding: 10,
-  },
-  destinationName: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: Colors.textDark,
-    marginBottom: 2,
-  },
-  destinationPrice: {
-    fontSize: 12,
-    color: Colors.textLight,
-  },
-  packagesSection: {
-    paddingHorizontal: 16,
-    gap: 14,
-  },
-  packageCard: {
-    borderRadius: 14,
-    overflow: 'hidden',
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  packageImage: {
-    width: '100%',
-    height: 160,
-  },
-  packageInfo: {
-    padding: 14,
-  },
-  packageDuration: {
-    fontSize: 12,
-    color: Colors.textLight,
-    marginBottom: 4,
-  },
-  packageTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: Colors.textDark,
-    marginBottom: 4,
-  },
-  packagePrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: Colors.primary,
-  },
-  blogButton: {
-    marginHorizontal: 16,
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  blogButtonText: {
-    color: Colors.primary,
-    fontSize: 15,
-    fontWeight: 'bold',
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1 },
+  header: { backgroundColor: Colors.primary, paddingVertical: 16, paddingHorizontal: 20 },
+  logoText: { color: Colors.accent, fontSize: 22, fontWeight: 'bold', letterSpacing: 1 },
+  logoTag: { color: Colors.white, fontSize: 11, marginTop: 2 },
+  hero: { backgroundColor: Colors.primaryDark, padding: 24 },
+  heroTitle: { color: Colors.accent, fontSize: 28, fontWeight: 'bold', marginBottom: 12 },
+  heroSubtitle: { color: Colors.white, fontSize: 15, lineHeight: 22 },
+  featuresSection: { padding: 16, gap: 12 },
+  featureCard: { backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, padding: 16 },
+  featureTitle: { color: Colors.textDark, fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
+  featureSubtitle: { color: Colors.textLight, fontSize: 13 },
+  offersButton: { marginHorizontal: 16, marginBottom: 20, backgroundColor: Colors.accent, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  offersButtonText: { color: Colors.primaryDark, fontSize: 15, fontWeight: 'bold' },
+  sectionHeader: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12 },
+  sectionTitle: { fontSize: 19, fontWeight: 'bold', color: Colors.textDark },
+  destinationsRow: { paddingHorizontal: 16, gap: 12 },
+  destinationCard: { width: 160, borderRadius: 12, overflow: 'hidden', backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
+  destinationImage: { width: '100%', height: 110 },
+  heartButton: { position: 'absolute', top: 8, right: 8, backgroundColor: Colors.white, borderRadius: 16, width: 30, height: 30, justifyContent: 'center', alignItems: 'center' },
+  heartIcon: { fontSize: 15 },
+  destinationInfo: { padding: 10 },
+  destinationName: { fontSize: 15, fontWeight: 'bold', color: Colors.textDark, marginBottom: 2 },
+  destinationPrice: { fontSize: 12, color: Colors.textLight },
+  packagesSection: { paddingHorizontal: 16, gap: 14 },
+  packageCard: { borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
+  packageImage: { width: '100%', height: 160 },
+  badge: { position: 'absolute', top: 14, left: 14, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
+  badgeText: { fontSize: 10, fontWeight: 'bold', color: Colors.primaryDark },
+  packageInfo: { padding: 14 },
+  packageTitle: { fontSize: 17, fontWeight: 'bold', color: Colors.textDark, marginBottom: 6 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  packageDuration: { fontSize: 12, color: Colors.textLight },
+  packageRating: { fontSize: 12, color: Colors.textLight },
+  packagePrice: { fontSize: 16, fontWeight: 'bold', color: Colors.primary },
+  blogButton: { marginHorizontal: 16, backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.primary, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
+  blogButtonText: { color: Colors.primary, fontSize: 15, fontWeight: 'bold' },
 });
