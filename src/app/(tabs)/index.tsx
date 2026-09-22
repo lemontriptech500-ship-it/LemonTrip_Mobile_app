@@ -79,6 +79,34 @@ export default function HomeScreen() {
           })}
         </ScrollView>
 
+        <View style={styles.whySection}>
+          <Text style={styles.whyEyebrow}>WHY LEMON TRIP</Text>
+          <Text style={styles.whyTitle}>Your Journey.{'\n'}Our Responsibility.</Text>
+          <View style={styles.whyList}>
+            <View style={styles.whyItem}>
+              <Text style={styles.whyIcon}>✓</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.whyItemTitle}>Professional Travel Assistance</Text>
+                <Text style={styles.whyItemSubtitle}>Support from planning to the completion of your journey.</Text>
+              </View>
+            </View>
+            <View style={styles.whyItem}>
+              <Text style={styles.whyIcon}>⚡</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.whyItemTitle}>Technology-Driven Experience</Text>
+                <Text style={styles.whyItemSubtitle}>A modern platform built for speed, clarity and convenience.</Text>
+              </View>
+            </View>
+            <View style={styles.whyItem}>
+              <Text style={styles.whyIcon}>🤝</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.whyItemTitle}>Customer-First Service</Text>
+                <Text style={styles.whyItemSubtitle}>Transparent communication and long-term relationships.</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Featured Experiences</Text>
         </View>
@@ -146,6 +174,14 @@ const styles = StyleSheet.create({
   destinationInfo: { padding: 10 },
   destinationName: { fontSize: 15, fontWeight: 'bold', color: Colors.textDark, marginBottom: 2 },
   destinationPrice: { fontSize: 12, color: Colors.textLight },
+  whySection: { padding: 16, backgroundColor: Colors.accentSoft, marginHorizontal: 16, borderRadius: 16, marginTop: 20, marginBottom: 8 },
+  whyEyebrow: { fontSize: 11, fontWeight: 'bold', color: Colors.primary, letterSpacing: 1, marginBottom: 8 },
+  whyTitle: { fontSize: 22, fontWeight: 'bold', color: Colors.textDark, marginBottom: 16 },
+  whyList: { gap: 14 },
+  whyItem: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  whyIcon: { fontSize: 20, width: 28 },
+  whyItemTitle: { fontSize: 14, fontWeight: 'bold', color: Colors.textDark, marginBottom: 2 },
+  whyItemSubtitle: { fontSize: 12, color: Colors.textLight, lineHeight: 16 },
   packagesSection: { paddingHorizontal: 16, gap: 14 },
   packageCard: { borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
   packageImage: { width: '100%', height: 160 },
