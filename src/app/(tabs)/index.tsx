@@ -3,7 +3,7 @@ import { destinations } from '@/data/destinations';
 import { travelPackages } from '@/data/packages';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router } from 'expo-router';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const features = [
@@ -25,12 +25,17 @@ export default function HomeScreen() {
           <Text style={styles.logoTag}>Travel • Tourism • Technology</Text>
         </View>
 
-        <View style={styles.hero}>
-          <Text style={styles.heroTitle}>Travel Beyond{'\n'}Expectations.</Text>
-          <Text style={styles.heroSubtitle}>
-            Discover the world with reliable travel solutions, curated experiences and technology-driven service.
-          </Text>
-        </View>
+        <ImageBackground
+          source={{ uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80' }}
+          style={styles.hero}
+          imageStyle={{ opacity: 0.85 }}>
+          <View style={styles.heroOverlay}>
+            <Text style={styles.heroTitle}>Travel Beyond{'\n'}Expectations.</Text>
+            <Text style={styles.heroSubtitle}>
+              Discover the world with reliable travel solutions, curated experiences and technology-driven service.
+            </Text>
+          </View>
+        </ImageBackground>
 
         <View style={styles.featuresSection}>
           {features.map((item, index) => (
@@ -155,7 +160,8 @@ const styles = StyleSheet.create({
   header: { backgroundColor: Colors.primary, paddingVertical: 16, paddingHorizontal: 20 },
   logoText: { color: Colors.accent, fontSize: 22, fontWeight: 'bold', letterSpacing: 1 },
   logoTag: { color: Colors.white, fontSize: 11, marginTop: 2 },
-  hero: { backgroundColor: Colors.primaryDark, padding: 24 },
+  hero: { minHeight: 260, justifyContent: 'flex-end' },
+  heroOverlay: { backgroundColor: 'rgba(6, 59, 36, 0.75)', padding: 24 },
   heroTitle: { color: Colors.accent, fontSize: 28, fontWeight: 'bold', marginBottom: 12 },
   heroSubtitle: { color: Colors.white, fontSize: 15, lineHeight: 22 },
   featuresSection: { padding: 16, gap: 12 },
