@@ -1,12 +1,43 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(false);
+  const [language, setLanguage] = useState('English');
+  const [currency, setCurrency] = useState('INR (₹)');
+
+  const handleLanguageChange = () => {
+    setLanguage((prev) => (prev === 'English' ? 'Hindi' : 'English'));
+  };
+
+  const handleCurrencyChange = () => {
+    setCurrency((prev) => (prev === 'INR (₹)' ? 'USD ($)' : 'INR (₹)'));
+  };
+
+  const handlePrivacyPolicy = () => {
+    Alert.alert('Privacy Policy', 'LemonTrip respects your privacy. Full policy coming soon.');
+  };
+
+  const handleTerms = () => {
+    Alert.alert('Terms of Service', 'By using LemonTrip, you agree to our terms. Full terms coming soon.');
+  };
+
+  const handleLogout = () => {
+    Alert.alert('Log Out', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Log Out',
+        style: 'destructive',
+        onPress: () => {
+          router.replace('/(tabs)/profile');
+        },
+      },
+    ]);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -48,29 +79,29 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Preferences</Text>
 
-        <TouchableOpacity style={styles.linkRow}>
+        <TouchableOpacity style={styles.linkRow} onPress={handleLanguageChange}>
           <Text style={styles.rowLabel}>Language</Text>
-          <Text style={styles.linkValue}>English</Text>
+          <Text style={styles.linkValue}>{language}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkRow}>
+        <TouchableOpacity style={styles.linkRow} onPress={handleCurrencyChange}>
           <Text style={styles.rowLabel}>Currency</Text>
-          <Text style={styles.linkValue}>INR (₹)</Text>
+          <Text style={styles.linkValue}>{currency}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
 
-        <TouchableOpacity style={styles.linkRow}>
+        <TouchableOpacity style={styles.linkRow} onPress={handlePrivacyPolicy}>
           <Text style={styles.rowLabel}>Privacy Policy</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkRow}>
+        <TouchableOpacity style={styles.linkRow} onPress={handleTerms}>
           <Text style={styles.rowLabel}>Terms of Service</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>

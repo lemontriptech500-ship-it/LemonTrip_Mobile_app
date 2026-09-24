@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors';
+import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
@@ -33,7 +34,8 @@ export default function LoginScreen() {
 
     if (hasError) return;
 
-    Alert.alert('Login', 'Login successful! (Demo — backend not connected yet)');
+    login({ name: email.split('@')[0] || 'User', email: email.trim() });
+    router.replace('/(tabs)/profile');
   };
 
   const handleBack = () => {

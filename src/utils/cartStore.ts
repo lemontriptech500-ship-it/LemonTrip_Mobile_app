@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface CartItem {
   id: string;
@@ -15,7 +15,9 @@ function notify() {
 }
 
 export function addToCart(item: CartItem) {
+  console.log('addToCart called with:', item);
   cart = [item, ...cart];
+  console.log('Cart now has', cart.length, 'items:', cart);
   notify();
 }
 

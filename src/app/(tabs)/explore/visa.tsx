@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const visaTypes = [
   { name: 'Tourist Visa', countries: 'UAE, Thailand, Singapore', processing: '3-5 days' },
@@ -18,6 +19,12 @@ const documentChecklist = [
 ];
 
 export default function VisaScreen() {
+  const [applied, setApplied] = useState(false);
+
+  const handleApply = () => {
+    setApplied(true);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
@@ -55,14 +62,30 @@ export default function VisaScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Application Tracking</Text>
           <View style={styles.trackingCard}>
-            <Text style={styles.trackingEmpty}>
-              No active visa applications. Start a new application to track its progress here.
-            </Text>
+            {applied ? (
+              <>
+                <Text style={[styles.trackingEmpty, { color: Colors.primary, fontWeight: 'bold', marginBottom: 6 }]}>
+                  Application Submitted ✓
+                </Text>
+                <Text style={styles.trackingEmpty}>
+                  Status: Under Review · We'll notify you once processing begins.
+                </Text>
+              </>
+            ) : (
+              <Text style={styles.trackingEmpty}>
+                No active visa applications. Start a new application to track its progress here.
+              </Text>
+            )}
           </View>
         </View>
 
-        <TouchableOpacity style={styles.applyButton}>
-          <Text style={styles.applyButtonText}>Start Visa Application</Text>
+        <TouchableOpacity
+          style={[styles.applyButton, applied && { backgroundColor: Colors.success }]}
+          disabled={applied}
+          onPress={handleApply}>
+          <Text style={styles.applyButtonText}>
+            {applied ? 'Application Submitted ✓' : 'Start Visa Application'}
+          </Text>
         </TouchableOpacity>
 
         <View style={{ height: 24 }} />

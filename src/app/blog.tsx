@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { blogPosts } from '@/data/blog';
+import { router } from 'expo-router';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function BlogScreen() {
   return (
@@ -17,7 +17,7 @@ export default function BlogScreen() {
 
       <ScrollView contentContainerStyle={styles.list}>
         {blogPosts.map((post) => (
-          <View key={post.id} style={styles.card}>
+          <TouchableOpacity key={post.id} style={styles.card} onPress={() => router.push(`/blog/${post.id}`)}>
             <Image source={{ uri: post.image }} style={styles.cardImage} />
             <View style={styles.cardBody}>
               <View style={styles.metaRow}>
@@ -27,7 +27,7 @@ export default function BlogScreen() {
               <Text style={styles.title}>{post.title}</Text>
               <Text style={styles.excerpt}>{post.excerpt}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </SafeAreaView>

@@ -10,7 +10,7 @@ export default function ServiceListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const service = services.find((s) => s.id === id);
   const listings = dummyListings[id ?? ''] ?? [];
-  useCart(); // subscribe to re-render
+  useCart();
   const [searched, setSearched] = useState(false);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -27,6 +27,7 @@ export default function ServiceListingScreen() {
   };
 
   const handleAddToCart = (listingId: string, name: string, price: string) => {
+    console.log('Add to Cart clicked!', listingId, name);
     addToCart({
       id: `${id}-${listingId}`,
       serviceName: service?.title ?? '',
