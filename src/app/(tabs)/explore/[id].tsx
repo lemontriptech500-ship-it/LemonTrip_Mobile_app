@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { dummyListings, services } from '@/data/services';
 import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
@@ -40,17 +42,11 @@ export default function ServiceListingScreen() {
     <SafeAreaView style={styles.safeArea}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Text style={styles.backArrow}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{service?.title ?? 'Listings'}</Text>
-        <Text style={styles.headerSubtitle}>{service?.subtitle}</Text>
-      </View>
+      <ScreenHeader title={service?.title ?? 'Listings'} subtitle={service?.subtitle} eyebrow="LEMON TRIP / SEARCH" onBack={handleBack} />
 
       {showSearchForm && !searched ? (
         <View style={styles.searchForm}>
-          <Text style={styles.label}>From</Text>
+          <Text style={styles.label}>FROM</Text>
           <TextInput
             style={styles.input}
             placeholder="Departure city"
@@ -59,7 +55,7 @@ export default function ServiceListingScreen() {
             onChangeText={setFrom}
           />
 
-          <Text style={styles.label}>To</Text>
+          <Text style={styles.label}>TO</Text>
           <TextInput
             style={styles.input}
             placeholder="Destination city"
@@ -68,7 +64,7 @@ export default function ServiceListingScreen() {
             onChangeText={setTo}
           />
 
-          <Text style={styles.label}>Travel Date</Text>
+          <Text style={styles.label}>TRAVEL DATE</Text>
           <TextInput
             style={styles.input}
             placeholder="DD/MM/YYYY"
@@ -85,6 +81,7 @@ export default function ServiceListingScreen() {
         <>
           {showSearchForm && (
             <TouchableOpacity style={styles.editSearchBar} onPress={() => setSearched(false)}>
+              <Ionicons name="search-outline" size={17} color={Colors.primary} />
               <Text style={styles.editSearchText}>
                 {from || 'Anywhere'} → {to || 'Anywhere'} · Edit Search
               </Text>
@@ -108,7 +105,7 @@ export default function ServiceListingScreen() {
                     disabled={inCart}
                     onPress={() => handleAddToCart(item.id, item.name, item.price)}>
                     <Text style={[styles.bookButtonText, inCart && styles.addedButtonText]}>
-                      {inCart ? 'Added ✓' : 'Add to Cart'}
+                      {inCart ? 'Added' : 'Add to cart'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -129,100 +126,100 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  backArrow: {
-    color: Colors.accent,
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  headerTitle: {
-    color: Colors.accent,
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    color: Colors.white,
-    fontSize: 13,
-  },
   searchForm: {
-    padding: 20,
+    marginHorizontal: 22,
+    marginTop: 18,
+    padding: 17,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontFamily: 'Manrope',
+    fontSize: 10,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
+    borderRadius: 2,
+    backgroundColor: Colors.background,
+    paddingHorizontal: 13,
+    paddingVertical: 13,
+    fontFamily: 'Manrope',
+    fontSize: 13,
     color: Colors.textDark,
     marginBottom: 16,
   },
   searchButton: {
     backgroundColor: Colors.accent,
-    borderRadius: 10,
+    borderRadius: 2,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 8,
   },
   searchButtonText: {
     color: Colors.primaryDark,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
   },
   editSearchBar: {
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    minHeight: 48,
+    marginHorizontal: 22,
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
   editSearchText: {
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontSize: 11,
     color: Colors.primary,
     fontWeight: '600',
   },
   list: {
-    padding: 16,
-    gap: 10,
+    paddingHorizontal: 22,
+    paddingTop: 16,
+    paddingBottom: 26,
+    gap: 11,
   },
   card: {
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    paddingVertical: 15,
   },
   cardName: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 14,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 4,
   },
   cardDetail: {
-    fontSize: 12,
+    fontFamily: 'Manrope',
+    fontSize: 10,
     color: Colors.textLight,
     marginBottom: 6,
   },
   cardPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
     color: Colors.primary,
     marginBottom: 12,
   },
   bookButton: {
     backgroundColor: Colors.accent,
-    borderRadius: 8,
+    borderRadius: 2,
     paddingVertical: 10,
     alignItems: 'center',
   },
@@ -231,8 +228,9 @@ const styles = StyleSheet.create({
   },
   bookButtonText: {
     color: Colors.primaryDark,
-    fontWeight: 'bold',
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontWeight: '800',
+    fontSize: 11,
   },
   addedButtonText: {
     color: Colors.white,

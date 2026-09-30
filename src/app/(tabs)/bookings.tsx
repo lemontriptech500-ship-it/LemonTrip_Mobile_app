@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { useBookings } from '@/utils/bookingStore';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,13 +10,12 @@ export default function BookingsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Bookings</Text>
-      </View>
+      <ScreenHeader title="Your bookings" subtitle="Every detail of your journey, in one place." eyebrow="TRAVEL RECORD" />
 
       {bookings.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>No bookings yet</Text>
+          <View style={styles.emptyIcon}><Ionicons name="ticket-outline" size={26} color={Colors.primary} /></View>
+          <Text style={styles.emptyTitle}>Nothing booked yet</Text>
           <Text style={styles.emptySubtitle}>
             Your flight, hotel, and package bookings will appear here once you make one.
           </Text>
@@ -46,14 +47,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
+    paddingTop: 8,
+    paddingBottom: 18,
   },
   headerTitle: {
-    color: Colors.accent,
-    fontSize: 24,
-    fontWeight: 'bold',
+    color: Colors.textDark,
+    fontFamily: 'Manrope',
+    fontSize: 28,
+    fontWeight: '800',
   },
   emptyState: {
     flex: 1,
@@ -62,27 +64,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   emptyTitle: {
+    fontFamily: 'Manrope',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 8,
   },
   emptySubtitle: {
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontSize: 13,
     color: Colors.textLight,
     textAlign: 'center',
     lineHeight: 20,
   },
   list: {
-    padding: 16,
+    paddingHorizontal: 22,
+    paddingTop: 17,
+    paddingBottom: 30,
     gap: 12,
   },
   card: {
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 16,
+    padding: 17,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.accent,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -90,8 +95,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   serviceTag: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 10,
+    fontWeight: '800',
     color: Colors.primary,
     backgroundColor: Colors.background,
     paddingHorizontal: 8,
@@ -100,18 +106,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   dateText: {
-    fontSize: 12,
+    fontFamily: 'Manrope',
+    fontSize: 10,
     color: Colors.textLight,
   },
   itemName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 15,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 4,
   },
   price: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
     color: Colors.primary,
   },
+  emptyIcon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
 });

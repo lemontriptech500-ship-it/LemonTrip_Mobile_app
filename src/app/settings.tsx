@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
@@ -41,12 +43,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/profile'))}>
-          <Text style={styles.backArrow}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Settings</Text>
-      </View>
+      <ScreenHeader title="Preferences" subtitle="Make LemonTrip feel more like yours." eyebrow="ACCOUNT / SETTINGS" onBack={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/profile'))} />
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Notifications</Text>
@@ -115,27 +112,30 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
+    paddingTop: 8,
+    paddingBottom: 18,
   },
   backArrow: {
-    color: Colors.accent,
-    fontSize: 14,
+    color: Colors.primary,
+    fontFamily: 'Manrope',
+    fontSize: 13,
     marginBottom: 10,
   },
   headerTitle: {
-    color: Colors.accent,
-    fontSize: 22,
-    fontWeight: 'bold',
+    color: Colors.textDark,
+    fontFamily: 'Manrope',
+    fontSize: 27,
+    fontWeight: '800',
   },
   section: {
-    marginTop: 20,
-    paddingHorizontal: 16,
+    marginTop: 17,
+    paddingHorizontal: 22,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 10,
+    fontWeight: '800',
     color: Colors.textLight,
     marginBottom: 10,
     textTransform: 'uppercase',
@@ -144,19 +144,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 13,
+    marginBottom: 1,
   },
   rowLabel: {
-    fontSize: 15,
+    fontFamily: 'Manrope',
+    fontSize: 12,
     color: Colors.textDark,
     fontWeight: '600',
   },
   rowSubtitle: {
-    fontSize: 12,
+    fontFamily: 'Manrope',
+    fontSize: 10,
     color: Colors.textLight,
     marginTop: 2,
   },
@@ -165,28 +165,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    paddingVertical: 15,
   },
   linkValue: {
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontSize: 11,
     color: Colors.textLight,
   },
   logoutButton: {
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.error,
-    borderRadius: 10,
+    borderRadius: 2,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 8,
   },
   logoutText: {
     color: Colors.error,
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
   },
 });

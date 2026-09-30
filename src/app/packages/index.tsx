@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { travelPackages } from '@/data/packages';
 import { router } from 'expo-router';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -12,13 +14,7 @@ export default function PackagesListScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Text style={styles.backArrow}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Tours & Packages</Text>
-        <Text style={styles.headerSubtitle}>Curated holiday experiences</Text>
-      </View>
+      <ScreenHeader title="Tours & packages" subtitle="Considered itineraries for your next escape." eyebrow="CURATED JOURNEYS" onBack={handleBack} />
 
       <FlatList
         data={travelPackages}
@@ -27,14 +23,14 @@ export default function PackagesListScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card} onPress={() => router.push(`/packages/${item.id}`)}>
             <Image source={{ uri: item.image }} style={styles.image} />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{item.badge}</Text>
+              <View style={styles.badge}>
+            <Text style={styles.badgeText}>{item.badge}</Text>
             </View>
             <View style={styles.body}>
               <Text style={styles.title}>{item.title}</Text>
               <View style={styles.metaRow}>
                 <Text style={styles.meta}>{item.duration}</Text>
-                <Text style={styles.meta}>{item.rating}</Text>
+                <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.primary} /><Text style={styles.meta}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View>
               </View>
               <Text style={styles.price}>From {item.price}</Text>
             </View>
@@ -47,18 +43,19 @@ export default function PackagesListScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
-  header: { backgroundColor: Colors.primary, paddingVertical: 20, paddingHorizontal: 20 },
-  backArrow: { color: Colors.accent, fontSize: 14, marginBottom: 10 },
-  headerTitle: { color: Colors.accent, fontSize: 22, fontWeight: 'bold', marginBottom: 4 },
-  headerSubtitle: { color: Colors.white, fontSize: 13 },
-  list: { padding: 16, gap: 14 },
-  card: { borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
-  image: { width: '100%', height: 150 },
-  badge: { position: 'absolute', top: 12, left: 12, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
-  badgeText: { fontSize: 10, fontWeight: 'bold', color: Colors.primaryDark },
-  body: { padding: 14 },
-  title: { fontSize: 16, fontWeight: 'bold', color: Colors.textDark, marginBottom: 6 },
-  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  meta: { fontSize: 12, color: Colors.textLight },
-  price: { fontSize: 15, fontWeight: 'bold', color: Colors.primary },
+  header: { paddingHorizontal: 22, paddingTop: 8, paddingBottom: 18 },
+  backArrow: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, marginBottom: 10 },
+  headerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 27, fontWeight: '800', marginBottom: 4 },
+  headerSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  list: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 30, gap: 20 },
+  card: { overflow: 'hidden', backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border, paddingBottom: 14 },
+  image: { width: '100%', height: 190, backgroundColor: Colors.surfaceMuted },
+  badge: { position: 'absolute', top: 12, left: 12, backgroundColor: Colors.accent, paddingHorizontal: 9, paddingVertical: 5 },
+  badgeText: { fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', color: Colors.primaryDark },
+  body: { paddingTop: 12 },
+  title: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark, marginBottom: 7 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  meta: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  rating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  price: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primary },
 });

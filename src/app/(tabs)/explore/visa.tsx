@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -28,13 +30,7 @@ export default function VisaScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore'))}>
-            <Text style={styles.backArrow}>← Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Visa Services</Text>
-          <Text style={styles.headerSubtitle}>Global travel, simplified visas</Text>
-        </View>
+        <ScreenHeader title="Visa, made clearer" subtitle="Expert guidance for your next border crossing." eyebrow="LEMON TRIP / VISA" onBack={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore'))} />
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Visa Types</Text>
@@ -52,7 +48,7 @@ export default function VisaScreen() {
           <View style={styles.checklistCard}>
             {documentChecklist.map((doc, index) => (
               <View key={index} style={styles.checklistRow}>
-                <Text style={styles.checkmark}>✓</Text>
+                <Ionicons name="checkmark-circle-outline" size={17} color={Colors.secondary} style={styles.checkmark} />
                 <Text style={styles.checklistText}>{doc}</Text>
               </View>
             ))}
@@ -65,7 +61,7 @@ export default function VisaScreen() {
             {applied ? (
               <>
                 <Text style={[styles.trackingEmpty, { color: Colors.primary, fontWeight: 'bold', marginBottom: 6 }]}>
-                  Application Submitted ✓
+                  Application submitted
                 </Text>
                 <Text style={styles.trackingEmpty}>
                   Status: Under Review · We'll notify you once processing begins.
@@ -84,7 +80,7 @@ export default function VisaScreen() {
           disabled={applied}
           onPress={handleApply}>
           <Text style={styles.applyButtonText}>
-            {applied ? 'Application Submitted ✓' : 'Start Visa Application'}
+            {applied ? 'Application submitted' : 'Start visa application'}
           </Text>
         </TouchableOpacity>
 
@@ -99,60 +95,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  backArrow: {
-    color: Colors.accent,
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  headerTitle: {
-    color: Colors.accent,
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    color: Colors.white,
-    fontSize: 13,
-  },
   section: {
-    padding: 16,
+    paddingHorizontal: 22,
+    paddingTop: 21,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 16,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 12,
   },
   visaCard: {
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    paddingVertical: 13,
     marginBottom: 10,
   },
   visaName: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 4,
   },
   visaDetail: {
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontSize: 11,
     color: Colors.textLight,
     marginBottom: 2,
   },
   checklistCard: {
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 14,
+    padding: 15,
     gap: 10,
   },
   checklistRow: {
@@ -162,23 +138,21 @@ const styles = StyleSheet.create({
   checkmark: {
     color: Colors.success,
     fontWeight: 'bold',
-    marginRight: 8,
+    marginRight: 9,
   },
   checklistText: {
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontSize: 12,
     color: Colors.textDark,
     flex: 1,
   },
   trackingCard: {
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
+    backgroundColor: Colors.surfaceMuted,
+    padding: 17,
   },
   trackingEmpty: {
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontSize: 12,
     color: Colors.textLight,
     textAlign: 'center',
     lineHeight: 18,
@@ -186,13 +160,14 @@ const styles = StyleSheet.create({
   applyButton: {
     marginHorizontal: 16,
     backgroundColor: Colors.accent,
-    borderRadius: 12,
+    borderRadius: 2,
     paddingVertical: 15,
     alignItems: 'center',
   },
   applyButtonText: {
     color: Colors.primaryDark,
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
   },
 });

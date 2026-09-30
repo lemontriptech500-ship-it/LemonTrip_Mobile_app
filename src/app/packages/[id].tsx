@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { travelPackages } from '@/data/packages';
 import { addBooking } from '@/utils/bookingStore';
 import { useState } from 'react';
@@ -56,7 +57,7 @@ export default function PackageDetailScreen() {
         <View style={styles.content}>
           <View style={styles.metaRow}>
             <Text style={styles.duration}>{pkg.duration}</Text>
-            <Text style={styles.rating}>{pkg.rating}</Text>
+            <Text style={styles.rating}><Ionicons name="star" size={13} color={Colors.primary} /> {pkg.rating.replace(/[^0-9.]/g, '')}</Text>
           </View>
           <Text style={styles.title}>{pkg.title}</Text>
           <Text style={styles.price}>From {pkg.price}</Text>
@@ -67,7 +68,7 @@ export default function PackageDetailScreen() {
           <View style={styles.highlightsList}>
             {pkg.highlights.map((h, index) => (
               <View key={index} style={styles.highlightRow}>
-                <Text style={styles.checkmark}>✓</Text>
+                <Ionicons name="checkmark-circle" size={17} color={Colors.secondary} style={styles.checkmark} />
                 <Text style={styles.highlightText}>{h}</Text>
               </View>
             ))}
@@ -80,7 +81,7 @@ export default function PackageDetailScreen() {
           style={[styles.bookButton, booked && styles.bookedButton]}
           disabled={booked}
           onPress={handleBook}>
-          <Text style={styles.bookButtonText}>{booked ? 'Booked ✓' : 'Book This Package'}</Text>
+          <Text style={styles.bookButtonText}>{booked ? 'Booked' : 'Book this package'}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -91,25 +92,25 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   notFound: { textAlign: 'center', marginTop: 40, color: Colors.textLight },
   imageWrapper: { position: 'relative' },
-  image: { width: '100%', height: 260 },
-  backButton: { position: 'absolute', top: 16, left: 16, backgroundColor: Colors.white, borderRadius: 8, paddingVertical: 8, paddingHorizontal: 12 },
-  backButtonText: { color: Colors.primary, fontWeight: 'bold', fontSize: 13 },
-  badge: { position: 'absolute', top: 16, right: 16, backgroundColor: Colors.accent, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
-  badgeText: { fontSize: 11, fontWeight: 'bold', color: Colors.primaryDark },
-  content: { padding: 20 },
-  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  duration: { fontSize: 13, color: Colors.textLight },
-  rating: { fontSize: 13, color: Colors.textLight, fontWeight: 'bold' },
-  title: { fontSize: 24, fontWeight: 'bold', color: Colors.textDark, marginBottom: 6 },
-  price: { fontSize: 16, fontWeight: 'bold', color: Colors.primary, marginBottom: 16 },
-  description: { fontSize: 14, color: Colors.textLight, lineHeight: 20, marginBottom: 20 },
-  highlightsTitle: { fontSize: 16, fontWeight: 'bold', color: Colors.textDark, marginBottom: 10 },
+  image: { width: '100%', height: 310, backgroundColor: Colors.surfaceMuted },
+  backButton: { position: 'absolute', top: 16, left: 16, backgroundColor: Colors.white, paddingVertical: 10, paddingHorizontal: 13 },
+  backButtonText: { color: Colors.primary, fontFamily: 'Manrope', fontWeight: '800', fontSize: 12 },
+  badge: { position: 'absolute', top: 16, right: 16, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6 },
+  badgeText: { fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', color: Colors.primaryDark },
+  content: { paddingHorizontal: 22, paddingTop: 21, paddingBottom: 24 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
+  duration: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  rating: { flexDirection: 'row', alignItems: 'center', gap: 4, fontFamily: 'Manrope', fontSize: 11, color: Colors.textDark, fontWeight: '800' },
+  title: { fontFamily: 'Manrope', fontSize: 27, fontWeight: '800', color: Colors.textDark, marginBottom: 7 },
+  price: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.primary, marginBottom: 17 },
+  description: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight, lineHeight: 21, marginBottom: 23 },
+  highlightsTitle: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark, marginBottom: 12 },
   highlightsList: { gap: 8 },
   highlightRow: { flexDirection: 'row', alignItems: 'center' },
   checkmark: { color: Colors.success, fontWeight: 'bold', marginRight: 8 },
-  highlightText: { fontSize: 14, color: Colors.textDark },
-  footer: { padding: 16, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.white },
-  bookButton: { backgroundColor: Colors.accent, borderRadius: 10, paddingVertical: 15, alignItems: 'center' },
+  highlightText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textDark },
+  footer: { paddingHorizontal: 22, paddingVertical: 13, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.white },
+  bookButton: { backgroundColor: Colors.accent, paddingVertical: 15, alignItems: 'center' },
   bookedButton: { backgroundColor: Colors.success },
-  bookButtonText: { color: Colors.primaryDark, fontSize: 16, fontWeight: 'bold' },
+  bookButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 });

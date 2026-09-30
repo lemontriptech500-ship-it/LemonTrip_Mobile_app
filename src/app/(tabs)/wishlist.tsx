@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { useWishlist, toggleWishlist } from '@/utils/wishlistStore';
 
 export default function WishlistScreen() {
@@ -9,15 +11,11 @@ export default function WishlistScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backArrow}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Saved / Wishlist</Text>
-      </View>
+      <ScreenHeader title="Saved places" subtitle="Keep the places you want to come back to." eyebrow="YOUR SHORTLIST" onBack={() => router.back()} />
 
       {wishlist.length === 0 ? (
         <View style={styles.emptyState}>
+          <View style={styles.emptyIcon}><Ionicons name="heart-outline" size={26} color={Colors.primary} /></View>
           <Text style={styles.emptyTitle}>No saved destinations yet</Text>
           <Text style={styles.emptySubtitle}>
             Tap the heart icon on any destination to save it here.
@@ -52,19 +50,21 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
+    paddingTop: 8,
+    paddingBottom: 18,
   },
   backArrow: {
-    color: Colors.accent,
-    fontSize: 14,
+    color: Colors.primary,
+    fontFamily: 'Manrope',
+    fontSize: 13,
     marginBottom: 10,
   },
   headerTitle: {
-    color: Colors.accent,
-    fontSize: 22,
-    fontWeight: 'bold',
+    color: Colors.textDark,
+    fontFamily: 'Manrope',
+    fontSize: 27,
+    fontWeight: '800',
   },
   emptyState: {
     flex: 1,
@@ -73,46 +73,51 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 17,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 8,
   },
   emptySubtitle: {
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontSize: 13,
     color: Colors.textLight,
     textAlign: 'center',
     lineHeight: 20,
   },
   list: {
-    padding: 16,
+    paddingHorizontal: 22,
+    paddingTop: 17,
+    paddingBottom: 30,
     gap: 12,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
     overflow: 'hidden',
   },
   cardImage: {
-    width: 80,
-    height: 80,
+    width: 92,
+    height: 92,
   },
   cardInfo: {
     flex: 1,
     padding: 12,
   },
   cardName: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 4,
   },
   cardPrice: {
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontSize: 11,
     color: Colors.textLight,
   },
   removeButton: {
@@ -120,7 +125,9 @@ const styles = StyleSheet.create({
   },
   removeText: {
     color: Colors.error,
+    fontFamily: 'Manrope',
     fontSize: 13,
     fontWeight: '600',
   },
+  emptyIcon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
 });

@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Ionicons } from '@expo/vector-icons';
 import { hotels } from '@/data/hotels';
 import { addBooking } from '@/utils/bookingStore';
 import { useState } from 'react';
@@ -31,13 +33,7 @@ export default function HotelsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Text style={styles.backArrow}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hotels</Text>
-        <Text style={styles.headerSubtitle}>Handpicked stays across the globe</Text>
-      </View>
+      <ScreenHeader title="Stays worth the journey" subtitle="Handpicked places to feel at home." eyebrow="LEMON TRIP / STAYS" onBack={handleBack} />
 
       <ScrollView contentContainerStyle={styles.list}>
         {hotels.map((hotel) => {
@@ -48,7 +44,7 @@ export default function HotelsScreen() {
               <View style={styles.cardBody}>
                 <View style={styles.topRow}>
                   <Text style={styles.name}>{hotel.name}</Text>
-                  <Text style={styles.rating}>{hotel.rating}</Text>
+                  <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.primary} /><Text style={styles.ratingText}>{hotel.rating}</Text></View>
                 </View>
                 <Text style={styles.location}>{hotel.location}</Text>
                 <Text style={styles.description}>{hotel.description}</Text>
@@ -68,7 +64,7 @@ export default function HotelsScreen() {
                     disabled={isBooked}
                     onPress={() => handleBook(hotel.id, hotel.name, hotel.price)}>
                     <Text style={[styles.bookButtonText, isBooked && styles.bookedButtonText]}>
-                      {isBooked ? 'Booked ✓' : 'Book Now'}
+                      {isBooked ? 'Booked' : 'Book now'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -86,43 +82,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  backArrow: {
-    color: Colors.accent,
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  headerTitle: {
-    color: Colors.accent,
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    color: Colors.white,
-    fontSize: 13,
-  },
   list: {
-    padding: 16,
-    gap: 16,
+    paddingHorizontal: 22,
+    paddingTop: 16,
+    paddingBottom: 30,
+    gap: 20,
   },
   card: {
-    borderRadius: 14,
+    borderRadius: 3,
     overflow: 'hidden',
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
   image: {
     width: '100%',
-    height: 160,
+    height: 190,
   },
   cardBody: {
-    padding: 14,
+    paddingTop: 13,
+    paddingBottom: 16,
   },
   topRow: {
     flexDirection: 'row',
@@ -131,28 +110,31 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 15,
+    fontWeight: '800',
     color: Colors.textDark,
     flex: 1,
   },
   rating: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 10,
+    fontWeight: '800',
     color: Colors.primary,
     backgroundColor: Colors.background,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
-    overflow: 'hidden',
+    gap: 4,
   },
   location: {
-    fontSize: 12,
+    fontFamily: 'Manrope',
+    fontSize: 10,
     color: Colors.textLight,
     marginBottom: 8,
   },
   description: {
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontSize: 11,
     color: Colors.textLight,
     lineHeight: 18,
     marginBottom: 10,
@@ -164,13 +146,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   amenityTag: {
-    backgroundColor: Colors.background,
-    borderRadius: 6,
+    backgroundColor: Colors.surfaceMuted,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 5,
   },
   amenityText: {
-    fontSize: 11,
+    fontFamily: 'Manrope',
+    fontSize: 9,
     color: Colors.textDark,
   },
   bottomRow: {
@@ -179,13 +161,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   price: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 14,
+    fontWeight: '800',
     color: Colors.primary,
   },
   bookButton: {
     backgroundColor: Colors.accent,
-    borderRadius: 8,
+    borderRadius: 2,
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
@@ -194,10 +177,12 @@ const styles = StyleSheet.create({
   },
   bookButtonText: {
     color: Colors.primaryDark,
-    fontWeight: 'bold',
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontWeight: '800',
+    fontSize: 11,
   },
   bookedButtonText: {
     color: Colors.white,
   },
+  ratingText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
 });

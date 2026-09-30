@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -52,7 +53,11 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.logoText}>LemonTrip</Text>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={20} color={Colors.primaryDark} />
+          </TouchableOpacity>
+          <Text style={styles.eyebrow}>LEMON TRIP / ACCOUNT</Text>
+          <Text style={styles.logoText}>Welcome back.</Text>
         </View>
 
         <View style={styles.form}>
@@ -97,9 +102,6 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleBack} style={styles.backLink}>
-            <Text style={styles.backText}>← Back</Text>
-          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -115,42 +117,48 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 24,
-    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: 22,
   },
+  backButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', marginLeft: -10, marginBottom: 28 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', marginBottom: 9 },
   logoText: {
-    color: Colors.accent,
-    fontSize: 26,
-    fontWeight: 'bold',
+    color: Colors.textDark,
+    fontFamily: 'Manrope',
+    fontSize: 30,
+    fontWeight: '800',
   },
-  form: {
-    padding: 24,
-  },
+  form: { paddingHorizontal: 24, paddingTop: 7 },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 22,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontSize: 12,
     color: Colors.textLight,
     marginBottom: 28,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontFamily: 'Manrope',
+    fontSize: 11,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 10,
+    borderRadius: 2,
+    backgroundColor: Colors.surface,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 15,
+    fontFamily: 'Manrope',
+    fontSize: 13,
     color: Colors.textDark,
     marginBottom: 6,
   },
@@ -159,39 +167,35 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: Colors.error,
-    fontSize: 12,
+    fontFamily: 'Manrope',
+    fontSize: 11,
     marginBottom: 12,
   },
   loginButton: {
-    backgroundColor: Colors.accent,
-    borderRadius: 10,
+    backgroundColor: Colors.primary,
+    borderRadius: 2,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 12,
   },
   loginButtonText: {
-    color: Colors.primaryDark,
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: Colors.white,
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    fontWeight: '800',
   },
   signupLink: {
     marginTop: 20,
     alignItems: 'center',
   },
   signupText: {
-    fontSize: 14,
+    fontFamily: 'Manrope',
+    fontSize: 12,
     color: Colors.textLight,
   },
   signupTextBold: {
     color: Colors.primary,
-    fontWeight: 'bold',
-  },
-  backLink: {
-    marginTop: 24,
-    alignItems: 'center',
-  },
-  backText: {
-    fontSize: 14,
-    color: Colors.textLight,
+    fontFamily: 'Manrope',
+    fontWeight: '800',
   },
 });
