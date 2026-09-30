@@ -1,8 +1,9 @@
-import { Colors } from '@/constants/colors';
+﻿import { Colors } from '@/constants/colors';
 import { destinations } from '@/data/destinations';
 import { travelPackages } from '@/data/packages';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,15 +15,43 @@ const features = [
   { title: '24/7 Support', subtitle: 'We are here for you always' },
 ];
 
+const quickServices = [
+  { id: 'flights', label: 'Flights', icon: '✈️' },
+  { id: 'hotels', label: 'Hotels', icon: '🏨' },
+  { id: 'buses', label: 'Buses', icon: '🚌' },
+  { id: 'trains', label: 'Trains', icon: '🚆' },
+  { id: 'packages', label: 'Packages', icon: '🧳' },
+  { id: 'visa', label: 'Visa', icon: '🛂' },
+];
+
 export default function HomeScreen() {
   useWishlist();
+  const [activeService, setActiveService] = useState('flights');
+
+  const handleServicePress = (id: string) => {
+    setActiveService(id);
+    if (id === 'visa') {
+      router.push('/(tabs)/explore/visa');
+    } else if (id === 'hotels') {
+      router.push('/(tabs)/explore/hotels');
+    } else if (id === 'packages') {
+      router.push('/packages');
+    } else {
+      router.push(`/(tabs)/explore/${id}`);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.logoText}>LEMON TRIP</Text>
-          <Text style={styles.logoTag}>Travel • Tourism • Technology</Text>
+          <View style={styles.logoRow}>
+            <Text style={styles.logoEmoji}>🍋</Text>
+            <View>
+              <Text style={styles.logoText}>LemonTrip</Text>
+              <Text style={styles.logoTag}>Travel Smarter. Travel Better.</Text>
+            </View>
+          </View>
         </View>
 
         <ImageBackground
@@ -30,12 +59,29 @@ export default function HomeScreen() {
           style={styles.hero}
           imageStyle={{ opacity: 0.85 }}>
           <View style={styles.heroOverlay}>
-            <Text style={styles.heroTitle}>Travel Beyond{'\n'}Expectations.</Text>
+            <Text style={styles.heroTitle}>Book your{'\n'}journey.</Text>
             <Text style={styles.heroSubtitle}>
-              Discover the world with reliable travel solutions, curated experiences and technology-driven service.
+              Flights, hotels, buses, trains, holiday packages and visas — all in one place.
             </Text>
           </View>
         </ImageBackground>
+
+        <View style={styles.searchCard}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
+            {quickServices.map((service) => (
+              <TouchableOpacity
+                key={service.id}
+                style={[styles.tabItem, activeService === service.id && styles.tabItemActive]}
+                onPress={() => handleServicePress(service.id)}>
+                <Text style={styles.tabIcon}>{service.icon}</Text>
+                <Text style={[styles.tabLabel, activeService === service.id && styles.tabLabelActive]}>
+                  {service.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <Text style={styles.searchHint}>Tap a service above to search & book</Text>
+        </View>
 
         <View style={styles.featuresSection}>
           {features.map((item, index) => (
@@ -157,13 +203,43 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1 },
-  header: { backgroundColor: Colors.primary, paddingVertical: 16, paddingHorizontal: 20 },
-  logoText: { color: Colors.accent, fontSize: 22, fontWeight: 'bold', letterSpacing: 1 },
-  logoTag: { color: Colors.white, fontSize: 11, marginTop: 2 },
-  hero: { minHeight: 260, justifyContent: 'flex-end' },
-  heroOverlay: { backgroundColor: 'rgba(6, 59, 36, 0.75)', padding: 24 },
-  heroTitle: { color: Colors.accent, fontSize: 28, fontWeight: 'bold', marginBottom: 12 },
-  heroSubtitle: { color: Colors.white, fontSize: 15, lineHeight: 22 },
+  header: { backgroundColor: Colors.primary, paddingVertical: 14, paddingHorizontal: 20 },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logoEmoji: { fontSize: 28 },
+  logoText: { color: Colors.accent, fontSize: 20, fontWeight: 'bold', letterSpacing: 0.5 },
+  logoTag: { color: Colors.white, fontSize: 10, marginTop: 1 },
+  hero: { minHeight: 240, justifyContent: 'flex-end' },
+  heroOverlay: { backgroundColor: 'rgba(6, 59, 36, 0.75)', padding: 24, paddingBottom: 36 },
+  heroTitle: { color: Colors.white, fontSize: 34, fontWeight: '300', fontStyle: 'italic', marginBottom: 12, lineHeight: 40 },
+  heroSubtitle: { color: Colors.white, fontSize: 14, lineHeight: 20 },
+  searchCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: -24,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    marginBottom: 20,
+  },
+  tabsRow: { gap: 10, paddingBottom: 4 },
+  tabItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    backgroundColor: Colors.background,
+    minWidth: 72,
+  },
+  tabItemActive: { backgroundColor: Colors.primary },
+  tabIcon: { fontSize: 20, marginBottom: 4 },
+  tabLabel: { fontSize: 11, color: Colors.textDark, fontWeight: '600' },
+  tabLabelActive: { color: Colors.accent },
+  searchHint: { fontSize: 12, color: Colors.textLight, marginTop: 10, textAlign: 'center' },
   featuresSection: { padding: 16, gap: 12 },
   featureCard: { backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, padding: 16 },
   featureTitle: { color: Colors.textDark, fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
