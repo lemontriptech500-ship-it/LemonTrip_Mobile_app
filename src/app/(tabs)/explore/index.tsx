@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors';
 import { services } from '@/data/services';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExploreScreen() {
@@ -19,28 +20,42 @@ export default function ExploreScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.headerTitle}>Explore</Text>
-            <TouchableOpacity onPress={() => router.push('/cart')} style={styles.cartButton}>
-              <Text style={styles.cartButtonText}>🛒 Cart</Text>
+          <View style={styles.headerTop}>
+            <Text style={styles.eyebrow}>LEMON TRIP / DISCOVER</Text>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open cart" onPress={() => router.push('/cart')} style={styles.cartButton}>
+              <Ionicons name="bag-outline" size={19} color={Colors.primaryDark} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.headerSubtitle}>All our travel services in one place</Text>
+          <Text style={styles.headerTitle}>Explore</Text>
+          <Text style={styles.headerSubtitle}>Everything for a considered journey.</Text>
         </View>
 
+        <View style={styles.searchBox}>
+          <Ionicons name="search-outline" size={18} color={Colors.textLight} />
+          <TextInput placeholder="Where would you like to go?" placeholderTextColor={Colors.textLight} style={styles.searchText} editable={false} onPressIn={() => router.push('/(tabs)/explore/flights')} />
+          <Ionicons name="options-outline" size={18} color={Colors.primary} />
+        </View>
+
+        <View style={styles.sectionHeading}>
+          <Text style={styles.sectionTitle}>Travel, your way</Text>
+          <Text style={styles.sectionSubtitle}>Choose a service to get started</Text>
+        </View>
         <View style={styles.servicesGrid}>
           {services.map((item) => (
             <TouchableOpacity
               key={item.id}
               style={styles.serviceCard}
               onPress={() => handlePress(item.id)}>
-              <Text style={styles.serviceIcon}>{item.icon}</Text>
+              <View style={styles.serviceIcon}>
+                <Ionicons name={item.icon} size={23} color={Colors.primary} />
+              </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.serviceTitle}>{item.title}</Text>
                 <Text style={styles.serviceSubtitle}>{item.subtitle}</Text>
               </View>
+              <Ionicons name="chevron-forward" size={17} color={Colors.textLight} />
             </TouchableOpacity>
           ))}
         </View>
@@ -58,56 +73,74 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 18,
+    paddingHorizontal: 22,
   },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 17 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   headerTitle: {
-    color: Colors.accent,
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
+    color: Colors.textDark,
+    fontFamily: 'Manrope',
+    fontSize: 30,
+    fontWeight: '800',
   },
   headerSubtitle: {
-    color: Colors.white,
-    fontSize: 14,
+    color: Colors.textLight,
+    fontFamily: 'Manrope',
+    fontSize: 13,
+    marginTop: 4,
   },
   cartButton: {
-    backgroundColor: Colors.accent,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.accentSoft,
   },
-  cartButtonText: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: Colors.primaryDark,
-  },
-  servicesGrid: {
-    padding: 16,
-    gap: 12,
-  },
-  serviceCard: {
+  searchBox: {
+    height: 52,
+    marginHorizontal: 22,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    backgroundColor: Colors.white,
+    gap: 10,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 18,
   },
-  serviceIcon: {
-    fontSize: 28,
+  searchText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, paddingVertical: 0 },
+  sectionHeading: { marginTop: 29, paddingHorizontal: 22, marginBottom: 14 },
+  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 19, fontWeight: '800' },
+  sectionSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 4 },
+  servicesGrid: {
+    paddingHorizontal: 18,
+    paddingBottom: 28,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
   },
+  serviceCard: {
+    width: '48%',
+    minHeight: 142,
+    alignItems: 'flex-start',
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    padding: 14,
+  },
+  serviceIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted, marginBottom: 13 },
   serviceTitle: {
     color: Colors.textDark,
-    fontSize: 17,
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontFamily: 'Manrope',
+    fontSize: 14,
+    fontWeight: '800',
+    marginBottom: 5,
   },
   serviceSubtitle: {
     color: Colors.textLight,
-    fontSize: 13,
+    fontFamily: 'Manrope',
+    fontSize: 10,
+    lineHeight: 15,
   },
 });

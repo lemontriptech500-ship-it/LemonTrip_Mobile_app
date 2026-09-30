@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { Ionicons } from '@expo/vector-icons';
 import { blogPosts } from '@/data/blog';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -27,7 +28,7 @@ export default function BlogDetailScreen() {
         <View style={styles.imageWrapper}>
           <Image source={{ uri: post.image }} style={styles.image} />
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-            <Text style={styles.backButtonText}>← Back</Text>
+            <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
           </TouchableOpacity>
         </View>
 
@@ -59,16 +60,17 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 220,
+    height: 300,
   },
   backButton: {
     position: 'absolute',
     top: 16,
     left: 16,
     backgroundColor: Colors.white,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    width: 42,
+    height: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backButtonText: {
     color: Colors.primary,
@@ -76,7 +78,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   content: {
-    padding: 20,
+    paddingHorizontal: 22,
+    paddingTop: 22,
+    paddingBottom: 36,
   },
   metaRow: {
     flexDirection: 'row',
@@ -84,23 +88,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   category: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 10,
+    fontWeight: '800',
     color: Colors.primary,
   },
   date: {
-    fontSize: 12,
+    fontFamily: 'Manrope',
+    fontSize: 10,
     color: Colors.textLight,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: 'Manrope',
+    fontSize: 27,
+    fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 14,
   },
   excerpt: {
-    fontSize: 15,
+    fontFamily: 'Manrope',
+    fontSize: 14,
     color: Colors.textLight,
-    lineHeight: 22,
+    lineHeight: 23,
   },
 });
