@@ -7,14 +7,13 @@ import FlightFilters, { periodFor } from './FlightFilters';
 import FlightSort from './FlightSort';
 import type { FlightFiltersState, FlightOffer, FlightSortOption } from './types';
 
-type FlightResultsProps = { offers: FlightOffer[]; loading: boolean };
+type FlightResultsProps = { offers: FlightOffer[]; loading: boolean; onSelect: (offer: FlightOffer) => void };
 
-export default function FlightResults({ offers, loading }: FlightResultsProps) {
+export default function FlightResults({ offers, loading, onSelect }: FlightResultsProps) {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [filters, setFilters] = useState<FlightFiltersState>({ stops: [], airlines: [], departurePeriods: [], arrivalPeriods: [], maxDurationHours: null, maxPrice: null, baggage: 'any' });
   const [sort, setSort] = useState<FlightSortOption>('recommended');
-  const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
 
   const visibleOffers = useMemo(() => {
     const filtered = offers.filter((offer) => {
@@ -34,8 +33,6 @@ export default function FlightResults({ offers, loading }: FlightResultsProps) {
     if (sort === 'earliest') filtered.sort((a, b) => new Date(a.departure.time).getTime() - new Date(b.departure.time).getTime());
     return filtered;
   }, [offers, filters, sort]);
-
-  const handleSelect = (offer: FlightOffer) => setSelectedOfferId(offer.id);
 
   return (
     <View style={[styles.resultsLayout, desktop && styles.resultsLayoutDesktop]}>
@@ -66,7 +63,7 @@ export default function FlightResults({ offers, loading }: FlightResultsProps) {
               <FlightSort selected={sort} onChange={setSort} />
             </View>
             <View style={styles.listContent}>
-              {visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} selected={selectedOfferId === offer.id} onSelect={handleSelect} />)}
+              {visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={onSelect} />)}
             </View>
           </>
         )}

@@ -8,6 +8,7 @@ import FareSummary from './FareSummary';
 import FlightResults from './FlightResults';
 import FlightSearchForm from './FlightSearchForm';
 import { searchFlights } from './flightApi';
+import { setFlightSelection } from './flightSelectionStore';
 import type { FlightOffer, FlightSearchRequest } from './types';
 
 export default function FlightSearchScreen() {
@@ -31,6 +32,12 @@ export default function FlightSearchScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectFlight = (offer: FlightOffer) => {
+    if (!request) return;
+    setFlightSelection(request, offer);
+    router.push('/(tabs)/explore/flight-details');
   };
 
   return (
@@ -81,7 +88,7 @@ export default function FlightSearchScreen() {
               ) : (
                 <>
                   <Text style={styles.resultsTitle}>{loading ? 'Searching available flights' : 'Available flights'}</Text>
-                  <FlightResults offers={offers} loading={loading} />
+                  <FlightResults offers={offers} loading={loading} onSelect={handleSelectFlight} />
                 </>
               )}
             </View>

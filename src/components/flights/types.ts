@@ -14,6 +14,26 @@ export interface FlightSearchRequest {
   specialFare: SpecialFare;
 }
 
+export interface FlightFarePrice {
+  total: number;
+  currency: string;
+  baseFare?: number;
+  taxes?: number;
+  fees?: number;
+}
+
+export interface FlightFareOption {
+  id: string;
+  name: string;
+  price: FlightFarePrice;
+  cabin?: string;
+  baggage?: string;
+  cancellation?: string;
+  dateChange?: string;
+  seatSelection?: string;
+  refundable?: boolean;
+}
+
 export interface FlightOffer {
   id: string;
   airline: { name: string; code: string; logoUrl?: string };
@@ -22,10 +42,18 @@ export interface FlightOffer {
   arrival: { time: string; airportCode: string; airportName?: string };
   durationMinutes: number;
   stops: number;
+  aircraft?: { name?: string; code?: string };
   baggage?: string;
   price: { amount: number; currency: string };
   fareInfo?: string;
   refundable?: boolean;
+  fareOptions?: FlightFareOption[];
+}
+
+export interface FlightSelection {
+  request: FlightSearchRequest;
+  offer: FlightOffer;
+  fareOption?: FlightFareOption;
 }
 
 export interface FlightSearchResponse {

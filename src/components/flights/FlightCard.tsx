@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { FlightOffer } from './types';
 
-type FlightCardProps = { offer: FlightOffer; selected: boolean; onSelect: (offer: FlightOffer) => void };
+type FlightCardProps = { offer: FlightOffer; onSelect: (offer: FlightOffer) => void };
 
 function formatTime(value: string) {
   const parsed = new Date(value);
@@ -19,18 +19,18 @@ function formatDuration(minutes: number) {
 
 function formatPrice(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount);
   } catch {
     return `${currency} ${amount.toLocaleString('en-IN')}`;
   }
 }
 
-export default function FlightCard({ offer, selected, onSelect }: FlightCardProps) {
+export default function FlightCard({ offer, onSelect }: FlightCardProps) {
   const stopLabel = offer.stops === 0 ? 'Nonstop' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
   const fareNote = offer.fareInfo ?? (offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null);
 
   return (
-    <View style={[styles.card, selected && styles.cardSelected]}>
+    <View style={styles.card}>
       <View style={styles.airline}>
         {offer.airline.logoUrl ? (
           <Image source={{ uri: offer.airline.logoUrl }} style={styles.logo} accessibilityLabel={`${offer.airline.name} logo`} />
@@ -67,8 +67,8 @@ export default function FlightCard({ offer, selected, onSelect }: FlightCardProp
           <Text style={styles.baggage} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}</Text>
           {fareNote ? <Text style={styles.fareNote}>{fareNote}</Text> : null}
         </View>
-        <TouchableOpacity accessibilityRole="button" onPress={() => onSelect(offer)} style={[styles.selectButton, selected && styles.selectButtonSelected]}>
-          <Text style={[styles.selectText, selected && styles.selectTextSelected]}>{selected ? 'Selected' : 'Select'}</Text>
+        <TouchableOpacity accessibilityRole="button" onPress={() => onSelect(offer)} style={styles.selectButton}>
+          <Text style={styles.selectText}>Select</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -77,7 +77,6 @@ export default function FlightCard({ offer, selected, onSelect }: FlightCardProp
 
 const styles = StyleSheet.create({
   card: { padding: 14, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
-  cardSelected: { borderColor: Colors.primary, borderWidth: 2 },
   airline: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
   logo: { width: 34, height: 34, borderRadius: 9, resizeMode: 'contain', backgroundColor: Colors.background },
   logoFallback: { width: 34, height: 34, borderRadius: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
@@ -102,7 +101,5 @@ const styles = StyleSheet.create({
   baggage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
   fareNote: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', marginTop: 3 },
   selectButton: { minWidth: 82, minHeight: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent, paddingHorizontal: 12 },
-  selectButtonSelected: { backgroundColor: Colors.primary },
   selectText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  selectTextSelected: { color: Colors.white },
 });
