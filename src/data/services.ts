@@ -25,11 +25,6 @@ export interface Listing {
 }
 
 export const dummyListings: Record<string, Listing[]> = {
-  flights: [
-    { id: '1', name: 'Delhi → Mumbai', detail: 'IndiGo · Non-stop · 2h 10m', price: '₹4,299' },
-    { id: '2', name: 'Mumbai → Bangalore', detail: 'Air India · Non-stop · 1h 40m', price: '₹3,899' },
-    { id: '3', name: 'Delhi → Dubai', detail: 'Emirates · Non-stop · 3h 45m', price: '₹22,500' },
-  ],
   hotels: [
     { id: '1', name: 'Taj Palace, Mumbai', detail: '5 Star · Free Wifi · Pool', price: '₹8,500/night' },
     { id: '2', name: 'Beach Resort, Goa', detail: '4 Star · Sea View', price: '₹5,200/night' },
