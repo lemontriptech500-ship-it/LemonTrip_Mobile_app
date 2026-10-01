@@ -241,7 +241,7 @@ export default function ExploreScreen() {
                           accessibilityRole="button"
                           accessibilityLabel={saved ? `Remove ${item.name} from wishlist` : `Add ${item.name} to wishlist`}
                           style={styles.saveButton}
-                          onPress={() => toggleWishlist({ id: item.id, name: item.name, image: item.image, price: item.priceFrom })}>
+                          onPress={() => toggleWishlist({ id: item.id, name: item.name, image: item.image, price: item.priceFrom, category: 'Destinations', location: item.name })}>
                           <Ionicons name={saved ? 'heart' : 'heart-outline'} size={19} color={saved ? Colors.error : Colors.primaryDark} />
                         </TouchableOpacity>
                         <View style={styles.destinationCopy}>

@@ -2,12 +2,14 @@ import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { travelPackages } from '@/data/packages';
 import { addBooking } from '@/utils/bookingStore';
+import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PackageDetailScreen() {
+  useWishlist();
   const { id } = useLocalSearchParams<{ id: string }>();
   const pkg = travelPackages.find((item) => item.id === id);
   const { width } = useWindowDimensions();
@@ -75,7 +77,16 @@ export default function PackageDetailScreen() {
                   <Text style={styles.destination}>{pkg.destination ?? 'Destination details unavailable'}</Text>
                   <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.ratingText}>{pkg.rating.replace(/[^0-9.]/g, '')}</Text></View>
                 </View>
-                <Text style={styles.title}>{pkg.title}</Text>
+                <View style={styles.titleRow}>
+                  <Text style={styles.title}>{pkg.title}</Text>
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={isInWishlist(pkg.id) ? 'Remove package from wishlist' : 'Save package to wishlist'}
+                    onPress={() => toggleWishlist({ id: pkg.id, name: pkg.title, image: pkg.image, price: pkg.price, category: 'Packages', location: pkg.destination })}
+                    style={styles.saveButton}>
+                    <Ionicons name={isInWishlist(pkg.id) ? 'heart' : 'heart-outline'} size={17} color={isInWishlist(pkg.id) ? Colors.error : Colors.primary} />
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.tripMeta}>
                   <View style={styles.metaItem}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.duration}</Text></View>
                   <View style={styles.metaItem}><Ionicons name="pricetag-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.badge}</Text></View>
@@ -191,6 +202,8 @@ const styles = StyleSheet.create({
   rating: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 9, backgroundColor: Colors.primaryDark },
   ratingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
   title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '900', marginTop: 5 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  saveButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surfaceMuted },
   tripMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 13, marginTop: 8 },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   metaText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },

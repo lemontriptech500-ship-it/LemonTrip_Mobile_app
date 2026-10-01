@@ -52,7 +52,14 @@ export async function loadOffers(): Promise<{ offers: Offer[]; source: OfferSour
 export function getOfferValidity(validUntil: string | undefined, now = new Date()): OfferValidity {
   if (!validUntil?.trim()) return 'unknown';
   const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(validUntil);
-  const expiry = new Date(dateOnly ? `${validUntil}T23:59:59` : validUntil);
+  let expiry: Date;
+  if (dateOnly) {
+    const [year, month, day] = validUntil.split('-').map(Number);
+    expiry = new Date(year, month - 1, day, 23, 59, 59, 999);
+    if (expiry.getFullYear() !== year || expiry.getMonth() !== month - 1 || expiry.getDate() !== day) return 'unknown';
+  } else {
+    expiry = new Date(validUntil);
+  }
   if (Number.isNaN(expiry.getTime())) return 'unknown';
   return expiry.getTime() < now.getTime() ? 'expired' : 'active';
 }

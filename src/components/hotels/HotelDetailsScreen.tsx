@@ -2,6 +2,7 @@ import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { addBooking } from '@/utils/bookingStore';
 import { getHotelSearch, getSelectedHotel } from '@/utils/hotelSearchStore';
+import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { formatINR, getNightCount, parseNightlyPrice } from './HotelCard';
 
 export default function HotelDetailsScreen() {
+  useWishlist();
   const hotel = getSelectedHotel();
   const search = getHotelSearch();
   const { width } = useWindowDimensions();
@@ -59,7 +61,17 @@ export default function HotelDetailsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <ScreenHeader title={hotel.name} subtitle={hotel.location} eyebrow="LEMONTRIP / STAY DETAILS" onBack={() => router.back()} />
+          <ScreenHeader
+            title={hotel.name}
+            subtitle={hotel.location}
+            eyebrow="LEMONTRIP / STAY DETAILS"
+            onBack={() => router.back()}
+            rightAction={{
+              label: isInWishlist(hotel.id) ? 'Saved' : 'Save stay',
+              icon: isInWishlist(hotel.id) ? 'heart' : 'heart-outline',
+              onPress: () => toggleWishlist({ id: hotel.id, name: hotel.name, image: hotel.image, price: hotel.price, category: 'Hotels', location: hotel.location }),
+            }}
+          />
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>
             {gallery.map((image, index) => (
