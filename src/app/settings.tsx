@@ -98,7 +98,7 @@ export default function SettingsScreen() {
               </SettingsSection>
 
               <SettingsSection title="Support" icon="help-circle-outline" description="We’re here to help">
-                <SettingRow icon="book-outline" title="Help center" description="Find answers about your trips" onPress={() => showUnavailable('Help center', 'The help center is being prepared. Email hello@lemontrip.in for assistance.')} />
+                <SettingRow icon="book-outline" title="Help center" description="Find answers about your trips" onPress={() => router.push('/help' as never)} />
                 <SettingRow icon="chatbubble-ellipses-outline" title="Contact support" description="hello@lemontrip.in" onPress={() => Linking.openURL('mailto:hello@lemontrip.in')} />
               </SettingsSection>
 

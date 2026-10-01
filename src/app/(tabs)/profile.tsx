@@ -5,7 +5,7 @@ import { useBookings, type Booking } from '@/utils/bookingStore';
 import { useWishlist } from '@/utils/wishlistStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ProfileEntry = {
@@ -13,9 +13,9 @@ type ProfileEntry = {
   title: string;
   description: string;
   icon: keyof typeof Ionicons.glyphMap;
-  route?: '/(tabs)/bookings' | '/(tabs)/wishlist' | '/settings';
+  route?: '/(tabs)/bookings' | '/(tabs)/wishlist' | '/settings' | '/help';
   requiresLogin?: boolean;
-  info?: 'payments' | 'personal' | 'support' | 'security';
+  info?: 'payments' | 'personal' | 'security';
   badge?: string;
 };
 
@@ -50,7 +50,7 @@ const guestSections: Array<{ title: string; entries: ProfileEntry[] }> = [
     title: 'Account & support',
     entries: [
       { id: 'payments', title: 'Payment Methods', description: 'Sign in to manage payment details', icon: 'card-outline', requiresLogin: true },
-      { id: 'support', title: 'Help & Support', description: 'Get in touch with the LemonTrip team', icon: 'chatbubble-ellipses-outline', info: 'support' },
+      { id: 'support', title: 'Help & Support', description: 'Get in touch with the LemonTrip team', icon: 'chatbubble-ellipses-outline', route: '/help' },
       { id: 'settings', title: 'Settings', description: 'Language, currency and notification preferences', icon: 'settings-outline', route: '/settings' },
     ],
   },
@@ -78,7 +78,7 @@ const memberSections: Array<{ title: string; entries: ProfileEntry[] }> = [
   {
     title: 'Need a hand?',
     entries: [
-      { id: 'support', title: 'Help & Support', description: 'We’re here to help with your journey', icon: 'chatbubble-ellipses-outline', info: 'support' },
+      { id: 'support', title: 'Help & Support', description: 'We’re here to help with your journey', icon: 'chatbubble-ellipses-outline', route: '/help' },
     ],
   },
 ];
@@ -99,7 +99,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    if (entry.route) router.push(entry.route);
+    if (entry.route) router.push(entry.route as Parameters<typeof router.push>[0]);
     if (entry.info) setActiveInfo(entry.info);
   };
 
@@ -109,14 +109,14 @@ export default function ProfileScreen() {
       ? 'Personal information'
       : activeInfo === 'security'
         ? 'Security'
-        : 'Help & Support';
+        : 'Payment methods';
   const infoDescription = activeInfo === 'payments'
     ? 'Saved payment methods are not available yet. No card details are stored in LemonTrip.'
     : activeInfo === 'personal'
       ? 'Your profile details currently come from your sign-in.'
       : activeInfo === 'security'
         ? 'Account security controls are not available yet. Your current sign-in session remains active on this device.'
-        : 'Contact our travel support team for help with your account or journey.';
+        : 'Saved payment methods are not available yet. No card details are stored in LemonTrip.';
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -221,7 +221,7 @@ export default function ProfileScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <View style={styles.modalIcon}><Ionicons name={activeInfo === 'support' ? 'chatbubble-ellipses-outline' : activeInfo === 'personal' ? 'person-circle-outline' : activeInfo === 'security' ? 'shield-checkmark-outline' : 'card-outline'} size={20} color={Colors.primary} /></View>
+              <View style={styles.modalIcon}><Ionicons name={activeInfo === 'personal' ? 'person-circle-outline' : activeInfo === 'security' ? 'shield-checkmark-outline' : 'card-outline'} size={20} color={Colors.primary} /></View>
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={() => setActiveInfo(null)} style={styles.closeButton}>
                 <Ionicons name="close" size={18} color={Colors.textDark} />
               </TouchableOpacity>
@@ -234,12 +234,6 @@ export default function ProfileScreen() {
                 <View><Text style={styles.detailLabel}>EMAIL</Text><Text style={styles.detailValue}>{getProfileEmail(user)}</Text></View>
                 <View><Text style={styles.detailLabel}>PHONE</Text><Text style={styles.detailValue}>{getProfilePhone(user)}</Text></View>
               </View>
-            ) : null}
-            {activeInfo === 'support' ? (
-              <TouchableOpacity onPress={() => Linking.openURL('mailto:hello@lemontrip.in')} style={styles.supportLink}>
-                <Text style={styles.supportLinkText}>hello@lemontrip.in</Text>
-                <Ionicons name="open-outline" size={14} color={Colors.primary} />
-              </TouchableOpacity>
             ) : null}
             <TouchableOpacity onPress={() => setActiveInfo(null)} style={styles.doneButton}><Text style={styles.doneText}>Done</Text></TouchableOpacity>
           </View>
