@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 export interface User {
   name: string;
   email: string;
+  phone?: string;
 }
 
 let currentUser: User | null = null;
