@@ -1,231 +1,385 @@
 import { Colors } from '@/constants/colors';
+import { blogPosts } from '@/data/blog';
 import { destinations } from '@/data/destinations';
+import { offers } from '@/data/offers';
 import { travelPackages } from '@/data/packages';
+import { services } from '@/data/services';
+import TripSearchPanel, { SearchType } from '@/components/TripSearchPanel';
+import { getUser, useAuth } from '@/utils/authStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const services = [
-  { label: 'Flights', icon: 'airplane-outline' as const, route: '/(tabs)/explore' },
-  { label: 'Stays', icon: 'bed-outline' as const, route: '/(tabs)/explore/hotels' },
-  { label: 'Packages', icon: 'map-outline' as const, route: '/packages' },
-  { label: 'Visa', icon: 'document-text-outline' as const, route: '/(tabs)/explore/visa' },
-];
+const navItems = ['Flights', 'Hotels', 'Buses', 'Trains', 'Packages', 'Visa', 'Offers'];
 
-const quickServices = [
-  { id: 'flights', label: 'Flights', icon: '✈️' },
-  { id: 'hotels', label: 'Hotels', icon: '🏨' },
-  { id: 'explore', label: 'Explore', icon: '🔎' },
-  { id: 'packages', label: 'Packages', icon: '🧳' },
-  { id: 'visa', label: 'Visa', icon: '🛂' },
-];
-
-const whyPoints = [
-  {
-    icon: '✓',
-    title: 'Professional Travel Assistance',
-    subtitle: 'Support from planning to the completion of your journey.',
-  },
-  {
-    icon: '⚡',
-    title: 'Technology-Driven Experience',
-    subtitle: 'A modern platform built for speed, clarity and convenience.',
-  },
-  {
-    icon: '🤝',
-    title: 'Customer-First Service',
-    subtitle: 'Transparent communication and long-term relationships.',
-  },
+const trustPoints = [
+  { icon: 'shield-checkmark-outline', title: 'Secure bookings', subtitle: 'Protected payments and verified stays.' },
+  { icon: 'cash-outline', title: 'Transparent pricing', subtitle: 'No surprises, just clear value.' },
+  { icon: 'headset-outline', title: 'Travel support', subtitle: 'Real help, before and during your trip.' },
+  { icon: 'sparkles-outline', title: 'Personalized travel', subtitle: 'Trips designed around your preferences.' },
 ];
 
 export default function HomeScreen() {
   useWishlist();
-  const [activeService, setActiveService] = useState('flights');
+  const user = useAuth();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
-  const handleServicePress = (id: string) => {
-    setActiveService(id);
-
-    if (id === 'visa') {
+  const handleServicePress = (serviceId: string) => {
+    if (serviceId === 'visa') {
       router.push('/(tabs)/explore/visa');
       return;
     }
 
-    if (id === 'hotels') {
+    if (serviceId === 'hotels') {
       router.push('/(tabs)/explore/hotels');
       return;
     }
 
-    if (id === 'packages') {
+    if (serviceId === 'packages') {
       router.push('/packages');
       return;
     }
 
-    router.push('/(tabs)/explore');
+    router.push(`/(tabs)/explore/${serviceId}`);
   };
+
+  const handleSearch = (type: SearchType) => {
+    setSearchError(null);
+    setIsSearchLoading(true);
+
+    const routeMap: Record<SearchType, Parameters<typeof router.push>[0]> = {
+      flights: '/(tabs)/explore/flights',
+      hotels: '/(tabs)/explore/hotels',
+      buses: '/(tabs)/explore/buses',
+      trains: '/(tabs)/explore/trains',
+      packages: '/packages',
+    };
+
+    const route = routeMap[type] ?? '/(tabs)/explore';
+
+    setTimeout(() => {
+      setIsSearchLoading(false);
+      router.push(route);
+    }, 250);
+  };
+
+  const handleProfilePress = () => {
+    if (getUser()) {
+      router.push('/(tabs)/profile');
+      return;
+    }
+
+    router.push('/login');
+  };
+
+  const visibleDestinations = destinations.slice(0, 6);
+  const visiblePackages = travelPackages.slice(0, 3);
+  const visibleOffers = offers.slice(0, 4);
+  const visibleStories = blogPosts.slice(0, 3);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
-        <View style={styles.topBar}>
-          <View>
-            <Text style={styles.brand}>LEMON TRIP</Text>
-            <Text style={styles.brandLine}>Travel, thoughtfully planned</Text>
-          </View>
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel="Open profile"
-            onPress={() => router.push('/(tabs)/profile')}
-            style={styles.profileButton}>
-            <Ionicons name="person-outline" size={20} color={Colors.primaryDark} />
-          </TouchableOpacity>
-        </View>
-
-        <ImageBackground
-          source={{ uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1400&q=88' }}
-          style={styles.hero}
-          imageStyle={styles.heroImage}>
-          <View style={styles.heroShade} />
-          <View style={styles.heroCopy}>
-            <Text style={styles.heroEyebrow}>MAKE ROOM FOR SOMEWHERE NEW</Text>
-            <Text style={styles.heroTitle}>The world,{"\n"}a little closer.</Text>
-            <Text style={styles.heroSubtitle}>Find the place that feels like your next story.</Text>
-            <TouchableOpacity style={styles.heroButton} onPress={() => router.push('/(tabs)/explore')}>
-              <Text style={styles.heroButtonText}>Explore journeys</Text>
-              <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeading}>
-            <View>
-              <Text style={styles.eyebrow}>PLAN YOUR WAY</Text>
-              <Text style={styles.sectionTitle}>Where to next?</Text>
+        <View style={styles.headerShell}>
+          <View style={styles.headerRow}>
+            <View style={styles.brandWrap}>
+              <View style={styles.brandBadge}><Text style={styles.brandBadgeText}>L</Text></View>
+              <Text style={styles.brand}>LemonTrip</Text>
             </View>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
-              <Text style={styles.textLink}>All services</Text>
-            </TouchableOpacity>
-          </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickServiceRow}>
-            {quickServices.map((service) => (
-              <TouchableOpacity
-                key={service.id}
-                style={[styles.quickServiceItem, activeService === service.id && styles.quickServiceItemActive]}
-                onPress={() => handleServicePress(service.id)}>
-                <Text style={styles.quickServiceIcon}>{service.icon}</Text>
-                <Text style={[styles.quickServiceLabel, activeService === service.id && styles.quickServiceLabelActive]}>
-                  {service.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeading}>
-            <View>
-              <Text style={styles.eyebrow}>A GOOD PLACE TO START</Text>
-              <Text style={styles.sectionTitle}>Popular destinations</Text>
-            </View>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
-              <Ionicons name="arrow-forward" size={20} color={Colors.primary} />
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.destinationRow}>
-            {destinations.map((destination) => {
-              const saved = isInWishlist(destination.id);
-              return (
-                <TouchableOpacity
-                  key={destination.id}
-                  style={styles.destinationItem}
-                  onPress={() => router.push('/(tabs)/explore')}>
-                  <Image source={{ uri: destination.image }} style={styles.destinationImage} />
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    accessibilityLabel={saved ? `Remove ${destination.name} from saved places` : `Save ${destination.name}`}
-                    style={styles.saveButton}
-                    onPress={() =>
-                      toggleWishlist({
-                        id: destination.id,
-                        name: destination.name,
-                        image: destination.image,
-                        price: destination.priceFrom,
-                      })
-                    }>
-                    <Ionicons name={saved ? 'heart' : 'heart-outline'} size={18} color={saved ? Colors.error : Colors.primaryDark} />
+            {isDesktop ? (
+              <View style={styles.navRow}>
+                {navItems.map((item) => (
+                  <TouchableOpacity key={item} activeOpacity={0.8} onPress={() => router.push('/(tabs)/explore')}>
+                    <Text style={styles.navItem}>{item}</Text>
                   </TouchableOpacity>
-                  <Text style={styles.destinationName} numberOfLines={1}>{destination.name}</Text>
-                  <Text style={styles.destinationPrice}>From {destination.priceFrom}</Text>
+                ))}
+              </View>
+            ) : null}
+
+            <View style={styles.headerActions}>
+              {isDesktop ? (
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore')} style={styles.iconButton}>
+                  <Ionicons name="search-outline" size={18} color={Colors.primaryDark} />
                 </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+              ) : null}
+
+              <TouchableOpacity accessibilityRole="button" onPress={handleProfilePress} style={styles.profileButton}>
+                <Ionicons name="person-outline" size={18} color={Colors.primaryDark} />
+                <Text style={styles.profileText}>{user ? user.name.split(' ')[0] : 'Login'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
-        <TouchableOpacity style={styles.offerStrip} onPress={() => router.push('/offers')}>
-          <View style={styles.offerCopy}>
-            <Text style={styles.offerEyebrow}>A LITTLE MORE JOURNEY FOR LESS</Text>
-            <Text style={styles.offerTitle}>Explore this season’s offers</Text>
-          </View>
-          <Ionicons name="arrow-forward-circle" size={30} color={Colors.accent} />
-        </TouchableOpacity>
+        <View style={styles.heroWrap}>
+          <ImageBackground
+            source={{ uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1400&q=90' }}
+            style={styles.heroImage}
+            imageStyle={styles.heroImageStyle}>
+            <View style={styles.heroOverlay} />
+            <View style={styles.heroContent}>
+              <Text style={styles.heroEyebrow}>Premium travel booking</Text>
+              <Text style={styles.heroTitle}>Your journey starts here.</Text>
+              <Text style={styles.heroCopy}>Flights, stays, experiences and more — planned around you.</Text>
+              <View style={styles.heroActions}>
+                <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(tabs)/explore')}>
+                  <Text style={styles.primaryButtonText}>Explore journeys</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/(tabs)/explore/flights')}>
+                  <Text style={styles.secondaryButtonText}>Search trips</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
 
-        <View style={styles.whySection}>
-          <Text style={styles.whyEyebrow}>WHY LEMON TRIP</Text>
-          <Text style={styles.whyTitle}>Your Journey.{"\n"}Our Responsibility.</Text>
-          <View style={styles.whyList}>
-            {whyPoints.map((point) => (
-              <View key={point.title} style={styles.whyItem}>
-                <Text style={styles.whyIcon}>{point.icon}</Text>
-                <View style={styles.whyTextWrap}>
-                  <Text style={styles.whyItemTitle}>{point.title}</Text>
-                  <Text style={styles.whyItemSubtitle}>{point.subtitle}</Text>
+        <TripSearchPanel loading={isSearchLoading} error={searchError} onSearch={handleSearch} />
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.eyebrow}>Travel services</Text>
+              <Text style={styles.sectionTitle}>Plan your next move</Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
+              <Text style={styles.linkText}>View all</Text>
+            </TouchableOpacity>
+          </View>
+
+          {services.length > 0 ? (
+            <View style={styles.serviceGrid}>
+              {services.map((service) => (
+                <TouchableOpacity
+                  key={service.id}
+                  style={styles.serviceCard}
+                  onPress={() => handleServicePress(service.id)}
+                  activeOpacity={0.9}>
+                  <View style={styles.serviceIconWrap}>
+                    <Ionicons name={service.icon} size={22} color={Colors.primary} />
+                  </View>
+                  <Text style={styles.serviceTitle}>{service.title}</Text>
+                  <Text style={styles.serviceSubtitle}>{service.subtitle}</Text>
+                  <Ionicons name="arrow-forward" size={16} color={Colors.textLight} style={styles.serviceArrow} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No travel services available right now.</Text></View>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.eyebrow}>Popular destinations</Text>
+              <Text style={styles.sectionTitle}>Places travellers keep returning to</Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
+              <Ionicons name="arrow-forward" size={18} color={Colors.primary} />
+            </TouchableOpacity>
+          </View>
+
+          {visibleDestinations.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.destinationRow}>
+              {visibleDestinations.map((destination) => {
+                const saved = isInWishlist(destination.id);
+                return (
+                  <TouchableOpacity key={destination.id} style={styles.destinationCard} onPress={() => router.push('/(tabs)/explore')} activeOpacity={0.9}>
+                    <Image source={{ uri: destination.image }} style={styles.destinationImage} />
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={saved ? `Remove ${destination.name} from saved places` : `Save ${destination.name}`}
+                      style={styles.saveButton}
+                      onPress={() =>
+                        toggleWishlist({
+                          id: destination.id,
+                          name: destination.name,
+                          image: destination.image,
+                          price: destination.priceFrom,
+                        })
+                      }>
+                      <Ionicons name={saved ? 'heart' : 'heart-outline'} size={16} color={saved ? Colors.error : Colors.primaryDark} />
+                    </TouchableOpacity>
+                    <View style={styles.destinationMeta}>
+                      <Text style={styles.destinationName}>{destination.name}</Text>
+                      <Text style={styles.destinationPrice}>From {destination.priceFrom}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          ) : (
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No destinations to show right now.</Text></View>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.eyebrow}>Featured journeys</Text>
+              <Text style={styles.sectionTitle}>Holiday packages made easy</Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push('/packages')}>
+              <Text style={styles.linkText}>View all</Text>
+            </TouchableOpacity>
+          </View>
+
+          {visiblePackages.length > 0 ? (
+            <View style={styles.packageList}>
+              {visiblePackages.map((travelPackage) => (
+                <TouchableOpacity
+                  key={travelPackage.id}
+                  style={styles.packageCard}
+                  onPress={() => router.push(`/packages/${travelPackage.id}`)}
+                  activeOpacity={0.9}>
+                  <Image source={{ uri: travelPackage.image }} style={styles.packageImage} />
+                  <View style={styles.packageBody}>
+                    <View style={styles.packageTopRow}>
+                      <Text style={styles.packageBadge}>{travelPackage.badge}</Text>
+                      <Text style={styles.packageRating}>{travelPackage.rating}</Text>
+                    </View>
+                    <Text style={styles.packageTitle}>{travelPackage.title}</Text>
+                    <Text style={styles.packageMeta}>{travelPackage.duration}</Text>
+                    <View style={styles.packageBottomRow}>
+                      <Text style={styles.packagePrice}>From {travelPackage.price}</Text>
+                      <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No featured journeys available right now.</Text></View>
+          )}
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.eyebrow}>Special offers</Text>
+              <Text style={styles.sectionTitle}>Smart savings for every trip</Text>
+            </View>
+            <TouchableOpacity onPress={() => router.push('/offers')}>
+              <Text style={styles.linkText}>See offers</Text>
+            </TouchableOpacity>
+          </View>
+
+          {visibleOffers.length > 0 ? (
+            <View style={styles.offerList}>
+              {visibleOffers.map((offer) => (
+                <TouchableOpacity key={offer.id} style={styles.offerCard} onPress={() => router.push('/offers')} activeOpacity={0.9}>
+                  <Image source={{ uri: offer.image }} style={styles.offerImage} />
+                  <View style={styles.offerBody}>
+                    <Text style={styles.offerCategory}>{offer.category}</Text>
+                    <Text style={styles.offerTitle}>{offer.title}</Text>
+                    <Text style={styles.offerDescription} numberOfLines={2}>{offer.description}</Text>
+                    <Text style={styles.offerCode}>{offer.code}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No offers available at the moment.</Text></View>
+          )}
+        </View>
+
+        <View style={styles.trustPanel}>
+          <Text style={styles.eyebrow}>Why LemonTrip</Text>
+          <Text style={styles.sectionTitle}>Travel with confidence.</Text>
+          <View style={styles.trustGrid}>
+            {trustPoints.map((point) => (
+              <View key={point.title} style={styles.trustCard}>
+                <View style={styles.trustIconWrap}>
+                  <Ionicons name={point.icon as any} size={20} color={Colors.primary} />
                 </View>
+                <Text style={styles.trustTitle}>{point.title}</Text>
+                <Text style={styles.trustText}>{point.subtitle}</Text>
               </View>
             ))}
           </View>
         </View>
 
         <View style={styles.section}>
-          <View style={styles.sectionHeading}>
+          <View style={styles.sectionHeader}>
             <View>
-              <Text style={styles.eyebrow}>MADE FOR YOUR NEXT ESCAPE</Text>
-              <Text style={styles.sectionTitle}>Featured journeys</Text>
+              <Text style={styles.eyebrow}>Travel stories</Text>
+              <Text style={styles.sectionTitle}>Ideas and inspiration for your next escape</Text>
             </View>
-            <TouchableOpacity onPress={() => router.push('/packages')}>
-              <Text style={styles.textLink}>View all</Text>
+            <TouchableOpacity onPress={() => router.push('/blog')}>
+              <Text style={styles.linkText}>Read all</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.packageList}>
-            {travelPackages.map((travelPackage) => (
-              <TouchableOpacity
-                key={travelPackage.id}
-                style={styles.packageItem}
-                onPress={() => router.push(`/packages/${travelPackage.id}`)}>
-                <Image source={{ uri: travelPackage.image }} style={styles.packageImage} />
-                <View style={styles.packageInfo}>
-                  <Text style={styles.packageBadge}>{travelPackage.badge}</Text>
-                  <Text style={styles.packageTitle} numberOfLines={2}>{travelPackage.title}</Text>
-                  <Text style={styles.packageMeta}>{travelPackage.duration} · {travelPackage.rating}</Text>
-                  <Text style={styles.packagePrice}>From {travelPackage.price}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
-              </TouchableOpacity>
-            ))}
+
+          {visibleStories.length > 0 ? (
+            <View style={styles.storyList}>
+              {visibleStories.map((story) => (
+                <TouchableOpacity key={story.id} style={styles.storyCard} onPress={() => router.push(`/blog/${story.id}`)} activeOpacity={0.9}>
+                  <Image source={{ uri: story.image }} style={styles.storyImage} />
+                  <View style={styles.storyBody}>
+                    <Text style={styles.storyCategory}>{story.category}</Text>
+                    <Text style={styles.storyTitle}>{story.title}</Text>
+                    <View style={styles.storyMeta}>
+                      <Text style={styles.storyMetaText}>{story.date}</Text>
+                      <Text style={styles.storyMetaText}>•</Text>
+                      <Text style={styles.storyMetaText}>5 min read</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No stories available right now.</Text></View>
+          )}
+        </View>
+
+        <View style={styles.finalCta}>
+          <Text style={styles.finalCtaTitle}>Ready for your next journey?</Text>
+          <View style={styles.finalCtaActions}>
+            <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(tabs)/explore')}>
+              <Text style={styles.primaryButtonText}>Explore journeys</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryButtonAlt} onPress={() => router.push('/(tabs)/explore/flights')}>
+              <Text style={styles.secondaryButtonAltText}>Search flights</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.journalLink} onPress={() => router.push('/blog')}>
-          <View>
-            <Text style={styles.eyebrow}>THE LEMON TRIP JOURNAL</Text>
-            <Text style={styles.journalTitle}>Stories for the road</Text>
+        <View style={styles.footer}>
+          <View style={styles.footerGrid}>
+            <View style={styles.footerColumn}>
+              <Text style={styles.footerTitle}>Company</Text>
+              <Text style={styles.footerLink}>About</Text>
+              <Text style={styles.footerLink}>Careers</Text>
+              <Text style={styles.footerLink}>Media</Text>
+            </View>
+            <View style={styles.footerColumn}>
+              <Text style={styles.footerTitle}>Travel</Text>
+              <Text style={styles.footerLink}>Flights</Text>
+              <Text style={styles.footerLink}>Hotels</Text>
+              <Text style={styles.footerLink}>Packages</Text>
+            </View>
+            <View style={styles.footerColumn}>
+              <Text style={styles.footerTitle}>Support</Text>
+              <Text style={styles.footerLink}>Customer care</Text>
+              <Text style={styles.footerLink}>FAQs</Text>
+              <Text style={styles.footerLink}>Visa help</Text>
+            </View>
+            <View style={styles.footerColumn}>
+              <Text style={styles.footerTitle}>Legal</Text>
+              <Text style={styles.footerLink}>Privacy</Text>
+              <Text style={styles.footerLink}>Terms</Text>
+              <Text style={styles.footerLink}>Security</Text>
+            </View>
           </View>
-          <Ionicons name="arrow-forward" size={20} color={Colors.primary} />
-        </TouchableOpacity>
+          <Text style={styles.footerNote}>hello@lemontrip.in • +91 22 1234 5678</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -234,65 +388,111 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 36 },
-  topBar: { minHeight: 76, paddingHorizontal: 22, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  brand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
-  brandLine: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 1 },
-  profileButton: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  hero: { height: 385, justifyContent: 'flex-end', marginHorizontal: 14, overflow: 'hidden', borderRadius: 18 },
-  heroImage: { borderRadius: 18 },
-  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(4, 31, 19, 0.42)' },
-  heroCopy: { paddingHorizontal: 24, paddingBottom: 26, paddingTop: 52 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  heroTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 38, fontWeight: '800', lineHeight: 44, marginTop: 9 },
-  heroSubtitle: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, marginTop: 10, maxWidth: 270 },
-  heroButton: { alignSelf: 'flex-start', minHeight: 46, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.accent, marginTop: 20 },
-  heroButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  section: { marginTop: 31 },
-  sectionHeading: { paddingHorizontal: 22, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 16 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
-  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '800', marginTop: 4 },
-  textLink: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', paddingBottom: 3 },
-  quickServiceRow: { paddingHorizontal: 18, gap: 10 },
-  quickServiceItem: {
+  headerShell: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
+  headerRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 18,
     paddingHorizontal: 14,
-    borderRadius: 12,
-    backgroundColor: Colors.surfaceMuted,
-    minWidth: 76,
+    paddingVertical: 10,
   },
-  quickServiceItemActive: { backgroundColor: Colors.primary },
-  quickServiceIcon: { fontSize: 20, marginBottom: 4 },
-  quickServiceLabel: { fontSize: 11, color: Colors.textDark, fontWeight: '600' },
-  quickServiceLabelActive: { color: Colors.white },
-  destinationRow: { paddingHorizontal: 22, gap: 13 },
-  destinationItem: { width: 190 },
-  destinationImage: { width: 190, height: 128, backgroundColor: Colors.surfaceMuted },
-  saveButton: { position: 'absolute', top: 9, right: 9, width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.white },
-  destinationName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginTop: 9 },
-  destinationPrice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 2 },
-  offerStrip: { minHeight: 92, marginHorizontal: 22, marginTop: 34, paddingHorizontal: 18, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 16 },
-  offerCopy: { flex: 1, paddingRight: 12 },
-  offerEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
-  offerTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 5 },
-  whySection: { padding: 16, backgroundColor: Colors.accentSoft, marginHorizontal: 16, borderRadius: 16, marginTop: 20, marginBottom: 8 },
-  whyEyebrow: { fontSize: 11, fontWeight: 'bold', color: Colors.primary, letterSpacing: 1, marginBottom: 8 },
-  whyTitle: { fontSize: 22, fontWeight: 'bold', color: Colors.textDark, marginBottom: 16 },
-  whyList: { gap: 14 },
-  whyItem: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
-  whyIcon: { fontSize: 20, width: 28 },
-  whyTextWrap: { flex: 1 },
-  whyItemTitle: { fontSize: 14, fontWeight: 'bold', color: Colors.textDark, marginBottom: 2 },
-  whyItemSubtitle: { fontSize: 12, color: Colors.textLight, lineHeight: 16 },
-  packageList: { paddingHorizontal: 22, gap: 15 },
-  packageItem: { flexDirection: 'row', alignItems: 'center', gap: 13, paddingBottom: 15, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  packageImage: { width: 96, height: 88, backgroundColor: Colors.surfaceMuted },
-  packageInfo: { flex: 1 },
-  packageBadge: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
-  packageTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginTop: 3 },
-  packageMeta: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 4 },
-  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginTop: 4 },
-  journalLink: { minHeight: 78, marginHorizontal: 22, marginTop: 30, paddingVertical: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: Colors.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  journalTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 4 },
+  brandWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  brandBadge: { width: 28, height: 28, borderRadius: 10, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
+  brandBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
+  brand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  navRow: { flexDirection: 'row', alignItems: 'center', gap: 18 },
+  navItem: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  iconButton: { width: 36, height: 36, borderRadius: 10, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border },
+  profileButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12, backgroundColor: Colors.accentSoft, borderWidth: 1, borderColor: Colors.border },
+  profileText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  heroWrap: { paddingHorizontal: 16, marginTop: 12 },
+  heroImage: { minHeight: 390, justifyContent: 'flex-end', borderRadius: 24, overflow: 'hidden' },
+  heroImageStyle: { resizeMode: 'cover' },
+  heroOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(6, 35, 26, 0.42)' },
+  heroContent: { paddingHorizontal: 22, paddingBottom: 24, paddingTop: 28 },
+  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  heroTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 38, fontWeight: '800', lineHeight: 42, marginTop: 8 },
+  heroCopy: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Manrope', fontSize: 15, lineHeight: 22, marginTop: 10, maxWidth: 300 },
+  heroActions: { marginTop: 18, flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  primaryButton: { minHeight: 46, paddingHorizontal: 18, borderRadius: 12, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
+  primaryButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  secondaryButton: { minHeight: 46, paddingHorizontal: 18, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', alignItems: 'center', justifyContent: 'center' },
+  secondaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  section: { paddingTop: 26, paddingHorizontal: 16 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 14 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.3 },
+  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', marginTop: 4 },
+  linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  serviceGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  serviceCard: {
+    width: '48%',
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 16,
+    padding: 14,
+    minHeight: 140,
+  },
+  serviceIconWrap: { width: 42, height: 42, borderRadius: 12, backgroundColor: Colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  serviceTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', marginBottom: 5 },
+  serviceSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 15 },
+  serviceArrow: { marginTop: 12, alignSelf: 'flex-end' },
+  destinationRow: { paddingRight: 16, gap: 12 },
+  destinationCard: { width: 210, overflow: 'hidden', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 18 },
+  destinationImage: { width: 210, height: 170, backgroundColor: Colors.surfaceMuted },
+  saveButton: { position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' },
+  destinationMeta: { paddingHorizontal: 12, paddingVertical: 12 },
+  destinationName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  destinationPrice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 4 },
+  packageList: { gap: 14 },
+  packageCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 18, overflow: 'hidden' },
+  packageImage: { width: '100%', height: 180, backgroundColor: Colors.surfaceMuted },
+  packageBody: { padding: 14 },
+  packageTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  packageBadge: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 0.8 },
+  packageRating: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
+  packageTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', marginBottom: 4 },
+  packageMeta: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginBottom: 8 },
+  packageBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  offerList: { gap: 12 },
+  offerCard: { flexDirection: 'row', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 18, overflow: 'hidden' },
+  offerImage: { width: 120, height: 118, backgroundColor: Colors.surfaceMuted },
+  offerBody: { flex: 1, padding: 14 },
+  offerCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  offerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 6 },
+  offerDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 16, marginTop: 5 },
+  offerCode: { marginTop: 10, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  trustPanel: { marginTop: 28, marginHorizontal: 16, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 20, padding: 18 },
+  trustGrid: { marginTop: 12, flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  trustCard: { width: '48%', backgroundColor: Colors.background, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: Colors.border },
+  trustIconWrap: { width: 36, height: 36, borderRadius: 10, backgroundColor: Colors.accentSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  trustTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginBottom: 5 },
+  trustText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 16 },
+  storyList: { gap: 12 },
+  storyCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 18, overflow: 'hidden' },
+  storyImage: { width: '100%', height: 180, backgroundColor: Colors.surfaceMuted },
+  storyBody: { padding: 14 },
+  storyCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  storyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 7 },
+  storyMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
+  storyMetaText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
+  finalCta: { marginTop: 28, marginHorizontal: 16, padding: 18, borderRadius: 20, backgroundColor: Colors.primaryDark },
+  finalCtaTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 24, fontWeight: '800' },
+  finalCtaActions: { marginTop: 16, flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  secondaryButtonAlt: { minHeight: 46, paddingHorizontal: 18, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+  secondaryButtonAltText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  footer: { marginTop: 28, paddingHorizontal: 16 },
+  footerGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 16 },
+  footerColumn: { width: '45%', gap: 6 },
+  footerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginBottom: 4 },
+  footerLink: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  footerNote: { marginTop: 18, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11 },
+  emptyStateCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 14, padding: 18, alignItems: 'center' },
+  emptyStateText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
 });
