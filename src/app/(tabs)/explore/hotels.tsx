@@ -1,188 +1,228 @@
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import HotelCard from '@/components/hotels/HotelCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { hotels, type Hotel } from '@/data/hotels';
+import { setHotelSearch, selectHotel, type HotelSearchCriteria } from '@/utils/hotelSearchStore';
 import { Ionicons } from '@expo/vector-icons';
-import { hotels } from '@/data/hotels';
-import { addBooking } from '@/utils/bookingStore';
-import { useState } from 'react';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+const filterOptions = [
+  { id: 'rating-5-star', label: '5 Star', matches: (hotel: Hotel) => hotel.rating === '5 Star' },
+  { id: 'rating-4-star', label: '4 Star', matches: (hotel: Hotel) => hotel.rating === '4 Star' },
+  { id: 'rating-boutique', label: 'Boutique rating', matches: (hotel: Hotel) => hotel.rating === 'Boutique' },
+  { id: 'property-hotel', label: 'Hotel', matches: (hotel: Hotel) => hotel.propertyType?.toLowerCase() === 'hotel' },
+  { id: 'property-resort', label: 'Resort', matches: (hotel: Hotel) => hotel.propertyType?.toLowerCase() === 'resort' },
+  { id: 'property-homestay', label: 'Homestay', matches: (hotel: Hotel) => hotel.propertyType?.toLowerCase() === 'homestay' },
+  { id: 'property-boutique', label: 'Boutique property', matches: (hotel: Hotel) => hotel.propertyType?.toLowerCase() === 'boutique' },
+  { id: 'amenity-wifi', label: 'Free WiFi', matches: (hotel: Hotel) => hotel.amenities.some((amenity) => amenity.toLowerCase().includes('free wifi')) },
+  { id: 'amenity-pool', label: 'Pool', matches: (hotel: Hotel) => hotel.amenities.some((amenity) => amenity.toLowerCase().includes('pool')) },
+  { id: 'amenity-beach', label: 'Beach Access', matches: (hotel: Hotel) => hotel.amenities.some((amenity) => amenity.toLowerCase().includes('beach')) },
+  { id: 'breakfast', label: 'Breakfast', matches: (hotel: Hotel) => hotel.breakfast === true || hotel.roomOptions?.some((room) => room.breakfast === true) === true },
+  { id: 'cancellation', label: 'Free cancellation', matches: (hotel: Hotel) => Boolean(hotel.cancellation?.toLowerCase().includes('free') || hotel.roomOptions?.some((room) => room.cancellation?.toLowerCase().includes('free'))) },
+];
+const sortOptions = ['Recommended', 'Price low to high', 'Rating', 'Distance'] as const;
+type SortOption = typeof sortOptions[number];
+
+function getPrice(price: string) {
+  const match = price.match(/[\d,]+(?:\.\d+)?/);
+  return match ? Number(match[0].replace(/,/g, '')) : Number.POSITIVE_INFINITY;
+}
+
+function toDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
 export default function HotelsScreen() {
-  const [bookedIds, setBookedIds] = useState<string[]>([]);
+  const { width } = useWindowDimensions();
+  const desktop = width >= 950;
+  const [destination, setDestination] = useState('');
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(2);
+  const [rooms, setRooms] = useState(1);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [sort, setSort] = useState<SortOption>('Recommended');
 
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)/explore');
+  const search: HotelSearchCriteria = { destination, checkIn, checkOut, guests, rooms };
+
+  const visibleHotels = useMemo(() => {
+    const filtered = hotels.filter((hotel) => {
+      const query = destination.trim().toLowerCase();
+      const matchesLocation = !hasSearched || !query || `${hotel.name} ${hotel.location}`.toLowerCase().includes(query);
+      const matchesAmenities = activeFilters.every((id) => filterOptions.find((filter) => filter.id === id)?.matches(hotel) ?? false);
+      return matchesLocation && matchesAmenities;
+    });
+
+    if (sort === 'Price low to high') filtered.sort((a, b) => getPrice(a.price) - getPrice(b.price));
+    if (sort === 'Rating') filtered.sort((a, b) => (b.reviewScore ?? -1) - (a.reviewScore ?? -1));
+    if (sort === 'Distance') filtered.sort((a, b) => (a.distanceKm ?? Number.POSITIVE_INFINITY) - (b.distanceKm ?? Number.POSITIVE_INFINITY));
+    return filtered;
+  }, [activeFilters, destination, hasSearched, sort]);
+
+  const handleSearch = () => {
+    const start = toDate(checkIn);
+    const end = toDate(checkOut);
+    if (checkIn && !start) {
+      Alert.alert('Check-in date', 'Use YYYY-MM-DD for your check-in date.');
+      return;
     }
+    if (checkOut && !end) {
+      Alert.alert('Check-out date', 'Use YYYY-MM-DD for your check-out date.');
+      return;
+    }
+    if (start && end && end <= start) {
+      Alert.alert('Check-out date', 'Check-out must be after check-in.');
+      return;
+    }
+    setHasSearched(true);
+    setHotelSearch(search);
   };
 
-  const handleBook = (hotelId: string, name: string, price: string) => {
-    addBooking({
-      id: `hotel-${hotelId}-${Date.now()}`,
-      serviceName: 'Hotels',
-      itemName: name,
-      price,
-      bookedAt: new Date().toLocaleDateString(),
-    });
-    setBookedIds((prev) => [...prev, hotelId]);
-    Alert.alert('Booked!', `${name} has been added to your bookings.`);
+  const openHotel = (hotel: Hotel) => {
+    setHotelSearch(search);
+    selectHotel(hotel);
+    router.push('/(tabs)/explore/hotel-details');
+  };
+
+  const toggleFilter = (filter: string) => {
+    setActiveFilters((current) => current.includes(filter) ? current.filter((item) => item !== filter) : [...current, filter]);
+  };
+
+  const handleBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)/explore');
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScreenHeader title="Stays worth the journey" subtitle="Handpicked places to feel at home." eyebrow="LEMON TRIP / STAYS" onBack={handleBack} />
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
+        <View style={styles.content}>
+          <ScreenHeader title="Find your stay" subtitle="Distinctive stays, chosen for your journey." eyebrow="LEMONTRIP / HOTELS" onBack={handleBack} />
 
-      <ScrollView contentContainerStyle={styles.list}>
-        {hotels.map((hotel) => {
-          const isBooked = bookedIds.includes(hotel.id);
-          return (
-            <View key={hotel.id} style={styles.card}>
-              <Image source={{ uri: hotel.image }} style={styles.image} />
-              <View style={styles.cardBody}>
-                <View style={styles.topRow}>
-                  <Text style={styles.name}>{hotel.name}</Text>
-                  <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.primary} /><Text style={styles.ratingText}>{hotel.rating}</Text></View>
-                </View>
-                <Text style={styles.location}>{hotel.location}</Text>
-                <Text style={styles.description}>{hotel.description}</Text>
-
-                <View style={styles.amenitiesRow}>
-                  {hotel.amenities.slice(0, 3).map((amenity, index) => (
-                    <View key={index} style={styles.amenityTag}>
-                      <Text style={styles.amenityText}>{amenity}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                <View style={styles.bottomRow}>
-                  <Text style={styles.price}>{hotel.price}</Text>
-                  <TouchableOpacity
-                    style={[styles.bookButton, isBooked && styles.bookedButton]}
-                    disabled={isBooked}
-                    onPress={() => handleBook(hotel.id, hotel.name, hotel.price)}>
-                    <Text style={[styles.bookButtonText, isBooked && styles.bookedButtonText]}>
-                      {isBooked ? 'Booked' : 'Book now'}
-                    </Text>
-                  </TouchableOpacity>
+          <View style={styles.searchPanel}>
+            <View style={styles.searchTitleRow}><Ionicons name="bed-outline" size={18} color={Colors.primary} /><Text style={styles.searchTitle}>Where are you staying?</Text></View>
+            <View style={styles.searchFields}>
+              <View style={[styles.field, desktop && styles.destinationField]}>
+                <Text style={styles.fieldLabel}>DESTINATION</Text>
+                <View style={styles.inputWrap}><Ionicons name="location-outline" size={16} color={Colors.textLight} /><TextInput value={destination} onChangeText={setDestination} placeholder="City, region or property" placeholderTextColor={Colors.textLight} style={styles.input} /></View>
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.fieldLabel}>CHECK-IN</Text>
+                <TextInput value={checkIn} onChangeText={setCheckIn} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textLight} style={styles.dateInput} />
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.fieldLabel}>CHECK-OUT</Text>
+                <TextInput value={checkOut} onChangeText={setCheckOut} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textLight} style={styles.dateInput} />
+              </View>
+              <View style={styles.field}>
+                <Text style={styles.fieldLabel}>GUESTS & ROOMS</Text>
+                <View style={styles.occupancy}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove guest" onPress={() => setGuests((current) => Math.max(1, current - 1))}><Ionicons name="remove-circle-outline" size={19} color={Colors.primary} /></TouchableOpacity>
+                  <Text style={styles.occupancyText}>{guests} · {rooms} {rooms === 1 ? 'room' : 'rooms'}</Text>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add guest" onPress={() => setGuests((current) => Math.min(12, current + 1))}><Ionicons name="add-circle-outline" size={19} color={Colors.primary} /></TouchableOpacity>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add room" onPress={() => setRooms((current) => Math.min(6, current + 1))} style={styles.addRoom}><Text style={styles.addRoomText}>+ Room</Text></TouchableOpacity>
                 </View>
               </View>
             </View>
-          );
-        })}
+            <TouchableOpacity accessibilityRole="button" onPress={handleSearch} style={styles.searchButton}>
+              <Ionicons name="search-outline" size={17} color={Colors.primaryDark} /><Text style={styles.searchButtonText}>Search hotels</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.resultsHeader}>
+            <View><Text style={styles.resultsEyebrow}>{hasSearched ? 'STAYS FOR YOUR SEARCH' : 'HANDPICKED PLACES'}</Text><Text style={styles.resultsTitle}>{hasSearched ? `${visibleHotels.length} stays to explore` : 'Places to stay'}</Text></View>
+            <View style={styles.sortWrap}>
+              <Text style={styles.sortLabel}>SORT</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sortOptions}>
+                {sortOptions.map((option) => <TouchableOpacity key={option} onPress={() => setSort(option)} style={[styles.sortChip, sort === option && styles.sortChipActive]}><Text style={[styles.sortChipText, sort === option && styles.sortChipTextActive]}>{option}</Text></TouchableOpacity>)}
+              </ScrollView>
+            </View>
+          </View>
+
+          <View style={styles.filtersBlock}>
+            <View style={styles.filtersTitleRow}><Ionicons name="options-outline" size={15} color={Colors.primary} /><Text style={styles.filtersTitle}>Refine your stay</Text></View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterOptions}>
+              {filterOptions.map((filter) => <TouchableOpacity key={filter.id} onPress={() => toggleFilter(filter.id)} style={[styles.filterChip, activeFilters.includes(filter.id) && styles.filterChipActive]}><Text style={[styles.filterChipText, activeFilters.includes(filter.id) && styles.filterChipTextActive]}>{filter.label}</Text></TouchableOpacity>)}
+            </ScrollView>
+            <View style={styles.unavailableFilters}>
+              <Text style={styles.unavailableLabel}>Price</Text><Text style={styles.unavailableLabel}>Location</Text>
+              <Text style={styles.unavailableNote}>No distance or review data supplied</Text>
+            </View>
+          </View>
+
+          {visibleHotels.length ? (
+            <View style={styles.hotelList}>
+              {visibleHotels.map((hotel) => <HotelCard key={hotel.id} hotel={hotel} search={search} onPress={openHotel} />)}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Ionicons name="search-outline" size={24} color={Colors.primary} />
+              <Text style={styles.emptyTitle}>No stays match these filters</Text>
+              <Text style={styles.emptyText}>Try a different destination or clear a filter.</Text>
+              <TouchableOpacity onPress={() => { setActiveFilters([]); setDestination(''); setHasSearched(false); }} style={styles.clearButton}><Text style={styles.clearButtonText}>Clear search</Text></TouchableOpacity>
+            </View>
+          )}
+
+          <View style={styles.trustNote}><Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} /><Text style={styles.trustText}>Property details shown here come from the available hotel listing.</Text></View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  list: {
-    paddingHorizontal: 22,
-    paddingTop: 16,
-    paddingBottom: 30,
-    gap: 20,
-  },
-  card: {
-    borderRadius: 3,
-    overflow: 'hidden',
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  image: {
-    width: '100%',
-    height: 190,
-  },
-  cardBody: {
-    paddingTop: 13,
-    paddingBottom: 16,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  name: {
-    fontFamily: 'Manrope',
-    fontSize: 15,
-    fontWeight: '800',
-    color: Colors.textDark,
-    flex: 1,
-  },
-  rating: {
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
-    color: Colors.primary,
-    backgroundColor: Colors.background,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    gap: 4,
-  },
-  location: {
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    color: Colors.textLight,
-    marginBottom: 8,
-  },
-  description: {
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    color: Colors.textLight,
-    lineHeight: 18,
-    marginBottom: 10,
-  },
-  amenitiesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 12,
-  },
-  amenityTag: {
-    backgroundColor: Colors.surfaceMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-  },
-  amenityText: {
-    fontFamily: 'Manrope',
-    fontSize: 9,
-    color: Colors.textDark,
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  price: {
-    fontFamily: 'Manrope',
-    fontSize: 14,
-    fontWeight: '800',
-    color: Colors.primary,
-  },
-  bookButton: {
-    backgroundColor: Colors.accent,
-    borderRadius: 2,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  bookedButton: {
-    backgroundColor: Colors.success,
-  },
-  bookButtonText: {
-    color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  bookedButtonText: {
-    color: Colors.white,
-  },
-  ratingText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
+  page: { paddingBottom: 30 },
+  content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
+  searchPanel: { marginHorizontal: 16, padding: 15, borderRadius: 17, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  searchTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 13 },
+  searchTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  searchFields: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  field: { flexGrow: 1, flexBasis: '46%', minWidth: 140, marginBottom: 4 },
+  destinationField: { flexBasis: '28%' },
+  fieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 0.8, marginBottom: 5 },
+  inputWrap: { minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: 9, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
+  input: { flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9 },
+  dateInput: { minHeight: 42, paddingHorizontal: 9, borderRadius: 9, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9 },
+  occupancy: { minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, paddingHorizontal: 8, borderRadius: 9, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
+  occupancyText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  addRoom: { paddingHorizontal: 5, paddingVertical: 5 },
+  addRoomText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  searchButton: { minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 7, borderRadius: 10, backgroundColor: Colors.accent },
+  searchButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  resultsHeader: { marginTop: 23, paddingHorizontal: 16, gap: 12 },
+  resultsEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  resultsTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 3 },
+  sortWrap: { gap: 6 },
+  sortLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 0.8 },
+  sortOptions: { gap: 6 },
+  sortChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  sortChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  sortChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  sortChipTextActive: { color: Colors.white },
+  filtersBlock: { marginHorizontal: 16, marginTop: 14, padding: 11, borderRadius: 13, backgroundColor: Colors.surfaceMuted },
+  filtersTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  filtersTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  filterOptions: { gap: 6 },
+  filterChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: 14, backgroundColor: Colors.surface },
+  filterChipActive: { backgroundColor: Colors.primary },
+  filterChipText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  filterChipTextActive: { color: Colors.white },
+  unavailableFilters: { flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 8 },
+  unavailableLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  unavailableNote: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, textAlign: 'right' },
+  hotelList: { paddingHorizontal: 16, gap: 12, marginTop: 14 },
+  emptyState: { minHeight: 180, alignItems: 'center', justifyContent: 'center', marginHorizontal: 16, marginTop: 14, padding: 20, borderRadius: 15, backgroundColor: Colors.surface },
+  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginTop: 9 },
+  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, marginTop: 4 },
+  clearButton: { marginTop: 11, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 9, backgroundColor: Colors.accent },
+  clearButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  trustNote: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginHorizontal: 16, marginTop: 19 },
+  trustText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
 });
