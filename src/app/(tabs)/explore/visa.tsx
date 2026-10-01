@@ -19,7 +19,7 @@ const supportedCountries: VisaCountry[] = [
   { code: 'UAE', name: 'United Arab Emirates', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days', fee: '₹4,500' },
   { code: 'UK', name: 'United Kingdom', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=900&q=85', visaTypes: ['Business Visa', 'Student Visa'], processing: '10–15 days (Business) · 15–30 days (Student)' },
   { code: 'USA', name: 'United States', image: 'https://images.unsplash.com/photo-1496588152823-86ff7695e68f?w=900&q=85', visaTypes: ['Business Visa'], processing: '10–15 days' },
-  { code: 'Canada', name: 'Canada', image: 'https://images.unsplash.com/photo-1503614472-8c93d56cd9b6?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
+  { code: 'Canada', name: 'Canada', image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
   { code: 'Australia', name: 'Australia', image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
   { code: 'Schengen', name: 'Schengen Area', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=900&q=85', visaTypes: ['Business Visa'], processing: '10–15 days', fee: '₹7,200' },
   { code: 'Singapore', name: 'Singapore', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days' },
@@ -121,7 +121,7 @@ export default function VisaScreen() {
           {selectedCountry ? (
             <View style={styles.detailsSection}>
               <View style={styles.detailsHeading}><View><Text style={styles.eyebrow}>REQUIREMENTS OVERVIEW</Text><Text style={styles.sectionTitle}>{selectedCountry.name}</Text></View><TouchableOpacity accessibilityRole="button" accessibilityLabel="Close country details" onPress={() => setSelectedCountry(null)} style={styles.closeButton}><Ionicons name="close" size={17} color={Colors.textDark} /></TouchableOpacity></View>
-              <View style={[styles.detailsLayout, desktop && styles.detailsLayoutDesktop]}>
+              <View style={styles.detailsLayout}>
                 <View style={styles.detailsMain}>
                   <VisaDetail title="Eligibility" icon="person-outline"><Text style={styles.detailText}>Eligibility depends on nationality, travel purpose, and individual circumstances. Confirm requirements with a visa advisor before applying.</Text></VisaDetail>
                   <VisaDetail title="Documents" icon="document-text-outline">
@@ -134,7 +134,6 @@ export default function VisaScreen() {
                   <VisaDetail title="FAQs" icon="help-circle-outline"><Text style={styles.detailText}>Destination-specific FAQs are not available in the current service data. Contact an advisor for guidance.</Text></VisaDetail>
                   <TouchableOpacity onPress={() => handleStartApplication(selectedCountry)} style={styles.startButton}><Ionicons name="mail-outline" size={15} color={Colors.primaryDark} /><Text style={styles.startButtonText}>Start application</Text></TouchableOpacity>
                 </View>
-                {desktop ? <TrackingPanel applicationId={applicationId} onChange={setApplicationId} message={trackingMessage} onCheck={checkApplication} /> : null}
               </View>
             </View>
           ) : null}
@@ -174,18 +173,6 @@ export default function VisaScreen() {
 
 function VisaDetail({ title, icon, children }: { title: string; icon: keyof typeof Ionicons.glyphMap; children: React.ReactNode }) {
   return <View style={styles.visaDetail}><View style={styles.visaDetailHeading}><View style={styles.visaDetailIcon}><Ionicons name={icon} size={15} color={Colors.primary} /></View><Text style={styles.visaDetailTitle}>{title}</Text></View><View style={styles.visaDetailBody}>{children}</View></View>;
-}
-
-function TrackingPanel({ applicationId, onChange, message, onCheck }: { applicationId: string; onChange: (value: string) => void; message: string; onCheck: () => void }) {
-  return (
-    <View style={styles.trackingPanel}>
-      <Text style={styles.trackingPanelTitle}>Track an application</Text>
-      <Text style={styles.trackingIntro}>Application status is not connected to a provider yet.</Text>
-      <View style={styles.trackingInputRow}><TextInput value={applicationId} onChangeText={onChange} placeholder="Application ID" placeholderTextColor={Colors.textLight} style={styles.trackingInput} /><TouchableOpacity onPress={onCheck} style={styles.checkButton}><Ionicons name="search-outline" size={13} color={Colors.primaryDark} /></TouchableOpacity></View>
-      {message ? <Text style={styles.trackingMessage}>{message}</Text> : null}
-      <View style={styles.trackingUnavailable}><Ionicons name="information-circle-outline" size={14} color={Colors.textLight} /><Text style={styles.trackingUnavailableText}>No live status is available.</Text></View>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -233,7 +220,6 @@ const styles = StyleSheet.create({
   detailsHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 9 },
   closeButton: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.surface },
   detailsLayout: { gap: 13, paddingHorizontal: 16 },
-  detailsLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
   detailsMain: { flex: 1, minWidth: 0 },
   visaDetail: { paddingVertical: 9, borderTopWidth: 1, borderTopColor: Colors.border },
   visaDetailHeading: { flexDirection: 'row', alignItems: 'center', gap: 7 },
@@ -246,16 +232,11 @@ const styles = StyleSheet.create({
   documentText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 7 },
   startButton: { minHeight: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10, borderRadius: 10, backgroundColor: Colors.accent },
   startButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
-  trackingPanel: { width: 285, padding: 13, borderWidth: 1, borderColor: Colors.border, borderRadius: 14, backgroundColor: Colors.surface },
-  trackingPanelTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  trackingIntro: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, lineHeight: 12, marginTop: 5 },
   trackingInputRow: { flexDirection: 'row', gap: 6, marginTop: 9 },
   trackingInput: { flex: 1, minWidth: 0, minHeight: 35, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: 'Manrope', fontSize: 8, color: Colors.textDark },
   checkButton: { minHeight: 35, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 9, borderRadius: 8, backgroundColor: Colors.accent },
   checkButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800' },
   trackingMessage: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, lineHeight: 11, marginTop: 6 },
-  trackingUnavailable: { flexDirection: 'row', gap: 5, alignItems: 'center', marginTop: 10 },
-  trackingUnavailableText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7 },
   trackingSection: { marginHorizontal: 16, marginTop: 24, padding: 13, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   trackingHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   trackingBadge: { paddingHorizontal: 7, paddingVertical: 5, borderRadius: 7, backgroundColor: Colors.surfaceMuted },
