@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { logout, useAuth } from '@/utils/authStore';
+import { logout, useAuth, type User } from '@/utils/authStore';
 import { useBookings, type Booking } from '@/utils/bookingStore';
 import { useWishlist } from '@/utils/wishlistStore';
 import { router } from 'expo-router';
@@ -15,7 +15,7 @@ type ProfileEntry = {
   icon: keyof typeof Ionicons.glyphMap;
   route?: '/(tabs)/bookings' | '/(tabs)/wishlist' | '/settings';
   requiresLogin?: boolean;
-  info?: 'payments' | 'personal' | 'support';
+  info?: 'payments' | 'personal' | 'support' | 'security';
   badge?: string;
 };
 
@@ -28,6 +28,14 @@ function hasFutureTripDate(booking: Booking) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return tripDate >= today;
+}
+
+function getProfileEmail(user: User) {
+  return user.email.includes('@') ? user.email : 'Email not added';
+}
+
+function getProfilePhone(user: User) {
+  return user.phone || (user.email.includes('@') ? 'Phone not added' : user.email);
 }
 
 const guestSections: Array<{ title: string; entries: ProfileEntry[] }> = [
@@ -63,7 +71,7 @@ const memberSections: Array<{ title: string; entries: ProfileEntry[] }> = [
       { id: 'personal', title: 'Personal Information', description: 'Name, email and contact details', icon: 'person-circle-outline', info: 'personal' },
       { id: 'preferences', title: 'Travel Preferences', description: 'Language, currency and trip settings', icon: 'options-outline', route: '/settings' },
       { id: 'notifications', title: 'Notifications', description: 'Booking alerts and email updates', icon: 'notifications-outline', route: '/settings' },
-      { id: 'security', title: 'Security', description: 'Privacy and account protection', icon: 'shield-checkmark-outline', route: '/settings' },
+      { id: 'security', title: 'Security', description: 'Privacy and account protection', icon: 'shield-checkmark-outline', info: 'security', badge: 'Coming soon' },
       { id: 'settings', title: 'Settings', description: 'Manage your app preferences', icon: 'settings-outline', route: '/settings' },
     ],
   },
@@ -99,12 +107,16 @@ export default function ProfileScreen() {
     ? 'Payment methods'
     : activeInfo === 'personal'
       ? 'Personal information'
-      : 'Help & Support';
+      : activeInfo === 'security'
+        ? 'Security'
+        : 'Help & Support';
   const infoDescription = activeInfo === 'payments'
     ? 'Saved payment methods are not available yet. No card details are stored in LemonTrip.'
     : activeInfo === 'personal'
       ? 'Your profile details currently come from your sign-in.'
-      : 'Contact our travel support team for help with your account or journey.';
+      : activeInfo === 'security'
+        ? 'Account security controls are not available yet. Your current sign-in session remains active on this device.'
+        : 'Contact our travel support team for help with your account or journey.';
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -115,11 +127,6 @@ export default function ProfileScreen() {
               <Text style={styles.eyebrow}>LEMONTRIP / ACCOUNT</Text>
               <Text style={styles.pageTitle}>Your account</Text>
             </View>
-            {user ? (
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log out" onPress={logout} style={styles.logoutIcon}>
-                <Ionicons name="log-out-outline" size={18} color={Colors.primaryDark} />
-              </TouchableOpacity>
-            ) : null}
           </View>
 
           <View style={[styles.profileCard, wide && styles.profileCardWide]}>
@@ -129,8 +136,8 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.identityCopy}>
                 <Text style={styles.name}>{user ? user.name : 'Guest User'}</Text>
-                <Text style={styles.emailText}>{user ? user.email : 'Sign in to manage your trips'}</Text>
-                {user ? <Text style={styles.phoneText}>{user.phone || 'Phone not added'}</Text> : null}
+                <Text style={styles.emailText}>{user ? getProfileEmail(user) : 'Sign in to manage your trips'}</Text>
+                {user ? <Text style={styles.phoneText}>{getProfilePhone(user)}</Text> : null}
               </View>
             </View>
             {!user ? (
@@ -162,7 +169,7 @@ export default function ProfileScreen() {
 
           <View style={[styles.accountLayout, wide && styles.accountLayoutWide]}>
             <View style={styles.accountColumn}>
-              {sections.slice(0, user ? 2 : 1).map((section) => (
+              {sections.slice(0, 1).map((section) => (
                 <View key={section.title} style={styles.section}>
                   <Text style={styles.sectionTitle}>{section.title}</Text>
                   <View style={styles.entryGroup}>
@@ -184,7 +191,7 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.accountColumn}>
-              {sections.slice(user ? 2 : 1).map((section) => (
+              {sections.slice(1).map((section) => (
                 <View key={section.title} style={styles.section}>
                   <Text style={styles.sectionTitle}>{section.title}</Text>
                   <View style={styles.entryGroup}>
@@ -214,7 +221,7 @@ export default function ProfileScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <View style={styles.modalIcon}><Ionicons name={activeInfo === 'support' ? 'chatbubble-ellipses-outline' : activeInfo === 'personal' ? 'person-circle-outline' : 'card-outline'} size={20} color={Colors.primary} /></View>
+              <View style={styles.modalIcon}><Ionicons name={activeInfo === 'support' ? 'chatbubble-ellipses-outline' : activeInfo === 'personal' ? 'person-circle-outline' : activeInfo === 'security' ? 'shield-checkmark-outline' : 'card-outline'} size={20} color={Colors.primary} /></View>
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close" onPress={() => setActiveInfo(null)} style={styles.closeButton}>
                 <Ionicons name="close" size={18} color={Colors.textDark} />
               </TouchableOpacity>
@@ -224,8 +231,8 @@ export default function ProfileScreen() {
             {activeInfo === 'personal' && user ? (
               <View style={styles.personalDetails}>
                 <View><Text style={styles.detailLabel}>NAME</Text><Text style={styles.detailValue}>{user.name}</Text></View>
-                <View><Text style={styles.detailLabel}>EMAIL</Text><Text style={styles.detailValue}>{user.email}</Text></View>
-                <View><Text style={styles.detailLabel}>PHONE</Text><Text style={styles.detailValue}>{user.phone || 'Not added'}</Text></View>
+                <View><Text style={styles.detailLabel}>EMAIL</Text><Text style={styles.detailValue}>{getProfileEmail(user)}</Text></View>
+                <View><Text style={styles.detailLabel}>PHONE</Text><Text style={styles.detailValue}>{getProfilePhone(user)}</Text></View>
               </View>
             ) : null}
             {activeInfo === 'support' ? (
@@ -249,7 +256,6 @@ const styles = StyleSheet.create({
   pageHeader: { minHeight: 72, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
   pageTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 25, fontWeight: '900', marginTop: 3 },
-  logoutIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.surface },
   profileCard: { padding: 17, borderRadius: 18, backgroundColor: Colors.primaryDark },
   profileCardWide: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   profileIdentity: { flexDirection: 'row', alignItems: 'center', gap: 13, flex: 1 },
