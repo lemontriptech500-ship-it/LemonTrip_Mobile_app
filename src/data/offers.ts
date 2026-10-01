@@ -3,8 +3,11 @@ export interface Offer {
   category: string;
   title: string;
   description: string;
-  code: string;
+  code?: string;
   image: string;
+  discount?: string;
+  validUntil?: string;
+  terms?: string;
 }
 
 export const offers: Offer[] = [

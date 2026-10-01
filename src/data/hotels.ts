@@ -7,6 +7,32 @@ export interface Hotel {
   price: string;
   description: string;
   amenities: string[];
+  propertyType?: string;
+  reviewScore?: number;
+  reviewCount?: number;
+  gallery?: string[];
+  roomOptions?: HotelRoomOption[];
+  cancellation?: string;
+  breakfast?: boolean;
+  distanceKm?: number;
+  address?: string;
+  reviews?: HotelReview[];
+}
+
+export interface HotelRoomOption {
+  id: string;
+  name: string;
+  pricePerNight: string;
+  cancellation?: string;
+  breakfast?: boolean;
+  amenities?: string[];
+}
+
+export interface HotelReview {
+  id: string;
+  author: string;
+  score: number;
+  comment: string;
 }
 
 export const hotels: Hotel[] = [

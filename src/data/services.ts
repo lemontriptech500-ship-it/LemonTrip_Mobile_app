@@ -1,17 +1,20 @@
+import type { ComponentProps } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+
 export interface Service {
   id: string;
   title: string;
   subtitle: string;
-  icon: string;
+  icon: ComponentProps<typeof Ionicons>['name'];
 }
 
 export const services: Service[] = [
-  { id: 'flights', title: 'Flights', subtitle: 'Book domestic & international flights', icon: '✈️' },
-  { id: 'hotels', title: 'Hotels', subtitle: 'Handpicked stays across the globe', icon: '🏨' },
-  { id: 'buses', title: 'Buses', subtitle: 'Comfortable bus travel', icon: '🚌' },
-  { id: 'trains', title: 'Trains', subtitle: 'IRCTC bookings made easy', icon: '🚆' },
-  { id: 'packages', title: 'Tours & Packages', subtitle: 'Curated holiday experiences', icon: '🧳' },
-  { id: 'visa', title: 'Visa Services', subtitle: 'Expert visa assistance', icon: '🛂' },
+  { id: 'flights', title: 'Flights', subtitle: 'Book domestic & international flights', icon: 'airplane-outline' },
+  { id: 'hotels', title: 'Hotels', subtitle: 'Handpicked stays across the globe', icon: 'bed-outline' },
+  { id: 'buses', title: 'Buses', subtitle: 'Comfortable bus travel', icon: 'bus-outline' },
+  { id: 'trains', title: 'Trains', subtitle: 'Rail bookings made easy', icon: 'train-outline' },
+  { id: 'packages', title: 'Tours & Packages', subtitle: 'Curated holiday experiences', icon: 'map-outline' },
+  { id: 'visa', title: 'Visa Services', subtitle: 'Expert visa assistance', icon: 'document-text-outline' },
 ];
 
 export interface Listing {
@@ -22,11 +25,6 @@ export interface Listing {
 }
 
 export const dummyListings: Record<string, Listing[]> = {
-  flights: [
-    { id: '1', name: 'Delhi → Mumbai', detail: 'IndiGo · Non-stop · 2h 10m', price: '₹4,299' },
-    { id: '2', name: 'Mumbai → Bangalore', detail: 'Air India · Non-stop · 1h 40m', price: '₹3,899' },
-    { id: '3', name: 'Delhi → Dubai', detail: 'Emirates · Non-stop · 3h 45m', price: '₹22,500' },
-  ],
   hotels: [
     { id: '1', name: 'Taj Palace, Mumbai', detail: '5 Star · Free Wifi · Pool', price: '₹8,500/night' },
     { id: '2', name: 'Beach Resort, Goa', detail: '4 Star · Sea View', price: '₹5,200/night' },

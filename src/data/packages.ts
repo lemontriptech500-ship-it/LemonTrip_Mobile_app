@@ -8,7 +8,20 @@ export interface TravelPackage {
   price: string;
   description: string;
   highlights: string[];
+  destination?: string;
+  categories?: PackageCategory[];
+  gallery?: string[];
+  itinerary?: Array<{ day: string; title: string; description: string }>;
+  hotels?: string[];
+  meals?: string[];
+  transfers?: string[];
+  inclusions?: string[];
+  exclusions?: string[];
+  terms?: string;
+  cancellation?: string;
 }
+
+export type PackageCategory = 'Weekend' | 'Honeymoon' | 'Family' | 'Adventure' | 'Luxury' | 'Spiritual' | 'International' | 'Domestic';
 
 export const travelPackages: TravelPackage[] = [
   {
@@ -21,6 +34,8 @@ export const travelPackages: TravelPackage[] = [
     price: '₹24,999',
     description: 'Experience the glitz and glamour of Dubai with luxury stays, desert safaris, and iconic skyline views.',
     highlights: ['Desert Safari', 'Burj Khalifa Visit', 'Luxury Hotel Stay'],
+    destination: 'Dubai',
+    categories: ['Luxury', 'Adventure', 'International'],
   },
   {
     id: 'pkg-2',
@@ -32,6 +47,8 @@ export const travelPackages: TravelPackage[] = [
     price: '₹32,999',
     description: 'Explore the tropical paradise of Bali with its stunning beaches, ancient temples, and vibrant culture.',
     highlights: ['Temple Tours', 'Beach Resorts', 'Cultural Experiences'],
+    destination: 'Bali',
+    categories: ['International'],
   },
   {
     id: 'pkg-3',
@@ -43,5 +60,7 @@ export const travelPackages: TravelPackage[] = [
     price: '₹15,999',
     description: 'Discover the breathtaking beauty of Kashmir with houseboats, snow-capped mountains, and lush gardens.',
     highlights: ['Houseboat Stay', 'Shikara Ride', 'Mountain Views'],
+    destination: 'Kashmir',
+    categories: ['Luxury', 'Domestic'],
   },
 ];

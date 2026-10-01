@@ -5,6 +5,7 @@ export interface CartItem {
   serviceName: string;
   itemName: string;
   price: string;
+  tripDate?: string;
 }
 
 let cart: CartItem[] = [];

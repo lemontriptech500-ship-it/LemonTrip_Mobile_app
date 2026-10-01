@@ -1,220 +1,109 @@
 import { Colors } from '@/constants/colors';
+import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
 import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SignupScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [errors, setErrors] = useState({ name: '', email: '', phone: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateAndSignup = () => {
-    let hasError = false;
-    setNameError('');
-    setEmailError('');
-    setPasswordError('');
+    const nextErrors = { name: '', email: '', phone: '', password: '' };
+    if (!name.trim()) nextErrors.name = 'Your name is required';
+    if (!email.trim()) nextErrors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) nextErrors.email = 'Enter a valid email address';
+    if (!phone.trim()) nextErrors.phone = 'Mobile number is required';
+    else if (phone.replace(/\D/g, '').length < 7) nextErrors.phone = 'Enter a valid mobile number';
+    if (!password.trim()) nextErrors.password = 'Password is required';
+    else if (password.length < 6) nextErrors.password = 'Use at least 6 characters';
 
-    if (!name.trim()) {
-      setNameError('Full name is required');
-      hasError = true;
-    }
+    setErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) return;
 
-    if (!email.trim()) {
-      setEmailError('Email or phone is required');
-      hasError = true;
-    } else if (email.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Please enter a valid email address');
-      hasError = true;
-    }
-
-    if (!password.trim()) {
-      setPasswordError('Password is required');
-      hasError = true;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      hasError = true;
-    }
-
-    if (hasError) return;
-
-    login({ name: name.trim(), email: email.trim() });
+    login({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     router.replace('/(tabs)/profile');
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
+  };
+
+  const showUnavailable = (feature: string) => {
+    Alert.alert(feature, `${feature} is not connected yet. Contact hello@lemontrip.in for help.`);
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.container}>
-        <ScrollView>
-          <View style={styles.header}>
-            <Text style={styles.logoText}>LemonTrip</Text>
-          </View>
+    <AuthLayout
+      eyebrow="LEMONTRIP / CREATE ACCOUNT"
+      title="Create your LemonTrip account"
+      subtitle="Save your plans and keep every journey close."
+      onBack={handleBack}>
+      <AuthField
+        label="Name"
+        value={name}
+        placeholder="Your full name"
+        onChangeText={(value) => { setName(value); if (errors.name) setErrors((current) => ({ ...current, name: '' })); }}
+        error={errors.name}
+        autoCapitalize="words"
+      />
+      <AuthField
+        label="Email"
+        value={email}
+        placeholder="you@example.com"
+        onChangeText={(value) => { setEmail(value); if (errors.email) setErrors((current) => ({ ...current, email: '' })); }}
+        error={errors.email}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+      <AuthField
+        label="Mobile"
+        value={phone}
+        placeholder="Your mobile number"
+        onChangeText={(value) => { setPhone(value); if (errors.phone) setErrors((current) => ({ ...current, phone: '' })); }}
+        error={errors.phone}
+        autoCapitalize="none"
+        keyboardType="phone-pad"
+      />
+      <AuthField
+        label="Password"
+        value={password}
+        placeholder="Create a password"
+        onChangeText={(value) => { setPassword(value); if (errors.password) setErrors((current) => ({ ...current, password: '' })); }}
+        error={errors.password}
+        secure={!showPassword}
+        onToggleSecure={() => setShowPassword((visible) => !visible)}
+        autoCapitalize="none"
+      />
 
-          <View style={styles.form}>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Sign up to start planning your trips</Text>
+      <TouchableOpacity accessibilityRole="button" style={styles.primaryButton} onPress={validateAndSignup}>
+        <Text style={styles.primaryButtonText}>Create account</Text>
+      </TouchableOpacity>
 
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={[styles.input, nameError ? styles.inputError : null]}
-              placeholder="Enter your name"
-              placeholderTextColor={Colors.textLight}
-              value={name}
-              onChangeText={(text) => {
-                setName(text);
-                if (nameError) setNameError('');
-              }}
-            />
-            {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+      <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
+      <GoogleAuthButton label="Sign up with Google" onPress={() => showUnavailable('Google sign-up')} />
 
-            <Text style={styles.label}>Email or Phone</Text>
-            <TextInput
-              style={[styles.input, emailError ? styles.inputError : null]}
-              placeholder="Enter your email or phone"
-              placeholderTextColor={Colors.textLight}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                if (emailError) setEmailError('');
-              }}
-              autoCapitalize="none"
-            />
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              placeholder="Create a password"
-              placeholderTextColor={Colors.textLight}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                if (passwordError) setPasswordError('');
-              }}
-              secureTextEntry
-            />
-            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-
-            <TouchableOpacity style={styles.signupButton} onPress={validateAndSignup}>
-              <Text style={styles.signupButtonText}>Sign Up</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => router.push('/login')} style={styles.loginLink}>
-              <Text style={styles.loginText}>
-                Already have an account? <Text style={styles.loginTextBold}>Login</Text>
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleBack} style={styles.backLink}>
-              <Text style={styles.backText}>← Back</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <TouchableOpacity onPress={() => router.push('/login')} style={styles.switchLink}>
+        <Text style={styles.switchText}>Already have an account? <Text style={styles.switchTextStrong}>Login</Text></Text>
+      </TouchableOpacity>
+      <AuthLegalLinks onTerms={() => showUnavailable('Terms')} onPrivacy={() => showUnavailable('Privacy policy')} />
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    backgroundColor: Colors.primary,
-    paddingVertical: 24,
-    alignItems: 'center',
-  },
-  logoText: {
-    color: Colors.accent,
-    fontSize: 26,
-    fontWeight: 'bold',
-  },
-  form: {
-    padding: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Colors.textLight,
-    marginBottom: 28,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  inputError: {
-    borderColor: Colors.error,
-  },
-  errorText: {
-    color: Colors.error,
-    fontSize: 12,
-    marginBottom: 12,
-  },
-  signupButton: {
-    backgroundColor: Colors.accent,
-    borderRadius: 10,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  signupButtonText: {
-    color: Colors.primaryDark,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loginLink: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  loginText: {
-    fontSize: 14,
-    color: Colors.textLight,
-  },
-  loginTextBold: {
-    color: Colors.primary,
-    fontWeight: 'bold',
-  },
-  backLink: {
-    marginTop: 24,
-    alignItems: 'center',
-  },
-  backText: {
-    fontSize: 14,
-    color: Colors.textLight,
-  },
+  primaryButton: { minHeight: 45, alignItems: 'center', justifyContent: 'center', marginTop: 1, borderRadius: 11, backgroundColor: Colors.primary },
+  primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 12 },
+  divider: { flex: 1, height: 1, backgroundColor: Colors.border },
+  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  switchLink: { alignItems: 'center', marginTop: 13, paddingVertical: 4 },
+  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
+  switchTextStrong: { color: Colors.primary, fontWeight: '800' },
 });
