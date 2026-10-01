@@ -47,6 +47,7 @@ export default function FlightDetailsScreen() {
       serviceName: 'Flight',
       itemName: `${selection.offer.airline.name} ${selection.offer.flightNumber} · ${selection.offer.departure.airportCode} to ${selection.offer.arrival.airportCode} · ${selectedFare.name}`,
       price: formatPrice(selectedFare.price.total, selectedFare.price.currency),
+      tripDate: selection.request.departureDate,
     });
     router.push('/cart');
   };

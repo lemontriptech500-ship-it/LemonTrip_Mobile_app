@@ -26,6 +26,7 @@ export default function CartScreen() {
         itemName: item.itemName,
         price: item.price,
         bookedAt: new Date().toLocaleDateString(),
+        tripDate: item.tripDate,
       });
     });
     clearCart();
