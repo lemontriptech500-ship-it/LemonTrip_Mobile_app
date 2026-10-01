@@ -1,192 +1,224 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { logout, useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { Linking, Modal, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+type DialogState = { title: string; message: string; actionLabel?: string } | null;
+type ConfirmAction = 'logout' | 'delete' | null;
+
 export default function SettingsScreen() {
-  const [notifications, setNotifications] = useState(true);
-  const [emailUpdates, setEmailUpdates] = useState(false);
-  const [language, setLanguage] = useState('English');
+  const user = useAuth();
+  const { width } = useWindowDimensions();
+  const desktop = width >= 900;
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [bookingUpdates, setBookingUpdates] = useState(true);
+  const [offerUpdates, setOfferUpdates] = useState(false);
   const [currency, setCurrency] = useState('INR (₹)');
+  const [language, setLanguage] = useState('English');
+  const [dialog, setDialog] = useState<DialogState>(null);
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
 
-  const handleLanguageChange = () => {
-    setLanguage((prev) => (prev === 'English' ? 'Hindi' : 'English'));
+  const handleBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)/profile');
   };
 
-  const handleCurrencyChange = () => {
-    setCurrency((prev) => (prev === 'INR (₹)' ? 'USD ($)' : 'INR (₹)'));
+  const showUnavailable = (title: string, message: string) => setDialog({ title, message });
+
+  const confirmDanger = () => {
+    if (confirmAction === 'logout') {
+      setConfirmAction(null);
+      logout();
+      router.replace('/(tabs)/profile');
+      return;
+    }
+    setConfirmAction(null);
+    setDialog({ title: 'Delete account', message: 'Account deletion is not connected. No account data was deleted. Contact hello@lemontrip.in for account assistance.' });
   };
 
-  const handlePrivacyPolicy = () => {
-    Alert.alert('Privacy Policy', 'LemonTrip respects your privacy. Full policy coming soon.');
-  };
-
-  const handleTerms = () => {
-    Alert.alert('Terms of Service', 'By using LemonTrip, you agree to our terms. Full terms coming soon.');
-  };
-
-  const handleLogout = () => {
-    Alert.alert('Log Out', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Log Out',
-        style: 'destructive',
-        onPress: () => {
-          router.replace('/(tabs)/profile');
-        },
-      },
-    ]);
-  };
+  const showPersonalInfo = () => setDialog({
+    title: 'Personal information',
+    message: user ? `Name: ${user.name}\nEmail: ${user.email.includes('@') ? user.email : 'Not added'}\nMobile: ${user.phone || (user.email.includes('@') ? 'Not added' : user.email)}` : 'Sign in to view your account details.',
+  });
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScreenHeader title="Preferences" subtitle="Make LemonTrip feel more like yours." eyebrow="ACCOUNT / SETTINGS" onBack={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/profile'))} />
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
-
-        <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.rowLabel}>Push Notifications</Text>
-            <Text style={styles.rowSubtitle}>Get alerts about deals and bookings</Text>
-          </View>
-          <Switch
-            value={notifications}
-            onValueChange={setNotifications}
-            trackColor={{ false: Colors.border, true: Colors.primary }}
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
+        <View style={styles.content}>
+          <ScreenHeader
+            title="Settings"
+            subtitle="Manage your account and travel preferences."
+            eyebrow="LEMONTRIP / ACCOUNT"
+            onBack={handleBack}
           />
-        </View>
 
-        <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.rowLabel}>Email Updates</Text>
-            <Text style={styles.rowSubtitle}>Receive offers and newsletters</Text>
+          <View style={styles.accountBanner}>
+            <View style={styles.accountAvatar}><Ionicons name="person-outline" size={20} color={Colors.primaryDark} /></View>
+            <View style={styles.accountCopy}>
+              <Text style={styles.accountName}>{user?.name ?? 'Guest User'}</Text>
+              <Text style={styles.accountEmail}>{user?.email ?? 'Sign in to manage your account'}</Text>
+            </View>
+            {!user ? <TouchableOpacity onPress={() => router.push('/login')} style={styles.signInButton}><Text style={styles.signInText}>Sign in</Text></TouchableOpacity> : null}
           </View>
-          <Switch
-            value={emailUpdates}
-            onValueChange={setEmailUpdates}
-            trackColor={{ false: Colors.border, true: Colors.primary }}
-          />
+
+          <View style={[styles.sections, desktop && styles.sectionsDesktop]}>
+            <View style={styles.column}>
+              <SettingsSection title="Account" icon="person-circle-outline" description="Your LemonTrip profile">
+                <SettingRow icon="person-outline" title="Personal information" description="Name and contact details" onPress={showPersonalInfo} />
+                <SettingRow icon="airplane-outline" title="Travel preferences" description="Language, currency and trip settings" onPress={() => showUnavailable('Travel preferences', 'Set your language and currency in Preferences below. More travel preferences are not available yet.')} />
+              </SettingsSection>
+
+              <SettingsSection title="Notifications" icon="notifications-outline" description="Choose what you hear from us">
+                <SettingRow icon="mail-outline" title="Email notifications" description="Account news and service messages" trailing={<Switch value={emailNotifications} onValueChange={setEmailNotifications} trackColor={{ false: Colors.border, true: Colors.primary }} />} />
+                <SettingRow icon="calendar-outline" title="Booking updates" description="Changes to your trips and bookings" trailing={<Switch value={bookingUpdates} onValueChange={setBookingUpdates} trackColor={{ false: Colors.border, true: Colors.primary }} />} />
+                <SettingRow icon="pricetag-outline" title="Offers" description="Occasional travel deals by email" trailing={<Switch value={offerUpdates} onValueChange={setOfferUpdates} trackColor={{ false: Colors.border, true: Colors.primary }} />} />
+              </SettingsSection>
+
+              <SettingsSection title="Preferences" icon="options-outline" description="Personalize your app">
+                <SettingRow icon="cash-outline" title="Currency" description="Display preference" value={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} />
+                <SettingRow icon="language-outline" title="Language" description="App language" value={language} onPress={() => setLanguage((current) => current === 'English' ? 'Hindi' : 'English')} />
+                <SettingRow icon="contrast-outline" title="Theme" description="Appearance follows your device" value="System" onPress={() => showUnavailable('Theme', 'Only the system appearance is currently supported.')} />
+              </SettingsSection>
+            </View>
+
+            <View style={styles.column}>
+              <SettingsSection title="Security" icon="shield-checkmark-outline" description="Keep your account protected">
+                <SettingRow icon="key-outline" title="Change password" description="Password updates are not connected" badge="Unavailable" onPress={() => showUnavailable('Change password', 'Password changes are not connected to an authentication provider yet.')} />
+                <SettingRow icon="phone-portrait-outline" title="Login sessions" description="This device · local session" value="Current" onPress={() => showUnavailable('Login sessions', 'Session management is not connected. Your account currently uses a local app session.')} />
+                <SettingRow icon="lock-closed-outline" title="Two-factor authentication" description="Additional sign-in protection" badge="Coming soon" onPress={() => showUnavailable('Two-factor authentication', 'Two-factor authentication is not supported by the current sign-in system.')} />
+              </SettingsSection>
+
+              <SettingsSection title="Privacy" icon="eye-outline" description="Your privacy and data">
+                <SettingRow icon="document-text-outline" title="Privacy settings" description="Review how account data is used" onPress={() => showUnavailable('Privacy settings', 'Detailed privacy controls are not available yet. Contact hello@lemontrip.in for privacy requests.')} />
+                <SettingRow icon="server-outline" title="Data preferences" description="Request or manage your data" onPress={() => showUnavailable('Data preferences', 'Data management tools are not connected. Contact hello@lemontrip.in for a data request.')} />
+              </SettingsSection>
+
+              <SettingsSection title="Support" icon="help-circle-outline" description="We’re here to help">
+                <SettingRow icon="book-outline" title="Help center" description="Find answers about your trips" onPress={() => showUnavailable('Help center', 'The help center is being prepared. Email hello@lemontrip.in for assistance.')} />
+                <SettingRow icon="chatbubble-ellipses-outline" title="Contact support" description="hello@lemontrip.in" onPress={() => Linking.openURL('mailto:hello@lemontrip.in')} />
+              </SettingsSection>
+
+              <SettingsSection title="Danger zone" icon="warning-outline" description="Destructive account actions" danger>
+                <SettingRow icon="log-out-outline" title="Log out" description="Sign out on this device" danger onPress={() => setConfirmAction('logout')} />
+                <SettingRow icon="trash-outline" title="Delete account" description="Permanently remove your account" danger badge="Unavailable" onPress={() => setConfirmAction('delete')} />
+              </SettingsSection>
+            </View>
+          </View>
         </View>
-      </View>
+      </ScrollView>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Preferences</Text>
+      <Modal visible={dialog !== null} transparent animationType="fade" onRequestClose={() => setDialog(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalIcon}><Ionicons name="information-circle-outline" size={20} color={Colors.primary} /></View>
+            <Text style={styles.modalTitle}>{dialog?.title}</Text>
+            <Text style={styles.modalMessage}>{dialog?.message}</Text>
+            <TouchableOpacity onPress={() => setDialog(null)} style={styles.modalDone}><Text style={styles.modalDoneText}>Done</Text></TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
-        <TouchableOpacity style={styles.linkRow} onPress={handleLanguageChange}>
-          <Text style={styles.rowLabel}>Language</Text>
-          <Text style={styles.linkValue}>{language}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.linkRow} onPress={handleCurrencyChange}>
-          <Text style={styles.rowLabel}>Currency</Text>
-          <Text style={styles.linkValue}>{currency}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-
-        <TouchableOpacity style={styles.linkRow} onPress={handlePrivacyPolicy}>
-          <Text style={styles.rowLabel}>Privacy Policy</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.linkRow} onPress={handleTerms}>
-          <Text style={styles.rowLabel}>Terms of Service</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-      </View>
+      <Modal visible={confirmAction !== null} transparent animationType="fade" onRequestClose={() => setConfirmAction(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={[styles.modalIcon, styles.dangerModalIcon]}><Ionicons name={confirmAction === 'logout' ? 'log-out-outline' : 'trash-outline'} size={20} color={Colors.error} /></View>
+            <Text style={styles.modalTitle}>{confirmAction === 'logout' ? 'Log out?' : 'Delete account?'}</Text>
+            <Text style={styles.modalMessage}>{confirmAction === 'logout' ? 'You will be signed out of LemonTrip on this device.' : 'Account deletion cannot be completed from this app because no deletion service is connected.'}</Text>
+            <View style={styles.confirmActions}>
+              <TouchableOpacity onPress={() => setConfirmAction(null)} style={styles.cancelButton}><Text style={styles.cancelText}>Cancel</Text></TouchableOpacity>
+              <TouchableOpacity onPress={confirmDanger} style={[styles.confirmButton, confirmAction === 'delete' && styles.deleteConfirmButton]}><Text style={styles.confirmText}>{confirmAction === 'logout' ? 'Log out' : 'Continue'}</Text></TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
+function SettingsSection({ title, icon, description, children, danger = false }: { title: string; icon: keyof typeof Ionicons.glyphMap; description: string; children: ReactNode; danger?: boolean }) {
+  return (
+    <View style={[styles.section, danger && styles.dangerSection]}>
+      <View style={styles.sectionHeading}>
+        <View style={[styles.sectionIcon, danger && styles.dangerSectionIcon]}><Ionicons name={icon} size={17} color={danger ? Colors.error : Colors.primary} /></View>
+        <View style={styles.sectionHeadingCopy}><Text style={[styles.sectionTitle, danger && styles.dangerTitle]}>{title}</Text><Text style={styles.sectionDescription}>{description}</Text></View>
+      </View>
+      <View style={styles.rows}>{children}</View>
+    </View>
+  );
+}
+
+function SettingRow({ icon, title, description, value, badge, trailing, onPress, danger = false }: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  description: string;
+  value?: string;
+  badge?: string;
+  trailing?: ReactNode;
+  onPress?: () => void;
+  danger?: boolean;
+}) {
+  const content = (
+    <>
+      <View style={[styles.rowIcon, danger && styles.dangerRowIcon]}><Ionicons name={icon} size={15} color={danger ? Colors.error : Colors.primary} /></View>
+      <View style={styles.rowCopy}><Text style={[styles.rowTitle, danger && styles.dangerText]}>{title}</Text><Text style={styles.rowDescription}>{description}</Text></View>
+      {badge ? <Text style={[styles.rowBadge, danger && styles.dangerBadge]}>{badge}</Text> : null}
+      {value ? <Text style={styles.rowValue}>{value}</Text> : null}
+      {trailing ?? (onPress ? <Ionicons name="chevron-forward" size={14} color={Colors.textLight} /> : null)}
+    </>
+  );
+  return onPress ? <TouchableOpacity accessibilityRole="button" onPress={onPress} style={styles.row}>{content}</TouchableOpacity> : <View style={styles.row}>{content}</View>;
+}
+
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    paddingHorizontal: 22,
-    paddingTop: 8,
-    paddingBottom: 18,
-  },
-  backArrow: {
-    color: Colors.primary,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    marginBottom: 10,
-  },
-  headerTitle: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 27,
-    fontWeight: '800',
-  },
-  section: {
-    marginTop: 17,
-    paddingHorizontal: 22,
-  },
-  sectionTitle: {
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
-    color: Colors.textLight,
-    marginBottom: 10,
-    textTransform: 'uppercase',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    paddingVertical: 15,
-    paddingHorizontal: 13,
-    marginBottom: 1,
-  },
-  rowLabel: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    color: Colors.textDark,
-    fontWeight: '600',
-  },
-  rowSubtitle: {
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    color: Colors.textLight,
-    marginTop: 2,
-  },
-  linkRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    paddingVertical: 15,
-  },
-  linkValue: {
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    color: Colors.textLight,
-  },
-  logoutButton: {
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.error,
-    borderRadius: 2,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  logoutText: {
-    color: Colors.error,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '800',
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
+  page: { paddingBottom: 28 },
+  content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
+  accountBanner: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 16, padding: 12, borderRadius: 14, backgroundColor: Colors.primaryDark },
+  accountAvatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: Colors.accent },
+  accountCopy: { flex: 1, minWidth: 0 },
+  accountName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  accountEmail: { color: 'rgba(255,255,255,0.75)', fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
+  signInButton: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 9, backgroundColor: Colors.accent },
+  signInText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  sections: { gap: 11, marginTop: 15, paddingHorizontal: 16 },
+  sectionsDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
+  column: { flex: 1, minWidth: 0, gap: 11 },
+  section: { overflow: 'hidden', borderRadius: 14, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  dangerSection: { borderColor: '#efdada' },
+  sectionHeading: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 11, paddingTop: 11, paddingBottom: 8 },
+  sectionIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accentSoft },
+  dangerSectionIcon: { backgroundColor: '#fff0f0' },
+  sectionHeadingCopy: { flex: 1 },
+  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900' },
+  dangerTitle: { color: Colors.error },
+  sectionDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, marginTop: 2 },
+  rows: { paddingHorizontal: 8, paddingBottom: 7 },
+  row: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 5, paddingVertical: 6, borderTopWidth: 1, borderTopColor: Colors.background },
+  rowIcon: { width: 27, height: 27, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.background },
+  dangerRowIcon: { backgroundColor: '#fff5f5' },
+  rowCopy: { flex: 1, minWidth: 0 },
+  rowTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  dangerText: { color: Colors.error },
+  rowDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, lineHeight: 10, marginTop: 2 },
+  rowValue: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800' },
+  rowBadge: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800' },
+  dangerBadge: { color: Colors.error },
+  modalBackdrop: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 18, backgroundColor: 'rgba(8, 26, 18, 0.48)' },
+  modalCard: { width: '100%', maxWidth: 400, padding: 17, borderRadius: 17, backgroundColor: Colors.surface },
+  modalIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accentSoft },
+  dangerModalIcon: { backgroundColor: '#fff0f0' },
+  modalTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900', marginTop: 11 },
+  modalMessage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 14, marginTop: 5 },
+  modalDone: { minHeight: 37, alignItems: 'center', justifyContent: 'center', marginTop: 13, borderRadius: 9, backgroundColor: Colors.accent },
+  modalDoneText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  confirmActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 7, marginTop: 14 },
+  cancelButton: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 9, backgroundColor: Colors.background },
+  cancelText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  confirmButton: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 9, backgroundColor: Colors.primary },
+  deleteConfirmButton: { backgroundColor: Colors.error },
+  confirmText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
 });
