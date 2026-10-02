@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import type { Hotel } from '@/data/hotels';
+import type { Hotel } from '@/types/content';
 import type { HotelSearchCriteria } from '@/utils/hotelSearchStore';
 
 type HotelCardProps = {

@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { type TravelPackage } from '@/data/packages';
+import type { TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { addBooking } from '@/utils/bookingStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';

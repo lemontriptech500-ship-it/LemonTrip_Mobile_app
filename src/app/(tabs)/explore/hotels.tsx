@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors';
 import HotelCard from '@/components/hotels/HotelCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { hotels, type Hotel } from '@/data/hotels';
+import type { Hotel } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { setHotelSearch, selectHotel, type HotelSearchCriteria } from '@/utils/hotelSearchStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -48,6 +49,7 @@ export default function HotelsScreen() {
   const [hasSearched, setHasSearched] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState<SortOption>('Recommended');
+  const { items: hotels, loading, error } = useContentItems<Hotel>('hotel');
 
   const search: HotelSearchCriteria = { destination, checkIn, checkOut, guests, rooms };
 
@@ -63,7 +65,7 @@ export default function HotelsScreen() {
     if (sort === 'Rating') filtered.sort((a, b) => (b.reviewScore ?? -1) - (a.reviewScore ?? -1));
     if (sort === 'Distance') filtered.sort((a, b) => (a.distanceKm ?? Number.POSITIVE_INFINITY) - (b.distanceKm ?? Number.POSITIVE_INFINITY));
     return filtered;
-  }, [activeFilters, destination, hasSearched, sort]);
+  }, [activeFilters, destination, hasSearched, hotels, sort]);
 
   const handleSearch = () => {
     const start = toDate(checkIn);
@@ -156,7 +158,7 @@ export default function HotelsScreen() {
             </View>
           </View>
 
-          {visibleHotels.length ? (
+          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading stays…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text></View> : visibleHotels.length ? (
             <View style={styles.hotelList}>
               {visibleHotels.map((hotel) => <HotelCard key={hotel.id} hotel={hotel} search={search} onPress={openHotel} />)}
             </View>

@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { busListings, type BusListing } from '@/data/buses';
+import type { BusListing } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
@@ -33,6 +34,8 @@ export default function BusesScreen() {
   const [travelDate, setTravelDate] = useState('');
   const [searched, setSearched] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const { items: allListings, loading, error } = useContentItems<BusListing>('listing');
+  const busListings = allListings.filter((item) => item.serviceId === 'buses');
 
   const results = useMemo(() => busListings.filter((bus) => {
     const fromMatch = !searched || !from.trim() || bus.origin.toLowerCase().includes(from.trim().toLowerCase());
@@ -43,7 +46,7 @@ export default function BusesScreen() {
       return typeFilters.find((option) => option.id === filter)?.matches(bus) ?? false;
     });
     return fromMatch && toMatch && filtersMatch;
-  }), [activeFilters, from, searched, to]);
+  }), [activeFilters, busListings, from, searched, to]);
 
   const handleSearch = () => {
     if (travelDate && !validDate(travelDate)) {
@@ -113,7 +116,7 @@ export default function BusesScreen() {
               <View style={styles.resultHeading}><View><Text style={styles.eyebrow}>{searched ? 'ROUTES MATCHING YOUR SEARCH' : 'AVAILABLE ROUTES'}</Text><Text style={styles.resultTitle}>{results.length} bus {results.length === 1 ? 'service' : 'services'}</Text></View>
                 {activeFilters.length ? <TouchableOpacity onPress={() => setActiveFilters([])}><Text style={styles.clearText}>Clear filters</Text></TouchableOpacity> : null}
               </View>
-              {results.length ? (
+              {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading bus listings…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text></View> : results.length ? (
                 <View style={styles.busList}>
                   {results.map((bus) => <BusResultCard key={bus.id} bus={bus} onPress={() => openBus(bus)} />)}
                 </View>

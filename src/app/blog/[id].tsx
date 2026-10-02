@@ -1,7 +1,5 @@
 import { Colors } from '@/constants/colors';
-import { type BlogPost } from '@/data/blog';
-import { destinations } from '@/data/destinations';
-import { type TravelPackage } from '@/data/packages';
+import type { BlogPost, Destination, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -14,6 +12,7 @@ export default function BlogDetailScreen() {
   const desktop = width >= 900;
   const { items: blogPosts, loading } = useContentItems<BlogPost>('blog');
   const { items: travelPackages } = useContentItems<TravelPackage>('package');
+  const { items: destinations } = useContentItems<Destination>('destination');
   const post = blogPosts.find((item) => item.id === id);
   const relatedDestinations = destinations.filter((item) => post?.relatedDestinationIds?.includes(item.id));
   const relatedPackages = travelPackages.filter((item) => post?.relatedPackageIds?.includes(item.id));

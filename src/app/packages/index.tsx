@@ -1,10 +1,10 @@
 import { Colors } from '@/constants/colors';
-import { type PackageCategory, type TravelPackage } from '@/data/packages';
+import type { PackageCategory, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const categories: PackageCategory[] = ['Weekend', 'Honeymoon', 'Family', 'Adventure', 'Luxury', 'Spiritual', 'International', 'Domestic'];
@@ -21,7 +21,7 @@ export default function PackagesListScreen() {
     const matchesQuery = !search || `${item.title} ${item.destination ?? ''} ${item.description}`.toLowerCase().includes(search);
     const matchesCategory = !activeCategory || item.categories?.includes(activeCategory);
     return matchesQuery && matchesCategory;
-  }), [activeCategory, query]);
+  }), [activeCategory, query, travelPackages]);
 
   const destinations = travelPackages.filter((item, index, all) => all.findIndex((candidate) => candidate.destination === item.destination) === index);
 

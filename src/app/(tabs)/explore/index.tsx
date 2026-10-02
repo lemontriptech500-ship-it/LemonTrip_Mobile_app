@@ -1,13 +1,12 @@
 import { Colors } from '@/constants/colors';
-import { destinations } from '@/data/destinations';
-import { travelPackages } from '@/data/packages';
-import { services } from '@/data/services';
+import type { Destination, TravelPackage, TravelService } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
+import { useContentItems } from '@/utils/contentApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const destinationCountries: Record<string, string> = {
@@ -50,6 +49,9 @@ export default function ExploreScreen() {
   const [filters, setFilters] = useState({ duration: 'Any', budget: 'Any', destination: 'Any', category: 'Any' });
   const [selectedExperience, setSelectedExperience] = useState<string | null>(null);
   const [tripPreference, setTripPreference] = useState<string | null>(null);
+  const { items: travelPackages } = useContentItems<TravelPackage>('package');
+  const { items: destinations } = useContentItems<Destination>('destination');
+  const { items: services } = useContentItems<TravelService>('service');
 
   const handlePress = (serviceId: string) => {
     if (serviceId === 'visa') {
@@ -75,7 +77,7 @@ export default function ExploreScreen() {
       const country = destinationCountries[destination.id] ?? '';
       return !search || `${destination.name} ${country}`.toLowerCase().includes(search);
     });
-  }, [query]);
+  }, [destinations, query]);
 
   const filteredPackages = useMemo(() => {
     return travelPackages.filter((item) => {
@@ -104,7 +106,7 @@ export default function ExploreScreen() {
 
       return matchesDestination && matchesCategory && matchesDuration && matchesBudget && matchesExperience;
     });
-  }, [filters, selectedExperience]);
+  }, [filters, selectedExperience, travelPackages]);
 
   const suggestions = query.trim()
     ? destinations
@@ -175,7 +177,7 @@ export default function ExploreScreen() {
 
             {showFilters ? (
               <View style={styles.filterPanel}>
-                {(Object.keys(filterOptions) as Array<keyof typeof filterOptions>).map((filterName) => (
+                {(Object.keys(filterOptions) as (keyof typeof filterOptions)[]).map((filterName) => (
                   <View key={filterName} style={styles.filterGroup}>
                     <Text style={styles.filterLabel}>{filterName}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterOptions}>

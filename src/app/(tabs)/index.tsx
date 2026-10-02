@@ -1,10 +1,8 @@
 import { Colors } from '@/constants/colors';
 import type { Offer } from '@/data/offers';
 import { loadOffers, getOfferValidity } from '@/utils/offerApi';
-import { blogPosts } from '@/data/blog';
-import { destinations } from '@/data/destinations';
-import { travelPackages } from '@/data/packages';
-import { services } from '@/data/services';
+import type { BlogPost, Destination, TravelPackage, TravelService } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import TripSearchPanel, { SearchType } from '@/components/TripSearchPanel';
 import { getUser, useAuth } from '@/utils/authStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
@@ -31,6 +29,10 @@ export default function HomeScreen() {
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [verifiedOffers, setVerifiedOffers] = useState<Offer[]>([]);
+  const { items: travelPackages } = useContentItems<TravelPackage>('package');
+  const { items: blogPosts } = useContentItems<BlogPost>('blog');
+  const { items: destinations } = useContentItems<Destination>('destination');
+  const { items: services } = useContentItems<TravelService>('service');
 
   useEffect(() => {
     let mounted = true;

@@ -175,13 +175,11 @@ function ConfiguredGoogleAuthButton({
 
     handledResponse.current = response;
     const idToken = response.params.id_token;
-    if (!idToken) {
-      setAuthError('Google did not return a verified identity token. Please try again.');
-      setLoading(false);
-      return;
-    }
-
-    void onSuccess(idToken)
+    void Promise.resolve()
+      .then(() => {
+        if (!idToken) throw new Error('Google did not return a verified identity token. Please try again.');
+        return onSuccess(idToken);
+      })
       .catch((error) => setAuthError(error instanceof Error ? error.message : 'Google sign-in failed. Please try again.'))
       .finally(() => setLoading(false));
   }, [response, onSuccess]);

@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { type BlogPost } from '@/data/blog';
+import type { BlogPost } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -16,7 +16,7 @@ export default function BlogScreen() {
   const [activeCategory, setActiveCategory] = useState('All stories');
   const { items: blogPosts, loading, error } = useContentItems<BlogPost>('blog');
   const featured = blogPosts[0];
-  const visiblePosts = useMemo(() => activeCategory === 'All stories' ? blogPosts : blogPosts.filter((post) => post.category === activeCategory), [activeCategory]);
+  const visiblePosts = useMemo(() => activeCategory === 'All stories' ? blogPosts : blogPosts.filter((post) => post.category === activeCategory), [activeCategory, blogPosts]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
