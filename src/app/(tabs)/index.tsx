@@ -221,8 +221,6 @@ export default function HomeScreen() {
                           name: destination.name,
                           image: destination.image,
                           price: destination.priceFrom,
-                          category: 'Destinations',
-                          location: destination.name,
                         })
                       }>
                       <Ionicons name={saved ? 'heart' : 'heart-outline'} size={16} color={saved ? Colors.error : Colors.primaryDark} />
@@ -306,7 +304,7 @@ export default function HomeScreen() {
               ))}
             </View>
           ) : (
-            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No verified offers available right now.</Text></View>
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No offers available at the moment.</Text></View>
           )}
         </View>
 
