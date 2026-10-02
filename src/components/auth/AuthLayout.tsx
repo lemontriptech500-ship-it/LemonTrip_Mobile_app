@@ -1,8 +1,12 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { ReactNode } from 'react';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+WebBrowser.maybeCompleteAuthSession();
 
 type AuthLayoutProps = {
   eyebrow: string;
@@ -120,12 +124,94 @@ export function AuthField({
   );
 }
 
-export function GoogleAuthButton({ label, onPress }: { label: string; onPress: () => void }) {
+export function GoogleAuthButton({ label, onSuccess }: { label: string; onSuccess: (idToken: string) => Promise<void> }) {
+  const clientIds = {
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim(),
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim(),
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID?.trim(),
+  };
+  const platformClientId = Platform.OS === 'web'
+    ? clientIds.webClientId
+    : Platform.OS === 'ios'
+      ? clientIds.iosClientId
+      : clientIds.androidClientId;
+
+  if (!platformClientId || platformClientId.startsWith('your-google-')) {
+    return (
+      <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: true }} disabled style={[styles.googleButton, styles.googleButtonDisabled]}>
+        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <Text style={styles.googleButtonText}>Google sign-in not configured</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  return <ConfiguredGoogleAuthButton label={label} onSuccess={onSuccess} {...clientIds} />;
+}
+
+function ConfiguredGoogleAuthButton({
+  label,
+  onSuccess,
+  webClientId,
+  iosClientId,
+  androidClientId,
+}: {
+  label: string;
+  onSuccess: (idToken: string) => Promise<void>;
+  webClientId?: string;
+  iosClientId?: string;
+  androidClientId?: string;
+}) {
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    webClientId,
+    iosClientId,
+    androidClientId,
+  });
+  const [authError, setAuthError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const handledResponse = useRef<unknown>(null);
+
+  useEffect(() => {
+    if (!response || response.type !== 'success' || response === handledResponse.current) return;
+
+    handledResponse.current = response;
+    const idToken = response.params.id_token;
+    if (!idToken) {
+      setAuthError('Google did not return a verified identity token. Please try again.');
+      setLoading(false);
+      return;
+    }
+
+    void onSuccess(idToken)
+      .catch((error) => setAuthError(error instanceof Error ? error.message : 'Google sign-in failed. Please try again.'))
+      .finally(() => setLoading(false));
+  }, [response, onSuccess]);
+
+  const startGoogleAuth = async () => {
+    setAuthError('');
+    setLoading(true);
+    try {
+      const result = await promptAsync();
+
+      if (result.type === 'error') {
+        setAuthError('Google sign-in could not be completed. Check the OAuth client configuration and try again.');
+        setLoading(false);
+        return;
+      }
+      if (result.type !== 'success') setLoading(false);
+    } catch {
+      setAuthError('Google sign-in could not start. Check the OAuth client ID and authorized redirect URI.');
+      setLoading(false);
+    }
+  };
+
   return (
-    <TouchableOpacity accessibilityRole="button" onPress={onPress} style={styles.googleButton}>
-      <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
-      <Text style={styles.googleButtonText}>{label}</Text>
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity accessibilityRole="button" disabled={!request || loading} onPress={() => void startGoogleAuth()} style={[styles.googleButton, (!request || loading) && styles.googleButtonDisabled]}>
+        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <Text style={styles.googleButtonText}>{!request ? 'Preparing Google sign-in…' : loading ? 'Connecting to Google…' : label}</Text>
+      </TouchableOpacity>
+      {authError ? <Text accessibilityRole="alert" style={styles.googleError}>{authError}</Text> : null}
+    </View>
   );
 }
 
@@ -178,6 +264,8 @@ const styles = StyleSheet.create({
   visibilityButton: { width: 40, height: 42, alignItems: 'center', justifyContent: 'center' },
   errorText: { color: Colors.error, fontFamily: 'Manrope', fontSize: 9, marginTop: 4 },
   googleButton: { minHeight: 43, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.surface },
+  googleButtonDisabled: { opacity: 0.55 },
+  googleError: { color: Colors.error, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14, marginTop: 6, textAlign: 'center' },
   googleMark: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
   googleMarkText: { color: '#4285F4', fontFamily: 'Manrope', fontSize: 17, fontWeight: '900' },
   googleButtonText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },

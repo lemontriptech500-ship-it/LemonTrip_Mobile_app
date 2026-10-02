@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { travelPackages } from '@/data/packages';
+import { type TravelPackage } from '@/data/packages';
+import { useContentItems } from '@/utils/contentApi';
 import { addBooking } from '@/utils/bookingStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -11,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function PackageDetailScreen() {
   useWishlist();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { items: travelPackages, loading } = useContentItems<TravelPackage>('package');
   const pkg = travelPackages.find((item) => item.id === id);
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
@@ -46,6 +48,7 @@ export default function PackageDetailScreen() {
     }
   };
 
+  if (loading) return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Loading package…</Text></View></SafeAreaView>;
   if (!pkg) {
     return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Package not found.</Text><TouchableOpacity onPress={() => router.replace('/packages')} style={styles.backToPackages}><Text style={styles.backToPackagesText}>Browse journeys</Text></TouchableOpacity></View></SafeAreaView>;
   }

@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors';
-import { blogPosts } from '@/data/blog';
+import { type BlogPost } from '@/data/blog';
 import { destinations } from '@/data/destinations';
-import { travelPackages } from '@/data/packages';
+import { type TravelPackage } from '@/data/packages';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
@@ -11,6 +12,8 @@ export default function BlogDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
+  const { items: blogPosts, loading } = useContentItems<BlogPost>('blog');
+  const { items: travelPackages } = useContentItems<TravelPackage>('package');
   const post = blogPosts.find((item) => item.id === id);
   const relatedDestinations = destinations.filter((item) => post?.relatedDestinationIds?.includes(item.id));
   const relatedPackages = travelPackages.filter((item) => post?.relatedPackageIds?.includes(item.id));
@@ -20,6 +23,7 @@ export default function BlogDetailScreen() {
     else router.replace('/blog');
   };
 
+  if (loading) return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundTitle}>Loading story…</Text></View></SafeAreaView>;
   if (!post) {
     return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Ionicons name="book-outline" size={24} color={Colors.primary} /><Text style={styles.notFoundTitle}>Story not found</Text><TouchableOpacity onPress={() => router.replace('/blog')} style={styles.backToStories}><Text style={styles.backToStoriesText}>Browse stories</Text></TouchableOpacity></View></SafeAreaView>;
   }

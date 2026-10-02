@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/colors';
-import { travelPackages, type PackageCategory, type TravelPackage } from '@/data/packages';
+import { type PackageCategory, type TravelPackage } from '@/data/packages';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -13,6 +14,7 @@ export default function PackagesListScreen() {
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<PackageCategory | null>(null);
+  const { items: travelPackages, loading, error } = useContentItems<TravelPackage>('package');
 
   const results = useMemo(() => travelPackages.filter((item) => {
     const search = query.trim().toLowerCase();
@@ -82,7 +84,7 @@ export default function PackagesListScreen() {
               <View><Text style={styles.eyebrow}>MADE FOR THE WAY YOU TRAVEL</Text><Text style={styles.sectionTitle}>{activeCategory ?? 'Curated journeys'}</Text></View>
               <Text style={styles.resultCount}>{results.length} journeys</Text>
             </View>
-            {results.length ? (
+            {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading journeys…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text></View> : results.length ? (
               <View style={styles.packageGrid}>
                 {results.map((item) => <PackageCard key={item.id} item={item} desktop={desktop} onPress={() => openPackage(item)} />)}
               </View>

@@ -44,7 +44,7 @@ export default function SettingsScreen() {
 
   const showPersonalInfo = () => setDialog({
     title: 'Personal information',
-    message: user ? `Name: ${user.name}\nEmail: ${user.email.includes('@') ? user.email : 'Not added'}\nMobile: ${user.phone || (user.email.includes('@') ? 'Not added' : user.email)}` : 'Sign in to view your account details.',
+    message: user ? `Name: ${user.name}\nEmail: ${user.email?.includes('@') ? user.email : 'Not added'}\nMobile: ${user.phone || 'Not added'}` : 'Sign in to view your account details.',
   });
 
   return (

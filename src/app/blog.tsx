@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { blogPosts } from '@/data/blog';
+import { type BlogPost } from '@/data/blog';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -13,6 +14,7 @@ export default function BlogScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [activeCategory, setActiveCategory] = useState('All stories');
+  const { items: blogPosts, loading, error } = useContentItems<BlogPost>('blog');
   const featured = blogPosts[0];
   const visiblePosts = useMemo(() => activeCategory === 'All stories' ? blogPosts : blogPosts.filter((post) => post.category === activeCategory), [activeCategory]);
 
@@ -22,7 +24,7 @@ export default function BlogScreen() {
         <View style={styles.content}>
           <ScreenHeader title="Travel stories" subtitle="Ideas, guides, and places worth taking the long way to." eyebrow="THE LEMONTRIP JOURNAL" onBack={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)'))} />
 
-          <TouchableOpacity accessibilityRole="button" onPress={() => router.push(`/blog/${featured.id}`)} style={styles.hero} activeOpacity={0.94}>
+          {featured ? <TouchableOpacity accessibilityRole="button" onPress={() => router.push(`/blog/${featured.id}`)} style={styles.hero} activeOpacity={0.94}>
             <ImageBackground source={{ uri: featured.image }} style={styles.heroImage} imageStyle={styles.heroImageStyle}>
               <View style={styles.heroShade} />
               <View style={styles.heroCopy}>
@@ -32,7 +34,7 @@ export default function BlogScreen() {
                 <View style={styles.heroFooter}><View style={styles.readButton}><Text style={styles.readButtonText}>Read article</Text><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View><Text style={styles.heroTime}>{featured.readingTime}</Text></View>
               </View>
             </ImageBackground>
-          </TouchableOpacity>
+          </TouchableOpacity> : null}
 
           <View style={styles.categoryHeader}><View><Text style={styles.eyebrow}>BROWSE THE JOURNAL</Text><Text style={styles.sectionTitle}>Stories for wherever you are going</Text></View></View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
@@ -43,14 +45,14 @@ export default function BlogScreen() {
           <View style={[styles.articleGrid, desktop && styles.articleGridDesktop]}>
             {visiblePosts.map((post) => <ArticleCard key={post.id} post={post} desktop={desktop} />)}
           </View>
-          {!visiblePosts.length ? <View style={styles.emptyState}><Ionicons name="book-outline" size={24} color={Colors.primary} /><Text style={styles.emptyTitle}>More stories are on the way</Text><Text style={styles.emptyText}>Try another journal category.</Text></View> : null}
+          {loading || error || !visiblePosts.length ? <View style={styles.emptyState}><Ionicons name="book-outline" size={24} color={Colors.primary} /><Text style={styles.emptyTitle}>{loading ? 'Loading stories…' : error ?? 'More stories are on the way'}</Text><Text style={styles.emptyText}>{error ? 'Please try again later.' : 'Try another journal category.'}</Text></View> : null}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function ArticleCard({ post, desktop }: { post: (typeof blogPosts)[number]; desktop: boolean }) {
+function ArticleCard({ post, desktop }: { post: BlogPost; desktop: boolean }) {
   return <TouchableOpacity accessibilityRole="button" onPress={() => router.push(`/blog/${post.id}`)} style={[styles.articleCard, desktop && styles.articleCardDesktop]} activeOpacity={0.9}><Image source={{ uri: post.image }} style={styles.articleImage} /><View style={styles.articleBody}><View style={styles.articleMeta}><Text style={styles.articleCategory}>{post.category}</Text><Text style={styles.articleTime}>{post.readingTime}</Text></View><Text style={styles.articleTitle} numberOfLines={2}>{post.title}</Text><Text style={styles.articleDate}>{post.date}</Text><View style={styles.cardFooter}><Text style={styles.readStory}>Read story</Text><Ionicons name="arrow-forward" size={15} color={Colors.primary} /></View></View></TouchableOpacity>;
 }
 

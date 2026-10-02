@@ -31,14 +31,14 @@ function hasFutureTripDate(booking: Booking) {
 }
 
 function getProfileEmail(user: User) {
-  return user.email.includes('@') ? user.email : 'Email not added';
+  return user.email?.includes('@') ? user.email : 'Email not added';
 }
 
 function getProfilePhone(user: User) {
-  return user.phone || (user.email.includes('@') ? 'Phone not added' : user.email);
+  return user.phone || 'Phone not added';
 }
 
-const guestSections: Array<{ title: string; entries: ProfileEntry[] }> = [
+const guestSections: { title: string; entries: ProfileEntry[] }[] = [
   {
     title: 'Your travel',
     entries: [
@@ -56,7 +56,7 @@ const guestSections: Array<{ title: string; entries: ProfileEntry[] }> = [
   },
 ];
 
-const memberSections: Array<{ title: string; entries: ProfileEntry[] }> = [
+const memberSections: { title: string; entries: ProfileEntry[] }[] = [
   {
     title: 'Travel',
     entries: [

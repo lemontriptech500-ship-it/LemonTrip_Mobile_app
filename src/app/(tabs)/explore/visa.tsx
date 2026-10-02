@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -14,17 +15,6 @@ type VisaCountry = {
   processing: string;
   fee?: string;
 };
-
-const supportedCountries: VisaCountry[] = [
-  { code: 'UAE', name: 'United Arab Emirates', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days', fee: '₹4,500' },
-  { code: 'UK', name: 'United Kingdom', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=900&q=85', visaTypes: ['Business Visa', 'Student Visa'], processing: '10–15 days (Business) · 15–30 days (Student)' },
-  { code: 'USA', name: 'United States', image: 'https://images.unsplash.com/photo-1496588152823-86ff7695e68f?w=900&q=85', visaTypes: ['Business Visa'], processing: '10–15 days' },
-  { code: 'Canada', name: 'Canada', image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
-  { code: 'Australia', name: 'Australia', image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
-  { code: 'Schengen', name: 'Schengen Area', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=900&q=85', visaTypes: ['Business Visa'], processing: '10–15 days', fee: '₹7,200' },
-  { code: 'Singapore', name: 'Singapore', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days' },
-  { code: 'Thailand', name: 'Thailand', image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days' },
-];
 
 const commonDocuments = [
   'Valid passport',
@@ -43,6 +33,7 @@ export default function VisaScreen() {
   const [selectedCountry, setSelectedCountry] = useState<VisaCountry | null>(null);
   const [applicationId, setApplicationId] = useState('');
   const [trackingMessage, setTrackingMessage] = useState('');
+  const { items: supportedCountries, loading, error } = useContentItems<VisaCountry>('visa');
 
   const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
     const search = query.trim().toLowerCase();
@@ -98,7 +89,7 @@ export default function VisaScreen() {
           </View>
 
           <View style={[styles.countryGrid, desktop && styles.countryGridDesktop]}>
-            {visibleCountries.map((country) => (
+          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text></View> : visibleCountries.map((country) => (
               <TouchableOpacity key={country.code} accessibilityRole="button" accessibilityState={{ selected: selectedCountry?.code === country.code }} onPress={() => setSelectedCountry((current) => current?.code === country.code ? null : country)} style={[styles.countryCard, desktop && styles.countryCardDesktop, selectedCountry?.code === country.code && styles.countryCardSelected]}>
                 <ImageBackground source={{ uri: country.image }} style={styles.countryImage} imageStyle={styles.countryImageStyle}>
                   <View style={styles.countryShade} />
@@ -114,7 +105,7 @@ export default function VisaScreen() {
             ))}
           </View>
 
-          {visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
+          {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
           <View style={styles.serviceNotice}><Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Country and visa-type support is based on the existing LemonTrip service list. Requirements, processing estimates, and fees require advisor confirmation.</Text></View>
 
