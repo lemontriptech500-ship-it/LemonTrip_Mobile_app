@@ -33,7 +33,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
     <View style={styles.card}>
       <View style={styles.airline}>
         {offer.airline.logoUrl ? (
-          <Image source={{ uri: offer.airline.logoUrl }} style={styles.logo} accessibilityLabel={`${offer.airline.name} logo`} />
+          <Image source={{ uri: offer.airline.logoUrl }} style={styles.logo} resizeMode="contain" accessibilityLabel={`${offer.airline.name} logo`} />
         ) : (
           <View style={styles.logoFallback}><Ionicons name="airplane" size={18} color={Colors.primary} /></View>
         )}
@@ -78,7 +78,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
 const styles = StyleSheet.create({
   card: { padding: 14, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
   airline: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  logo: { width: 34, height: 34, borderRadius: 9, resizeMode: 'contain', backgroundColor: Colors.background },
+  logo: { width: 34, height: 34, borderRadius: 9, backgroundColor: Colors.background },
   logoFallback: { width: 34, height: 34, borderRadius: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   airlineCopy: { flex: 1 },
   airlineName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },

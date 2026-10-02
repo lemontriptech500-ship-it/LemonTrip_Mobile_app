@@ -111,11 +111,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: 18,
-    shadowColor: '#0b3427',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    elevation: 6,
   },
   tabsRow: {
     flexDirection: 'row',

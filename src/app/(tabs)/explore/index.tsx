@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   headerSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 5, lineHeight: 20 },
   cartButton: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   searchSection: { zIndex: 5, marginHorizontal: 16 },
-  searchBox: { minHeight: 62, paddingLeft: 17, paddingRight: 8, flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 17, shadowColor: '#16392d', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 13, elevation: 3 },
+  searchBox: { minHeight: 62, paddingLeft: 17, paddingRight: 8, flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 17 },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, paddingVertical: 11 },
   clearSearch: { padding: 6 },
   filterButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: Colors.accentSoft },

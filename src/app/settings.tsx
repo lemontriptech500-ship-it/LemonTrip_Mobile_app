@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { logout, useAuth } from '@/utils/authStore';
+import { useThemeName } from '@/utils/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
@@ -21,6 +22,7 @@ export default function SettingsScreen() {
   const [language, setLanguage] = useState('English');
   const [dialog, setDialog] = useState<DialogState>(null);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
+  const { theme, setTheme } = useThemeName();
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
@@ -81,7 +83,7 @@ export default function SettingsScreen() {
               <SettingsSection title="Preferences" icon="options-outline" description="Personalize your app">
                 <SettingRow icon="cash-outline" title="Currency" description="Display preference" value={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} />
                 <SettingRow icon="language-outline" title="Language" description="App language" value={language} onPress={() => setLanguage((current) => current === 'English' ? 'Hindi' : 'English')} />
-                <SettingRow icon="contrast-outline" title="Theme" description="Appearance follows your device" value="System" onPress={() => showUnavailable('Theme', 'Only the system appearance is currently supported.')} />
+                <SettingRow icon="contrast-outline" title="Theme" description="Choose your app appearance" value={theme === 'dark' ? 'Dark' : 'Light'} onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
               </SettingsSection>
             </View>
 

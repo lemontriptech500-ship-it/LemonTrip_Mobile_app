@@ -164,7 +164,7 @@ export default function FlightSearchForm({ loading, onSearch }: FlightSearchForm
 }
 
 const styles = StyleSheet.create({
-  panel: { marginHorizontal: 16, marginTop: -25, padding: 16, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 18, shadowColor: '#17372b', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.09, shadowRadius: 16, elevation: 4 },
+  panel: { marginHorizontal: 16, marginTop: -25, padding: 16, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 18 },
   tripTabs: { gap: 5, paddingBottom: 16 },
   tripTab: { paddingHorizontal: 13, paddingVertical: 9, borderRadius: 16, backgroundColor: Colors.background },
   tripTabSelected: { backgroundColor: Colors.primary },

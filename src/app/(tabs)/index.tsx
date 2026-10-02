@@ -138,7 +138,7 @@ export default function HomeScreen() {
           <ImageBackground
             source={{ uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1400&q=90' }}
             style={styles.heroImage}
-            imageStyle={styles.heroImageStyle}>
+            resizeMode="cover">
             <View style={styles.heroOverlay} />
             <View style={styles.heroContent}>
               <Text style={styles.heroEyebrow}>Premium travel booking</Text>
@@ -430,7 +430,6 @@ const styles = StyleSheet.create({
   profileText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
   heroWrap: { paddingHorizontal: 16, marginTop: 12 },
   heroImage: { minHeight: 390, justifyContent: 'flex-end', borderRadius: 24, overflow: 'hidden' },
-  heroImageStyle: { resizeMode: 'cover' },
   heroOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(6, 35, 26, 0.42)' },
   heroContent: { paddingHorizontal: 22, paddingBottom: 24, paddingTop: 28 },
   heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
