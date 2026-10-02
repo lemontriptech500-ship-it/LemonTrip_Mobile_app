@@ -18,7 +18,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tisha07.LemonTripMobile"
+      "package": "com.gokul.lemontrip"
     },
     "web": {
       "output": "static",
@@ -40,8 +40,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "df1f04f5-5b6b-4a61-b8ff-9f3c855325fd"
+        "projectId": "d350722c-2eb4-475b-aa80-a60f00827262"
       }
-    }
+    },
+    "owner": "gokulsir500"
   }
 }
