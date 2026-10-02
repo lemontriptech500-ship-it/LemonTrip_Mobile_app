@@ -1,6 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { travelPackages } from '@/data/packages';
+import type { TravelPackage } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { addBooking } from '@/utils/bookingStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -11,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function PackageDetailScreen() {
   useWishlist();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { items: travelPackages, loading } = useContentItems<TravelPackage>('package');
   const pkg = travelPackages.find((item) => item.id === id);
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
@@ -21,15 +23,15 @@ export default function PackageDetailScreen() {
     else router.replace('/packages');
   };
 
-  const handleBook = () => {
+  const handleBook = (bookingTime: number) => {
     if (!pkg || booked) return;
-    const bookingId = `package-${pkg.id}-${Date.now()}`;
+    const bookingId = `package-${pkg.id}-${bookingTime}`;
     addBooking({
       id: bookingId,
       serviceName: 'Holiday Package',
       itemName: pkg.title,
       price: pkg.price,
-      bookedAt: new Date().toLocaleDateString(),
+      bookedAt: new Date(bookingTime).toLocaleDateString(),
     });
     setBooked(true);
     Alert.alert('Booking confirmed', `${pkg.title} has been added to your bookings.`, [{ text: 'View confirmation', onPress: () => router.push({ pathname: '/confirmation', params: { bookingId } }) }]);
@@ -46,6 +48,7 @@ export default function PackageDetailScreen() {
     }
   };
 
+  if (loading) return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Loading package…</Text></View></SafeAreaView>;
   if (!pkg) {
     return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Package not found.</Text><TouchableOpacity onPress={() => router.replace('/packages')} style={styles.backToPackages}><Text style={styles.backToPackagesText}>Browse journeys</Text></TouchableOpacity></View></SafeAreaView>;
   }
@@ -76,7 +79,7 @@ export default function PackageDetailScreen() {
               <View style={styles.titleArea}>
                 <View style={styles.metaRow}>
                   <Text style={styles.destination}>{pkg.destination ?? 'Destination details unavailable'}</Text>
-                  <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.ratingText}>{pkg.rating.replace(/[^0-9.]/g, '')}</Text></View>
+                  {pkg.rating ? <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.ratingText}>{pkg.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}
                 </View>
                 <View style={styles.titleRow}>
                   <Text style={styles.title}>{pkg.title}</Text>
@@ -90,7 +93,7 @@ export default function PackageDetailScreen() {
                 </View>
                 <View style={styles.tripMeta}>
                   <View style={styles.metaItem}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.duration}</Text></View>
-                  <View style={styles.metaItem}><Ionicons name="pricetag-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.badge}</Text></View>
+                  {pkg.badge ? <View style={styles.metaItem}><Ionicons name="pricetag-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.badge}</Text></View> : null}
                 </View>
                 {pkg.categories?.length ? <View style={styles.categoryList}>{pkg.categories.map((category) => <View key={category} style={styles.categoryTag}><Text style={styles.categoryText}>{category}</Text></View>)}</View> : null}
               </View>
@@ -109,7 +112,7 @@ export default function PackageDetailScreen() {
               <DetailSection title="Cancellation" icon="calendar-clear-outline" text={pkg.cancellation} />
             </View>
 
-            {desktop ? <View style={styles.bookingColumn}><BookingPanel title={pkg.title} duration={pkg.duration} price={pkg.price} booked={booked} onEnquire={handleEnquire} onBook={handleBook} /></View> : null}
+            {desktop ? <View style={styles.bookingColumn}><BookingPanel title={pkg.title} duration={pkg.duration} price={pkg.price} booked={booked} onEnquire={handleEnquire} onBook={() => handleBook(Date.now())} /></View> : null}
           </View>
         </View>
       </ScrollView>
@@ -118,7 +121,7 @@ export default function PackageDetailScreen() {
         <View style={styles.mobileBar}>
           <View style={styles.mobilePrice}><Text style={styles.mobilePriceLabel}>STARTING FROM</Text><Text style={styles.mobilePriceValue}>{pkg.price}</Text></View>
           <TouchableOpacity onPress={handleEnquire} style={styles.enquireButton}><Text style={styles.enquireText}>Enquire</Text></TouchableOpacity>
-          <TouchableOpacity disabled={booked} onPress={handleBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookText}>{booked ? 'Added' : 'Book'}</Text></TouchableOpacity>
+          <TouchableOpacity disabled={booked} onPress={() => handleBook(Date.now())} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookText}>{booked ? 'Added' : 'Book'}</Text></TouchableOpacity>
         </View>
       ) : null}
     </SafeAreaView>

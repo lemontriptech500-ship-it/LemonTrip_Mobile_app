@@ -1,4 +1,4 @@
-import type { Hotel } from '@/data/hotels';
+import type { Hotel } from '@/types/content';
 
 export interface HotelSearchCriteria {
   destination: string;

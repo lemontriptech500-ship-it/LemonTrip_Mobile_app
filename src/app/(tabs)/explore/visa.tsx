@@ -1,53 +1,24 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import type { VisaCountry } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ImageBackground, Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Alert, ImageBackground, Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-type VisaCountry = {
-  code: string;
-  name: string;
-  image: string;
-  visaTypes: string[];
-  processing: string;
-  fee?: string;
-};
-
-const supportedCountries: VisaCountry[] = [
-  { code: 'UAE', name: 'United Arab Emirates', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days', fee: '₹4,500' },
-  { code: 'UK', name: 'United Kingdom', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=900&q=85', visaTypes: ['Business Visa', 'Student Visa'], processing: '10–15 days (Business) · 15–30 days (Student)' },
-  { code: 'USA', name: 'United States', image: 'https://images.unsplash.com/photo-1496588152823-86ff7695e68f?w=900&q=85', visaTypes: ['Business Visa'], processing: '10–15 days' },
-  { code: 'Canada', name: 'Canada', image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
-  { code: 'Australia', name: 'Australia', image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=900&q=85', visaTypes: ['Student Visa'], processing: '15–30 days' },
-  { code: 'Schengen', name: 'Schengen Area', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=900&q=85', visaTypes: ['Business Visa'], processing: '10–15 days', fee: '₹7,200' },
-  { code: 'Singapore', name: 'Singapore', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days' },
-  { code: 'Thailand', name: 'Thailand', image: 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=900&q=85', visaTypes: ['Tourist Visa'], processing: '3–5 days' },
-];
-
-const commonDocuments = [
-  'Valid passport',
-  'Passport-size photographs',
-  'Proof of travel plans',
-  'Financial documents',
-  'Accommodation details',
-];
-
-const trackingStages = ['Submitted', 'Documents', 'Under review', 'Approved / rejected'];
 
 export default function VisaScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<VisaCountry | null>(null);
-  const [applicationId, setApplicationId] = useState('');
-  const [trackingMessage, setTrackingMessage] = useState('');
+  const { items: supportedCountries, loading, error } = useContentItems<VisaCountry>('visa');
 
   const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
     const search = query.trim().toLowerCase();
     return !search || `${country.name} ${country.code} ${country.visaTypes.join(' ')}`.toLowerCase().includes(search);
-  }), [query]);
+  }), [query, supportedCountries]);
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
@@ -60,16 +31,8 @@ export default function VisaScreen() {
     try {
       await Linking.openURL(`mailto:hello@lemontrip.in?subject=${subject}&body=${body}`);
     } catch {
-      setTrackingMessage('Application intake is not connected. Contact hello@lemontrip.in to start your enquiry.');
+      Alert.alert('Visa enquiry', 'Contact hello@lemontrip.in to start your enquiry.');
     }
-  };
-
-  const checkApplication = () => {
-    if (!applicationId.trim()) {
-      setTrackingMessage('Enter an application ID to check its status.');
-      return;
-    }
-    setTrackingMessage('Live application tracking is not connected yet. Contact hello@lemontrip.in with your application ID.');
   };
 
   return (
@@ -98,7 +61,7 @@ export default function VisaScreen() {
           </View>
 
           <View style={[styles.countryGrid, desktop && styles.countryGridDesktop]}>
-            {visibleCountries.map((country) => (
+          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text></View> : visibleCountries.map((country) => (
               <TouchableOpacity key={country.code} accessibilityRole="button" accessibilityState={{ selected: selectedCountry?.code === country.code }} onPress={() => setSelectedCountry((current) => current?.code === country.code ? null : country)} style={[styles.countryCard, desktop && styles.countryCardDesktop, selectedCountry?.code === country.code && styles.countryCardSelected]}>
                 <ImageBackground source={{ uri: country.image }} style={styles.countryImage} imageStyle={styles.countryImageStyle}>
                   <View style={styles.countryShade} />
@@ -114,7 +77,7 @@ export default function VisaScreen() {
             ))}
           </View>
 
-          {visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
+          {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
           <View style={styles.serviceNotice}><Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Country and visa-type support is based on the existing LemonTrip service list. Requirements, processing estimates, and fees require advisor confirmation.</Text></View>
 
@@ -123,41 +86,20 @@ export default function VisaScreen() {
               <View style={styles.detailsHeading}><View><Text style={styles.eyebrow}>REQUIREMENTS OVERVIEW</Text><Text style={styles.sectionTitle}>{selectedCountry.name}</Text></View><TouchableOpacity accessibilityRole="button" accessibilityLabel="Close country details" onPress={() => setSelectedCountry(null)} style={styles.closeButton}><Ionicons name="close" size={17} color={Colors.textDark} /></TouchableOpacity></View>
               <View style={styles.detailsLayout}>
                 <View style={styles.detailsMain}>
-                  <VisaDetail title="Eligibility" icon="person-outline"><Text style={styles.detailText}>Eligibility depends on nationality, travel purpose, and individual circumstances. Confirm requirements with a visa advisor before applying.</Text></VisaDetail>
+                  {selectedCountry.eligibility ? <VisaDetail title="Eligibility" icon="person-outline"><Text style={styles.detailText}>{selectedCountry.eligibility}</Text></VisaDetail> : null}
                   <VisaDetail title="Documents" icon="document-text-outline">
-                    <Text style={styles.detailNote}>Common checklist from the existing demo guidance; country-specific requirements are not connected.</Text>
-                    {commonDocuments.map((document) => <View key={document} style={styles.documentRow}><Ionicons name="checkmark-circle-outline" size={14} color={Colors.secondary} /><Text style={styles.documentText}>{document}</Text></View>)}
+                    {selectedCountry.documents?.length ? selectedCountry.documents.map((document) => <View key={document} style={styles.documentRow}><Ionicons name="checkmark-circle-outline" size={14} color={Colors.secondary} /><Text style={styles.documentText}>{document}</Text></View>) : <Text style={styles.detailText}>Document requirements have not been supplied.</Text>}
                   </VisaDetail>
-                  <VisaDetail title="Processing timeline" icon="time-outline"><Text style={styles.detailText}>{selectedCountry.processing} · indicative service data only; processing times are not guaranteed.</Text></VisaDetail>
-                  <VisaDetail title="Fees" icon="card-outline"><Text style={styles.detailText}>{selectedCountry.fee ? `${selectedCountry.fee} shown in demo data; confirm the current fee before applying.` : 'A current fee was not supplied for this destination.'}</Text></VisaDetail>
-                  <VisaDetail title="Process" icon="git-branch-outline"><Text style={styles.detailText}>Requirements review → document preparation → application guidance. Submission and decisions are handled by the relevant authorities.</Text></VisaDetail>
-                  <VisaDetail title="FAQs" icon="help-circle-outline"><Text style={styles.detailText}>Destination-specific FAQs are not available in the current service data. Contact an advisor for guidance.</Text></VisaDetail>
+                  {selectedCountry.processing ? <VisaDetail title="Processing timeline" icon="time-outline"><Text style={styles.detailText}>{selectedCountry.processing}</Text></VisaDetail> : null}
+                  {selectedCountry.fee ? <VisaDetail title="Fees" icon="card-outline"><Text style={styles.detailText}>{selectedCountry.fee}</Text></VisaDetail> : null}
+                  {selectedCountry.process?.length ? <VisaDetail title="Process" icon="git-branch-outline"><Text style={styles.detailText}>{selectedCountry.process.join(' → ')}</Text></VisaDetail> : null}
+                  {selectedCountry.faqs?.length ? <VisaDetail title="FAQs" icon="help-circle-outline"><Text style={styles.detailText}>{selectedCountry.faqs.join('\n\n')}</Text></VisaDetail> : null}
                   <TouchableOpacity onPress={() => handleStartApplication(selectedCountry)} style={styles.startButton}><Ionicons name="mail-outline" size={15} color={Colors.primaryDark} /><Text style={styles.startButtonText}>Start application</Text></TouchableOpacity>
                 </View>
               </View>
             </View>
           ) : null}
 
-          <View style={styles.trackingSection}>
-            <View style={styles.trackingHeading}><View><Text style={styles.eyebrow}>APPLICATION STATUS</Text><Text style={styles.sectionTitle}>Application tracking</Text></View><View style={styles.trackingBadge}><Text style={styles.trackingBadgeText}>NOT CONNECTED</Text></View></View>
-            <Text style={styles.trackingIntro}>Track an existing application after its provider integration is connected.</Text>
-            <View style={styles.trackingInputRow}>
-              <TextInput value={applicationId} onChangeText={(value) => { setApplicationId(value); setTrackingMessage(''); }} placeholder="Application ID" placeholderTextColor={Colors.textLight} style={styles.trackingInput} />
-              <TouchableOpacity onPress={checkApplication} style={styles.checkButton}><Text style={styles.checkButtonText}>Check status</Text></TouchableOpacity>
-            </View>
-            {trackingMessage ? <Text style={styles.trackingMessage}>{trackingMessage}</Text> : null}
-            <View style={styles.trackingSteps}>
-              {[
-                { icon: 'send-outline' as const, label: 'Submitted' },
-                { icon: 'documents-outline' as const, label: 'Documents' },
-                { icon: 'time-outline' as const, label: 'Under review' },
-                { icon: 'checkmark-done-outline' as const, label: 'Approved / rejected' },
-              ].map((stage, index) => (
-                <View key={stage.label} style={styles.trackingStep}><View style={styles.stepIcon}><Ionicons name={stage.icon} size={15} color={Colors.textLight} /></View><Text style={styles.stepLabel}>{stage.label}</Text>{index < 3 ? <View style={styles.stepLine} /> : null}</View>
-              ))}
-            </View>
-            <Text style={styles.trackingFootnote}>These are possible process stages, not a live application status.</Text>
-          </View>
         </View>
       </ScrollView>
 

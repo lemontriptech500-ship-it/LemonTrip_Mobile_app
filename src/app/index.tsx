@@ -4,11 +4,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { Image } from 'expo-image';
 import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Platform, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SPLASH_DURATION = 3100;
 const lemonImage = require('../../assets/images/lemon-slice.png');
+const useNativeDriver = Platform.OS !== 'web';
 
 export default function LaunchScreen() {
   const { width, height } = useWindowDimensions();
@@ -47,29 +48,29 @@ export default function LaunchScreen() {
       Animated.sequence([
         Animated.delay(350),
         Animated.parallel([
-          Animated.timing(imageOpacity, { toValue: 1, duration: 420, useNativeDriver: true }),
-          Animated.timing(imageScale, { toValue: 1, duration: 600, useNativeDriver: true }),
-          Animated.timing(imageRotation, { toValue: 0, duration: 700, useNativeDriver: true }),
+          Animated.timing(imageOpacity, { toValue: 1, duration: 420, useNativeDriver }),
+          Animated.timing(imageScale, { toValue: 1, duration: 600, useNativeDriver }),
+          Animated.timing(imageRotation, { toValue: 0, duration: 700, useNativeDriver }),
         ]),
       ]),
       Animated.sequence([
         Animated.delay(1450),
         Animated.parallel([
           Animated.timing(revealProgress, { toValue: 1, duration: 650, useNativeDriver: false }),
-          Animated.timing(strokeOpacity, { toValue: 1, duration: 120, useNativeDriver: true }),
+          Animated.timing(strokeOpacity, { toValue: 1, duration: 120, useNativeDriver }),
         ]),
       ]),
       Animated.sequence([
         Animated.delay(1750),
         Animated.parallel([
-          Animated.timing(wordmarkOpacity, { toValue: 1, duration: 340, useNativeDriver: true }),
-          Animated.timing(wordmarkScale, { toValue: 1, duration: 340, useNativeDriver: true }),
+          Animated.timing(wordmarkOpacity, { toValue: 1, duration: 340, useNativeDriver }),
+          Animated.timing(wordmarkScale, { toValue: 1, duration: 340, useNativeDriver }),
         ]),
-        Animated.timing(strokeOpacity, { toValue: 0, duration: 220, useNativeDriver: true }),
+        Animated.timing(strokeOpacity, { toValue: 0, duration: 220, useNativeDriver }),
       ]),
       Animated.sequence([
         Animated.delay(2350),
-        Animated.timing(taglineOpacity, { toValue: 1, duration: 320, useNativeDriver: true }),
+        Animated.timing(taglineOpacity, { toValue: 1, duration: 320, useNativeDriver }),
       ]),
     ]);
     entrance.start();

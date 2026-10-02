@@ -1,15 +1,14 @@
 import { Colors } from '@/constants/colors';
-import { blogPosts } from '@/data/blog';
-import { destinations } from '@/data/destinations';
-import { offers } from '@/data/offers';
-import { travelPackages } from '@/data/packages';
-import { services } from '@/data/services';
+import type { Offer } from '@/data/offers';
+import { loadOffers, getOfferValidity } from '@/utils/offerApi';
+import type { BlogPost, Destination, TravelPackage, TravelService } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import TripSearchPanel, { SearchType } from '@/components/TripSearchPanel';
 import { getUser, useAuth } from '@/utils/authStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -29,6 +28,25 @@ export default function HomeScreen() {
   const isDesktop = width >= 768;
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [verifiedOffers, setVerifiedOffers] = useState<Offer[]>([]);
+  const { items: travelPackages } = useContentItems<TravelPackage>('package');
+  const { items: blogPosts } = useContentItems<BlogPost>('blog');
+  const { items: destinations } = useContentItems<Destination>('destination');
+  const { items: services } = useContentItems<TravelService>('service');
+
+  useEffect(() => {
+    let mounted = true;
+    loadOffers()
+      .then(({ offers: loadedOffers, source }) => {
+        if (!mounted || source !== 'backend') return;
+        setVerifiedOffers(loadedOffers.filter((offer) => getOfferValidity(offer.validUntil) === 'active'));
+      })
+      .catch(() => {
+        if (mounted) setVerifiedOffers([]);
+      });
+
+    return () => { mounted = false; };
+  }, []);
 
   const handleServicePress = (serviceId: string) => {
     if (serviceId === 'visa') {
@@ -80,7 +98,7 @@ export default function HomeScreen() {
 
   const visibleDestinations = destinations.slice(0, 6);
   const visiblePackages = travelPackages.slice(0, 3);
-  const visibleOffers = offers.slice(0, 4);
+  const visibleOffers = verifiedOffers.slice(0, 4);
   const visibleStories = blogPosts.slice(0, 3);
 
   return (
@@ -122,7 +140,7 @@ export default function HomeScreen() {
           <ImageBackground
             source={{ uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1400&q=90' }}
             style={styles.heroImage}
-            imageStyle={styles.heroImageStyle}>
+            resizeMode="cover">
             <View style={styles.heroOverlay} />
             <View style={styles.heroContent}>
               <Text style={styles.heroEyebrow}>Premium travel booking</Text>
@@ -242,8 +260,8 @@ export default function HomeScreen() {
                   <Image source={{ uri: travelPackage.image }} style={styles.packageImage} />
                   <View style={styles.packageBody}>
                     <View style={styles.packageTopRow}>
-                      <Text style={styles.packageBadge}>{travelPackage.badge}</Text>
-                      <Text style={styles.packageRating}>{travelPackage.rating}</Text>
+                      {travelPackage.badge ? <Text style={styles.packageBadge}>{travelPackage.badge}</Text> : null}
+                      {travelPackage.rating ? <Text style={styles.packageRating}>{travelPackage.rating}</Text> : null}
                     </View>
                     <Text style={styles.packageTitle}>{travelPackage.title}</Text>
                     <Text style={styles.packageMeta}>{travelPackage.duration}</Text>
@@ -412,7 +430,6 @@ const styles = StyleSheet.create({
   profileText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
   heroWrap: { paddingHorizontal: 16, marginTop: 12 },
   heroImage: { minHeight: 390, justifyContent: 'flex-end', borderRadius: 24, overflow: 'hidden' },
-  heroImageStyle: { resizeMode: 'cover' },
   heroOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(6, 35, 26, 0.42)' },
   heroContent: { paddingHorizontal: 22, paddingBottom: 24, paddingTop: 28 },
   heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },

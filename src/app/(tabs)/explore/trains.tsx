@@ -1,13 +1,12 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { dummyListings, type Listing } from '@/data/services';
+import type { Listing } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const trainListings = dummyListings.trains ?? [];
 
 function getRoute(detail: string) {
   const route = detail.split('·')[0] ?? '';
@@ -39,6 +38,8 @@ function validDate(value: string) {
 export default function TrainsScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
+  const { items: allListings, loading, error } = useContentItems<Listing>('listing');
+  const trainListings = allListings.filter((item) => item.serviceId === 'trains');
   const availableClasses = [...new Set(trainListings.flatMap((train) => getClasses(train.detail)))];
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -57,7 +58,7 @@ export default function TrainsScreen() {
       && (!activeClassFilter || classes.includes(activeClassFilter));
     const matchesType = !expressOnly || /express/i.test(train.name);
     return matchesFrom && matchesTo && matchesClass && matchesType;
-  }).sort((first, second) => parsePrice(first.price) - parsePrice(second.price)), [activeClassFilter, expressOnly, from, searched, selectedClass, to]);
+  }).sort((first, second) => parsePrice(first.price) - parsePrice(second.price)), [activeClassFilter, expressOnly, from, searched, selectedClass, to, trainListings]);
 
   const handleSearch = () => {
     if (travelDate && !validDate(travelDate)) {
@@ -76,12 +77,7 @@ export default function TrainsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <ScreenHeader title="Book train travel" subtitle="Compare routes, classes, and demo fares." eyebrow="LEMONTRIP / RAIL" onBack={handleBack} />
-
-          <View style={styles.demoBanner}>
-            <View style={styles.demoIcon}><Ionicons name="information-circle-outline" size={17} color={Colors.primaryDark} /></View>
-            <View style={styles.demoCopy}><Text style={styles.demoTitle}>Demo rail listings</Text><Text style={styles.demoText}>Live timetable and seat availability are not connected. Fares below are sample app data.</Text></View>
-          </View>
+          <ScreenHeader title="Book train travel" subtitle="Compare routes and fares supplied by LemonTrip." eyebrow="LEMONTRIP / RAIL" onBack={handleBack} />
 
           <View style={styles.searchPanel}>
             <View style={styles.searchHeading}><View style={styles.railIcon}><Ionicons name="train-outline" size={19} color={Colors.primary} /></View><View><Text style={styles.searchTitle}>Plan your rail journey</Text><Text style={styles.searchSubtitle}>Search stations, travel date, and class.</Text></View></View>
@@ -114,11 +110,10 @@ export default function TrainsScreen() {
             </View>
 
             <View style={styles.resultColumn}>
-              <View style={styles.resultHeading}><View><Text style={styles.eyebrow}>{searched ? 'MATCHING DEMO ROUTES' : 'DEMO ROUTES'}</Text><Text style={styles.resultTitle}>{results.length} {results.length === 1 ? 'train' : 'trains'}</Text></View>
+              <View style={styles.resultHeading}><View><Text style={styles.eyebrow}>{searched ? 'MATCHING ROUTES' : 'AVAILABLE ROUTES'}</Text><Text style={styles.resultTitle}>{results.length} {results.length === 1 ? 'train' : 'trains'}</Text></View>
                 {(activeClassFilter || expressOnly) ? <TouchableOpacity onPress={() => { setActiveClassFilter(null); setExpressOnly(false); }}><Text style={styles.clearText}>Clear filters</Text></TouchableOpacity> : null}
               </View>
-              {results.length ? <View style={styles.trainList}>{results.map((train) => <TrainResult key={train.id} train={train} />)}</View> : <View style={styles.empty}><Ionicons name="train-outline" size={23} color={Colors.primary} /><Text style={styles.emptyTitle}>No trains match your search</Text><Text style={styles.unavailable}>Try another station or class.</Text></View>}
-              <Text style={styles.resultsNote}>Sample fixtures only · no live availability or booking is performed.</Text>
+              {loading ? <View style={styles.empty}><Text style={styles.emptyTitle}>Loading train listings…</Text></View> : error ? <View style={styles.empty}><Text style={styles.emptyTitle}>{error}</Text></View> : results.length ? <View style={styles.trainList}>{results.map((train) => <TrainResult key={train.id} train={train} />)}</View> : <View style={styles.empty}><Ionicons name="train-outline" size={23} color={Colors.primary} /><Text style={styles.emptyTitle}>No train listings are available</Text><Text style={styles.unavailable}>Try again after train inventory is added.</Text></View>}
             </View>
           </View>
         </View>

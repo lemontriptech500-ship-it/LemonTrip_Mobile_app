@@ -1,13 +1,12 @@
 import { Colors } from '@/constants/colors';
-import { destinations } from '@/data/destinations';
-import { travelPackages } from '@/data/packages';
-import { services } from '@/data/services';
+import type { Destination, TravelPackage, TravelService } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
+import { useContentItems } from '@/utils/contentApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const destinationCountries: Record<string, string> = {
@@ -50,6 +49,9 @@ export default function ExploreScreen() {
   const [filters, setFilters] = useState({ duration: 'Any', budget: 'Any', destination: 'Any', category: 'Any' });
   const [selectedExperience, setSelectedExperience] = useState<string | null>(null);
   const [tripPreference, setTripPreference] = useState<string | null>(null);
+  const { items: travelPackages } = useContentItems<TravelPackage>('package');
+  const { items: destinations } = useContentItems<Destination>('destination');
+  const { items: services } = useContentItems<TravelService>('service');
 
   const handlePress = (serviceId: string) => {
     if (serviceId === 'visa') {
@@ -75,7 +77,7 @@ export default function ExploreScreen() {
       const country = destinationCountries[destination.id] ?? '';
       return !search || `${destination.name} ${country}`.toLowerCase().includes(search);
     });
-  }, [query]);
+  }, [destinations, query]);
 
   const filteredPackages = useMemo(() => {
     return travelPackages.filter((item) => {
@@ -83,7 +85,7 @@ export default function ExploreScreen() {
       const price = Number(item.price.replace(/[^\d]/g, ''));
       const destinationFilter = filters.destination.toLowerCase();
       const matchesDestination = filters.destination === 'Any' || item.title.toLowerCase().includes(destinationFilter);
-      const text = `${item.title} ${item.badge} ${item.highlights.join(' ')}`.toLowerCase();
+      const text = `${item.title} ${item.badge ?? ''} ${item.highlights.join(' ')}`.toLowerCase();
       const matchesCategory = filters.category === 'Any' || text.includes(filters.category.toLowerCase());
       const matchesDuration = filters.duration === 'Any'
         || (filters.duration === '1-5 nights' && nights <= 5)
@@ -98,13 +100,13 @@ export default function ExploreScreen() {
         || (experienceText === 'honeymoon' && /bali|maldives/i.test(item.title))
         || (experienceText === 'adventure' && /safari|explorer|scenic/i.test(`${item.title} ${item.highlights.join(' ')}`))
         || (experienceText === 'weekend' && nights <= 5)
-        || (experienceText === 'family' && /popular|best seller/i.test(item.badge))
+        || (experienceText === 'family' && /popular|best seller/i.test(item.badge ?? ''))
         || (experienceText === 'business' && /dubai/i.test(item.title))
-        || (experienceText === 'luxury' && /luxury/i.test(`${item.title} ${item.badge}`));
+        || (experienceText === 'luxury' && /luxury/i.test(`${item.title} ${item.badge ?? ''}`));
 
       return matchesDestination && matchesCategory && matchesDuration && matchesBudget && matchesExperience;
     });
-  }, [filters, selectedExperience]);
+  }, [filters, selectedExperience, travelPackages]);
 
   const suggestions = query.trim()
     ? destinations
@@ -175,7 +177,7 @@ export default function ExploreScreen() {
 
             {showFilters ? (
               <View style={styles.filterPanel}>
-                {(Object.keys(filterOptions) as Array<keyof typeof filterOptions>).map((filterName) => (
+                {(Object.keys(filterOptions) as (keyof typeof filterOptions)[]).map((filterName) => (
                   <View key={filterName} style={styles.filterGroup}>
                     <Text style={styles.filterLabel}>{filterName}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterOptions}>
@@ -293,8 +295,8 @@ export default function ExploreScreen() {
                 {filteredPackages.map((item) => (
                   <TouchableOpacity key={item.id} style={styles.packageCard} activeOpacity={0.9} onPress={() => router.push(`/packages/${item.id}`)}>
                     <ImageBackground source={{ uri: item.image }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
-                      <Text style={styles.packageBadge}>{item.badge}</Text>
-                      <View style={styles.packageRating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.packageRatingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View>
+                      {item.badge ? <Text style={styles.packageBadge}>{item.badge}</Text> : null}
+                      {item.rating ? <View style={styles.packageRating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.packageRatingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}
                     </ImageBackground>
                     <View style={styles.packageBody}>
                       <Text style={styles.packageTitle} numberOfLines={2}>{item.title}</Text>
@@ -358,7 +360,7 @@ const styles = StyleSheet.create({
   headerSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 5, lineHeight: 20 },
   cartButton: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   searchSection: { zIndex: 5, marginHorizontal: 16 },
-  searchBox: { minHeight: 62, paddingLeft: 17, paddingRight: 8, flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 17, shadowColor: '#16392d', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 13, elevation: 3 },
+  searchBox: { minHeight: 62, paddingLeft: 17, paddingRight: 8, flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 17 },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, paddingVertical: 11 },
   clearSearch: { padding: 6 },
   filterButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: Colors.accentSoft },

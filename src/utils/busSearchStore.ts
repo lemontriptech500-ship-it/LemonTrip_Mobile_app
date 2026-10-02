@@ -1,4 +1,4 @@
-import type { BusListing } from '@/data/buses';
+import type { BusListing } from '@/types/content';
 
 export interface BusSearchCriteria {
   from: string;

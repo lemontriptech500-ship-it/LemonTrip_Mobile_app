@@ -1,7 +1,6 @@
 import { Colors } from '@/constants/colors';
-import { blogPosts } from '@/data/blog';
-import { destinations } from '@/data/destinations';
-import { travelPackages } from '@/data/packages';
+import type { BlogPost, Destination, TravelPackage } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
@@ -11,6 +10,9 @@ export default function BlogDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
+  const { items: blogPosts, loading } = useContentItems<BlogPost>('blog');
+  const { items: travelPackages } = useContentItems<TravelPackage>('package');
+  const { items: destinations } = useContentItems<Destination>('destination');
   const post = blogPosts.find((item) => item.id === id);
   const relatedDestinations = destinations.filter((item) => post?.relatedDestinationIds?.includes(item.id));
   const relatedPackages = travelPackages.filter((item) => post?.relatedPackageIds?.includes(item.id));
@@ -20,6 +22,7 @@ export default function BlogDetailScreen() {
     else router.replace('/blog');
   };
 
+  if (loading) return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundTitle}>Loading story…</Text></View></SafeAreaView>;
   if (!post) {
     return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Ionicons name="book-outline" size={24} color={Colors.primary} /><Text style={styles.notFoundTitle}>Story not found</Text><TouchableOpacity onPress={() => router.replace('/blog')} style={styles.backToStories}><Text style={styles.backToStoriesText}>Browse stories</Text></TouchableOpacity></View></SafeAreaView>;
   }
@@ -34,7 +37,7 @@ export default function BlogDetailScreen() {
             <Text style={styles.category}>{post.category.toUpperCase()}</Text>
             <Text style={styles.title}>{post.title}</Text>
             <Text style={styles.excerpt}>{post.excerpt}</Text>
-            <View style={styles.byline}><View style={styles.authorMark}><Text style={styles.authorMarkText}>L</Text></View><View><Text style={styles.author}>{post.author}</Text><Text style={styles.metadata}>{post.date}  ·  {post.readingTime}</Text></View></View>
+            <View style={styles.byline}>{post.author ? <><View style={styles.authorMark}><Text style={styles.authorMarkText}>L</Text></View><Text style={styles.author}>{post.author}</Text></> : null}<Text style={styles.metadata}>{post.date}  ·  {post.readingTime}</Text></View>
           </View>
 
           <View style={[styles.articleLayout, desktop && styles.articleLayoutDesktop]}>
