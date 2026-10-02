@@ -23,15 +23,16 @@ export default function PackageDetailScreen() {
 
   const handleBook = () => {
     if (!pkg || booked) return;
+    const bookingId = `package-${pkg.id}-${Date.now()}`;
     addBooking({
-      id: `package-${pkg.id}-${Date.now()}`,
+      id: bookingId,
       serviceName: 'Holiday Package',
       itemName: pkg.title,
       price: pkg.price,
       bookedAt: new Date().toLocaleDateString(),
     });
     setBooked(true);
-    Alert.alert('Added to bookings', `${pkg.title} has been added to your bookings.`);
+    Alert.alert('Booking confirmed', `${pkg.title} has been added to your bookings.`, [{ text: 'View confirmation', onPress: () => router.push({ pathname: '/confirmation', params: { bookingId } }) }]);
   };
 
   const handleEnquire = async () => {
