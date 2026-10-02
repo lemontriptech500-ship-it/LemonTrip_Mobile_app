@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { offers as demoOffers, type Offer } from '@/data/offers';
+import type { Offer } from '@/data/offers';
 import { getOfferCategory, getOfferValidity, loadOffers, type OfferSource } from '@/utils/offerApi';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
