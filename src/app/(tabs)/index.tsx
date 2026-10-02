@@ -1,8 +1,7 @@
 import { Colors } from '@/constants/colors';
-import type { Offer } from '@/data/offers';
-import { loadOffers, getOfferValidity } from '@/utils/offerApi';
 import { blogPosts } from '@/data/blog';
 import { destinations } from '@/data/destinations';
+import { offers } from '@/data/offers';
 import { travelPackages } from '@/data/packages';
 import { services } from '@/data/services';
 import TripSearchPanel, { SearchType } from '@/components/TripSearchPanel';
@@ -10,7 +9,7 @@ import { getUser, useAuth } from '@/utils/authStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -30,21 +29,6 @@ export default function HomeScreen() {
   const isDesktop = width >= 768;
   const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [verifiedOffers, setVerifiedOffers] = useState<Offer[]>([]);
-
-  useEffect(() => {
-    let mounted = true;
-    loadOffers()
-      .then(({ offers: loadedOffers, source }) => {
-        if (!mounted || source !== 'backend') return;
-        setVerifiedOffers(loadedOffers.filter((offer) => getOfferValidity(offer.validUntil) === 'active'));
-      })
-      .catch(() => {
-        if (mounted) setVerifiedOffers([]);
-      });
-
-    return () => { mounted = false; };
-  }, []);
 
   const handleServicePress = (serviceId: string) => {
     if (serviceId === 'visa') {
@@ -96,7 +80,7 @@ export default function HomeScreen() {
 
   const visibleDestinations = destinations.slice(0, 6);
   const visiblePackages = travelPackages.slice(0, 3);
-  const visibleOffers = verifiedOffers.slice(0, 4);
+  const visibleOffers = offers.slice(0, 4);
   const visibleStories = blogPosts.slice(0, 3);
 
   return (
@@ -219,8 +203,6 @@ export default function HomeScreen() {
                           name: destination.name,
                           image: destination.image,
                           price: destination.priceFrom,
-                          category: 'Destinations',
-                          location: destination.name,
                         })
                       }>
                       <Ionicons name={saved ? 'heart' : 'heart-outline'} size={16} color={saved ? Colors.error : Colors.primaryDark} />
@@ -304,7 +286,7 @@ export default function HomeScreen() {
               ))}
             </View>
           ) : (
-            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No verified offers available right now.</Text></View>
+            <View style={styles.emptyStateCard}><Text style={styles.emptyStateText}>No offers available at the moment.</Text></View>
           )}
         </View>
 
