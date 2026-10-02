@@ -262,8 +262,8 @@ export default function HomeScreen() {
                   <Image source={{ uri: travelPackage.image }} style={styles.packageImage} />
                   <View style={styles.packageBody}>
                     <View style={styles.packageTopRow}>
-                      <Text style={styles.packageBadge}>{travelPackage.badge}</Text>
-                      <Text style={styles.packageRating}>{travelPackage.rating}</Text>
+                      {travelPackage.badge ? <Text style={styles.packageBadge}>{travelPackage.badge}</Text> : null}
+                      {travelPackage.rating ? <Text style={styles.packageRating}>{travelPackage.rating}</Text> : null}
                     </View>
                     <Text style={styles.packageTitle}>{travelPackage.title}</Text>
                     <Text style={styles.packageMeta}>{travelPackage.duration}</Text>

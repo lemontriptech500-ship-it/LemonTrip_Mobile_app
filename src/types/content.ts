@@ -24,8 +24,8 @@ export interface TravelPackage {
   title: string;
   image: string;
   duration: string;
-  rating: string;
-  badge: string;
+  rating?: string;
+  badge?: string;
   price: string;
   description: string;
   highlights: string[];
@@ -49,7 +49,7 @@ export interface BlogPost {
   title: string;
   excerpt: string;
   image: string;
-  author: string;
+  author?: string;
   readingTime: string;
   content: string[];
   relatedDestinationIds?: string[];

@@ -37,7 +37,7 @@ export default function BlogDetailScreen() {
             <Text style={styles.category}>{post.category.toUpperCase()}</Text>
             <Text style={styles.title}>{post.title}</Text>
             <Text style={styles.excerpt}>{post.excerpt}</Text>
-            <View style={styles.byline}><View style={styles.authorMark}><Text style={styles.authorMarkText}>L</Text></View><View><Text style={styles.author}>{post.author}</Text><Text style={styles.metadata}>{post.date}  ·  {post.readingTime}</Text></View></View>
+            <View style={styles.byline}>{post.author ? <><View style={styles.authorMark}><Text style={styles.authorMarkText}>L</Text></View><Text style={styles.author}>{post.author}</Text></> : null}<Text style={styles.metadata}>{post.date}  ·  {post.readingTime}</Text></View>
           </View>
 
           <View style={[styles.articleLayout, desktop && styles.articleLayoutDesktop]}>

@@ -7,14 +7,13 @@ import { useMemo, useState } from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const categories: PackageCategory[] = ['Weekend', 'Honeymoon', 'Family', 'Adventure', 'Luxury', 'Spiritual', 'International', 'Domestic'];
-
 export default function PackagesListScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<PackageCategory | null>(null);
   const { items: travelPackages, loading, error } = useContentItems<TravelPackage>('package');
+  const categories = useMemo(() => [...new Set(travelPackages.flatMap((item) => item.categories ?? []))], [travelPackages]);
 
   const results = useMemo(() => travelPackages.filter((item) => {
     const search = query.trim().toLowerCase();
@@ -104,7 +103,7 @@ function PackageCard({ item, desktop, onPress }: { item: TravelPackage; desktop:
   return (
     <TouchableOpacity accessibilityRole="button" activeOpacity={0.9} onPress={onPress} style={[styles.packageCard, desktop && styles.packageCardDesktop]}>
       <ImageBackground source={{ uri: item.image }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
-        <View style={styles.imageTop}><Text style={styles.packageBadge}>{item.badge}</Text><View style={styles.rating}><Ionicons name="star" size={11} color={Colors.accent} /><Text style={styles.ratingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View></View>
+        <View style={styles.imageTop}>{item.badge ? <Text style={styles.packageBadge}>{item.badge}</Text> : null}{item.rating ? <View style={styles.rating}><Ionicons name="star" size={11} color={Colors.accent} /><Text style={styles.ratingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}</View>
         <View style={styles.imageArrow}><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
       </ImageBackground>
       <View style={styles.packageBody}>

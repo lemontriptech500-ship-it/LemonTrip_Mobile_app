@@ -8,13 +8,12 @@ import { useMemo, useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const categories = ['All stories', 'Destinations', 'Travel Tips', 'Guides', 'Visa', 'Budget Travel', 'Experiences'];
-
 export default function BlogScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [activeCategory, setActiveCategory] = useState('All stories');
   const { items: blogPosts, loading, error } = useContentItems<BlogPost>('blog');
+  const categories = useMemo(() => ['All stories', ...new Set(blogPosts.map((post) => post.category))], [blogPosts]);
   const featured = blogPosts[0];
   const visiblePosts = useMemo(() => activeCategory === 'All stories' ? blogPosts : blogPosts.filter((post) => post.category === activeCategory), [activeCategory, blogPosts]);
 

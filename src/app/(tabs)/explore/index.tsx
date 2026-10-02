@@ -85,7 +85,7 @@ export default function ExploreScreen() {
       const price = Number(item.price.replace(/[^\d]/g, ''));
       const destinationFilter = filters.destination.toLowerCase();
       const matchesDestination = filters.destination === 'Any' || item.title.toLowerCase().includes(destinationFilter);
-      const text = `${item.title} ${item.badge} ${item.highlights.join(' ')}`.toLowerCase();
+      const text = `${item.title} ${item.badge ?? ''} ${item.highlights.join(' ')}`.toLowerCase();
       const matchesCategory = filters.category === 'Any' || text.includes(filters.category.toLowerCase());
       const matchesDuration = filters.duration === 'Any'
         || (filters.duration === '1-5 nights' && nights <= 5)
@@ -100,9 +100,9 @@ export default function ExploreScreen() {
         || (experienceText === 'honeymoon' && /bali|maldives/i.test(item.title))
         || (experienceText === 'adventure' && /safari|explorer|scenic/i.test(`${item.title} ${item.highlights.join(' ')}`))
         || (experienceText === 'weekend' && nights <= 5)
-        || (experienceText === 'family' && /popular|best seller/i.test(item.badge))
+        || (experienceText === 'family' && /popular|best seller/i.test(item.badge ?? ''))
         || (experienceText === 'business' && /dubai/i.test(item.title))
-        || (experienceText === 'luxury' && /luxury/i.test(`${item.title} ${item.badge}`));
+        || (experienceText === 'luxury' && /luxury/i.test(`${item.title} ${item.badge ?? ''}`));
 
       return matchesDestination && matchesCategory && matchesDuration && matchesBudget && matchesExperience;
     });
@@ -295,8 +295,8 @@ export default function ExploreScreen() {
                 {filteredPackages.map((item) => (
                   <TouchableOpacity key={item.id} style={styles.packageCard} activeOpacity={0.9} onPress={() => router.push(`/packages/${item.id}`)}>
                     <ImageBackground source={{ uri: item.image }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
-                      <Text style={styles.packageBadge}>{item.badge}</Text>
-                      <View style={styles.packageRating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.packageRatingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View>
+                      {item.badge ? <Text style={styles.packageBadge}>{item.badge}</Text> : null}
+                      {item.rating ? <View style={styles.packageRating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.packageRatingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}
                     </ImageBackground>
                     <View style={styles.packageBody}>
                       <Text style={styles.packageTitle} numberOfLines={2}>{item.title}</Text>
