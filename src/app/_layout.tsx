@@ -1,18 +1,17 @@
 ﻿import { Stack } from "expo-router";
-import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-
-void SplashScreen.preventAutoHideAsync();
+import { useThemeName } from '@/utils/themeStore';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Manrope: require('../../assets/fonts/Manrope[wght].ttf'),
   });
+  const { theme } = useThemeName();
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded || theme === null) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack key={theme} screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
     </Stack>
   );

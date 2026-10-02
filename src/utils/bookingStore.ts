@@ -6,6 +6,8 @@ export interface Booking {
   itemName: string;
   price: string;
   bookedAt: string;
+  tripDate?: string;
+  status?: 'upcoming' | 'completed' | 'cancelled' | 'confirmed';
 }
 
 let bookings: Booking[] = [];

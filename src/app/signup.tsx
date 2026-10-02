@@ -1,227 +1,145 @@
 import { Colors } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
+import { loginWithGoogle, sendPhoneOtp, signupWithEmail, verifyPhoneOtp } from '@/utils/authApi';
 import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SignupScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [nameError, setNameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [otp, setOtp] = useState('');
+  const [mode, setMode] = useState<'email' | 'phone'>('email');
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({ name: '', email: '', phone: '', password: '' });
+  const [otpError, setOtpError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const validateAndSignup = () => {
-    let hasError = false;
-    setNameError('');
-    setEmailError('');
-    setPasswordError('');
-
-    if (!name.trim()) {
-      setNameError('Full name is required');
-      hasError = true;
+  const validateAndSignup = async () => {
+    const nextErrors = { name: '', email: '', phone: '', password: '' };
+    if (!name.trim()) nextErrors.name = 'Your name is required';
+    if (mode === 'email') {
+      if (!email.trim()) nextErrors.email = 'Email is required';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) nextErrors.email = 'Enter a valid email address';
+      if (!password) nextErrors.password = 'Password is required';
+      else if (password.length < 8) nextErrors.password = 'Use at least 8 characters';
+    } else {
+      if (!phone.trim()) nextErrors.phone = 'Mobile number is required';
+      else if (phone.replace(/\D/g, '').length < 7) nextErrors.phone = 'Enter a valid mobile number';
+      if (otpSent && !/^\d{6}$/.test(otp)) setOtpError('Enter the six-digit code');
     }
 
-    if (!email.trim()) {
-      setEmailError('Email or phone is required');
-      hasError = true;
-    } else if (email.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Please enter a valid email address');
-      hasError = true;
+    setErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean) || (mode === 'phone' && otpSent && !/^\d{6}$/.test(otp))) return;
+    setLoading(true);
+    try {
+      if (mode === 'email') {
+        const result = await signupWithEmail({ name: name.trim(), email: email.trim(), password });
+        Alert.alert('Verify your email', result.message, [{ text: 'Continue to sign in', onPress: () => router.replace('/login') }]);
+      } else if (!otpSent) {
+        await sendPhoneOtp({ phone: phone.trim(), purpose: 'signup', name: name.trim() });
+        setOtpSent(true);
+        Alert.alert('Code sent', 'Enter the verification code sent to your phone.');
+      } else {
+        await login(await verifyPhoneOtp({ phone: phone.trim(), code: otp, purpose: 'signup' }));
+        router.replace('/(tabs)/profile');
+      }
+    } catch (error) {
+      Alert.alert('Sign-up failed', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    if (!password.trim()) {
-      setPasswordError('Password is required');
-      hasError = true;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      hasError = true;
-    }
-
-    if (hasError) return;
-
-    login({ name: name.trim(), email: email.trim() });
-    router.replace('/(tabs)/profile');
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
+  };
+
+  const showUnavailable = (feature: string) => {
+    Alert.alert(feature, `${feature} is not connected yet. Contact hello@lemontrip.in for help.`);
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.container}>
-        <ScrollView>
-          <View style={styles.header}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={20} color={Colors.primaryDark} />
-            </TouchableOpacity>
-            <Text style={styles.eyebrow}>LEMON TRIP / ACCOUNT</Text>
-            <Text style={styles.logoText}>A new journey starts here.</Text>
-          </View>
+    <AuthLayout
+      eyebrow="LEMONTRIP / CREATE ACCOUNT"
+      title="Create your LemonTrip account"
+      subtitle="Save your plans and keep every journey close."
+      onBack={handleBack}>
+      <AuthField
+        label="Name"
+        value={name}
+        placeholder="Your full name"
+        onChangeText={(value) => { setName(value); if (errors.name) setErrors((current) => ({ ...current, name: '' })); }}
+        error={errors.name}
+        autoCapitalize="words"
+      />
+      <View style={styles.modeSwitch}>
+        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('email'); setOtpSent(false); }} style={[styles.modeButton, mode === 'email' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email + password</Text></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('phone'); setOtpSent(false); }} style={[styles.modeButton, mode === 'phone' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone OTP</Text></TouchableOpacity>
+      </View>
+      {mode === 'email' ? <AuthField
+        label="Email"
+        value={email}
+        placeholder="you@example.com"
+        onChangeText={(value) => { setEmail(value); if (errors.email) setErrors((current) => ({ ...current, email: '' })); }}
+        error={errors.email}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      /> : null}
+      {mode === 'phone' ? <AuthField
+        label="Mobile"
+        value={phone}
+        placeholder="+91 mobile number"
+        onChangeText={(value) => { setPhone(value); if (errors.phone) setErrors((current) => ({ ...current, phone: '' })); }}
+        error={errors.phone}
+        autoCapitalize="none"
+        keyboardType="phone-pad"
+      /> : null}
+      {mode === 'phone' && otpSent ? <AuthField label="Verification code" value={otp} placeholder="Six-digit code" onChangeText={(value) => { setOtp(value.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }} error={otpError} keyboardType="phone-pad" autoCapitalize="none" /> : null}
+      {mode === 'email' ? <AuthField
+        label="Password"
+        value={password}
+        placeholder="Create a password"
+        onChangeText={(value) => { setPassword(value); if (errors.password) setErrors((current) => ({ ...current, password: '' })); }}
+        error={errors.password}
+        secure={!showPassword}
+        onToggleSecure={() => setShowPassword((visible) => !visible)}
+        autoCapitalize="none"
+      /> : null}
 
-          <View style={styles.form}>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Sign up to start planning your trips</Text>
+      <TouchableOpacity accessibilityRole="button" disabled={loading} style={[styles.primaryButton, loading && styles.disabledButton]} onPress={() => void validateAndSignup()}>
+        <Text style={styles.primaryButtonText}>{loading ? 'Please wait…' : mode === 'phone' && !otpSent ? 'Send verification code' : mode === 'phone' ? 'Verify & create account' : 'Create account'}</Text>
+      </TouchableOpacity>
 
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={[styles.input, nameError ? styles.inputError : null]}
-              placeholder="Enter your name"
-              placeholderTextColor={Colors.textLight}
-              value={name}
-              onChangeText={(text) => {
-                setName(text);
-                if (nameError) setNameError('');
-              }}
-            />
-            {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+      <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
+      <GoogleAuthButton label="Sign up with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken)); router.replace('/(tabs)/profile'); }} />
 
-            <Text style={styles.label}>Email or Phone</Text>
-            <TextInput
-              style={[styles.input, emailError ? styles.inputError : null]}
-              placeholder="Enter your email or phone"
-              placeholderTextColor={Colors.textLight}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                if (emailError) setEmailError('');
-              }}
-              autoCapitalize="none"
-            />
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              placeholder="Create a password"
-              placeholderTextColor={Colors.textLight}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                if (passwordError) setPasswordError('');
-              }}
-              secureTextEntry
-            />
-            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-
-            <TouchableOpacity style={styles.signupButton} onPress={validateAndSignup}>
-              <Text style={styles.signupButtonText}>Sign Up</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => router.push('/login')} style={styles.loginLink}>
-              <Text style={styles.loginText}>
-                Already have an account? <Text style={styles.loginTextBold}>Login</Text>
-              </Text>
-            </TouchableOpacity>
-
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <TouchableOpacity onPress={() => router.push('/login')} style={styles.switchLink}>
+        <Text style={styles.switchText}>Already have an account? <Text style={styles.switchTextStrong}>Login</Text></Text>
+      </TouchableOpacity>
+      <AuthLegalLinks onTerms={() => showUnavailable('Terms')} onPrivacy={() => showUnavailable('Privacy policy')} />
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 22,
-  },
-  backButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', marginLeft: -10, marginBottom: 28 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', marginBottom: 9 },
-  logoText: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 28,
-    fontWeight: '800',
-  },
-  form: {
-    paddingHorizontal: 24,
-    paddingTop: 7,
-  },
-  title: {
-    fontFamily: 'Manrope',
-    fontSize: 22,
-    fontWeight: '800',
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    color: Colors.textLight,
-    marginBottom: 28,
-  },
-  label: {
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    fontWeight: '800',
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 2,
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  inputError: {
-    borderColor: Colors.error,
-  },
-  errorText: {
-    color: Colors.error,
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    marginBottom: 12,
-  },
-  signupButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 2,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  signupButtonText: {
-    color: Colors.white,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  loginLink: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  loginText: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    color: Colors.textLight,
-  },
-  loginTextBold: {
-    color: Colors.primary,
-    fontFamily: 'Manrope',
-    fontWeight: '800',
-  },
+  modeSwitch: { flexDirection: 'row', padding: 3, marginBottom: 12, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
+  modeButton: { flex: 1, minHeight: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  modeButtonActive: { backgroundColor: Colors.surface },
+  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
+  modeTextActive: { color: Colors.primary, fontWeight: '900' },
+  disabledButton: { opacity: 0.6 },
+  primaryButton: { minHeight: 45, alignItems: 'center', justifyContent: 'center', marginTop: 1, borderRadius: 11, backgroundColor: Colors.primary },
+  primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 12 },
+  divider: { flex: 1, height: 1, backgroundColor: Colors.border },
+  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  switchLink: { alignItems: 'center', marginTop: 13, paddingVertical: 4 },
+  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
+  switchTextStrong: { color: Colors.primary, fontWeight: '800' },
 });

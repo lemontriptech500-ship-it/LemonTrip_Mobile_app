@@ -5,6 +5,9 @@ export interface WishlistItem {
   name: string;
   image: string;
   price: string;
+  category?: 'Destinations' | 'Hotels' | 'Packages';
+  location?: string;
+  savedAt?: string;
 }
 
 let wishlist: WishlistItem[] = [];
@@ -19,7 +22,11 @@ export function toggleWishlist(item: WishlistItem) {
   if (exists) {
     wishlist = wishlist.filter((w) => w.id !== item.id);
   } else {
-    wishlist = [item, ...wishlist];
+    wishlist = [{
+      ...item,
+      category: item.category ?? 'Destinations',
+      savedAt: item.savedAt ?? new Date().toISOString(),
+    }, ...wishlist];
   }
   notify();
 }

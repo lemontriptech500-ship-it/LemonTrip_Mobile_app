@@ -1,201 +1,140 @@
 import { Colors } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
+import { loginWithEmail, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp } from '@/utils/authApi';
 import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const [otp, setOtp] = useState('');
+  const [mode, setMode] = useState<'email' | 'phone'>('email');
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const validateAndLogin = () => {
-    let hasError = false;
-    setEmailError('');
+  const validateAndLogin = async () => {
+    setIdentifierError('');
     setPasswordError('');
+    setOtpError('');
 
-    if (!email.trim()) {
-      setEmailError('Email or phone is required');
-      hasError = true;
-    } else if (email.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Please enter a valid email address');
-      hasError = true;
+    if (!identifier.trim()) {
+      setIdentifierError(mode === 'email' ? 'Email is required' : 'Mobile number is required');
+      return;
+    }
+    if (mode === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim())) {
+      setIdentifierError('Enter a valid email address');
+      return;
+    }
+    if (mode === 'phone' && identifier.replace(/\D/g, '').length < 7) {
+      setIdentifierError('Enter a valid mobile number');
+      return;
     }
 
-    if (!password.trim()) {
+    if (mode === 'email' && !password) {
       setPasswordError('Password is required');
-      hasError = true;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      hasError = true;
+      return;
+    }
+    if (mode === 'phone' && otpSent && !/^\d{6}$/.test(otp)) {
+      setOtpError('Enter the six-digit code');
+      return;
     }
 
-    if (hasError) return;
-
-    login({ name: email.split('@')[0] || 'User', email: email.trim() });
-    router.replace('/(tabs)/profile');
+    setLoading(true);
+    try {
+      if (mode === 'email') await login(await loginWithEmail({ email: identifier.trim(), password }));
+      else if (!otpSent) {
+        await sendPhoneOtp({ phone: identifier.trim(), purpose: 'login' });
+        setOtpSent(true);
+        Alert.alert('Code sent', 'If this number can be used, a verification code will arrive shortly.');
+        return;
+      } else await login(await verifyPhoneOtp({ phone: identifier.trim(), code: otp, purpose: 'login' }));
+      router.replace('/(tabs)/profile');
+    } catch (error) {
+      Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)');
+  };
+
+  const showUnavailable = (feature: string) => {
+    Alert.alert(feature, `${feature} is not connected yet. Contact hello@lemontrip.in for help.`);
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={20} color={Colors.primaryDark} />
-          </TouchableOpacity>
-          <Text style={styles.eyebrow}>LEMON TRIP / ACCOUNT</Text>
-          <Text style={styles.logoText}>Welcome back.</Text>
-        </View>
+    <AuthLayout
+      eyebrow="LEMONTRIP / LOGIN"
+      title="Welcome back"
+      subtitle="Sign in to pick up where your journey left off."
+      onBack={handleBack}>
+      <AuthField
+        label={mode === 'email' ? 'Email' : 'Mobile number'}
+        value={identifier}
+        placeholder={mode === 'email' ? 'you@example.com' : '+91 mobile number'}
+        onChangeText={(value) => { setIdentifier(value); setOtpSent(false); if (identifierError) setIdentifierError(''); }}
+        error={identifierError}
+        autoCapitalize="none"
+        keyboardType={mode === 'email' ? 'email-address' : 'phone-pad'}
+      />
+      <View style={styles.modeSwitch}>
+        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('email'); setOtpSent(false); }} style={[styles.modeButton, mode === 'email' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email</Text></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('phone'); setOtpSent(false); }} style={[styles.modeButton, mode === 'phone' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone OTP</Text></TouchableOpacity>
+      </View>
+      {mode === 'email' ? <AuthField
+        label="Password"
+        value={password}
+        placeholder="Enter your password"
+        onChangeText={(value) => { setPassword(value); if (passwordError) setPasswordError(''); }}
+        error={passwordError}
+        secure={!showPassword}
+        onToggleSecure={() => setShowPassword((visible) => !visible)}
+        autoCapitalize="none"
+      /> : otpSent ? <AuthField label="Verification code" value={otp} placeholder="Six-digit code" onChangeText={(value) => { setOtp(value.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }} error={otpError} keyboardType="phone-pad" autoCapitalize="none" /> : null}
 
-        <View style={styles.form}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Login to continue your journey</Text>
+      {mode === 'email' ? <TouchableOpacity onPress={() => showUnavailable('Password reset')} style={styles.forgotRow}>
+        <Text style={styles.forgotText}>Forgot password?</Text>
+      </TouchableOpacity> : null}
 
-          <Text style={styles.label}>Email or Phone</Text>
-          <TextInput
-            style={[styles.input, emailError ? styles.inputError : null]}
-            placeholder="Enter your email or phone"
-            placeholderTextColor={Colors.textLight}
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              if (emailError) setEmailError('');
-            }}
-            autoCapitalize="none"
-          />
-          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+      <TouchableOpacity accessibilityRole="button" disabled={loading} style={[styles.primaryButton, loading && styles.disabledButton]} onPress={() => void validateAndLogin()}>
+        <Text style={styles.primaryButtonText}>{loading ? 'Please wait…' : mode === 'phone' && !otpSent ? 'Send code' : mode === 'phone' ? 'Verify & sign in' : 'Login'}</Text>
+      </TouchableOpacity>
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={[styles.input, passwordError ? styles.inputError : null]}
-            placeholder="Enter your password"
-            placeholderTextColor={Colors.textLight}
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              if (passwordError) setPasswordError('');
-            }}
-            secureTextEntry
-          />
-          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+      <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
+      <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken)); router.replace('/(tabs)/profile'); }} />
 
-          <TouchableOpacity style={styles.loginButton} onPress={validateAndLogin}>
-            <Text style={styles.loginButtonText}>Login</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => router.push('/signup')} style={styles.signupLink}>
-            <Text style={styles.signupText}>
-              Don't have an account? <Text style={styles.signupTextBold}>Sign Up</Text>
-            </Text>
-          </TouchableOpacity>
-
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <TouchableOpacity onPress={() => router.push('/signup')} style={styles.switchLink}>
+        <Text style={styles.switchText}>New to LemonTrip? <Text style={styles.switchTextStrong}>Create an account</Text></Text>
+      </TouchableOpacity>
+      <AuthLegalLinks onTerms={() => showUnavailable('Terms')} onPrivacy={() => showUnavailable('Privacy policy')} />
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 22,
-  },
-  backButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', marginLeft: -10, marginBottom: 28 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', marginBottom: 9 },
-  logoText: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 30,
-    fontWeight: '800',
-  },
-  form: { paddingHorizontal: 24, paddingTop: 7 },
-  title: {
-    fontFamily: 'Manrope',
-    fontSize: 22,
-    fontWeight: '800',
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    color: Colors.textLight,
-    marginBottom: 28,
-  },
-  label: {
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    fontWeight: '800',
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 2,
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    color: Colors.textDark,
-    marginBottom: 6,
-  },
-  inputError: {
-    borderColor: Colors.error,
-  },
-  errorText: {
-    color: Colors.error,
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    marginBottom: 12,
-  },
-  loginButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 2,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  loginButtonText: {
-    color: Colors.white,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  signupLink: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  signupText: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    color: Colors.textLight,
-  },
-  signupTextBold: {
-    color: Colors.primary,
-    fontFamily: 'Manrope',
-    fontWeight: '800',
-  },
+  modeSwitch: { flexDirection: 'row', padding: 3, marginBottom: 12, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
+  modeButton: { flex: 1, minHeight: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  modeButtonActive: { backgroundColor: Colors.surface },
+  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
+  modeTextActive: { color: Colors.primary, fontWeight: '900' },
+  disabledButton: { opacity: 0.6 },
+  forgotRow: { alignSelf: 'flex-end', marginTop: -3, marginBottom: 11, paddingVertical: 5 },
+  forgotText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  primaryButton: { minHeight: 45, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.primary },
+  primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 14 },
+  divider: { flex: 1, height: 1, backgroundColor: Colors.border },
+  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  switchLink: { alignItems: 'center', marginTop: 15, paddingVertical: 5 },
+  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
+  switchTextStrong: { color: Colors.primary, fontWeight: '800' },
 });

@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
-import { dummyListings, services } from '@/data/services';
+import type { Listing, TravelService } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -10,8 +11,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ServiceListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const service = services.find((s) => s.id === id);
-  const listings = dummyListings[id ?? ''] ?? [];
+  const { items: services } = useContentItems<TravelService>('service');
+  const { items: allListings } = useContentItems<Listing>('listing');
+  const service = services.find((item) => item.id === id);
+  const listings = allListings.filter((item) => item.serviceId === id);
   useCart();
   const [searched, setSearched] = useState(false);
   const [from, setFrom] = useState('');
