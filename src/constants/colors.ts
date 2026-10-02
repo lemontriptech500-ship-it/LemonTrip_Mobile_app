@@ -7,7 +7,7 @@ const lightColors = {
   accent: '#ffd21a',
   accentSoft: '#fff6bd',
   white: '#FFFFFF',
-  background: '#f4f7f5',
+  background: '#FFFFFF',
   surface: '#FFFFFF',
   surfaceMuted: '#edf2ee',
   textDark: '#10231a',
