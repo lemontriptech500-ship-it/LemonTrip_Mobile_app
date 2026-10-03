@@ -4,35 +4,26 @@ import type { VisaCountry } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { useMemo, useState } from 'react';
-import { Alert, ImageBackground, Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function VisaScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState<VisaCountry | null>(null);
-  const { items: supportedCountries, loading, error } = useContentItems<VisaCountry>('visa');
+  const { items: supportedCountries, loading, error, retry } = useContentItems<VisaCountry>('visa');
 
   const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
     const search = query.trim().toLowerCase();
-    return !search || `${country.name} ${country.code} ${country.visaTypes.join(' ')}`.toLowerCase().includes(search);
+    return !search || `${country.name} ${country.id} ${country.visaType}`.toLowerCase().includes(search);
   }), [query, supportedCountries]);
 
   const handleBack = () => {
+    blurWebNavigationFocus();
     if (router.canGoBack()) router.back();
     else router.replace('/(tabs)/explore');
-  };
-
-  const handleStartApplication = async (country: VisaCountry) => {
-    const subject = encodeURIComponent(`Visa assistance enquiry · ${country.name}`);
-    const body = encodeURIComponent(`Hello LemonTrip, I would like to start a ${country.visaTypes[0]} enquiry for ${country.name}.`);
-    try {
-      await Linking.openURL(`mailto:hello@lemontrip.in?subject=${subject}&body=${body}`);
-    } catch {
-      Alert.alert('Visa enquiry', 'Contact hello@lemontrip.in to start your enquiry.');
-    }
   };
 
   return (
@@ -57,21 +48,22 @@ export default function VisaScreen() {
 
           <View style={styles.catalogHeader}>
             <View><Text style={styles.eyebrow}>CURRENT SERVICE LIST</Text><Text style={styles.sectionTitle}>Choose a destination</Text></View>
-            <Text style={styles.countryCount}>{visibleCountries.length} countries</Text>
+            <Text style={styles.countryCount}>{loading ? 'Loading…' : error ? 'Unavailable' : `${supportedCountries.length} countries`}</Text>
           </View>
 
           <View style={[styles.countryGrid, desktop && styles.countryGridDesktop]}>
-          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text></View> : visibleCountries.map((country) => (
-              <TouchableOpacity key={country.code} accessibilityRole="button" accessibilityState={{ selected: selectedCountry?.code === country.code }} onPress={() => setSelectedCountry((current) => current?.code === country.code ? null : country)} style={[styles.countryCard, desktop && styles.countryCardDesktop, selectedCountry?.code === country.code && styles.countryCardSelected]}>
+          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text><TouchableOpacity accessibilityRole="button" onPress={retry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></TouchableOpacity></View> : visibleCountries.map((country) => (
+              <TouchableOpacity key={country.id} accessibilityRole="button" onPress={() => { blurWebNavigationFocus(); router.push({ pathname: '/(tabs)/explore/visa/[id]', params: { id: country.id } }); }} style={[styles.countryCard, desktop && styles.countryCardDesktop]}>
                 <ImageBackground source={{ uri: country.image }} style={styles.countryImage} imageStyle={styles.countryImageStyle}>
                   <View style={styles.countryShade} />
-                  <View style={styles.countryImageTop}><Text style={styles.countryCode}>{country.code}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primaryDark} style={styles.countryArrow} /></View>
+                  <View style={styles.countryImageTop}><Text style={styles.countryCode}>VISA SUPPORT</Text><Ionicons name="arrow-forward" size={13} color={Colors.primaryDark} style={styles.countryArrow} /></View>
                   <Text style={styles.countryName}>{country.name}</Text>
                 </ImageBackground>
                 <View style={styles.countryBody}>
-                  <Text style={styles.countryVisaType}>{country.visaTypes.join(' · ')}</Text>
-                  <View style={styles.countryMeta}><Ionicons name="time-outline" size={12} color={Colors.textLight} /><Text style={styles.countryMetaText}>{country.processing}</Text></View>
-                  <View style={styles.countryFooter}><Text style={styles.countryFee}>{country.fee ? `From ${country.fee}` : 'Fees not listed'}</Text><Text style={styles.checkText}>Check requirements</Text></View>
+                  <Text style={styles.countryVisaType}>{country.visaType}</Text>
+                  <View style={styles.countryMeta}><Ionicons name="time-outline" size={12} color={Colors.textLight} /><Text style={styles.countryMetaText}>{country.processing ?? 'Processing time not listed'}</Text></View>
+                  <View style={styles.countryFooter}><Text style={styles.countryFee}>{country.fee ? `From ${country.fee}` : 'Price not listed'}</Text><Text style={styles.checkText}>Check requirements →</Text></View>
+                  <Text numberOfLines={2} style={styles.countryDocuments}>Documents: {country.documents.join(', ') || 'Requirements not listed'}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -79,42 +71,13 @@ export default function VisaScreen() {
 
           {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
-          <View style={styles.serviceNotice}><Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Country and visa-type support is based on the existing LemonTrip service list. Requirements, processing estimates, and fees require advisor confirmation.</Text></View>
-
-          {selectedCountry ? (
-            <View style={styles.detailsSection}>
-              <View style={styles.detailsHeading}><View><Text style={styles.eyebrow}>REQUIREMENTS OVERVIEW</Text><Text style={styles.sectionTitle}>{selectedCountry.name}</Text></View><TouchableOpacity accessibilityRole="button" accessibilityLabel="Close country details" onPress={() => setSelectedCountry(null)} style={styles.closeButton}><Ionicons name="close" size={17} color={Colors.textDark} /></TouchableOpacity></View>
-              <View style={styles.detailsLayout}>
-                <View style={styles.detailsMain}>
-                  {selectedCountry.eligibility ? <VisaDetail title="Eligibility" icon="person-outline"><Text style={styles.detailText}>{selectedCountry.eligibility}</Text></VisaDetail> : null}
-                  <VisaDetail title="Documents" icon="document-text-outline">
-                    {selectedCountry.documents?.length ? selectedCountry.documents.map((document) => <View key={document} style={styles.documentRow}><Ionicons name="checkmark-circle-outline" size={14} color={Colors.secondary} /><Text style={styles.documentText}>{document}</Text></View>) : <Text style={styles.detailText}>Document requirements have not been supplied.</Text>}
-                  </VisaDetail>
-                  {selectedCountry.processing ? <VisaDetail title="Processing timeline" icon="time-outline"><Text style={styles.detailText}>{selectedCountry.processing}</Text></VisaDetail> : null}
-                  {selectedCountry.fee ? <VisaDetail title="Fees" icon="card-outline"><Text style={styles.detailText}>{selectedCountry.fee}</Text></VisaDetail> : null}
-                  {selectedCountry.process?.length ? <VisaDetail title="Process" icon="git-branch-outline"><Text style={styles.detailText}>{selectedCountry.process.join(' → ')}</Text></VisaDetail> : null}
-                  {selectedCountry.faqs?.length ? <VisaDetail title="FAQs" icon="help-circle-outline"><Text style={styles.detailText}>{selectedCountry.faqs.join('\n\n')}</Text></VisaDetail> : null}
-                  <TouchableOpacity onPress={() => handleStartApplication(selectedCountry)} style={styles.startButton}><Ionicons name="mail-outline" size={15} color={Colors.primaryDark} /><Text style={styles.startButtonText}>Start application</Text></TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          ) : null}
+          <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>These visa listings are mock service content for browsing. Requirements, processing estimates, and fees are indicative and require advisor confirmation.</Text></View>
 
         </View>
       </ScrollView>
 
-      {selectedCountry ? (
-        <View style={styles.mobileBar}>
-          <View style={styles.mobileCountry}><Text style={styles.mobileCountryName}>{selectedCountry.name}</Text><Text style={styles.mobileCountryFee}>{selectedCountry.fee ? `From ${selectedCountry.fee}` : 'Fee not listed'}</Text></View>
-          <TouchableOpacity onPress={() => handleStartApplication(selectedCountry)} style={styles.mobileStart}><Text style={styles.mobileStartText}>Start application</Text></TouchableOpacity>
-        </View>
-      ) : null}
     </SafeAreaView>
   );
-}
-
-function VisaDetail({ title, icon, children }: { title: string; icon: keyof typeof Ionicons.glyphMap; children: React.ReactNode }) {
-  return <View style={styles.visaDetail}><View style={styles.visaDetailHeading}><View style={styles.visaDetailIcon}><Ionicons name={icon} size={15} color={Colors.primary} /></View><Text style={styles.visaDetailTitle}>{title}</Text></View><View style={styles.visaDetailBody}>{children}</View></View>;
 }
 
 const styles = StyleSheet.create({
@@ -125,39 +88,41 @@ const styles = StyleSheet.create({
   heroImage: { borderRadius: 20 },
   heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(7, 31, 23, 0.42)' },
   heroContent: { maxWidth: 520, padding: 18 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1.1 },
+  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.1 },
   heroTitle: { maxWidth: 360, color: Colors.white, fontFamily: 'Manrope', fontSize: 28, lineHeight: 34, fontWeight: '900', marginTop: 6 },
-  heroSubtitle: { maxWidth: 340, color: 'rgba(255,255,255,0.88)', fontFamily: 'Manrope', fontSize: 8, lineHeight: 13, marginTop: 6, marginBottom: 12 },
+  heroSubtitle: { maxWidth: 340, color: 'rgba(255,255,255,0.88)', fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 6, marginBottom: 12 },
   searchBar: { maxWidth: 430, minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 11, borderRadius: 11, backgroundColor: Colors.surface },
-  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, paddingVertical: 8 },
+  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, paddingVertical: 8 },
   catalogHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 22, marginBottom: 10 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 0.9 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9 },
   sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 3 },
-  countryCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
+  countryCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
   countryGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 9, paddingHorizontal: 15 },
   countryGridDesktop: { justifyContent: 'flex-start', gap: 10 },
   countryCard: { width: '48.5%', overflow: 'hidden', borderRadius: 13, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   countryCardDesktop: { width: '24%' },
-  countryCardSelected: { borderColor: Colors.primary, borderWidth: 2 },
   countryImage: { height: 102, justifyContent: 'space-between', padding: 8 },
   countryImageStyle: { borderTopLeftRadius: 12, borderTopRightRadius: 12 },
   countryShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(7, 30, 23, 0.25)' },
   countryImageTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  countryCode: { color: Colors.white, fontFamily: 'Manrope', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
+  countryCode: { color: Colors.white, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900', letterSpacing: 1 },
   countryArrow: { width: 24, height: 24, textAlign: 'center', textAlignVertical: 'center', overflow: 'hidden', borderRadius: 9, backgroundColor: Colors.accent },
-  countryName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
+  countryName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
   countryBody: { padding: 8 },
-  countryVisaType: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800' },
+  countryVisaType: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, lineHeight: 17, fontWeight: '800' },
   countryMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 5 },
-  countryMetaText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, flex: 1 },
+  countryMetaText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, flex: 1 },
   countryFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 5, marginTop: 7 },
-  countryFee: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800' },
-  checkText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800' },
+  countryFee: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  countryDocuments: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 13, marginTop: 5 },
+  checkText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
   emptyState: { minHeight: 140, alignItems: 'center', justifyContent: 'center', gap: 6, marginHorizontal: 16, padding: 18, borderRadius: 14, backgroundColor: Colors.surface },
-  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
+  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  retryButton: { marginTop: 5, paddingHorizontal: 13, paddingVertical: 8, borderRadius: 8, backgroundColor: Colors.accent },
+  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
   serviceNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginHorizontal: 16, marginTop: 13, padding: 9, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
-  serviceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, lineHeight: 12 },
+  serviceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 16 },
   detailsSection: { marginTop: 21, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.border },
   detailsHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 9 },
   closeButton: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.surface },
