@@ -7,9 +7,10 @@ import { getUser, useAuth } from '@/utils/authStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useRef, useState } from 'react';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
-import { Image, ImageBackground, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Animated, Easing, Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -30,21 +31,17 @@ const services: ServiceItem[] = [
     image: require('../../../assets/images/flight.png'),
     route: '/(tabs)/explore/flights',
   },
-  
-  
-  { label: 'Hotels', icon: 'bed-outline',    image: require('../../../assets/images/hotels_new.png'),
-  route: '/(tabs)/explore/hotels' },
+  { label: 'Hotels', icon: 'bed-outline', image: require('../../../assets/images/hotels_new.png'), route: '/(tabs)/explore/hotels' },
   { label: 'Holiday\nPackages', icon: 'umbrella-outline', image: require('../../../assets/images/holiday.png'), route: '/packages' },
-  { label: 'Trains', icon: 'train-outline',    image: require('../../../assets/images/trains.png'),
-  route: '/(tabs)/explore/trains' },
-  { label: 'Buses', icon: 'bus-outline',   image: require('../../../assets/images/buses.png'), route: '/(tabs)/explore/buses' },
-  { label: 'Visa', icon: 'id-card-outline',  image: require('../../../assets/images/visa.png'), route: '/(tabs)/explore/visa' },
-  { label: 'Offers', icon: 'pricetag-outline',image: require('../../../assets/images/offers.png'), badge: 'NEW', route: '/offers' },
-  { label: 'Saved\nPlaces', icon: 'heart-outline',image: require('../../../assets/images/saved.png'), route: '/(tabs)/wishlist' },
-  { label: 'Travel\nStories', icon: 'newspaper-outline',image: require('../../../assets/images/travel_stories.png') ,route: '/blog' },
+  { label: 'Trains', icon: 'train-outline', image: require('../../../assets/images/trains.png'), route: '/(tabs)/explore/trains' },
+  { label: 'Buses', icon: 'bus-outline', image: require('../../../assets/images/buses.png'), route: '/(tabs)/explore/buses' },
+  { label: 'Visa', icon: 'id-card-outline', image: require('../../../assets/images/visa.png'), route: '/(tabs)/explore/visa' },
+  { label: 'Offers', icon: 'pricetag-outline', image: require('../../../assets/images/offers.png'), badge: 'NEW', route: '/offers' },
+  { label: 'Saved\nPlaces', icon: 'heart-outline', image: require('../../../assets/images/saved.png'), route: '/(tabs)/wishlist' },
+  { label: 'Travel\nStories', icon: 'newspaper-outline', image: require('../../../assets/images/travel_stories.png'), route: '/blog' },
   { label: 'Cart', icon: 'cart-outline', image: require('../../../assets/images/cart.png'), route: '/cart' },
-  { label: 'Help', icon: 'headset-outline',  image: require('../../../assets/images/help.png'),route: '/help' },
-  { label: 'Explore\nAll', icon: 'compass-outline',  image: require('../../../assets/images/exploreall.png'), route: '/(tabs)/explore' },
+  { label: 'Help', icon: 'headset-outline', image: require('../../../assets/images/help.png'), route: '/help' },
+  { label: 'Explore\nAll', icon: 'compass-outline', image: require('../../../assets/images/exploreall.png'), route: '/(tabs)/explore' },
 ];
 
 const trustPoints: { icon: IconName; title: string; subtitle: string }[] = [
@@ -67,6 +64,64 @@ const samplePackages: TravelPackage[] = [
   { id: 'andaman-getaway', title: 'Andaman Getaway', image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=900', duration: '6 Days 5 Nights', price: '₹29,999', badge: 'Trending', description: '', highlights: [] },
 ];
 
+// Opacity steps for a left-to-right dark green fade behind the promo text
+// (built from plain Views so no extra gradient package is needed).
+const PROMO_FADE_STEPS = [0.62, 0.58, 0.52, 0.44, 0.35, 0.26, 0.17, 0.09, 0.03, 0];
+
+type PromoSlide = {
+  id: string;
+  image: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  cta: string;
+  route: Parameters<typeof router.push>[0];
+};
+
+// Swap the image URLs / copy here to change the banner slides.
+const PROMO_SLIDES: PromoSlide[] = [
+  {
+    id: 'adventure',
+    image: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=1400',
+    eyebrow: 'Your Next',
+    title: 'Adventure Awaits!',
+    description: 'Discover amazing destinations, exclusive deals and unforgettable experiences.',
+    cta: 'Explore Now',
+    route: '/packages',
+  },
+  {
+    id: 'beaches',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1400',
+    eyebrow: 'Escape To',
+    title: 'Tropical Beaches',
+    description: 'Handpicked island getaways with stays, flights and transfers sorted.',
+    cta: 'View Packages',
+    route: '/packages',
+  },
+  {
+    id: 'offers',
+    image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1400',
+    eyebrow: 'Save More On',
+    title: 'Exclusive Offers',
+    description: 'Grab limited-time deals on flights, hotels and holiday packages.',
+    cta: 'See Offers',
+    route: '/offers',
+  },
+];
+
+const PROMO_AUTOPLAY_MS = 4500;
+
+// Rotating search suggestions shown inside the search bar. Edit freely.
+const SEARCH_HINTS = [
+  'Goa hotels for stay',
+  'Delhi to Mumbai flights',
+  'Bali holiday packages',
+  'Chennai to Bengaluru trains',
+  'Dubai visa for trip',
+  'Chennai to Madurai buses',
+];
+const SEARCH_HINT_INTERVAL_MS = 1800;
+
 function SectionHeader({ title, action, onPress }: { title: string; action: string; onPress: () => void }) {
   return (
     <View style={styles.sectionHeader}>
@@ -81,6 +136,43 @@ function SectionHeader({ title, action, onPress }: { title: string; action: stri
 
 export default function HomeScreen() {
   const { width: viewportWidth } = useWindowDimensions();
+  const promoScrollRef = useRef<ScrollView>(null);
+  const [promoIndex, setPromoIndex] = useState(0);
+  // Banner width = page width (max 784) minus the 16px side margins
+  const promoWidth = Math.min(viewportWidth, 784) - 32;
+
+  const goToPromo = (index: number) => {
+    promoScrollRef.current?.scrollTo({ x: index * promoWidth, animated: true });
+    setPromoIndex(index);
+  };
+
+  // Auto-slide. The timer restarts whenever the slide changes (including manual swipes).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      goToPromo((promoIndex + 1) % PROMO_SLIDES.length);
+    }, PROMO_AUTOPLAY_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promoIndex, promoWidth]);
+  // Search bar hint: slides up and fades out, then the next suggestion slides in from below.
+  const [hintIndex, setHintIndex] = useState(0);
+  const hintAnim = useRef(new Animated.Value(0)).current; // 0 = visible, -1 = leaving, 1 = entering
+  useEffect(() => {
+    const timer = setInterval(() => {
+      Animated.timing(hintAnim, { toValue: -1, duration: 260, easing: Easing.in(Easing.quad), useNativeDriver: true }).start(({ finished }) => {
+        if (!finished) return;
+        setHintIndex((current) => (current + 1) % SEARCH_HINTS.length);
+        hintAnim.setValue(1);
+        Animated.timing(hintAnim, { toValue: 0, duration: 320, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+      });
+    }, SEARCH_HINT_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [hintAnim]);
+  const hintStyle = {
+    opacity: hintAnim.interpolate({ inputRange: [-1, 0, 1], outputRange: [0, 1, 0] }),
+    transform: [{ translateY: hintAnim.interpolate({ inputRange: [-1, 0, 1], outputRange: [-10, 0, 10] }) }],
+  };
+
   useWishlist();
   const user = useAuth();
   const [verifiedOffers, setVerifiedOffers] = useState<Offer[]>([]);
@@ -114,16 +206,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <StatusBar style="dark" backgroundColor="#FFFFFF" />
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.page}>
-        {/* Brand hero header */}
-        <ImageBackground
-          source={require('../../../assets/images/herosection_bgimage2.png')}
-          style={styles.hero}
-          resizeMode="cover">
-          <View style={styles.heroOverlay} />
+        {/* Brand header: plain white, no background image */}
+        <View style={styles.hero}>
           <View style={styles.headerRow}>
             <View style={styles.brandWrap}>
               <TouchableOpacity
@@ -131,7 +220,7 @@ export default function HomeScreen() {
                 accessibilityLabel="Settings"
                 onPress={() => router.push('/settings')}
                 style={styles.menuButton}>
-                <Ionicons name="menu" size={26} color="#FFFFFF" />
+                <Ionicons name="menu" size={26} color="#6B7280" />
               </TouchableOpacity>
               <Image
                 source={require('../../../assets/images/header_logo.png')}
@@ -141,20 +230,29 @@ export default function HomeScreen() {
               <Text style={styles.brand}>Lemon Trip</Text>
             </View>
             <TouchableOpacity accessibilityRole="button" onPress={handleProfilePress} style={styles.profileButton}>
-              <Ionicons name="person-outline" size={16} color="#FFFFFF" />
+              <Ionicons name="person-outline" size={16} color="#6B7280" />
               <Text style={styles.profileText}>{user ? user.name.split(' ')[0] : 'Login'}</Text>
             </TouchableOpacity>
           </View>
-        </ImageBackground>
 
-        {/* Search card overlapping the hero */}
-        <TouchableOpacity activeOpacity={0.92} style={styles.searchBar} onPress={() => router.push('/(tabs)/explore')}>
-          <Ionicons name="search-outline" size={20} color={Colors.primary} />
-          <Text style={styles.searchText} numberOfLines={1}>Search 'Goa hotels' or 'Delhi to Mumbai'</Text>
-          <View style={styles.searchGo}>
-            <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-          </View>
-        </TouchableOpacity>
+          {/* Search bar */}
+          <TouchableOpacity
+            accessibilityRole="search"
+            accessibilityLabel="Search flights, hotels, packages and more"
+            activeOpacity={0.92}
+            style={styles.searchBar}
+            onPress={() => router.push('/(tabs)/explore')}>
+            <Ionicons name="search-outline" size={20} color="#6B7280" />
+            <View style={styles.searchTextWrap}>
+              <Text style={styles.searchPrefix}>Search </Text>
+              <Animated.Text style={[styles.searchHint, hintStyle]} numberOfLines={1}>'{SEARCH_HINTS[hintIndex]}'</Animated.Text>
+            </View>
+            <View style={styles.searchGo}>
+              <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
+        </View>
+
 
         {/* Services grid */}
         <View style={styles.servicesCard}>
@@ -184,18 +282,61 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        {/* Inspiration banner */}
-        <TouchableOpacity activeOpacity={0.92} style={styles.promo} onPress={() => router.push('/packages')}>
-          <Image source={{ uri: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=1400' }} style={styles.promoImage} />
-          <View style={styles.promoShade} />
-          <View style={styles.promoCopy}>
-            <Text style={styles.promoEyebrow}>Your Next</Text>
-            <Text style={styles.promoTitle}>Adventure Awaits!</Text>
-            <Text style={styles.promoDescription}>Discover amazing destinations,{ '\n' }exclusive deals and unforgettable{ '\n' }experiences with LemonTrip.</Text>
-            <View style={styles.promoButton}><Text style={styles.promoButtonText}>Explore Now</Text><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
+        {/* Inspiration banner: 3 auto-sliding, swipeable slides */}
+        <View style={styles.promo}>
+          <ScrollView
+            ref={promoScrollRef}
+            horizontal
+            pagingEnabled
+            decelerationRate="fast"
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={(event) => {
+              const next = Math.round(event.nativeEvent.contentOffset.x / promoWidth);
+              if (next !== promoIndex && next >= 0 && next < PROMO_SLIDES.length) setPromoIndex(next);
+            }}>
+            {PROMO_SLIDES.map((slide) => (
+              <TouchableOpacity
+                key={slide.id}
+                activeOpacity={0.95}
+                style={[styles.promoSlide, { width: promoWidth }]}
+                onPress={() => router.push(slide.route)}>
+                <Image source={{ uri: slide.image }} style={styles.promoImage} resizeMode="cover" />
+                {/* Light overall tint + dark green fade on the left so the text is always readable */}
+                <View style={styles.promoShade} />
+                <View style={styles.promoFade} pointerEvents="none">
+                  {PROMO_FADE_STEPS.map((opacity, index) => (
+                    <View key={index} style={{ flex: 1, backgroundColor: `rgba(0,45,43,${opacity})` }} />
+                  ))}
+                </View>
+                <View style={styles.promoCopy}>
+                  <Text style={styles.promoEyebrow}>{slide.eyebrow}</Text>
+                  <Text style={styles.promoTitle}>{slide.title}</Text>
+                  <Text style={styles.promoDescription} numberOfLines={3}>{slide.description}</Text>
+                  <View style={styles.promoButton}>
+                    <Text style={styles.promoButtonText}>{slide.cta}</Text>
+                    <View style={styles.promoButtonArrow}>
+                      <Ionicons name="arrow-forward" size={13} color="#FFFFFF" />
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          <View style={styles.promoDots} pointerEvents="box-none">
+            {PROMO_SLIDES.map((slide, index) => (
+              <TouchableOpacity
+                key={slide.id}
+                accessibilityRole="button"
+                accessibilityLabel={`Show slide ${index + 1}`}
+                hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+                onPress={() => goToPromo(index)}
+                style={index === promoIndex ? styles.promoDotActive : styles.promoDot}
+              />
+            ))}
           </View>
-          <View style={styles.promoDots}><View style={styles.promoDotActive}/><View style={styles.promoDot}/><View style={styles.promoDot}/></View>
-        </TouchableOpacity>
+        </View>
 
         {/* Destinations */}
         <View style={styles.section}>
@@ -282,7 +423,7 @@ export default function HomeScreen() {
               { title: 'Car Rentals', icon: 'car-outline' as IconName, route: '/(tabs)/explore' },
               { title: 'Custom Packages', icon: 'gift-outline' as IconName, route: '/packages' },
             ].map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route)}>
-              <Ionicons name={item.icon} size={27} color={Colors.primary}/><Text style={styles.travelServiceText}>{item.title}</Text>
+              <View style={styles.travelServiceIcon}><Ionicons name={item.icon} size={24} color={Colors.primary}/></View><Text style={styles.travelServiceText}>{item.title}</Text>
             </TouchableOpacity>)}
           </View>
         </View>
@@ -290,7 +431,12 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.bottomCta} onPress={() => router.push('/(tabs)/explore')}>
           <Image source={require('../../../assets/images/header_logo.png')} style={styles.ctaLogo} resizeMode="contain" />
           <Text style={styles.ctaText}>Travel the world with LemonTrip</Text>
-          <Text style={styles.ctaButton}>Start Exploring  →</Text>
+          <View style={styles.ctaButton}>
+            <Text style={styles.ctaButtonText}>Start Exploring</Text>
+            <View style={styles.ctaButtonArrow}>
+              <Ionicons name="arrow-forward" size={12} color="#FFFFFF" />
+            </View>
+          </View>
         </TouchableOpacity>
 
         {/* Stories */}
@@ -330,25 +476,26 @@ const cardShadow = {
 
 const styles = StyleSheet.create({
   // Dark brand colour behind the status bar; the scroll area paints the light page background
-  safeArea: { flex: 1, backgroundColor: Colors.primaryDark },
+  safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
   scroll: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 30, maxWidth: 784, width: '100%', alignSelf: 'center' },
 
   // Hero
-  hero: { backgroundColor: Colors.primaryDark, paddingHorizontal: 18, paddingTop: 8, paddingBottom: 54, minHeight: 108, overflow: 'hidden' },
-  heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)' },
+  hero: { backgroundColor: '#FFFFFF', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#EEF0EF' },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   brandWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   menuButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', marginLeft: -6 },
   brandLogo: { width: 64, height: 46 },
-  brand: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
-  profileButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
-  profileText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  brand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
+  profileButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#D1D5DB' },
+  profileText: { color: '#4B5563', fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
 
   // Search (overlaps hero)
-  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 16, marginTop: -34, paddingLeft: 16, paddingRight: 8, height: 54, borderRadius: 29, backgroundColor: Colors.surface, ...cardShadow },
-  searchText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14 },
-  searchGo: { width: 42, height: 42, borderRadius: 21, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
+  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingLeft: 16, paddingRight: 6, height: 50, borderRadius: 25, backgroundColor: '#F3F4F6', borderWidth: 1, borderColor: '#E5E7EB' },
+  searchTextWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
+  searchPrefix: { color: '#9CA3AF', fontFamily: 'Manrope', fontSize: 14 },
+  searchHint: { flexShrink: 1, color: '#374151', fontFamily: 'Manrope', fontSize: 14, fontWeight: '600' },
+  searchGo: { width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
 
   // Services grid
   servicesCard: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 16, marginTop: 14, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 19, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
@@ -361,19 +508,25 @@ const styles = StyleSheet.create({
   badge: { position: 'absolute', top: -5, right: -9, backgroundColor: Colors.error, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1.5 },
   badgeText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 8, fontWeight: '900', letterSpacing: 0.3 },
 
-  // Sections
-  promo: { height: 212, marginHorizontal: 16, marginTop: 14, borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.primaryDark },
+  // Promo banner
+  promo: { height: 212, marginHorizontal: 16, marginTop: 14, borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.primaryDark, ...cardShadow },
+  promoSlide: { height: 212, overflow: 'hidden' },
   promoImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
-  promoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,45,43,0.30)' },
-  promoCopy: { position: 'absolute', left: 20, top: 19 },
-  promoEyebrow: { color: '#fff', fontFamily: 'Caveat', fontSize: 26, lineHeight: 29 },
-  promoTitle: { color: '#fff', fontFamily: 'Caveat', fontSize: 30, fontWeight: '700', lineHeight: 34 },
-  promoDescription: { color: '#fff', fontFamily: 'Manrope', fontSize: 12, lineHeight: 16, marginTop: 4 },
-  promoButton: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.accent, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 9, alignSelf: 'flex-start', marginTop: 13 },
+  promoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,25,23,0.32)' },
+  promoFade: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '0%', flexDirection: 'row' },
+  promoCopy: { position: 'absolute', left: 20, top: 20, width: '66%' },
+  promoEyebrow: { color: '#FFFFFF', fontFamily: 'Caveat', fontSize: 24, lineHeight: 26, textShadowColor: 'rgba(0,0,0,0.6)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 6 },
+  promoTitle: { color: '#FFFFFF', fontFamily: 'Caveat', fontSize: 32, fontWeight: '700', lineHeight: 36, textShadowColor: 'rgba(0,0,0,0.65)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 8 },
+  promoDescription: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 12, fontWeight: '600', lineHeight: 17, marginTop: 6, textShadowColor: 'rgba(0,0,0,0.6)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 5 },
+  // White pill + green arrow: matches the search bar button and the rest of the green theme
+  promoButton: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderRadius: 22, paddingLeft: 16, paddingRight: 5, paddingVertical: 5, alignSelf: 'flex-start', marginTop: 14 },
   promoButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontWeight: '800', fontSize: 12 },
-  promoDots: { position: 'absolute', bottom: 12, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  promoDotActive: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.accent },
-  promoDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.65)' },
+  promoButtonArrow: { width: 26, height: 26, borderRadius: 13, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
+  promoDots: { position: 'absolute', bottom: 12, right: 16, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  promoDotActive: { width: 20, height: 6, borderRadius: 3, backgroundColor: '#FFFFFF' },
+  promoDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.6)' },
+
+  // Sections
   section: { paddingTop: 18 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 10 },
   sectionTitle: { color: Colors.primaryDark, fontFamily: 'serif', fontSize: 20, fontWeight: '700' },
@@ -402,8 +555,8 @@ const styles = StyleSheet.create({
   // Packages
   pkgCard: { width: 246, overflow: 'hidden', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 14, ...cardShadow },
   pkgImage: { width: '100%', height: 86, backgroundColor: Colors.surfaceMuted },
-  pkgBadgePill: { position: 'absolute', top: 10, left: 10, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 10, backgroundColor: Colors.accent },
-  pkgBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
+  pkgBadgePill: { position: 'absolute', top: 10, left: 10, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 10, backgroundColor: Colors.primary },
+  pkgBadgeText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
   pkgBody: { padding: 11 },
   pkgTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
   pkgMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
@@ -425,12 +578,15 @@ const styles = StyleSheet.create({
   trustTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, lineHeight: 13, fontWeight: '800', textAlign: 'center' },
   trustSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 12, textAlign: 'center', marginTop: 2 },
   travelServices: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: 16 },
-  travelService: { width: '31.7%', minHeight: 72, borderRadius: 13, backgroundColor: '#fff9d9', borderWidth: 1, borderColor: '#f3edc7', alignItems: 'center', justifyContent: 'center', paddingVertical: 8, gap: 4, ...cardShadow },
-  travelServiceText: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', color: Colors.primaryDark, textAlign: 'center' },
+  travelService: { width: '31.7%', minHeight: 88, borderRadius: 16, backgroundColor: '#edf7ec', borderWidth: 1, borderColor: '#d3e8d6', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 4, gap: 7, ...cardShadow },
+  travelServiceIcon: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#d3e8d6', alignItems: 'center', justifyContent: 'center' },
+  travelServiceText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', color: Colors.primaryDark, textAlign: 'center' },
   bottomCta: { minHeight: 58, marginHorizontal: 16, marginTop: 16, borderRadius: 28, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 7 },
   ctaLogo: { width: 46, height: 42 },
   ctaText: { color: '#fff', fontFamily: 'Caveat', fontSize: 19, flex: 1 },
-  ctaButton: { backgroundColor: Colors.accent, color: Colors.primaryDark, paddingVertical: 9, paddingHorizontal: 12, borderRadius: 18, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', overflow: 'hidden' },
+  ctaButton: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#FFFFFF', borderRadius: 20, paddingLeft: 14, paddingRight: 5, paddingVertical: 5 },
+  ctaButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
+  ctaButtonArrow: { width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
 
   // Stories
   storyList: { paddingHorizontal: 16, gap: 14 },
