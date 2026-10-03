@@ -4,6 +4,37 @@ const configuredBaseUrl = process.env.EXPO_PUBLIC_API_URL?.trim().replace(/\/$/,
 export const visaApiConfigured = Boolean(configuredBaseUrl);
 export const visaApiRoot = configuredBaseUrl ? `${configuredBaseUrl}/api/v1/visa` : null;
 
+export type VisaApplication = {
+  id: string;
+  referenceId: string;
+  country: string;
+  visaType: string;
+  status: string;
+  createdAt: string;
+  documents: { passportFront: boolean; passportBack: boolean; applicantPhoto: boolean };
+};
+
+export type VisaDocumentKey = keyof VisaApplication['documents'];
+
+async function authenticatedVisaRequest<T>(path: string, accessToken: string): Promise<T> {
+  if (!visaApiRoot) throw new Error('Visa applications are unavailable while the API is not configured.');
+  const response = await fetch(`${visaApiRoot}${path}`, {
+    headers: { Accept: 'application/json', Authorization: `Bearer ${accessToken}` },
+  });
+  const payload = await response.json().catch(() => null) as { error?: string } & T | null;
+  if (!response.ok) throw new Error(payload?.error ?? 'Visa information could not be loaded.');
+  if (!payload) throw new Error('Visa service returned an invalid response.');
+  return payload;
+}
+
+export async function getVisaApplications(accessToken: string) {
+  return authenticatedVisaRequest<{ items: VisaApplication[]; pagination: { total: number; hasMore: boolean } }>('/applications?limit=50&offset=0', accessToken);
+}
+
+export async function getVisaDocumentUrl(applicationId: string, document: VisaDocumentKey, accessToken: string) {
+  return authenticatedVisaRequest<{ url: string; expiresIn: number }>(`/applications/${encodeURIComponent(applicationId)}/documents/${document}`, accessToken);
+}
+
 export const mockVisaServices: VisaCountry[] = [
   { id: 'visa-australia-visitor', name: 'Australia', visaType: 'Visitor Visa (Subclass 600)', processing: '20–35 working days', fee: 'INR 5,999', image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=900&q=85', documents: ['Passport', 'Bank statements', 'Travel itinerary', 'Accommodation details'] },
   { id: 'visa-france-schengen', name: 'France', visaType: 'Schengen Tourist Visa', processing: '15–25 working days', fee: 'INR 4,999', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=900&q=85', documents: ['Passport', 'Photograph', 'Travel itinerary', 'Travel insurance'] },

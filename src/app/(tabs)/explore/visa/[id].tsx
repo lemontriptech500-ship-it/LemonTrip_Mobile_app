@@ -44,6 +44,7 @@ export default function VisaApplicationScreen() {
   const [saving, setSaving] = useState(false);
   const [reference, setReference] = useState('');
   const submitting = useRef(false);
+  const submissionKey = useRef('');
 
   useEffect(() => { if (user) { setFullName(user.name); setEmail(user.email ?? ''); } }, [user]);
   useEffect(() => {
@@ -96,6 +97,7 @@ export default function VisaApplicationScreen() {
         setReference(`MOCK-${Date.now().toString(36).toUpperCase()}`);
         return;
       }
+      if (!submissionKey.current) submissionKey.current = `visa-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const form = new FormData();
       form.append('destinationId', destination.id);
       form.append('fullName', fullName.trim());
@@ -113,11 +115,12 @@ export default function VisaApplicationScreen() {
       }
       const token = getAccessToken();
       const response = await fetch(`${visaApiRoot}/applications`, {
-        method: 'POST', headers: { Accept: 'application/json', Authorization: `Bearer ${token}` }, body: form,
+        method: 'POST', headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, 'Idempotency-Key': submissionKey.current }, body: form,
       });
       const payload = await response.json().catch(() => null) as { error?: string; application?: { referenceId?: string; status?: string } } | null;
       if (!response.ok || !payload?.application?.referenceId) throw new Error(payload?.error ?? 'Your application could not be submitted. Please retry.');
       setReference(payload.application.referenceId);
+      submissionKey.current = '';
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Submission failed. Please retry.'); }
     finally { submitting.current = false; setSaving(false); }
   };

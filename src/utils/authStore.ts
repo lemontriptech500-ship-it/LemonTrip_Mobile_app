@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { refreshAuthSession, revokeAuthSession, type AuthSession, type AuthUser } from '@/utils/authApi';
+import { signOutFirebasePhoneUser } from '@/utils/firebasePhoneAuth';
 
 export type User = AuthUser;
 
@@ -24,6 +25,7 @@ export async function login(session: AuthSession) {
 
 export function logout() {
   if (accessToken) void revokeAuthSession(accessToken);
+  void signOutFirebasePhoneUser().catch(() => undefined);
   if (Platform.OS !== 'web') void SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
   currentUser = null;
   accessToken = null;
