@@ -9,31 +9,42 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, ImageBackground, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type ServiceItem = {
   label: string;
   icon: IconName;
+  // Optional custom image. When set, it is shown instead of the Ionicons icon.
+  image?: ImageSourcePropType;
   badge?: string;
   route: Parameters<typeof router.push>[0];
 };
 
 // One unified services grid (4 columns), thin outline icons
 const services: ServiceItem[] = [
-  { label: 'Flights', icon: 'airplane-outline', route: '/(tabs)/explore/flights' },
-  { label: 'Hotels', icon: 'bed-outline', route: '/(tabs)/explore/hotels' },
-  { label: 'Holiday\nPackages', icon: 'umbrella-outline', route: '/packages' },
-  { label: 'Trains', icon: 'train-outline', route: '/(tabs)/explore/trains' },
-  { label: 'Buses', icon: 'bus-outline', route: '/(tabs)/explore/buses' },
-  { label: 'Visa', icon: 'id-card-outline', route: '/(tabs)/explore/visa' },
-  { label: 'Offers', icon: 'pricetag-outline', badge: 'NEW', route: '/offers' },
-  { label: 'Saved\nPlaces', icon: 'heart-outline', route: '/(tabs)/wishlist' },
-  { label: 'Travel\nStories', icon: 'newspaper-outline', route: '/blog' },
-  { label: 'Cart', icon: 'cart-outline', route: '/cart' },
-  { label: 'Help', icon: 'headset-outline', route: '/help' },
-  { label: 'Explore\nAll', icon: 'compass-outline', route: '/(tabs)/explore' },
+  {
+    label: 'Flights',
+    icon: 'airplane-outline',
+    image: require('../../../assets/images/flight.png'),
+    route: '/(tabs)/explore/flights',
+  },
+  
+  
+  { label: 'Hotels', icon: 'bed-outline',    image: require('../../../assets/images/hotels_new.png'),
+  route: '/(tabs)/explore/hotels' },
+  { label: 'Holiday\nPackages', icon: 'umbrella-outline', image: require('../../../assets/images/holiday.png'), route: '/packages' },
+  { label: 'Trains', icon: 'train-outline',    image: require('../../../assets/images/trains.png'),
+  route: '/(tabs)/explore/trains' },
+  { label: 'Buses', icon: 'bus-outline',   image: require('../../../assets/images/buses.png'), route: '/(tabs)/explore/buses' },
+  { label: 'Visa', icon: 'id-card-outline',  image: require('../../../assets/images/visa.png'), route: '/(tabs)/explore/visa' },
+  { label: 'Offers', icon: 'pricetag-outline',image: require('../../../assets/images/offers.png'), badge: 'NEW', route: '/offers' },
+  { label: 'Saved\nPlaces', icon: 'heart-outline',image: require('../../../assets/images/saved.png'), route: '/(tabs)/wishlist' },
+  { label: 'Travel\nStories', icon: 'newspaper-outline',image: require('../../../assets/images/travel_stories.png') ,route: '/blog' },
+  { label: 'Cart', icon: 'cart-outline', image: require('../../../assets/images/cart.png'), route: '/cart' },
+  { label: 'Help', icon: 'headset-outline',  image: require('../../../assets/images/help.png'),route: '/help' },
+  { label: 'Explore\nAll', icon: 'compass-outline',  image: require('../../../assets/images/exploreall.png'), route: '/(tabs)/explore' },
 ];
 
 const trustPoints: { icon: IconName; title: string; subtitle: string }[] = [
@@ -156,8 +167,12 @@ export default function HomeScreen() {
                 if (item.label === 'Visa') blurWebNavigationFocus();
                 router.push(item.route);
               }}>
-              <View style={styles.serviceIconWrap}>
-                <Ionicons name={item.icon} size={26} color={Colors.primary} />
+              <View style={[styles.serviceIconWrap, item.image ? styles.serviceIconWrapImage : null]}>
+                {item.image ? (
+                  <Image source={item.image} style={styles.serviceImage} resizeMode="contain" />
+                ) : (
+                  <Ionicons name={item.icon} size={26} color={Colors.primary} />
+                )}
                 {item.badge ? (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>{item.badge}</Text>
@@ -339,6 +354,9 @@ const styles = StyleSheet.create({
   servicesCard: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 16, marginTop: 14, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 19, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
   serviceCell: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
   serviceIconWrap: { width: 54, height: 54, borderRadius: 27, backgroundColor: '#e6f4e8', alignItems: 'center', justifyContent: 'center' },
+  // Used when a service shows a custom image (e.g. flight.png). White background so a non-transparent PNG blends in.
+  serviceIconWrapImage: { backgroundColor: '#FFFFFF', overflow: 'hidden', borderWidth: 1, borderColor: '#e6f4e8' },
+  serviceImage: { width: 44, height: 44 },
   serviceLabel: { marginTop: 6, fontSize: 12, lineHeight: 15, fontFamily: 'Manrope', fontWeight: '700', textAlign: 'center', color: Colors.textDark },
   badge: { position: 'absolute', top: -5, right: -9, backgroundColor: Colors.error, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1.5 },
   badgeText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 8, fontWeight: '900', letterSpacing: 0.3 },
