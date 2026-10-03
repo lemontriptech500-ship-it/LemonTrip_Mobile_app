@@ -57,16 +57,13 @@ export interface BlogPost {
 }
 
 export interface VisaCountry {
-  code: string;
+  id: string;
   name: string;
   image: string;
-  visaTypes: string[];
-  processing: string;
-  fee?: string;
-  eligibility?: string;
-  documents?: string[];
-  process?: string[];
-  faqs?: string[];
+  visaType: string;
+  processing: string | null;
+  fee: string | null;
+  documents: string[];
 }
 
 export interface Listing {
