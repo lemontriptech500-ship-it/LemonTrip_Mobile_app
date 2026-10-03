@@ -6,6 +6,7 @@ import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
+import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -54,6 +55,7 @@ export default function ExploreScreen() {
   const { items: services } = useContentItems<TravelService>('service');
 
   const handlePress = (serviceId: string) => {
+    blurWebNavigationFocus();
     if (serviceId === 'visa') {
       router.push('/(tabs)/explore/visa');
     } else if (serviceId === 'hotels') {
