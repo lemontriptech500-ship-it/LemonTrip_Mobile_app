@@ -1,7 +1,6 @@
-```json
 {
   "expo": {
-    "name": "",
+    "name": "LemonTrip",
     "slug": "LemonTripMobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -64,4 +63,3 @@
     }
   }
 }
-```
