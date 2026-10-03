@@ -1,3 +1,4 @@
+```json
 {
   "expo": {
     "name": "",
@@ -13,6 +14,7 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.lemontrip.mobile",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -20,8 +22,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.gokul.lemontrip"
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
@@ -34,20 +35,33 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#063b24"
+          "backgroundColor": "#208AEF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "UpcomingTrip",
+              "label": "LemonTrip: Upcoming Trip",
+              "description": "Your next trip at a glance",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 2,
+              "updatePeriodMillis": 1800000
+            }
+          ]
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "d350722c-2eb4-475b-aa80-a60f00827262"
-      }
-    },
-    "owner": "gokulsir500"
+    }
   }
 }
+```

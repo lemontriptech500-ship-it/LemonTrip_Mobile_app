@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Colors } from '@/constants/colors';
 import type { Offer } from '@/data/offers';
 import { loadOffers, getOfferValidity } from '@/utils/offerApi';
@@ -178,10 +179,224 @@ export default function HomeScreen() {
             <Text style={styles.promoTitle}>Adventure Awaits!</Text>
             <Text style={styles.promoDescription}>Discover amazing destinations,{ '\n' }exclusive deals and unforgettable{ '\n' }experiences with LemonTrip.</Text>
             <View style={styles.promoButton}><Text style={styles.promoButtonText}>Explore Now</Text><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
+=======
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useCallback, useState } from 'react';
+import {
+  Alert,
+  Platform,
+  Pressable,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { requestPinWidget } from 'react-native-android-widget';
+
+import TripSearchPanel from '@/components/TripSearchPanel';
+import { Colors } from '@/constants/colors';
+
+type Offer = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  price?: string;
+  oldPrice?: string;
+  discount?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+};
+
+const OFFERS: Offer[] = [
+  {
+    id: '1',
+    title: 'Flights',
+    subtitle: 'Domestic & international',
+    price: 'From ₹2,499',
+    discount: 'Up to 35% OFF',
+    icon: 'airplane-outline',
+  },
+  {
+    id: '2',
+    title: 'Hotels',
+    subtitle: 'Premium stays',
+    price: 'From ₹1,299',
+    discount: 'Up to 40% OFF',
+    icon: 'bed-outline',
+  },
+  {
+    id: '3',
+    title: 'Holiday Packages',
+    subtitle: 'Curated trips',
+    price: 'From ₹6,999',
+    discount: 'Save more',
+    icon: 'map-outline',
+  },
+];
+
+export default function IndexScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+
+    try {
+      // Add API refresh logic here if required.
+      await new Promise((resolve) => setTimeout(resolve, 700));
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  const handleAddWidget = useCallback(async () => {
+    if (Platform.OS !== 'android') {
+      Alert.alert(
+        'Android Widget',
+        'The Upcoming Trip widget is available on Android only.'
+      );
+      return;
+    }
+
+    try {
+      const requested = await requestPinWidget({
+        widgetName: 'UpcomingTrip',
+      });
+
+      if (!requested) {
+        Alert.alert(
+          'Widget not supported',
+          'This launcher does not support adding widgets directly from the app.'
+        );
+      }
+    } catch (error) {
+      console.error('Failed to request widget:', error);
+
+      Alert.alert(
+        'Unable to add widget',
+        'Please add the LemonTrip widget from the Android widget picker.'
+      );
+    }
+  }, []);
+
+  const handleLogin = useCallback(() => {
+    router.push('/login');
+  }, []);
+
+  const handleViewTrips = useCallback(() => {
+    router.push('/bookings');
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={Colors.primaryDark}
+          />
+        }
+      >
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.brand}>LemonTrip</Text>
+            <Text style={styles.tagline}>Travel smarter. Travel better.</Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.profileButton}
+            activeOpacity={0.8}
+            onPress={handleLogin}
+          >
+            <Ionicons
+              name="person-outline"
+              size={21}
+              color={Colors.primaryDark}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* HERO */}
+        <View style={styles.hero}>
+          <View style={styles.heroBadge}>
+            <Ionicons
+              name="sparkles-outline"
+              size={15}
+              color={Colors.primaryDark}
+            />
+            <Text style={styles.heroBadgeText}>SMART TRAVEL</Text>
+          </View>
+
+          <Text style={styles.heroTitle}>
+            Your next adventure{'\n'}
+            starts <Text style={styles.heroAccent}>here.</Text>
+          </Text>
+
+          <Text style={styles.heroSubtitle}>
+            Search flights, hotels and unforgettable experiences — all in one
+            place.
+          </Text>
+
+          {/* WIDGET BUTTON */}
+          <TouchableOpacity
+            style={styles.widgetButton}
+            onPress={handleAddWidget}
+            activeOpacity={0.85}
+          >
+            <View style={styles.widgetIcon}>
+              <Ionicons
+                name="grid-outline"
+                size={18}
+                color={Colors.primaryDark}
+              />
+            </View>
+
+            <View style={styles.widgetTextContainer}>
+              <Text style={styles.widgetButtonText}>
+                Add Upcoming Trip Widget
+              </Text>
+
+              <Text style={styles.widgetButtonSubtext}>
+                See your next trip directly on Home Screen
+              </Text>
+            </View>
+
+            <Ionicons
+              name="arrow-forward"
+              size={18}
+              color={Colors.primaryDark}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* SEARCH */}
+        <View style={styles.searchSection}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Where are you going?</Text>
+              <Text style={styles.sectionSubtitle}>
+                Find your perfect trip
+              </Text>
+            </View>
+
+            <Ionicons
+              name="location-outline"
+              size={22}
+              color={Colors.primaryDark}
+            />
+>>>>>>> 3056448 (Add Upcoming Trip home screen widget)
           </View>
           <View style={styles.promoDots}><View style={styles.promoDotActive}/><View style={styles.promoDot}/><View style={styles.promoDot}/></View>
         </TouchableOpacity>
 
+<<<<<<< HEAD
         {/* Destinations */}
         <View style={styles.section}>
           <SectionHeader title="Popular Destinations" action="View all" onPress={() => router.push('/(tabs)/explore')} />
@@ -300,11 +515,151 @@ export default function HomeScreen() {
             </View>
           </View>
         ) : null}
+=======
+          <View style={styles.searchCard}>
+            <TripSearchPanel />
+          </View>
+        </View>
+
+        {/* QUICK ACTIONS */}
+        <View style={styles.quickSection}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Explore LemonTrip</Text>
+              <Text style={styles.sectionSubtitle}>
+                Everything you need for your journey
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.quickGrid}>
+            <QuickAction
+              icon="airplane-outline"
+              title="Flights"
+              subtitle="Book flights"
+              onPress={() => router.push('/explore/flights')}
+            />
+
+            <QuickAction
+              icon="bed-outline"
+              title="Hotels"
+              subtitle="Find stays"
+              onPress={() => router.push('/explore/hotels')}
+            />
+
+            <QuickAction
+              icon="briefcase-outline"
+              title="My Trips"
+              subtitle="Your bookings"
+              onPress={handleViewTrips}
+            />
+
+            <QuickAction
+              icon="heart-outline"
+              title="Wishlist"
+              subtitle="Saved places"
+              onPress={() => router.push('/wishlist')}
+            />
+          </View>
+        </View>
+
+        {/* OFFERS */}
+        <View style={styles.offersSection}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Exclusive Offers</Text>
+              <Text style={styles.sectionSubtitle}>
+                Deals made for your next journey
+              </Text>
+            </View>
+
+            <Pressable
+              onPress={() => router.push('/offers')}
+              style={styles.viewAllButton}
+            >
+              <Text style={styles.viewAllText}>View all</Text>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={Colors.primaryDark}
+              />
+            </Pressable>
+          </View>
+
+          {OFFERS.map((offer) => (
+            <OfferCard
+              key={offer.id}
+              offer={offer}
+              onPress={() => router.push('/offers')}
+            />
+          ))}
+        </View>
+
+        {/* UPCOMING TRIP */}
+        <View style={styles.tripSection}>
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionTitle}>Upcoming Trip</Text>
+              <Text style={styles.sectionSubtitle}>
+                Keep your next adventure close
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.tripCard}>
+            <View style={styles.tripIcon}>
+              <Ionicons
+                name="airplane"
+                size={25}
+                color={Colors.primaryDark}
+              />
+            </View>
+
+            <View style={styles.tripInfo}>
+              <Text style={styles.tripDestination}>Goa</Text>
+              <Text style={styles.tripRoute}>DEL → GOI</Text>
+              <Text style={styles.tripDate}>12 October</Text>
+            </View>
+
+            <View style={styles.confirmedBadge}>
+              <Text style={styles.confirmedText}>CONFIRMED</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.viewTripsButton}
+            onPress={handleViewTrips}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.viewTripsText}>View My Trips</Text>
+
+            <Ionicons
+              name="arrow-forward"
+              size={18}
+              color={Colors.primaryDark}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={20}
+            color={Colors.primaryDark}
+          />
+
+          <Text style={styles.footerText}>
+            Secure booking · Trusted travel · LemonTrip
+          </Text>
+        </View>
+>>>>>>> 3056448 (Add Upcoming Trip home screen widget)
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+<<<<<<< HEAD
 const cardShadow = {
   shadowColor: '#0B1B12',
   shadowOpacity: 0.08,
@@ -422,4 +777,523 @@ const styles = StyleSheet.create({
   storyCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
   storyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 5, lineHeight: 20 },
   storyMeta: { marginTop: 8, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11 },
+=======
+/* ---------------------------------------------------------
+   QUICK ACTION
+--------------------------------------------------------- */
+
+type QuickActionProps = {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  subtitle: string;
+  onPress: () => void;
+};
+
+function QuickAction({
+  icon,
+  title,
+  subtitle,
+  onPress,
+}: QuickActionProps) {
+  return (
+    <TouchableOpacity
+      style={styles.quickCard}
+      onPress={onPress}
+      activeOpacity={0.82}
+    >
+      <View style={styles.quickIcon}>
+        <Ionicons
+          name={icon}
+          size={23}
+          color={Colors.primaryDark}
+        />
+      </View>
+
+      <Text style={styles.quickTitle}>{title}</Text>
+      <Text style={styles.quickSubtitle}>{subtitle}</Text>
+
+      <Ionicons
+        name="arrow-forward-circle-outline"
+        size={20}
+        color={Colors.primaryDark}
+        style={styles.quickArrow}
+      />
+    </TouchableOpacity>
+  );
+}
+
+/* ---------------------------------------------------------
+   OFFER CARD
+--------------------------------------------------------- */
+
+type OfferCardProps = {
+  offer: Offer;
+  onPress: () => void;
+};
+
+function OfferCard({ offer, onPress }: OfferCardProps) {
+  return (
+    <TouchableOpacity
+      style={styles.offerCard}
+      onPress={onPress}
+      activeOpacity={0.84}
+    >
+      <View style={styles.offerIcon}>
+        <Ionicons
+          name={offer.icon || 'sparkles-outline'}
+          size={25}
+          color={Colors.primaryDark}
+        />
+      </View>
+
+      <View style={styles.offerContent}>
+        <View style={styles.offerTitleRow}>
+          <Text style={styles.offerTitle}>{offer.title}</Text>
+
+          {offer.discount ? (
+            <View style={styles.discountBadge}>
+              <Text style={styles.discountText}>
+                {offer.discount}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+
+        {offer.subtitle ? (
+          <Text style={styles.offerSubtitle}>
+            {offer.subtitle}
+          </Text>
+        ) : null}
+
+        {offer.price ? (
+          <Text style={styles.offerPrice}>{offer.price}</Text>
+        ) : null}
+      </View>
+
+      <Ionicons
+        name="chevron-forward"
+        size={19}
+        color="#8A8A8A"
+      />
+    </TouchableOpacity>
+  );
+}
+
+/* ---------------------------------------------------------
+   STYLES
+--------------------------------------------------------- */
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F7F8F5',
+  },
+
+  container: {
+    flex: 1,
+    backgroundColor: '#F7F8F5',
+  },
+
+  contentContainer: {
+    paddingHorizontal: 18,
+    paddingBottom: 40,
+  },
+
+  /* HEADER */
+
+  header: {
+    minHeight: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+  },
+
+  brand: {
+    fontSize: 26,
+    fontWeight: '900',
+    color: Colors.primaryDark,
+    letterSpacing: -0.8,
+  },
+
+  tagline: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#737873',
+    fontWeight: '600',
+  },
+
+  profileButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E4E8E2',
+  },
+
+  /* HERO */
+
+  hero: {
+    marginTop: 14,
+    padding: 22,
+    borderRadius: 28,
+    backgroundColor: '#E9F4C8',
+    overflow: 'hidden',
+  },
+
+  heroBadge: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.72)',
+  },
+
+  heroBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1,
+    color: Colors.primaryDark,
+  },
+
+  heroTitle: {
+    marginTop: 17,
+    fontSize: 36,
+    lineHeight: 41,
+    fontWeight: '900',
+    color: '#1D251C',
+    letterSpacing: -1.2,
+  },
+
+  heroAccent: {
+    color: Colors.primaryDark,
+  },
+
+  heroSubtitle: {
+    marginTop: 12,
+    maxWidth: 330,
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#566054',
+    fontWeight: '500',
+  },
+
+  /* WIDGET */
+
+  widgetButton: {
+    marginTop: 20,
+    minHeight: 68,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderRadius: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D8E5B5',
+  },
+
+  widgetIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF7D8',
+  },
+
+  widgetTextContainer: {
+    flex: 1,
+    marginLeft: 11,
+    marginRight: 8,
+  },
+
+  widgetButtonText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: Colors.primaryDark,
+  },
+
+  widgetButtonSubtext: {
+    marginTop: 3,
+    fontSize: 11,
+    lineHeight: 15,
+    color: '#737A6D',
+  },
+
+  /* SECTION */
+
+  searchSection: {
+    marginTop: 25,
+  },
+
+  quickSection: {
+    marginTop: 28,
+  },
+
+  offersSection: {
+    marginTop: 30,
+  },
+
+  tripSection: {
+    marginTop: 30,
+  },
+
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 13,
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#20251F',
+    letterSpacing: -0.35,
+  },
+
+  sectionSubtitle: {
+    marginTop: 3,
+    fontSize: 12,
+    color: '#777D76',
+    fontWeight: '500',
+  },
+
+  /* SEARCH */
+
+  searchCard: {
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E8E2',
+    overflow: 'hidden',
+  },
+
+  /* QUICK */
+
+  quickGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+
+  quickCard: {
+    width: '48%',
+    minHeight: 145,
+    padding: 15,
+    borderRadius: 21,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E7EAE5',
+  },
+
+  quickIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF6DA',
+  },
+
+  quickTitle: {
+    marginTop: 14,
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#252A24',
+  },
+
+  quickSubtitle: {
+    marginTop: 3,
+    fontSize: 11,
+    color: '#81867F',
+  },
+
+  quickArrow: {
+    position: 'absolute',
+    right: 13,
+    bottom: 13,
+  },
+
+  /* OFFERS */
+
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+
+  viewAllText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.primaryDark,
+  },
+
+  offerCard: {
+    minHeight: 90,
+    marginBottom: 11,
+    padding: 13,
+    borderRadius: 19,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E8E2',
+  },
+
+  offerIcon: {
+    width: 49,
+    height: 49,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF6DA',
+  },
+
+  offerContent: {
+    flex: 1,
+    marginHorizontal: 12,
+  },
+
+  offerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 7,
+  },
+
+  offerTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#252A24',
+  },
+
+  offerSubtitle: {
+    marginTop: 3,
+    fontSize: 11,
+    color: '#81867F',
+  },
+
+  offerPrice: {
+    marginTop: 5,
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.primaryDark,
+  },
+
+  discountBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: '#EAF4C9',
+  },
+
+  discountText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: Colors.primaryDark,
+  },
+
+  /* TRIP */
+
+  tripCard: {
+    minHeight: 100,
+    padding: 15,
+    borderRadius: 21,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#202A1D',
+  },
+
+  tripIcon: {
+    width: 49,
+    height: 49,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EAF4C9',
+  },
+
+  tripInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  tripDestination: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+
+  tripRoute: {
+    marginTop: 3,
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#C7D0C0',
+  },
+
+  tripDate: {
+    marginTop: 4,
+    fontSize: 11,
+    color: '#AEB9A7',
+  },
+
+  confirmedBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 9,
+    backgroundColor: '#DDECB6',
+  },
+
+  confirmedText: {
+    fontSize: 8,
+    fontWeight: '900',
+    color: '#33412B',
+  },
+
+  viewTripsButton: {
+    marginTop: 10,
+    minHeight: 49,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E1E5DE',
+  },
+
+  viewTripsText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: Colors.primaryDark,
+  },
+
+  /* FOOTER */
+
+  footer: {
+    marginTop: 30,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+  },
+
+  footerText: {
+    fontSize: 11,
+    color: '#858B83',
+    fontWeight: '600',
+  },
+>>>>>>> 3056448 (Add Upcoming Trip home screen widget)
 });
