@@ -2,13 +2,17 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
+import type { ColorValue } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const icon = (active: IconName, inactive: IconName) =>
-  ({ color, focused }: { color: string; focused: boolean }) => (
+const icon = (active: IconName, inactive: IconName) => {
+  const TabIcon = ({ color, focused }: { color: ColorValue; focused: boolean }) => (
     <Ionicons name={focused ? active : inactive} size={24} color={color} />
   );
+  TabIcon.displayName = `TabIcon(${active})`;
+  return TabIcon;
+};
 
 export default function TabsLayout() {
   // Adds the phone's bottom gesture/nav bar height instead of a fixed 105

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const menuItems = [
   { label: 'My Bookings', route: '/(tabs)/bookings' },
+  { label: 'Visa Applications', route: '/(tabs)/explore/visa/applications' },
   { label: 'Saved / Wishlist', route: '/(tabs)/wishlist' },
   { label: 'Payment Methods', route: null },
   { label: 'Help & Support', route: null },

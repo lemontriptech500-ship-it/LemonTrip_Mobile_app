@@ -123,11 +123,10 @@ export default function HomeScreen() {
                 <Ionicons name="menu" size={26} color="#FFFFFF" />
               </TouchableOpacity>
               <Image
-                source={require('../../../assets/images/header_logo.png')}
+                source={require('../../../assets/images/App Logo.png')}
                 style={styles.brandLogo}
-                resizeMode="contain"
+                resizeMode="cover"
               />
-              <Text style={styles.brand}>Lemon Trip</Text>
             </View>
             <TouchableOpacity accessibilityRole="button" onPress={handleProfilePress} style={styles.profileButton}>
               <Ionicons name="person-outline" size={16} color="#FFFFFF" />
@@ -139,7 +138,7 @@ export default function HomeScreen() {
         {/* Search card overlapping the hero */}
         <TouchableOpacity activeOpacity={0.92} style={styles.searchBar} onPress={() => router.push('/(tabs)/explore')}>
           <Ionicons name="search-outline" size={20} color={Colors.primary} />
-          <Text style={styles.searchText} numberOfLines={1}>Search 'Goa hotels' or 'Delhi to Mumbai'</Text>
+          <Text style={styles.searchText} numberOfLines={1}>Search &apos;Goa hotels&apos; or &apos;Delhi to Mumbai&apos;</Text>
           <View style={styles.searchGo}>
             <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
           </View>
@@ -266,14 +265,14 @@ export default function HomeScreen() {
               { title: 'Travel Insurance', icon: 'shield-checkmark-outline' as IconName, route: '/(tabs)/explore' },
               { title: 'Car Rentals', icon: 'car-outline' as IconName, route: '/(tabs)/explore' },
               { title: 'Custom Packages', icon: 'gift-outline' as IconName, route: '/packages' },
-            ].map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route)}>
+            ].map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route as Parameters<typeof router.push>[0])}>
               <Ionicons name={item.icon} size={27} color={Colors.primary}/><Text style={styles.travelServiceText}>{item.title}</Text>
             </TouchableOpacity>)}
           </View>
         </View>
 
         <TouchableOpacity style={styles.bottomCta} onPress={() => router.push('/(tabs)/explore')}>
-          <Image source={require('../../../assets/images/header_logo.png')} style={styles.ctaLogo} resizeMode="contain" />
+          <Image source={require('../../../assets/images/App Logo.png')} style={styles.ctaLogo} resizeMode="contain" />
           <Text style={styles.ctaText}>Travel the world with LemonTrip</Text>
           <Text style={styles.ctaButton}>Start Exploring  →</Text>
         </TouchableOpacity>
@@ -321,12 +320,11 @@ const styles = StyleSheet.create({
 
   // Hero
   hero: { backgroundColor: Colors.primaryDark, paddingHorizontal: 18, paddingTop: 8, paddingBottom: 54, minHeight: 108, overflow: 'hidden' },
-  heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)' },
+  heroOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.3)' },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   brandWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   menuButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', marginLeft: -6 },
-  brandLogo: { width: 64, height: 46 },
-  brand: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
+  brandLogo: { width: 166, height: 52 },
   profileButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   profileText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
 
@@ -345,8 +343,8 @@ const styles = StyleSheet.create({
 
   // Sections
   promo: { height: 212, marginHorizontal: 16, marginTop: 14, borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.primaryDark },
-  promoImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
-  promoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,45,43,0.30)' },
+  promoImage: { ...StyleSheet.absoluteFill, width: '100%', height: '100%' },
+  promoShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,45,43,0.30)' },
   promoCopy: { position: 'absolute', left: 20, top: 19 },
   promoEyebrow: { color: '#fff', fontFamily: 'Caveat', fontSize: 26, lineHeight: 29 },
   promoTitle: { color: '#fff', fontFamily: 'Caveat', fontSize: 30, fontWeight: '700', lineHeight: 34 },
