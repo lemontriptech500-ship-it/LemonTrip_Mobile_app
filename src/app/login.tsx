@@ -1,27 +1,25 @@
 import { Colors } from '@/constants/colors';
 import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
-import { loginWithEmail, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp } from '@/utils/authApi';
+import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput } from '@/utils/authApi';
+import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
+  const phoneOtp = useFirebasePhoneOtp();
   const [mode, setMode] = useState<'email' | 'phone'>('email');
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [otpError, setOtpError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const validateAndLogin = async () => {
     setIdentifierError('');
     setPasswordError('');
-    setOtpError('');
 
     if (!identifier.trim()) {
       setIdentifierError(mode === 'email' ? 'Email is required' : 'Mobile number is required');
@@ -31,8 +29,9 @@ export default function LoginScreen() {
       setIdentifierError('Enter a valid email address');
       return;
     }
-    if (mode === 'phone' && identifier.replace(/\D/g, '').length < 7) {
-      setIdentifierError('Enter a valid mobile number');
+    const phoneNumber = mode === 'phone' ? normalizePhoneInput(identifier) : null;
+    if (mode === 'phone' && !phoneNumber) {
+      setIdentifierError('Enter a valid number. India (+91) is used when no country code is entered.');
       return;
     }
 
@@ -40,23 +39,19 @@ export default function LoginScreen() {
       setPasswordError('Password is required');
       return;
     }
-    if (mode === 'phone' && otpSent && !/^\d{6}$/.test(otp)) {
-      setOtpError('Enter the six-digit code');
-      return;
-    }
-
     setLoading(true);
     try {
       if (mode === 'email') await login(await loginWithEmail({ email: identifier.trim(), password }));
-      else if (!otpSent) {
-        await sendPhoneOtp({ phone: identifier.trim(), purpose: 'login' });
-        setOtpSent(true);
-        Alert.alert('Code sent', 'If this number can be used, a verification code will arrive shortly.');
-        return;
-      } else await login(await verifyPhoneOtp({ phone: identifier.trim(), code: otp, purpose: 'login' }));
+      else if (!phoneOtp.challenge) { await phoneOtp.sendCode(phoneNumber!); return; }
+      else {
+        const idToken = await phoneOtp.verifyCode();
+        if (!idToken) return;
+        await login(await exchangeFirebasePhoneIdentity({ idToken, purpose: 'login' }));
+      }
       router.replace('/(tabs)/profile');
     } catch (error) {
-      Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
+      if (mode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.');
+      else Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
     } finally {
       setLoading(false);
     }
@@ -80,15 +75,15 @@ export default function LoginScreen() {
       <AuthField
         label={mode === 'email' ? 'Email' : 'Mobile number'}
         value={identifier}
-        placeholder={mode === 'email' ? 'you@example.com' : '+91 mobile number'}
-        onChangeText={(value) => { setIdentifier(value); setOtpSent(false); if (identifierError) setIdentifierError(''); }}
+        placeholder={mode === 'email' ? 'you@example.com' : 'Phone number (+91 default)'}
+        onChangeText={(value) => { setIdentifier(value); if (phoneOtp.challenge) void phoneOtp.reset(); if (identifierError) setIdentifierError(''); }}
         error={identifierError}
         autoCapitalize="none"
         keyboardType={mode === 'email' ? 'email-address' : 'phone-pad'}
       />
       <View style={styles.modeSwitch}>
-        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('email'); setOtpSent(false); }} style={[styles.modeButton, mode === 'email' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email</Text></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('phone'); setOtpSent(false); }} style={[styles.modeButton, mode === 'phone' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone OTP</Text></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('email'); void phoneOtp.reset(); }} style={[styles.modeButton, mode === 'email' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email</Text></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('phone'); void phoneOtp.reset(); }} style={[styles.modeButton, mode === 'phone' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone OTP</Text></TouchableOpacity>
       </View>
       {mode === 'email' ? <AuthField
         label="Password"
@@ -99,14 +94,25 @@ export default function LoginScreen() {
         secure={!showPassword}
         onToggleSecure={() => setShowPassword((visible) => !visible)}
         autoCapitalize="none"
-      /> : otpSent ? <AuthField label="Verification code" value={otp} placeholder="Six-digit code" onChangeText={(value) => { setOtp(value.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }} error={otpError} keyboardType="phone-pad" autoCapitalize="none" /> : null}
+      /> : phoneOtp.challenge ? <>
+        <AuthField label="Verification code" value={phoneOtp.code} placeholder="Six-digit code" onChangeText={phoneOtp.setCode} error={phoneOtp.error} keyboardType="phone-pad" autoCapitalize="none" />
+        <View style={styles.otpActions}>
+          <TouchableOpacity accessibilityRole="button" onPress={() => void phoneOtp.reset()}><Text style={styles.otpActionText}>Edit phone</Text></TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" disabled={phoneOtp.busy || phoneOtp.resendSeconds > 0} onPress={() => { const phone = normalizePhoneInput(identifier); if (phone) void phoneOtp.sendCode(phone); }}>
+            <Text style={[styles.otpActionText, (phoneOtp.busy || phoneOtp.resendSeconds > 0) && styles.otpActionDisabled]}>{phoneOtp.resendSeconds > 0 ? `Resend in ${phoneOtp.resendSeconds}s` : 'Resend code'}</Text>
+          </TouchableOpacity>
+        </View>
+      </> : null}
+      {mode === 'phone' && Platform.OS === 'web' ? <View nativeID="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
+      {mode === 'phone' ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
+      {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <Text accessibilityRole="alert" style={styles.phoneError}>{phoneOtp.error}</Text> : null}
 
       {mode === 'email' ? <TouchableOpacity onPress={() => showUnavailable('Password reset')} style={styles.forgotRow}>
         <Text style={styles.forgotText}>Forgot password?</Text>
       </TouchableOpacity> : null}
 
-      <TouchableOpacity accessibilityRole="button" disabled={loading} style={[styles.primaryButton, loading && styles.disabledButton]} onPress={() => void validateAndLogin()}>
-        <Text style={styles.primaryButtonText}>{loading ? 'Please wait…' : mode === 'phone' && !otpSent ? 'Send code' : mode === 'phone' ? 'Verify & sign in' : 'Login'}</Text>
+      <TouchableOpacity accessibilityRole="button" disabled={loading || phoneOtp.busy} style={[styles.primaryButton, (loading || phoneOtp.busy) && styles.disabledButton]} onPress={() => void validateAndLogin()}>
+        <Text style={styles.primaryButtonText}>{loading || phoneOtp.busy ? 'Please wait…' : mode === 'phone' && !phoneOtp.challenge ? 'Send code' : mode === 'phone' ? 'Verify & sign in' : 'Login'}</Text>
       </TouchableOpacity>
 
       <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
@@ -126,6 +132,12 @@ const styles = StyleSheet.create({
   modeButtonActive: { backgroundColor: Colors.surface },
   modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
   modeTextActive: { color: Colors.primary, fontWeight: '900' },
+  otpActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 7, marginBottom: 10 },
+  otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  otpActionDisabled: { color: Colors.textLight },
+  recaptcha: { minHeight: 78, alignItems: 'flex-start', marginTop: 8, marginBottom: 8 },
+  smsNotice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14, marginBottom: 8 },
+  phoneError: { color: '#B42318', fontFamily: 'Manrope', fontSize: 10, lineHeight: 15, marginBottom: 8 },
   disabledButton: { opacity: 0.6 },
   forgotRow: { alignSelf: 'flex-end', marginTop: -3, marginBottom: 11, paddingVertical: 5 },
   forgotText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },

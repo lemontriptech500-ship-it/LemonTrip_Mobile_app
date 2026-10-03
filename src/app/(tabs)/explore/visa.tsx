@@ -1,7 +1,10 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { VisaApplicationHistory } from '@/components/visa/VisaApplicationHistory';
 import type { VisaCountry } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
+import { getAccessToken, useAuth } from '@/utils/authStore';
+import { visaApiConfigured } from '@/utils/visaService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
@@ -13,6 +16,7 @@ export default function VisaScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
+  const user = useAuth();
   const { items: supportedCountries, loading, error, retry } = useContentItems<VisaCountry>('visa');
 
   const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
@@ -71,7 +75,9 @@ export default function VisaScreen() {
 
           {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
-          <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>These visa listings are mock service content for browsing. Requirements, processing estimates, and fees are indicative and require advisor confirmation.</Text></View>
+          <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>{visaApiConfigured ? 'Visa requirements, processing estimates, and guidance prices are indicative and should be confirmed with an advisor.' : 'These visa listings are mock service content for browsing. Requirements, processing estimates, and fees are indicative and require advisor confirmation.'}</Text></View>
+
+          {visaApiConfigured ? <VisaApplicationHistory accessToken={user ? getAccessToken() : null} /> : null}
 
         </View>
       </ScrollView>
