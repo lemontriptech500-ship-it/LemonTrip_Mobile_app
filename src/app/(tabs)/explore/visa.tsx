@@ -1,11 +1,11 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { VisaCountry } from '@/types/content';
-import { useContentItems } from '@/utils/contentApi';
+import { getVisaServices, visaApiConfigured, visaDemoMode } from '@/utils/visaService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,7 +13,18 @@ export default function VisaScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
-  const { items: supportedCountries, loading, error, retry } = useContentItems<VisaCountry>('visa');
+  const [supportedCountries, setSupportedCountries] = useState<VisaCountry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [retryId, setRetryId] = useState(0);
+  useEffect(() => {
+    let active = true;
+    getVisaServices().then((items) => { if (active) setSupportedCountries(items); }).catch((failure: unknown) => {
+      if (active) { setSupportedCountries([]); setError(failure instanceof Error ? failure.message : 'Visa services could not be loaded.'); }
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [retryId]);
+  const retry = useCallback(() => { setLoading(true); setError(''); setRetryId((id) => id + 1); }, []);
 
   const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
     const search = query.trim().toLowerCase();
@@ -52,7 +63,7 @@ export default function VisaScreen() {
           </View>
 
           <View style={[styles.countryGrid, desktop && styles.countryGridDesktop]}>
-          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text><TouchableOpacity accessibilityRole="button" onPress={retry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></TouchableOpacity></View> : visibleCountries.map((country) => (
+          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Visa services couldn’t load</Text><Text style={styles.emptyText}>{error}</Text><TouchableOpacity accessibilityRole="button" onPress={retry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></TouchableOpacity></View> : visibleCountries.map((country) => (
               <TouchableOpacity key={country.id} accessibilityRole="button" onPress={() => { blurWebNavigationFocus(); router.push({ pathname: '/(tabs)/explore/visa/[id]', params: { id: country.id } }); }} style={[styles.countryCard, desktop && styles.countryCardDesktop]}>
                 <ImageBackground source={{ uri: country.image }} style={styles.countryImage} imageStyle={styles.countryImageStyle}>
                   <View style={styles.countryShade} />
@@ -63,7 +74,7 @@ export default function VisaScreen() {
                   <Text style={styles.countryVisaType}>{country.visaType}</Text>
                   <View style={styles.countryMeta}><Ionicons name="time-outline" size={12} color={Colors.textLight} /><Text style={styles.countryMetaText}>{country.processing ?? 'Processing time not listed'}</Text></View>
                   <View style={styles.countryFooter}><Text style={styles.countryFee}>{country.fee ? `From ${country.fee}` : 'Price not listed'}</Text><Text style={styles.checkText}>Check requirements →</Text></View>
-                  <Text numberOfLines={2} style={styles.countryDocuments}>Documents: {country.documents.join(', ') || 'Requirements not listed'}</Text>
+                  <Text numberOfLines={2} style={styles.countryDocuments}>Documents: {country.documents?.join(', ') || 'Requirements not listed'}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -71,7 +82,7 @@ export default function VisaScreen() {
 
           {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
-          <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>These visa listings are mock service content for browsing. Requirements, processing estimates, and fees are indicative and require advisor confirmation.</Text></View>
+          {!visaApiConfigured && visaDemoMode ? <View style={styles.serviceNotice}><Ionicons name="flask-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Demo data is shown. Requirements, processing estimates, and fees are indicative and require official confirmation.</Text></View> : <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Visa fees and processing estimates are indicative and subject to confirmation by the relevant authorities.</Text></View>}
 
         </View>
       </ScrollView>
