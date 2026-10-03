@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, type ConfirmationResult } from 'firebase/auth';
-import type { FirebasePhoneChallenge } from './firebasePhoneAuth';
+import type { FirebasePhoneChallenge } from './firebasePhoneAuthTypes';
 
 let verifier: RecaptchaVerifier | null = null;
 

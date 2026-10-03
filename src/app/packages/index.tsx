@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import type { PackageCategory, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
@@ -88,7 +89,7 @@ export default function PackagesListScreen() {
                 {results.map((item) => <PackageCard key={item.id} item={item} desktop={desktop} onPress={() => openPackage(item)} />)}
               </View>
             ) : (
-              <View style={styles.emptyState}><Ionicons name="map-outline" size={23} color={Colors.primary} /><Text style={styles.emptyTitle}>No journeys in this collection yet</Text><Text style={styles.emptyText}>Try another category or destination.</Text><TouchableOpacity onPress={() => { setActiveCategory(null); setQuery(''); }} style={styles.clearButton}><Text style={styles.clearButtonText}>See all journeys</Text></TouchableOpacity></View>
+              <View style={styles.emptyState}><TravelArtworkIcon name="package" size={40} /><Text style={styles.emptyTitle}>No journeys in this collection yet</Text><Text style={styles.emptyText}>Try another category or destination.</Text><TouchableOpacity onPress={() => { setActiveCategory(null); setQuery(''); }} style={styles.clearButton}><Text style={styles.clearButtonText}>See all journeys</Text></TouchableOpacity></View>
             )}
           </View>
 

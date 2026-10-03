@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { firebasePhoneError, resetFirebasePhoneCode, sendFirebasePhoneCode, type FirebasePhoneChallenge } from '@/utils/firebasePhoneAuth';
+import { firebasePhoneError, resetFirebasePhoneCode, sendFirebasePhoneCode } from '@/utils/firebasePhoneAuthService';
+import type { FirebasePhoneChallenge } from '@/utils/firebasePhoneAuthTypes';
 
 export function useFirebasePhoneOtp() {
   const [challenge, setChallenge] = useState<FirebasePhoneChallenge | null>(null);

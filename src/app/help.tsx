@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useBookings } from '@/utils/bookingStore';
 import { sendChatMessage } from '@/utils/chatApi';
@@ -10,15 +11,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Faq = { question: string; answer: string; category: string };
 type AssistantMessage = { id: string; text: string; from: 'assistant' | 'user' };
+type QuickHelpItem = { title: string; query: string } & (
+  | { artwork: TravelArtworkName }
+  | { icon: keyof typeof Ionicons.glyphMap }
+);
 
-const quickHelp = [
-  { title: 'Bookings', icon: 'ticket-outline' as const, query: 'booking' },
-  { title: 'Payments', icon: 'card-outline' as const, query: 'payment' },
-  { title: 'Flights', icon: 'airplane-outline' as const, query: 'flight' },
-  { title: 'Hotels', icon: 'bed-outline' as const, query: 'hotel' },
-  { title: 'Buses', icon: 'bus-outline' as const, query: 'bus' },
-  { title: 'Packages', icon: 'map-outline' as const, query: 'package' },
-  { title: 'Visa', icon: 'document-text-outline' as const, query: 'visa' },
+const quickHelp: QuickHelpItem[] = [
+  { title: 'Bookings', artwork: 'offer', query: 'booking' },
+  { title: 'Payments', icon: 'card-outline', query: 'payment' },
+  { title: 'Flights', artwork: 'flight', query: 'flight' },
+  { title: 'Hotels', artwork: 'hotel', query: 'hotel' },
+  { title: 'Buses', artwork: 'bus', query: 'bus' },
+  { title: 'Packages', artwork: 'package', query: 'package' },
+  { title: 'Visa', artwork: 'visa', query: 'visa' },
 ];
 
 const faqs: Faq[] = [
@@ -101,7 +106,7 @@ export default function HelpScreen() {
 
           <View style={styles.hero}>
             <View style={styles.heroGlow} />
-            <View style={styles.heroIcon}><Ionicons name="headset-outline" size={24} color={Colors.primaryDark} /></View>
+            <View style={styles.heroIcon}><TravelArtworkIcon name="help" size={38} /></View>
             <Text style={styles.heroEyebrow}>TRAVEL SUPPORT, MADE SIMPLE</Text>
             <Text style={styles.heroTitle}>How can we help?</Text>
             <Text style={styles.heroSubtitle}>Find a quick answer, check a booking, or talk to our team.</Text>
@@ -114,7 +119,7 @@ export default function HelpScreen() {
 
           <View style={styles.sectionHeading}><View><Text style={styles.eyebrow}>QUICK HELP</Text><Text style={styles.sectionTitle}>What can we help with?</Text></View><Text style={styles.sectionHint}>Start with a topic</Text></View>
           <View style={[styles.quickGrid, desktop && styles.quickGridDesktop]}>
-            {quickHelp.map((item) => <TouchableOpacity key={item.title} accessibilityRole="button" onPress={() => setSearch(item.query)} style={[styles.quickCard, desktop && styles.quickCardDesktop]}><View style={styles.quickIcon}><Ionicons name={item.icon} size={20} color={Colors.primary} /></View><Text style={styles.quickTitle}>{item.title}</Text><Ionicons name="arrow-forward" size={15} color={Colors.textLight} /></TouchableOpacity>)}
+            {quickHelp.map((item) => <TouchableOpacity key={item.title} accessibilityRole="button" onPress={() => setSearch(item.query)} style={[styles.quickCard, desktop && styles.quickCardDesktop]}><View style={styles.quickIcon}>{'artwork' in item ? <TravelArtworkIcon name={item.artwork} size={29} /> : <Ionicons name={item.icon} size={20} color={Colors.primary} />}</View><Text style={styles.quickTitle}>{item.title}</Text><Ionicons name="arrow-forward" size={15} color={Colors.textLight} /></TouchableOpacity>)}
           </View>
 
           <View style={[styles.mainLayout, desktop && styles.mainLayoutDesktop]}>

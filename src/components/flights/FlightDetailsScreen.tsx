@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -56,7 +57,7 @@ export default function FlightDetailsScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.missingSelection}>
-          <Ionicons name="airplane-outline" size={28} color={Colors.primary} />
+          <TravelArtworkIcon name="flight" size={48} />
           <Text style={styles.missingTitle}>No flight selected</Text>
           <Text style={styles.missingText}>Search for a flight and select an offer to view its itinerary and fares.</Text>
           <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(tabs)/explore/flights')}>

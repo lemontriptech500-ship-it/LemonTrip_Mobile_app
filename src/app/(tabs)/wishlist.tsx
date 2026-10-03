@@ -2,8 +2,8 @@ import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { Ionicons } from '@expo/vector-icons';
 import { useWishlist, toggleWishlist } from '@/utils/wishlistStore';
 
 export default function WishlistScreen() {
@@ -15,7 +15,7 @@ export default function WishlistScreen() {
 
       {wishlist.length === 0 ? (
         <View style={styles.emptyState}>
-          <View style={styles.emptyIcon}><Ionicons name="heart-outline" size={26} color={Colors.primary} /></View>
+          <View style={styles.emptyIcon}><TravelArtworkIcon name="saved" size={40} /></View>
           <Text style={styles.emptyTitle}>No saved destinations yet</Text>
           <Text style={styles.emptySubtitle}>
             Tap the heart icon on any destination to save it here.

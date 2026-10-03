@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import FlightCard from './FlightCard';
@@ -46,7 +46,7 @@ export default function FlightResults({ offers, loading, onSelect }: FlightResul
           </View>
         ) : offers.length === 0 ? (
           <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}><Ionicons name="airplane-outline" size={24} color={Colors.primary} /></View>
+            <View style={styles.emptyIcon}><TravelArtworkIcon name="flight" size={38} /></View>
             <Text style={styles.emptyTitle}>No flights found</Text>
             <Text style={styles.emptyText}>Try another date or adjust your search details.</Text>
           </View>

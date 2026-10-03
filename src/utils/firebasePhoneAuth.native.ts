@@ -1,5 +1,5 @@
 import { getAuth, signInWithPhoneNumber, signOut } from '@react-native-firebase/auth';
-import type { FirebasePhoneChallenge } from './firebasePhoneAuth';
+import type { FirebasePhoneChallenge } from './firebasePhoneAuthTypes';
 
 export async function signOutFirebasePhoneUser() {
   await signOut(getAuth());

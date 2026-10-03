@@ -415,15 +415,18 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <SectionHeader title="Travel Services" action="View all" onPress={() => router.push('/(tabs)/explore')} />
           <View style={styles.travelServices}>
-            {[
-              { title: 'Bus Tickets', icon: 'bus-outline' as IconName, route: '/(tabs)/explore/buses' },
-              { title: 'Hotel Bookings', icon: 'bed-outline' as IconName, route: '/(tabs)/explore/hotels' },
-              { title: 'Visa Services', icon: 'id-card-outline' as IconName, route: '/(tabs)/explore/visa' },
-              { title: 'Travel Insurance', icon: 'shield-checkmark-outline' as IconName, route: '/(tabs)/explore' },
-              { title: 'Car Rentals', icon: 'car-outline' as IconName, route: '/(tabs)/explore' },
-              { title: 'Custom Packages', icon: 'gift-outline' as IconName, route: '/packages' },
-            ].map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route)}>
-              <View style={styles.travelServiceIcon}><Ionicons name={item.icon} size={24} color={Colors.primary}/></View><Text style={styles.travelServiceText}>{item.title}</Text>
+            {([
+              { title: 'Bus Tickets', icon: 'bus-outline' as IconName, image: require('../../../assets/images/buses.png'), route: '/(tabs)/explore/buses' },
+              { title: 'Hotel Bookings', icon: 'bed-outline' as IconName, image: require('../../../assets/images/hotels_new.png'), route: '/(tabs)/explore/hotels' },
+              { title: 'Visa Services', icon: 'id-card-outline' as IconName, image: require('../../../assets/images/visa.png'), route: '/(tabs)/explore/visa' },
+              { title: 'Tour Tickets', icon: 'ticket-outline' as IconName, image: require('../../../assets/images/offers.png'), route: '/(tabs)/explore' },
+              { title: 'Train Tickets', icon: 'train-outline' as IconName, image: require('../../../assets/images/trains.png'), route: '/(tabs)/explore/trains' },
+              { title: 'Custom Packages', icon: 'gift-outline' as IconName, image: require('../../../assets/images/holiday.png'), route: '/packages' },
+            ] as const).map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route)}>
+              <View style={styles.travelServiceIcon}>
+                {item.image ? <Image source={item.image} style={styles.travelServiceImage} resizeMode="contain" /> : <Ionicons name={item.icon} size={24} color={Colors.primary} />}
+              </View>
+              <Text style={styles.travelServiceText}>{item.title}</Text>
             </TouchableOpacity>)}
           </View>
         </View>
@@ -578,8 +581,9 @@ const styles = StyleSheet.create({
   trustTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, lineHeight: 13, fontWeight: '800', textAlign: 'center' },
   trustSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 12, textAlign: 'center', marginTop: 2 },
   travelServices: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: 16 },
-  travelService: { width: '31.7%', minHeight: 88, borderRadius: 16, backgroundColor: '#edf7ec', borderWidth: 1, borderColor: '#d3e8d6', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 4, gap: 7, ...cardShadow },
-  travelServiceIcon: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#d3e8d6', alignItems: 'center', justifyContent: 'center' },
+  travelService: { width: '31.7%', minHeight: 88, borderRadius: 14, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#d3e8d6', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 4, gap: 7, ...cardShadow },
+  travelServiceIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#e6f4e8', alignItems: 'center', justifyContent: 'center' },
+  travelServiceImage: { width: 40, height: 40 },
   travelServiceText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', color: Colors.primaryDark, textAlign: 'center' },
   bottomCta: { minHeight: 58, marginHorizontal: 16, marginTop: 16, borderRadius: 28, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 7 },
   ctaLogo: { width: 46, height: 42 },

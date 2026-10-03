@@ -1,6 +1,5 @@
 import { Platform } from 'react-native';
-
-export type FirebasePhoneChallenge = { confirm(code: string): Promise<string> };
+import type { FirebasePhoneChallenge } from './firebasePhoneAuthTypes';
 
 export async function sendFirebasePhoneCode(phone: string): Promise<FirebasePhoneChallenge> {
   if (Platform.OS === 'web') return (await import('./firebasePhoneAuth.web')).sendFirebasePhoneCode(phone);

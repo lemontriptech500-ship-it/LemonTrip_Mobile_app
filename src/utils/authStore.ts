@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { refreshAuthSession, revokeAuthSession, type AuthSession, type AuthUser } from '@/utils/authApi';
-import { signOutFirebasePhoneUser } from '@/utils/firebasePhoneAuth';
+import { signOutFirebasePhoneUser } from '@/utils/firebasePhoneAuthService';
 
 export type User = AuthUser;
 

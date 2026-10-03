@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { BusListing } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
@@ -79,7 +80,7 @@ export default function BusesScreen() {
           <ScreenHeader title="Find your bus" subtitle="Choose a route and compare available services." eyebrow="LEMONTRIP / BUS BOOKING" onBack={handleBack} />
 
           <View style={styles.searchPanel}>
-            <View style={styles.searchTitleRow}><View style={styles.busIcon}><Ionicons name="bus-outline" size={18} color={Colors.primary} /></View><View><Text style={styles.searchTitle}>Where are you headed?</Text><Text style={styles.searchSubtitle}>Plan your next road journey.</Text></View></View>
+            <View style={styles.searchTitleRow}><View style={styles.busIcon}><TravelArtworkIcon name="bus" size={36} /></View><View><Text style={styles.searchTitle}>Where are you headed?</Text><Text style={styles.searchSubtitle}>Plan your next road journey.</Text></View></View>
             <View style={styles.fields}>
               <View style={styles.field}>
                 <Text style={styles.label}>FROM</Text>
@@ -121,7 +122,7 @@ export default function BusesScreen() {
                   {results.map((bus) => <BusResultCard key={bus.id} bus={bus} onPress={() => openBus(bus)} />)}
                 </View>
               ) : (
-                <View style={styles.emptyState}><Ionicons name="bus-outline" size={23} color={Colors.primary} /><Text style={styles.emptyTitle}>No buses match this search</Text><Text style={styles.unavailable}>Try another route or clear a filter.</Text></View>
+                <View style={styles.emptyState}><TravelArtworkIcon name="bus" size={40} /><Text style={styles.emptyTitle}>No buses match this search</Text><Text style={styles.unavailable}>Try another route or clear a filter.</Text></View>
               )}
               <Text style={styles.dataNote}>Schedule, operator, and seat inventory details appear when supplied by the bus service.</Text>
             </View>
@@ -140,7 +141,7 @@ function BusResultCard({ bus, onPress }: { bus: BusListing; onPress: () => void 
   return (
     <View style={styles.busCard}>
       <View style={styles.cardHeader}>
-        <View style={styles.operatorIcon}><Ionicons name="bus-outline" size={18} color={Colors.primary} /></View>
+        <View style={styles.operatorIcon}><TravelArtworkIcon name="bus" size={30} /></View>
         <View style={styles.operatorInfo}><Text style={styles.operator}>{bus.operator ?? 'Operator not provided'}</Text><Text style={styles.busType}>{bus.busType}</Text></View>
         {bus.rating !== undefined ? <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.ratingText}>{bus.rating.toFixed(1)}</Text></View> : null}
       </View>

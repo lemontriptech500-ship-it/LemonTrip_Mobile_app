@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { logout, useAuth } from '@/utils/authStore';
 import { router } from 'expo-router';
@@ -6,9 +7,9 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowD
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const quickLinks = [
-  { label: 'My trips', icon: 'briefcase-outline' as const, route: '/(tabs)/bookings' },
-  { label: 'Saved places', icon: 'heart-outline' as const, route: '/(tabs)/wishlist' },
-  { label: 'Visa updates', icon: 'document-text-outline' as const, route: '/(tabs)/explore/visa/applications' },
+  { label: 'My trips', artwork: 'flight' as const, route: '/(tabs)/bookings' },
+  { label: 'Saved places', artwork: 'saved' as const, route: '/(tabs)/wishlist' },
+  { label: 'Visa updates', artwork: 'visa' as const, route: '/(tabs)/explore/visa/applications' },
 ];
 
 const accountLinks = [
@@ -53,7 +54,7 @@ export default function ProfileScreen() {
           <View style={styles.heroCard}>
             <View style={styles.heroTopline}>
               <View style={styles.memberPill}>
-                <Ionicons name={user ? 'sparkles' : 'compass-outline'} size={12} color={Colors.primaryDark} />
+                {user ? <Ionicons name="sparkles" size={12} color={Colors.primaryDark} /> : <TravelArtworkIcon name="explore" size={21} />}
                 <Text style={styles.memberPillText}>{user ? 'LEMONTRIP MEMBER' : 'YOUR NEXT JOURNEY STARTS HERE'}</Text>
               </View>
               <View style={styles.heroRing} />
@@ -85,7 +86,7 @@ export default function ProfileScreen() {
             <View style={styles.quickLinks}>
               {quickLinks.map((item) => (
                 <TouchableOpacity key={item.label} accessibilityRole="button" onPress={() => router.push(item.route as never)} style={styles.quickCard} activeOpacity={0.75}>
-                  <View style={styles.quickIcon}><Ionicons name={item.icon} size={19} color={Colors.primary} /></View>
+                  <View style={styles.quickIcon}><TravelArtworkIcon name={item.artwork} size={29} /></View>
                   <Text style={styles.quickLabel}>{item.label}</Text>
                   <Ionicons name="arrow-up-right" size={14} color={Colors.textLight} style={styles.quickArrow} />
                 </TouchableOpacity>
@@ -116,7 +117,7 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore/visa')} style={styles.menuRow} activeOpacity={0.72}>
-                  <View style={styles.menuIcon}><Ionicons name="earth-outline" size={17} color={Colors.primary} /></View>
+                  <View style={styles.menuIcon}><TravelArtworkIcon name="visa" size={29} /></View>
                   <View style={styles.menuCopy}>
                     <Text style={styles.menuTitle}>Visa services</Text>
                     <Text style={styles.menuDetail}>Get help planning your next trip</Text>
@@ -127,7 +128,7 @@ export default function ProfileScreen() {
             </View>
 
             <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore')} style={styles.discoverCard} activeOpacity={0.8}>
-              <View style={styles.discoverIcon}><Ionicons name="paper-plane-outline" size={18} color={Colors.primaryDark} /></View>
+              <View style={styles.discoverIcon}><TravelArtworkIcon name="explore" size={32} /></View>
               <Text style={styles.discoverEyebrow}>A WORLD TO DISCOVER</Text>
               <Text style={styles.discoverTitle}>Where will you go next?</Text>
               <Text style={styles.discoverText}>Find a new favourite with handpicked destinations and stays.</Text>
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   headingRow: { minHeight: 92, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 22, paddingTop: 7, paddingBottom: 14 },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', letterSpacing: 1.7 },
   pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, lineHeight: 38, fontWeight: '900', marginTop: 3 },
-  settingsButton: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.surfaceMuted },
+  settingsButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
   heroCard: { marginHorizontal: 16, padding: 20, borderRadius: 23, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
   heroTopline: { minHeight: 28, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
   memberPill: { minHeight: 27, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 11, borderRadius: 14, backgroundColor: Colors.accent },
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
   sectionSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 4 },
   quickLinks: { flexDirection: 'row', gap: 10 },
   quickCard: { flex: 1, minWidth: 0, minHeight: 104, justifyContent: 'center', padding: 12, borderWidth: 1, borderColor: Colors.border, borderRadius: 17, backgroundColor: Colors.surface },
-  quickIcon: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accentSoft },
+  quickIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
   quickLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginTop: 9 },
   quickArrow: { position: 'absolute', right: 9, top: 10 },
   lowerLayout: { gap: 19, marginTop: 27, paddingHorizontal: 16 },
@@ -183,12 +184,12 @@ const styles = StyleSheet.create({
   menuCard: { overflow: 'hidden', paddingHorizontal: 14, borderWidth: 1, borderColor: Colors.border, borderRadius: 18, backgroundColor: Colors.surface },
   menuRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   menuDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
-  menuIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.surfaceMuted },
+  menuIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
   menuCopy: { flex: 1, minWidth: 0 },
   menuTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   menuDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 4 },
   discoverCard: { minHeight: 220, flex: 0.76, overflow: 'hidden', padding: 19, borderRadius: 20, backgroundColor: Colors.accentSoft },
-  discoverIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.accent },
+  discoverIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
   discoverEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900', letterSpacing: 1.2, marginTop: 16 },
   discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, lineHeight: 26, fontWeight: '900', marginTop: 5 },
   discoverText: { maxWidth: 280, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 7 },
