@@ -1,5 +1,4 @@
 import { Colors } from '@/constants/colors';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { logout, useAuth } from '@/utils/authStore';
 import { useThemeName } from '@/utils/themeStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,89 +27,173 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <ScreenHeader title="Settings" subtitle="Manage your account and travel preferences." eyebrow="LEMONTRIP / ACCOUNT" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/profile')} />
+          <View style={styles.topBar}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/profile')} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={19} color={Colors.primaryDark} />
+            </TouchableOpacity>
+            <Text style={styles.topBarLabel}>YOUR ACCOUNT</Text>
+            <View style={styles.topBarSpacer} />
+          </View>
+
+          <View style={styles.intro}>
+            <Text style={styles.eyebrow}>LEMONTRIP / PREFERENCES</Text>
+            <Text style={styles.pageTitle}>Settings</Text>
+            <Text style={styles.pageSubtitle}>Make every part of your journey feel like yours.</Text>
+          </View>
 
           <View style={styles.accountBanner}>
-            <View style={styles.accountAvatar}><Ionicons name="person-outline" size={20} color={Colors.primaryDark} /></View>
-            <View style={styles.accountCopy}><Text style={styles.accountName}>{user?.name ?? 'Guest User'}</Text><Text style={styles.accountEmail}>{user?.email ?? 'Sign in to manage your account'}</Text></View>
-            {!user ? <TouchableOpacity onPress={() => router.push('/login')} style={styles.signInButton}><Text style={styles.signInText}>Sign in</Text></TouchableOpacity> : null}
+            <View style={styles.accountAvatar}>
+              <Text style={styles.avatarInitial}>{user?.name?.trim()?.charAt(0)?.toUpperCase() || 'G'}</Text>
+            </View>
+            <View style={styles.accountCopy}>
+              <Text style={styles.accountEyebrow}>{user ? 'LEMONTRIP MEMBER' : 'TRAVELLING AS'}</Text>
+              <Text style={styles.accountName} numberOfLines={1}>{user?.name ?? 'Guest User'}</Text>
+              <Text style={styles.accountEmail} numberOfLines={1}>{user?.email ?? 'Sign in to manage your account'}</Text>
+            </View>
+            {user ? (
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="View profile" onPress={() => router.push('/(tabs)/profile')} style={styles.accountAction}>
+                <Ionicons name="arrow-forward" size={17} color={Colors.primaryDark} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/login')} style={styles.signInButton}>
+                <Text style={styles.signInText}>Sign in</Text>
+              </TouchableOpacity>
+            )}
+            <View pointerEvents="none" style={styles.bannerAccent} />
           </View>
 
           <View style={[styles.columns, desktop && styles.columnsDesktop]}>
             <View style={styles.column}>
-              <SettingsSection title="Preferences" icon="options-outline">
-                <SettingRow icon="contrast-outline" title="Theme" detail={theme === 'dark' ? 'Dark' : 'Light'} onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+              <SettingsSection title="Your preferences" subtitle="Set the way LemonTrip feels" icon="options-outline">
+                <SettingRow icon="contrast-outline" title="Appearance" detail={theme === 'dark' ? 'Dark mode' : 'Light mode'} onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
                 <SettingRow icon="language-outline" title="Language" detail={language} onPress={() => setLanguage((current) => current === 'English' ? 'Hindi' : 'English')} />
-                <SettingRow icon="cash-outline" title="Currency" detail={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} />
+                <SettingRow icon="cash-outline" title="Currency" detail={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} last />
               </SettingsSection>
 
-              <SettingsSection title="Notifications" icon="notifications-outline">
-                <SettingRow icon="mail-outline" title="Email notifications" trailing={<Switch value={emailNotifications} onValueChange={setEmailNotifications} trackColor={{ false: Colors.border, true: Colors.primary }} />} />
-                <SettingRow icon="calendar-outline" title="Booking updates" trailing={<Switch value={bookingUpdates} onValueChange={setBookingUpdates} trackColor={{ false: Colors.border, true: Colors.primary }} />} />
-                <SettingRow icon="pricetag-outline" title="Travel offers" trailing={<Switch value={offerUpdates} onValueChange={setOfferUpdates} trackColor={{ false: Colors.border, true: Colors.primary }} />} />
+              <SettingsSection title="Notifications" subtitle="Only the updates you want" icon="notifications-outline">
+                <SettingRow icon="mail-outline" title="Email updates" detail="News and account messages" trailing={<PreferenceSwitch value={emailNotifications} onValueChange={setEmailNotifications} />} />
+                <SettingRow icon="calendar-outline" title="Booking updates" detail="Changes to your trips" trailing={<PreferenceSwitch value={bookingUpdates} onValueChange={setBookingUpdates} />} />
+                <SettingRow icon="pricetag-outline" title="Travel offers" detail="Handpicked deals and inspiration" trailing={<PreferenceSwitch value={offerUpdates} onValueChange={setOfferUpdates} />} last />
               </SettingsSection>
 
-              <SettingsSection title="Account" icon="person-circle-outline">
-                <SettingRow icon="person-outline" title="Personal information" detail="View name and contact details" onPress={() => Alert.alert('Personal information', user ? `Name: ${user.name}\nEmail: ${user.email ?? 'Not added'}\nPhone: ${user.phone ?? 'Not added'}` : 'Sign in to view account details.')} />
-                <SettingRow icon="log-out-outline" title="Log out" detail="Sign out on this device" danger onPress={confirmLogout} />
+              <SettingsSection title="Account" subtitle="Your LemonTrip profile" icon="person-circle-outline">
+                <SettingRow icon="person-outline" title="Personal information" detail="Name and contact details" onPress={() => Alert.alert('Personal information', user ? `Name: ${user.name}\nEmail: ${user.email ?? 'Not added'}\nPhone: ${user.phone ?? 'Not added'}` : 'Sign in to view account details.')} />
+                {user ? <SettingRow icon="log-out-outline" title="Log out" detail="Sign out on this device" danger onPress={confirmLogout} last /> : <SettingRow icon="log-in-outline" title="Sign in or create account" detail="Keep your trips close at hand" onPress={() => router.push('/login')} last />}
               </SettingsSection>
             </View>
 
             <View style={styles.column}>
-              <SettingsSection title="Security & privacy" icon="shield-checkmark-outline">
-                <SettingRow icon="key-outline" title="Change password" detail="Not connected" onPress={() => Alert.alert('Change password', 'Password changes are not connected yet.')} />
+              <SettingsSection title="Security & privacy" subtitle="Your account, in your control" icon="shield-checkmark-outline">
+                <SettingRow icon="key-outline" title="Change password" detail="Not connected yet" onPress={() => Alert.alert('Change password', 'Password changes are not connected yet.')} />
                 <SettingRow icon="phone-portrait-outline" title="Login sessions" detail="Current device" onPress={() => Alert.alert('Login sessions', 'Session management is not available yet.')} />
                 <SettingRow icon="eye-outline" title="Privacy policy" onPress={() => Alert.alert('Privacy policy', 'Full policy coming soon.')} />
-                <SettingRow icon="document-text-outline" title="Terms of service" onPress={() => Alert.alert('Terms of service', 'Full terms coming soon.')} />
+                <SettingRow icon="document-text-outline" title="Terms of service" onPress={() => Alert.alert('Terms of service', 'Full terms coming soon.')} last />
               </SettingsSection>
 
-              <SettingsSection title="Support" icon="help-circle-outline">
-                <SettingRow icon="book-outline" title="Help center" onPress={() => router.push('/help' as never)} />
-                <SettingRow icon="chatbubble-ellipses-outline" title="Contact support" detail="hello@lemontrip.in" onPress={() => { void Linking.openURL('mailto:hello@lemontrip.in'); }} />
+              <SettingsSection title="We’re here to help" subtitle="A little help goes a long way" icon="help-circle-outline">
+                <SettingRow icon="book-outline" title="Help center" detail="Find answers to common questions" onPress={() => router.push('/help' as never)} />
+                <SettingRow icon="chatbubble-ellipses-outline" title="Contact support" detail="hello@lemontrip.in" onPress={() => { void Linking.openURL('mailto:hello@lemontrip.in'); }} last />
               </SettingsSection>
+
+              <View style={styles.helpCard}>
+                <View style={styles.helpIcon}><Ionicons name="sparkles-outline" size={17} color={Colors.primaryDark} /></View>
+                <View style={styles.helpCopy}>
+                  <Text style={styles.helpTitle}>Ready for somewhere new?</Text>
+                  <Text style={styles.helpText}>Explore places and find your next favourite.</Text>
+                </View>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Explore destinations" onPress={() => router.push('/(tabs)/explore')} style={styles.helpArrow}>
+                  <Ionicons name="arrow-forward" size={17} color={Colors.primaryDark} />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
+          <Text style={styles.version}>LEMONTRIP · MADE FOR THE WAY YOU TRAVEL</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function SettingsSection({ title, icon, children }: { title: string; icon: keyof typeof Ionicons.glyphMap; children: ReactNode }) {
+function PreferenceSwitch({ value, onValueChange }: { value: boolean; onValueChange: (value: boolean) => void }) {
+  return <Switch value={value} onValueChange={onValueChange} trackColor={{ false: Colors.borderStrong, true: Colors.primary }} thumbColor={Colors.white} />;
+}
+
+function SettingsSection({ title, subtitle, icon, children }: { title: string; subtitle: string; icon: keyof typeof Ionicons.glyphMap; children: ReactNode }) {
   return (
     <View style={styles.section}>
-      <View style={styles.sectionHeading}><Ionicons name={icon} size={17} color={Colors.primary} /><Text style={styles.sectionTitle}>{title}</Text></View>
+      <View style={styles.sectionHeading}>
+        <View style={styles.sectionIcon}><Ionicons name={icon} size={17} color={Colors.primary} /></View>
+        <View style={styles.sectionHeadingCopy}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          <Text style={styles.sectionSubtitle}>{subtitle}</Text>
+        </View>
+      </View>
       <View style={styles.rows}>{children}</View>
     </View>
   );
 }
 
-function SettingRow({ icon, title, detail, trailing, onPress, danger = false }: { icon: keyof typeof Ionicons.glyphMap; title: string; detail?: string; trailing?: ReactNode; onPress?: () => void; danger?: boolean }) {
-  const content = <><Ionicons name={icon} size={16} color={danger ? Colors.error : Colors.primary} /><View style={styles.rowCopy}><Text style={[styles.rowTitle, danger && styles.dangerText]}>{title}</Text>{detail ? <Text style={styles.rowDetail}>{detail}</Text> : null}</View>{trailing ?? (onPress ? <Ionicons name="chevron-forward" size={14} color={Colors.textLight} /> : null)}</>;
-  return onPress ? <TouchableOpacity accessibilityRole="button" onPress={onPress} style={styles.row}>{content}</TouchableOpacity> : <View style={styles.row}>{content}</View>;
+function SettingRow({ icon, title, detail, trailing, onPress, danger = false, last = false }: { icon: keyof typeof Ionicons.glyphMap; title: string; detail?: string; trailing?: ReactNode; onPress?: () => void; danger?: boolean; last?: boolean }) {
+  const content = <>
+    <View style={[styles.rowIcon, danger && styles.rowIconDanger]}><Ionicons name={icon} size={17} color={danger ? Colors.error : Colors.primary} /></View>
+    <View style={styles.rowCopy}>
+      <Text style={[styles.rowTitle, danger && styles.dangerText]}>{title}</Text>
+      {detail ? <Text style={styles.rowDetail} numberOfLines={1}>{detail}</Text> : null}
+    </View>
+    {trailing ?? (onPress ? <Ionicons name="chevron-forward" size={15} color={Colors.textLight} /> : null)}
+  </>;
+  const rowStyle = [styles.row, !last && styles.rowDivider];
+  return onPress
+    ? <TouchableOpacity accessibilityRole="button" onPress={onPress} style={rowStyle} activeOpacity={0.72}>{content}</TouchableOpacity>
+    : <View style={rowStyle}>{content}</View>;
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
-  page: { paddingBottom: 30 },
+  page: { paddingBottom: 32 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
-  accountBanner: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, padding: 15, borderRadius: 14, backgroundColor: Colors.primaryDark },
-  accountAvatar: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accent },
+  topBar: { minHeight: 42, marginHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  backButton: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: Colors.surfaceMuted },
+  topBarLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.7 },
+  topBarSpacer: { width: 38 },
+  intro: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 20 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900', letterSpacing: 1.35 },
+  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 31, lineHeight: 38, fontWeight: '900', marginTop: 5 },
+  pageSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 17, marginTop: 4 },
+  accountBanner: { minHeight: 102, flexDirection: 'row', alignItems: 'center', gap: 13, marginHorizontal: 16, paddingHorizontal: 16, paddingVertical: 14, borderRadius: 17, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
+  accountAvatar: { width: 51, height: 51, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.accent },
+  avatarInitial: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 21, fontWeight: '900' },
   accountCopy: { flex: 1, minWidth: 0 },
-  accountName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  accountEmail: { color: 'rgba(255,255,255,0.75)', fontFamily: 'Manrope', fontSize: 10, marginTop: 3 },
-  signInButton: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 9, backgroundColor: Colors.accent },
-  signInText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  columns: { gap: 12, marginTop: 14, paddingHorizontal: 16 },
+  accountEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 7, fontWeight: '900', letterSpacing: 1.25, marginBottom: 3 },
+  accountName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
+  accountEmail: { color: 'rgba(255,255,255,0.72)', fontFamily: 'Manrope', fontSize: 9, marginTop: 3 },
+  accountAction: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accent },
+  signInButton: { minHeight: 35, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 10, backgroundColor: Colors.accent },
+  signInText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900' },
+  bannerAccent: { position: 'absolute', width: 120, height: 120, right: -57, top: -78, borderRadius: 60, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' },
+  columns: { gap: 13, marginTop: 17, paddingHorizontal: 16 },
   columnsDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
-  column: { flex: 1, minWidth: 0, gap: 12 },
-  section: { overflow: 'hidden', borderRadius: 12, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  sectionHeading: { minHeight: 45, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  rows: { paddingHorizontal: 10, paddingBottom: 4 },
-  row: { minHeight: 51, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 4, borderBottomWidth: 1, borderBottomColor: Colors.background },
+  column: { flex: 1, minWidth: 0, gap: 13 },
+  section: { overflow: 'hidden', borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  sectionHeading: { minHeight: 67, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 13, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  sectionIcon: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accentSoft },
+  sectionHeadingCopy: { flex: 1 },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
+  sectionSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
+  rows: { paddingHorizontal: 12, paddingVertical: 2 },
+  row: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 2, paddingVertical: 7 },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
+  rowIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.surfaceMuted },
+  rowIconDanger: { backgroundColor: 'rgba(239,68,68,0.08)' },
   rowCopy: { flex: 1, minWidth: 0 },
-  rowTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
-  rowDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 2 },
+  rowTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  rowDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
   dangerText: { color: Colors.error },
+  helpCard: { minHeight: 86, flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 13, paddingVertical: 12, borderRadius: 16, backgroundColor: Colors.accentSoft },
+  helpIcon: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accent },
+  helpCopy: { flex: 1, minWidth: 0 },
+  helpTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900' },
+  helpText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 12, marginTop: 4 },
+  helpArrow: { width: 31, height: 31, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.surface },
+  version: { marginTop: 22, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1.1, textAlign: 'center' },
 });
