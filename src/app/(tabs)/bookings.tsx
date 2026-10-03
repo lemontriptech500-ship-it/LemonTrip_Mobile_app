@@ -1,4 +1,3 @@
-```tsx
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -16,8 +15,8 @@ import {
 } from 'react-native';
 import { requestPinWidget } from 'react-native-android-widget';
 
-import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { Colors } from '@/constants/colors';
 import { useBookings } from '@/utils/bookingStore';
 
 export default function BookingsScreen() {
@@ -28,9 +27,7 @@ export default function BookingsScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-
     await new Promise((resolve) => setTimeout(resolve, 400));
-
     setRefreshing(false);
   };
 
@@ -86,7 +83,6 @@ export default function BookingsScreen() {
 
   const getStatusLabel = (status?: string) => {
     if (!status) return 'CONFIRMED';
-
     return status.toUpperCase();
   };
 
@@ -134,7 +130,6 @@ export default function BookingsScreen() {
           eyebrow="TRAVEL RECORD"
         />
 
-        {/* UPCOMING TRIP WIDGET */}
         <View style={styles.widgetCard}>
           <View style={styles.widgetIcon}>
             <Ionicons
@@ -163,10 +158,7 @@ export default function BookingsScreen() {
               disabled={addingWidget}
             >
               {addingWidget ? (
-                <ActivityIndicator
-                  size="small"
-                  color="#FFFFFF"
-                />
+                <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
                   <Ionicons
@@ -190,7 +182,6 @@ export default function BookingsScreen() {
           </View>
         </View>
 
-        {/* BOOKINGS */}
         {bookings.length > 0 ? (
           <View>
             <View style={styles.sectionHeader}>
@@ -201,9 +192,7 @@ export default function BookingsScreen() {
 
                 <Text style={styles.sectionSubtitle}>
                   {bookings.length}{' '}
-                  {bookings.length === 1
-                    ? 'booking'
-                    : 'bookings'}
+                  {bookings.length === 1 ? 'booking' : 'bookings'}
                 </Text>
               </View>
 
@@ -215,9 +204,7 @@ export default function BookingsScreen() {
             </View>
 
             {bookings.map((booking) => {
-              const statusStyle = getStatusStyle(
-                booking.status
-              );
+              const statusStyle = getStatusStyle(booking.status);
 
               return (
                 <View
@@ -266,9 +253,7 @@ export default function BookingsScreen() {
                           },
                         ]}
                       >
-                        {getStatusLabel(
-                          booking.status
-                        )}
+                        {getStatusLabel(booking.status)}
                       </Text>
                     </View>
                   </View>
@@ -327,17 +312,14 @@ export default function BookingsScreen() {
             </Text>
 
             <Text style={styles.emptyDescription}>
-              You don't have any bookings yet. Explore
-              flights, hotels and experiences and plan your
-              next adventure.
+              You don't have any bookings yet. Explore flights,
+              hotels and experiences and plan your next adventure.
             </Text>
 
             <TouchableOpacity
               style={styles.exploreButton}
               activeOpacity={0.85}
-              onPress={() =>
-                router.push('/(tabs)/explore')
-              }
+              onPress={() => router.push('/(tabs)/explore')}
             >
               <Ionicons
                 name="compass-outline"
@@ -359,9 +341,7 @@ export default function BookingsScreen() {
             <TouchableOpacity
               style={styles.searchButton}
               activeOpacity={0.8}
-              onPress={() =>
-                router.push('/(tabs)/explore')
-              }
+              onPress={() => router.push('/(tabs)/explore')}
             >
               <Ionicons
                 name="search-outline"
@@ -391,8 +371,8 @@ export default function BookingsScreen() {
             </Text>
 
             <Text style={styles.infoText}>
-              Your LemonTrip travel details stay organized
-              in one convenient place.
+              Your LemonTrip travel details stay organized in one
+              convenient place.
             </Text>
           </View>
         </View>
@@ -418,8 +398,6 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 30,
   },
-
-  /* WIDGET */
 
   widgetCard: {
     flexDirection: 'row',
@@ -481,8 +459,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  /* SECTION */
-
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -516,8 +492,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: Colors.primaryDark,
   },
-
-  /* BOOKING CARD */
 
   bookingCard: {
     backgroundColor: '#FFFFFF',
@@ -607,8 +581,6 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
 
-  /* EMPTY */
-
   emptyCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 25,
@@ -684,8 +656,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  /* INFO */
-
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -728,4 +698,3 @@ const styles = StyleSheet.create({
     height: 25,
   },
 });
-```
