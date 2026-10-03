@@ -1,6 +1,8 @@
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { VisaApplicationHistory } from '@/components/visa/VisaApplicationHistory';
 import type { VisaCountry } from '@/types/content';
+import { getAccessToken, useAuth } from '@/utils/authStore';
 import { getVisaServices, visaApiConfigured, visaDemoMode } from '@/utils/visaService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -13,6 +15,7 @@ export default function VisaScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
+  const user = useAuth();
   const [supportedCountries, setSupportedCountries] = useState<VisaCountry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -83,6 +86,8 @@ export default function VisaScreen() {
           {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
           {!visaApiConfigured && visaDemoMode ? <View style={styles.serviceNotice}><Ionicons name="flask-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Demo data is shown. Requirements, processing estimates, and fees are indicative and require official confirmation.</Text></View> : <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Visa fees and processing estimates are indicative and subject to confirmation by the relevant authorities.</Text></View>}
+
+          {visaApiConfigured ? <VisaApplicationHistory accessToken={user ? getAccessToken() : null} /> : null}
 
         </View>
       </ScrollView>

@@ -16,6 +16,8 @@ export type VisaApplication = {
   documents: { passportFront: boolean; passportBack: boolean; applicantPhoto: boolean };
 };
 
+export type VisaDocumentKey = keyof VisaApplication['documents'];
+
 async function apiRequest<T>(path: string, token: string): Promise<T> {
   if (!visaApiRoot) throw new Error('Visa applications require a configured API connection.');
   const response = await fetch(`${visaApiRoot}${path}`, { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } });
@@ -41,6 +43,10 @@ export async function openVisaApplicationDocument(applicationId: string, documen
     // Let the user retry; the next press obtains a new signed URL.
     throw new Error('Could not open the document. Please try again.');
   }
+}
+
+export async function getVisaDocumentUrl(applicationId: string, document: VisaDocumentKey, accessToken: string) {
+  return apiRequest<{ url: string; expiresIn: number }>(`/applications/${encodeURIComponent(applicationId)}/documents/${document}`, accessToken);
 }
 
 export const mockVisaServices: VisaCountry[] = [

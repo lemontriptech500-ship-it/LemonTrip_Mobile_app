@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export type AuthPlatform = 'app' | 'website';
 export type AuthUser = {
@@ -23,6 +24,11 @@ export type AuthSession = {
 const authEndpoint = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/auth`;
 export const currentAuthPlatform: AuthPlatform = Platform.OS === 'web' ? 'website' : 'app';
 
+export function normalizePhoneInput(value: string) {
+  const parsed = parsePhoneNumberFromString(value.trim(), 'IN');
+  return parsed?.isValid() ? parsed.number : null;
+}
+
 async function request<T>(path: string, body: Record<string, unknown>): Promise<T> {
   let response: Response;
   try {
@@ -37,10 +43,14 @@ async function request<T>(path: string, body: Record<string, unknown>): Promise<
   }
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {
-    const message = typeof payload === 'object' && payload !== null && 'error' in payload && typeof payload.error === 'string'
-      ? payload.error
+    const result = typeof payload === 'object' && payload !== null ? payload as { error?: unknown; code?: unknown } : null;
+    const message = typeof result?.error === 'string'
+      ? result.error
       : 'Authentication is temporarily unavailable.';
-    throw new Error(message);
+    const requestError = new Error(message) as Error & { code?: string; status?: number };
+    if (typeof result?.code === 'string') requestError.code = result.code;
+    requestError.status = response.status;
+    throw requestError;
   }
   if (!payload || typeof payload !== 'object') throw new Error('The account service returned an invalid response.');
   return payload as T;
@@ -54,12 +64,8 @@ export function loginWithEmail(input: { email: string; password: string }) {
   return request<AuthSession>('/login', input);
 }
 
-export function sendPhoneOtp(input: { phone: string; purpose: 'signup' | 'login'; name?: string; email?: string; password?: string }) {
-  return request<{ success: true; message: string }>('/otp/send', input);
-}
-
-export function verifyPhoneOtp(input: { phone: string; code: string; purpose: 'signup' | 'login' }) {
-  return request<AuthSession>('/otp/verify', input);
+export function exchangeFirebasePhoneIdentity(input: { idToken: string; purpose: 'signup' | 'login'; name?: string }) {
+  return request<AuthSession>('/firebase/phone', input);
 }
 
 export function loginWithGoogle(idToken: string) {
