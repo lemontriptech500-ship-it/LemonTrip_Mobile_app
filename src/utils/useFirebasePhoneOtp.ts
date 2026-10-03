@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { firebasePhoneError, resetFirebasePhoneCode, sendFirebasePhoneCode, type FirebasePhoneChallenge } from '@/utils/firebasePhoneAuth';
-
+import { resetFirebasePhoneCode, sendFirebasePhoneCode, type FirebasePhoneChallenge } from '@/utils/firebasePhoneAuth';
+import { firebasePhoneError } from '@/utils/firebasePhoneShared';
 export function useFirebasePhoneOtp() {
   const [challenge, setChallenge] = useState<FirebasePhoneChallenge | null>(null);
   const [verifiedIdToken, setVerifiedIdToken] = useState('');
@@ -33,6 +33,7 @@ export function useFirebasePhoneOtp() {
       setResendSeconds(60);
       return true;
     } catch (reason) {
+      console.log('FIREBASE SEND ERROR:', reason);
       showError(firebasePhoneError(reason));
       return false;
     } finally {

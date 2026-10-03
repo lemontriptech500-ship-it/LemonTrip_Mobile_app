@@ -21,7 +21,9 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.gokul.lemontrip"
+      "package": "com.gokul.lemontrip",
+      "googleServicesFile": "./google-services.json"
+
     },
     "web": {
       "output": "static",
@@ -36,7 +38,8 @@
         {
           "backgroundColor": "#063b24"
         }
-      ]
+      ],
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true,

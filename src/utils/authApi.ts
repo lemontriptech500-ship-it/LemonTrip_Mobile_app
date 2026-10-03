@@ -64,7 +64,14 @@ export function loginWithEmail(input: { email: string; password: string }) {
   return request<AuthSession>('/login', input);
 }
 
-export function exchangeFirebasePhoneIdentity(input: { idToken: string; purpose: 'signup' | 'login'; name?: string }) {
+export function exchangeFirebasePhoneIdentity(input: {
+  idToken: string;
+  purpose: 'signup' | 'login';
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}) {
   return request<AuthSession>('/firebase/phone', input);
 }
 
