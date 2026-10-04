@@ -16,6 +16,7 @@ import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import {
   Image,
   ImageBackground,
+  ImageSourcePropType,
   ScrollView,
   StyleSheet,
   Text,
@@ -30,6 +31,7 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type ServiceItem = {
   label: string;
   icon: IconName;
+  image?: ImageSourcePropType;
   badge?: string;
   route: Parameters<typeof router.push>[0];
 };
@@ -39,62 +41,74 @@ const services: ServiceItem[] = [
   {
     label: 'Flights',
     icon: 'airplane-outline',
+    image: require('../../../assets/images/flight.png'),
     route: '/(tabs)/explore/flights',
   },
   {
     label: 'Hotels',
     icon: 'bed-outline',
+    image: require('../../../assets/images/hotels_new.png'),
     route: '/(tabs)/explore/hotels',
   },
   {
     label: 'Holiday\nPackages',
     icon: 'umbrella-outline',
+    image: require('../../../assets/images/holiday.png'),
     route: '/packages',
   },
   {
     label: 'Trains',
     icon: 'train-outline',
+    image: require('../../../assets/images/trains.png'),
     route: '/(tabs)/explore/trains',
   },
   {
     label: 'Buses',
     icon: 'bus-outline',
+    image: require('../../../assets/images/buses.png'),
     route: '/(tabs)/explore/buses',
   },
   {
     label: 'Visa',
     icon: 'id-card-outline',
+    image: require('../../../assets/images/visa.png'),
     route: '/(tabs)/explore/visa',
   },
   {
     label: 'Offers',
     icon: 'pricetag-outline',
+    image: require('../../../assets/images/offers.png'),
     badge: 'NEW',
     route: '/offers',
   },
   {
     label: 'Saved\nPlaces',
     icon: 'heart-outline',
+    image: require('../../../assets/images/saved.png'),
     route: '/(tabs)/wishlist',
   },
   {
     label: 'Travel\nStories',
     icon: 'newspaper-outline',
+    image: require('../../../assets/images/travel_stories.png'),
     route: '/blog',
   },
   {
     label: 'Cart',
     icon: 'cart-outline',
+    image: require('../../../assets/images/cart.png'),
     route: '/cart',
   },
   {
     label: 'Help',
     icon: 'headset-outline',
+    image: require('../../../assets/images/help.png'),
     route: '/help',
   },
   {
     label: 'Explore\nAll',
     icon: 'compass-outline',
+    image: require('../../../assets/images/exploreall.png'),
     route: '/(tabs)/explore',
   },
 ];
@@ -393,12 +407,12 @@ export default function HomeScreen() {
                 router.push(item.route as any);
               }}
             >
-              <View style={styles.serviceIconWrap}>
-                <Ionicons
-                  name={item.icon}
-                  size={26}
-                  color={Colors.primary}
-                />
+              <View style={[styles.serviceIconWrap, item.image ? styles.serviceIconWrapImage : null]}>
+                {item.image ? (
+                  <Image source={item.image} style={styles.serviceImage} resizeMode="contain" />
+                ) : (
+                  <Ionicons name={item.icon} size={26} color={Colors.primary} />
+                )}
 
                 {item.badge ? (
                   <View style={styles.badge}>
@@ -1042,6 +1056,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6f4e8',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  serviceIconWrapImage: {
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e6f4e8',
+  },
+
+  serviceImage: {
+    width: 44,
+    height: 44,
   },
 
   serviceLabel: {
