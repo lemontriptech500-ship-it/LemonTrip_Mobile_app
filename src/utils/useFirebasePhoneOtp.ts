@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { resetFirebasePhoneCode, sendFirebasePhoneCode, type FirebasePhoneChallenge } from '@/utils/firebasePhoneAuth';
-import { firebasePhoneError } from '@/utils/firebasePhoneShared';
+import { firebasePhoneError, resetFirebasePhoneCode, sendFirebasePhoneCode } from '@/utils/firebasePhoneAuthService';
+import type { FirebasePhoneChallenge } from '@/utils/firebasePhoneShared';
 export function useFirebasePhoneOtp() {
   const [challenge, setChallenge] = useState<FirebasePhoneChallenge | null>(null);
   const [verifiedIdToken, setVerifiedIdToken] = useState('');

@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Offer } from '@/data/offers';
 import { getOfferCategory, getOfferValidity, loadOffers, type OfferSource } from '@/utils/offerApi';
@@ -132,7 +133,7 @@ export default function OffersScreen() {
               {visibleOffers.map((offer) => <OfferCard key={offer.id} offer={offer} desktop={desktop} copied={copiedId === offer.id} source={source ?? 'demo'} onCopy={() => copyCode(offer)} />)}
             </View>
           ) : (
-            <View style={styles.stateCard}><Ionicons name="pricetag-outline" size={23} color={Colors.primary} /><Text style={styles.stateTitle}>No offers in this category</Text><Text style={styles.stateText}>Try another travel category.</Text></View>
+            <View style={styles.stateCard}><TravelArtworkIcon name="offer" size={40} /><Text style={styles.stateTitle}>No offers in this category</Text><Text style={styles.stateText}>Try another travel category.</Text></View>
           )}
 
           {source === 'backend' && !activeOffers.length && !loading && !error ? (

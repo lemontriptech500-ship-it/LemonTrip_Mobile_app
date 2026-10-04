@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import HotelCard from '@/components/hotels/HotelCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Hotel } from '@/types/content';
@@ -108,7 +109,7 @@ export default function HotelsScreen() {
           <ScreenHeader title="Find your stay" subtitle="Distinctive stays, chosen for your journey." eyebrow="LEMONTRIP / HOTELS" onBack={handleBack} />
 
           <View style={styles.searchPanel}>
-            <View style={styles.searchTitleRow}><Ionicons name="bed-outline" size={18} color={Colors.primary} /><Text style={styles.searchTitle}>Where are you staying?</Text></View>
+            <View style={styles.searchTitleRow}><TravelArtworkIcon name="hotel" size={34} /><Text style={styles.searchTitle}>Where are you staying?</Text></View>
             <View style={styles.searchFields}>
               <View style={[styles.field, desktop && styles.destinationField]}>
                 <Text style={styles.fieldLabel}>DESTINATION</Text>

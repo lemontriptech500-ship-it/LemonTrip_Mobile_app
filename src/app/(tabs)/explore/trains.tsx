@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Listing } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
@@ -80,7 +81,7 @@ export default function TrainsScreen() {
           <ScreenHeader title="Book train travel" subtitle="Compare routes and fares supplied by LemonTrip." eyebrow="LEMONTRIP / RAIL" onBack={handleBack} />
 
           <View style={styles.searchPanel}>
-            <View style={styles.searchHeading}><View style={styles.railIcon}><Ionicons name="train-outline" size={19} color={Colors.primary} /></View><View><Text style={styles.searchTitle}>Plan your rail journey</Text><Text style={styles.searchSubtitle}>Search stations, travel date, and class.</Text></View></View>
+            <View style={styles.searchHeading}><View style={styles.railIcon}><TravelArtworkIcon name="train" size={38} /></View><View><Text style={styles.searchTitle}>Plan your rail journey</Text><Text style={styles.searchSubtitle}>Search stations, travel date, and class.</Text></View></View>
             <View style={styles.fields}>
               <SearchField label="FROM STATION" value={from} onChangeText={setFrom} placeholder="Departure station" icon="radio-button-on-outline" />
               <View style={styles.swapIcon}><Ionicons name="arrow-forward" size={14} color={Colors.textLight} /></View>
@@ -113,7 +114,7 @@ export default function TrainsScreen() {
               <View style={styles.resultHeading}><View><Text style={styles.eyebrow}>{searched ? 'MATCHING ROUTES' : 'AVAILABLE ROUTES'}</Text><Text style={styles.resultTitle}>{results.length} {results.length === 1 ? 'train' : 'trains'}</Text></View>
                 {(activeClassFilter || expressOnly) ? <TouchableOpacity onPress={() => { setActiveClassFilter(null); setExpressOnly(false); }}><Text style={styles.clearText}>Clear filters</Text></TouchableOpacity> : null}
               </View>
-              {loading ? <View style={styles.empty}><Text style={styles.emptyTitle}>Loading train listings…</Text></View> : error ? <View style={styles.empty}><Text style={styles.emptyTitle}>{error}</Text></View> : results.length ? <View style={styles.trainList}>{results.map((train) => <TrainResult key={train.id} train={train} />)}</View> : <View style={styles.empty}><Ionicons name="train-outline" size={23} color={Colors.primary} /><Text style={styles.emptyTitle}>No train listings are available</Text><Text style={styles.unavailable}>Try again after train inventory is added.</Text></View>}
+              {loading ? <View style={styles.empty}><Text style={styles.emptyTitle}>Loading train listings…</Text></View> : error ? <View style={styles.empty}><Text style={styles.emptyTitle}>{error}</Text></View> : results.length ? <View style={styles.trainList}>{results.map((train) => <TrainResult key={train.id} train={train} />)}</View> : <View style={styles.empty}><TravelArtworkIcon name="train" size={40} /><Text style={styles.emptyTitle}>No train listings are available</Text><Text style={styles.unavailable}>Try again after train inventory is added.</Text></View>}
             </View>
           </View>
         </View>
@@ -134,7 +135,7 @@ function TrainResult({ train }: { train: Listing }) {
       <View style={styles.trainAccent} />
       <View style={styles.trainCardContent}>
         <View style={styles.trainTop}>
-          <View style={styles.trainNumber}><Ionicons name="train-outline" size={17} color={Colors.primary} /><Text style={styles.trainNumberText}>Number not provided</Text></View>
+          <View style={styles.trainNumber}><TravelArtworkIcon name="train" size={28} /><Text style={styles.trainNumberText}>Number not provided</Text></View>
           <View style={styles.demoTag}><Text style={styles.demoTagText}>DEMO</Text></View>
         </View>
         <Text style={styles.trainName}>{train.name}</Text>

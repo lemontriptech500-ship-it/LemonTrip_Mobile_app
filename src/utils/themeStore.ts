@@ -1,8 +1,8 @@
+import { applyTheme, type ThemeName } from '@/constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Updates from 'expo-updates';
 import { useEffect, useState } from 'react';
 import { Appearance, DevSettings, Platform } from 'react-native';
-import { applyTheme, type ThemeName } from '@/constants/colors';
 
 const THEME_KEY = 'lemontrip-theme';
 const listeners = new Set<(theme: ThemeName) => void>();
@@ -43,11 +43,16 @@ export function useThemeName() {
   useEffect(() => {
     let mounted = true;
 
-    getStoredTheme().then((storedTheme) => {
-      if (!mounted) return;
-      applyTheme(storedTheme);
-      setThemeState(storedTheme);
-    });
+    getStoredTheme()
+      .catch((error) => {
+        console.warn('Theme load failed, using system theme:', error);
+        return (Appearance.getColorScheme() === 'dark' ? 'dark' : 'light') as ThemeName;
+      })
+      .then((storedTheme) => {
+        if (!mounted) return;
+        applyTheme(storedTheme);
+        setThemeState(storedTheme);
+      });
 
     const unsubscribe = subscribeTheme((nextTheme) => {
       if (mounted) {

@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { addToCart } from '@/utils/cartStore';
 import { getBusSearch, getSelectedBus } from '@/utils/busSearchStore';
@@ -60,7 +61,7 @@ export default function BusDetailsScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.notFound}>
-          <Ionicons name="bus-outline" size={25} color={Colors.primary} />
+          <TravelArtworkIcon name="bus" size={44} />
           <Text style={styles.notFoundTitle}>Choose a bus service</Text>
           <Text style={styles.notFoundText}>Return to bus search and choose a route to select seats.</Text>
           <TouchableOpacity onPress={() => router.replace('/(tabs)/explore/buses')} style={styles.backButton}><Text style={styles.backButtonText}>Search buses</Text></TouchableOpacity>
@@ -76,7 +77,7 @@ export default function BusDetailsScreen() {
           <ScreenHeader title={`${bus.origin} to ${bus.destination}`} subtitle={search.travelDate || 'Travel date not selected'} eyebrow="LEMONTRIP / BUS SEATS" onBack={handleBack} />
 
           <View style={styles.routeCard}>
-            <View style={styles.operatorIcon}><Ionicons name="bus-outline" size={19} color={Colors.primary} /></View>
+            <View style={styles.operatorIcon}><TravelArtworkIcon name="bus" size={32} /></View>
             <View style={styles.routeInfo}>
               <Text style={styles.operator}>{bus.operator ?? 'Operator not provided'}</Text>
               <Text style={styles.busType}>{bus.busType}</Text>
@@ -103,7 +104,7 @@ export default function BusDetailsScreen() {
               </View>
 
               <View style={styles.seatMapCard}>
-                <View style={styles.driverRow}><Ionicons name="bus-outline" size={21} color={Colors.textLight} /><Text style={styles.driverText}>FRONT OF BUS</Text></View>
+                <View style={styles.driverRow}><TravelArtworkIcon name="bus" size={32} /><Text style={styles.driverText}>FRONT OF BUS</Text></View>
                 <View style={styles.seatGrid}>
                   {seatRows.map((row) => (
                     <View key={row} style={styles.seatRow}>

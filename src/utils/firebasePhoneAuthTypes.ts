@@ -1,0 +1,1 @@
+export type FirebasePhoneChallenge = { confirm(code: string): Promise<string> };

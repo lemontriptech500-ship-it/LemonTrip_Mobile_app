@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
 import { addBooking } from '@/utils/bookingStore';
@@ -40,7 +41,7 @@ export default function CartScreen() {
 
       {cart.length === 0 ? (
         <View style={styles.emptyState}>
-          <View style={styles.emptyIcon}><Ionicons name="bag-handle-outline" size={27} color={Colors.primary} /></View>
+          <View style={styles.emptyIcon}><TravelArtworkIcon name="cart" size={40} /></View>
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
           <Text style={styles.emptySubtitle}>
             Browse flights, hotels, and packages to add items to your cart.
