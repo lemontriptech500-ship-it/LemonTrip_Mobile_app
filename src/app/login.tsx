@@ -4,7 +4,7 @@ import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normali
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
@@ -16,6 +16,9 @@ export default function LoginScreen() {
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Clear reCAPTCHA when leaving the screen so it never touches a removed element.
+  useEffect(() => () => { void phoneOtp.reset(); }, []);
 
   const validateAndLogin = async () => {
     setIdentifierError('');
@@ -103,7 +106,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </> : null}
-      {mode === 'phone' && Platform.OS === 'web' ? <View nativeID="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
+      {mode === 'phone' && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
       {mode === 'phone' ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
       {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <Text accessibilityRole="alert" style={styles.phoneError}>{phoneOtp.error}</Text> : null}
 

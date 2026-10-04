@@ -1,4 +1,3 @@
-```json
 {
   "expo": {
     "name": "",
@@ -56,12 +55,19 @@
             }
           ]
         }
-      ]
+      ],
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d350722c-2eb4-475b-aa80-a60f00827262"
+      }
+    },
+    "owner": "gokulsir500"
   }
 }
-```

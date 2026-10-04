@@ -1,6 +1,9 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, type ConfirmationResult } from 'firebase/auth';
-import type { FirebasePhoneChallenge } from './firebasePhoneAuthTypes';
+import type { FirebasePhoneChallenge } from './firebasePhoneShared';
+
+export { firebasePhoneError } from './firebasePhoneShared';
+export type { FirebasePhoneChallenge } from './firebasePhoneShared';
 
 let verifier: RecaptchaVerifier | null = null;
 
@@ -20,7 +23,7 @@ function firebaseAuth() {
 }
 
 export async function resetFirebasePhoneCode() {
-  verifier?.clear();
+  try { verifier?.clear(); } catch {}
   verifier = null;
 }
 
@@ -34,7 +37,7 @@ export async function sendFirebasePhoneCode(phone: string): Promise<FirebasePhon
   }
   await resetFirebasePhoneCode();
   const auth = firebaseAuth();
-  verifier = new RecaptchaVerifier(auth, 'lemontrip-phone-recaptcha', { size: 'normal' });
+  verifier = new RecaptchaVerifier(auth, 'lemontrip-phone-recaptcha', { size: 'invisible' });
   let confirmation: ConfirmationResult;
   try {
     confirmation = await signInWithPhoneNumber(auth, phone, verifier);
