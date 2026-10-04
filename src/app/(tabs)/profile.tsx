@@ -89,7 +89,7 @@ export default function ProfileScreen() {
                 <TouchableOpacity key={item.label} accessibilityRole="button" onPress={() => router.push(item.route as never)} style={styles.quickCard} activeOpacity={0.75}>
                   <View style={styles.quickIcon}><TravelArtworkIcon name={item.artwork} size={29} /></View>
                   <Text style={styles.quickLabel}>{item.label}</Text>
-                  <Ionicons name="arrow-up-right" size={14} color={Colors.textLight} style={styles.quickArrow} />
+                  <Ionicons name="open-outline" size={14} color={Colors.textLight} style={styles.quickArrow} />
                 </TouchableOpacity>
               ))}
             </View>

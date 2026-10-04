@@ -773,32 +773,32 @@ export default function HomeScreen() {
             {[
               {
                 title: 'Bus Tickets',
-                icon: 'bus-outline' as IconName,
+                image: require('../../../assets/images/buses.png'),
                 route: '/(tabs)/explore/buses',
               },
               {
                 title: 'Hotel Bookings',
-                icon: 'bed-outline' as IconName,
+                image: require('../../../assets/images/hotels_new.png'),
                 route: '/(tabs)/explore/hotels',
               },
               {
                 title: 'Visa Services',
-                icon: 'id-card-outline' as IconName,
+                image: require('../../../assets/images/visa.png'),
                 route: '/(tabs)/explore/visa',
               },
               {
-                title: 'Travel Insurance',
-                icon: 'shield-checkmark-outline' as IconName,
-                route: '/(tabs)/explore',
+                title: 'Tour Tickets',
+                image: require('../../../assets/images/offers.png'),
+                route: '/offers',
               },
               {
-                title: 'Car Rentals',
-                icon: 'car-outline' as IconName,
-                route: '/(tabs)/explore',
+                title: 'Train Tickets',
+                image: require('../../../assets/images/trains.png'),
+                route: '/(tabs)/explore/trains',
               },
               {
                 title: 'Custom Packages',
-                icon: 'gift-outline' as IconName,
+                image: require('../../../assets/images/holiday.png'),
                 route: '/packages',
               },
             ].map((item) => (
@@ -809,11 +809,9 @@ export default function HomeScreen() {
                   router.push(item.route as any)
                 }
               >
-                <Ionicons
-                  name={item.icon}
-                  size={27}
-                  color={Colors.primary}
-                />
+                <View style={[styles.serviceIconWrap, styles.serviceIconWrapImage]}>
+                  <Image source={item.image} style={styles.serviceImage} resizeMode="contain" />
+                </View>
 
                 <Text
                   style={styles.travelServiceText}
@@ -1516,15 +1514,16 @@ const styles = StyleSheet.create({
 
   travelService: {
     width: '31.7%',
-    minHeight: 72,
-    borderRadius: 13,
-    backgroundColor: '#fff9d9',
+    minHeight: 94,
+    borderRadius: 14,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#f3edc7',
+    borderColor: '#d3e8d6',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    gap: 4,
+    paddingVertical: 9,
+    paddingHorizontal: 4,
+    gap: 6,
     ...cardShadow,
   },
 
