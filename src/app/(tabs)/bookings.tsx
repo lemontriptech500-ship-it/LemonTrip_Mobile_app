@@ -1,29 +1,95 @@
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { Colors } from '@/constants/colors';
+import { useAuth } from '@/utils/authStore';
+import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Platform,
   RefreshControl,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+// SafeAreaView from 'react-native' is deprecated — use the safe-area-context version.
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { requestPinWidget } from 'react-native-android-widget';
 
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { Colors } from '@/constants/colors';
-import { useBookings } from '@/utils/bookingStore';
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
+type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
+
+const SOFT_GREEN = '#f1f7ee';
+const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 } as const;
+
+const statusTabs: { key: StatusFilter; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'upcoming', label: 'Upcoming' },
+  { key: 'completed', label: 'Completed' },
+  { key: 'cancelled', label: 'Cancelled' },
+];
+
+const quickLinks: { label: string; icon: IconName; route: string }[] = [
+  { label: 'Explore', icon: 'compass-outline', route: '/(tabs)/explore' },
+  { label: 'Holiday Packages', icon: 'umbrella-outline', route: '/packages' },
+  { label: 'Offers', icon: 'pricetag-outline', route: '/offers' },
+  { label: 'Visa', icon: 'document-text-outline', route: '/(tabs)/explore/visa' },
+];
+
+const normalizeStatus = (status?: string): Exclude<StatusFilter, 'all'> => {
+  if (status === 'cancelled') return 'cancelled';
+  if (status === 'completed') return 'completed';
+  return 'upcoming'; // upcoming, confirmed or missing
+};
+
+const statusStyles = {
+  upcoming: { label: 'Confirmed', bg: '#EAF9F2', fg: Colors.primaryDark, icon: 'checkmark-circle' as IconName },
+  completed: { label: 'Completed', bg: '#EEF1F4', fg: '#56616F', icon: 'flag' as IconName },
+  cancelled: { label: 'Cancelled', bg: '#FDECEC', fg: '#C62828', icon: 'close-circle' as IconName },
+};
+
+const serviceIcon = (serviceName?: string): IconName => {
+  const name = (serviceName ?? '').toLowerCase();
+  if (name.includes('flight')) return 'airplane-outline';
+  if (name.includes('hotel') || name.includes('stay')) return 'bed-outline';
+  if (name.includes('bus')) return 'bus-outline';
+  if (name.includes('train')) return 'train-outline';
+  if (name.includes('visa')) return 'document-text-outline';
+  if (name.includes('package') || name.includes('holiday')) return 'umbrella-outline';
+  return 'ticket-outline';
+};
+
+const formatDate = (value?: string) => {
+  if (!value) return '';
+  try {
+    return new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch {
+    return value;
+  }
+};
 
 export default function BookingsScreen() {
   const bookings = useBookings();
+  const user = useAuth();
 
   const [refreshing, setRefreshing] = useState(false);
   const [addingWidget, setAddingWidget] = useState(false);
+  const [activeTab, setActiveTab] = useState<StatusFilter>('all');
+
+  const counts = useMemo(() => {
+    const base = { all: bookings.length, upcoming: 0, completed: 0, cancelled: 0 };
+    bookings.forEach((booking) => { base[normalizeStatus(booking.status)] += 1; });
+    return base;
+  }, [bookings]);
+
+  const visibleBookings = useMemo(
+    () => bookings.filter((booking) => activeTab === 'all' || normalizeStatus(booking.status) === activeTab),
+    [bookings, activeTab],
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -33,149 +99,92 @@ export default function BookingsScreen() {
 
   const handleAddWidget = async () => {
     if (Platform.OS !== 'android') {
-      Alert.alert(
-        'Android Feature',
-        'The Upcoming Trip Widget is currently available on Android.'
-      );
+      Alert.alert('Android feature', 'The Upcoming Trip widget is currently available on Android.');
       return;
     }
-
     if (addingWidget) return;
 
     try {
       setAddingWidget(true);
-
-      const requested = await requestPinWidget({
-        widgetName: 'UpcomingTrip',
-      });
-
+      const requested = await requestPinWidget({ widgetName: 'UpcomingTrip' });
       if (!requested) {
         Alert.alert(
-          'Widget Not Supported',
-          'Your current launcher does not support direct widget pinning. You can add the LemonTrip widget manually from the Android Home Screen widget picker.'
+          'Widget not supported',
+          'Your launcher does not support direct widget pinning. You can add the LemonTrip widget from the Android Home Screen widget picker.',
         );
       }
     } catch (error) {
       console.error('Widget request failed:', error);
-
-      Alert.alert(
-        'Unable to Add Widget',
-        'Please try adding the LemonTrip widget manually from the Android Home Screen.'
-      );
+      Alert.alert('Unable to add widget', 'Please try adding the LemonTrip widget manually from the Android Home Screen.');
     } finally {
       setAddingWidget(false);
     }
   };
 
-  const formatDate = (value?: string) => {
-    if (!value) return '';
-
-    try {
-      return new Date(value).toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      });
-    } catch {
-      return value;
-    }
-  };
-
-  const getStatusLabel = (status?: string) => {
-    if (!status) return 'CONFIRMED';
-    return status.toUpperCase();
-  };
-
-  const getStatusStyle = (status?: string) => {
-    switch (status) {
-      case 'cancelled':
-        return {
-          backgroundColor: '#FDECEC',
-          color: '#C62828',
-        };
-
-      case 'completed':
-        return {
-          backgroundColor: '#EEF1F4',
-          color: '#56616F',
-        };
-
-      case 'upcoming':
-      case 'confirmed':
-      default:
-        return {
-          backgroundColor: '#EAF9F2',
-          color: Colors.primaryDark,
-        };
-    }
-  };
-
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={Colors.primary}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} colors={[Colors.primary]} />}
       >
-        <ScreenHeader
-          title="Your bookings"
-          subtitle="Every detail of your journey, in one place."
-          eyebrow="TRAVEL RECORD"
-        />
+        {/* Header — same as Home / Explore */}
+        <BrandGradientBar style={styles.header}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
+            <LemonTripBrand size={50} />
+          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}>
+            <Ionicons name="heart-outline" size={24} color={Colors.white} />
+          </TouchableOpacity>
+          {user ? (
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}>
+              <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => router.push('/login')} style={styles.loginPill}>
+              <Ionicons name="person-outline" size={18} color={Colors.primaryDark} />
+              <Text style={styles.loginText}>Login</Text>
+            </TouchableOpacity>
+          )}
+        </BrandGradientBar>
 
+        {/* Title strip */}
+        <View style={styles.titleStrip}>
+          <View style={styles.titleCopy}>
+            <Text style={styles.pageTitle}>My Trips</Text>
+            <Text style={styles.pageSubtitle}>Every detail of your journey, in one place.</Text>
+          </View>
+          {bookings.length > 0 ? (
+            <View style={styles.countPill}>
+              <Text style={styles.countPillText}>{bookings.length}</Text>
+              <Text style={styles.countPillLabel}>{bookings.length === 1 ? 'booking' : 'bookings'}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Widget banner — same style as Home banner */}
         <View style={styles.widgetCard}>
           <View style={styles.widgetIcon}>
-            <Ionicons
-              name="grid-outline"
-              size={26}
-              color={Colors.primaryDark}
-            />
+            <Ionicons name="grid-outline" size={26} color={Colors.primaryDark} />
           </View>
-
           <View style={styles.widgetContent}>
-            <Text style={styles.widgetTitle}>
-              Upcoming Trip Widget
-            </Text>
-
-            <Text style={styles.widgetDescription}>
-              See your next trip directly on your Android Home Screen.
-            </Text>
-
+            <Text style={styles.widgetTitle}>Upcoming Trip widget</Text>
+            <Text style={styles.widgetDescription}>See your next trip right on your Android Home Screen.</Text>
             <TouchableOpacity
-              style={[
-                styles.widgetButton,
-                addingWidget && styles.disabledButton,
-              ]}
+              accessibilityRole="button"
+              style={[styles.widgetButton, addingWidget && styles.disabledButton]}
               activeOpacity={0.85}
               onPress={handleAddWidget}
               disabled={addingWidget}
             >
               {addingWidget ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={Colors.primaryDark} style={styles.widgetSpinner} />
               ) : (
                 <>
-                  <Ionicons
-                    name="add-circle-outline"
-                    size={19}
-                    color="#FFFFFF"
-                  />
-
-                  <Text style={styles.widgetButtonText}>
-                    Add Widget
-                  </Text>
-
-                  <Ionicons
-                    name="arrow-forward"
-                    size={18}
-                    color="#FFFFFF"
-                  />
+                  <Text style={styles.widgetButtonText}>Add widget</Text>
+                  <View style={styles.widgetArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
                 </>
               )}
             </TouchableOpacity>
@@ -183,518 +192,224 @@ export default function BookingsScreen() {
         </View>
 
         {bookings.length > 0 ? (
-          <View>
-            <View style={styles.sectionHeader}>
-              <View>
-                <Text style={styles.sectionTitle}>
-                  Your Journeys
-                </Text>
-
-                <Text style={styles.sectionSubtitle}>
-                  {bookings.length}{' '}
-                  {bookings.length === 1 ? 'booking' : 'bookings'}
-                </Text>
-              </View>
-
-              <View style={styles.countBadge}>
-                <Text style={styles.countText}>
-                  {bookings.length}
-                </Text>
-              </View>
-            </View>
-
-            {bookings.map((booking) => {
-              const statusStyle = getStatusStyle(booking.status);
-
-              return (
-                <View
-                  key={booking.id}
-                  style={styles.bookingCard}
-                >
-                  <View style={styles.bookingTop}>
-                    <View style={styles.bookingIcon}>
-                      <Ionicons
-                        name="airplane-outline"
-                        size={23}
-                        color={Colors.primary}
-                      />
+          <View style={styles.section}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRow}>
+              {statusTabs.map((tab) => {
+                const selected = activeTab === tab.key;
+                return (
+                  <TouchableOpacity
+                    key={tab.key}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={() => setActiveTab(tab.key)}
+                    style={[styles.tab, selected && styles.tabSelected]}
+                  >
+                    <Text style={[styles.tabText, selected && styles.tabTextSelected]}>{tab.label}</Text>
+                    <View style={[styles.tabCount, selected && styles.tabCountSelected]}>
+                      <Text style={[styles.tabCountText, selected && styles.tabCountTextSelected]}>{counts[tab.key]}</Text>
                     </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
 
-                    <View style={styles.bookingInfo}>
-                      <Text
-                        style={styles.serviceName}
-                        numberOfLines={1}
-                      >
-                        {booking.serviceName}
-                      </Text>
-
-                      <Text
-                        style={styles.itemName}
-                        numberOfLines={1}
-                      >
-                        {booking.itemName}
-                      </Text>
-                    </View>
-
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        {
-                          backgroundColor:
-                            statusStyle.backgroundColor,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.statusText,
-                          {
-                            color: statusStyle.color,
-                          },
-                        ]}
-                      >
-                        {getStatusLabel(booking.status)}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.divider} />
-
-                  <View style={styles.bookingDetails}>
-                    <View>
-                      <Text style={styles.detailLabel}>
-                        BOOKED ON
-                      </Text>
-
-                      <Text style={styles.detailValue}>
-                        {formatDate(booking.bookedAt)}
-                      </Text>
-                    </View>
-
-                    {booking.tripDate ? (
-                      <View>
-                        <Text style={styles.detailLabel}>
-                          TRIP DATE
-                        </Text>
-
-                        <Text style={styles.detailValue}>
-                          {formatDate(booking.tripDate)}
-                        </Text>
+            {visibleBookings.length ? (
+              <View style={styles.bookingList}>
+                {visibleBookings.map((booking) => {
+                  const status = statusStyles[normalizeStatus(booking.status)];
+                  return (
+                    <View key={booking.id} style={styles.bookingCard}>
+                      <View style={styles.bookingTop}>
+                        <View style={styles.bookingIcon}>
+                          <Ionicons name={serviceIcon(booking.serviceName)} size={26} color={Colors.primary} />
+                        </View>
+                        <View style={styles.bookingInfo}>
+                          <Text style={styles.serviceName} numberOfLines={1}>{booking.serviceName}</Text>
+                          <Text style={styles.itemName} numberOfLines={2}>{booking.itemName}</Text>
+                        </View>
+                        <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
+                          <Ionicons name={status.icon} size={13} color={status.fg} />
+                          <Text style={[styles.statusText, { color: status.fg }]}>{status.label}</Text>
+                        </View>
                       </View>
-                    ) : null}
 
-                    <View style={styles.priceBox}>
-                      <Text style={styles.detailLabel}>
-                        PRICE
-                      </Text>
+                      <View style={styles.ticketDivider}>
+                        <View style={[styles.notch, styles.notchLeft]} />
+                        <View style={styles.dash} />
+                        <View style={[styles.notch, styles.notchRight]} />
+                      </View>
 
-                      <Text style={styles.price}>
-                        {booking.price}
-                      </Text>
+                      <View style={styles.bookingDetails}>
+                        <View style={styles.detailCol}>
+                          <Text style={styles.detailLabel}>Booked on</Text>
+                          <Text style={styles.detailValue}>{formatDate(booking.bookedAt)}</Text>
+                        </View>
+                        {booking.tripDate ? (
+                          <View style={styles.detailCol}>
+                            <Text style={styles.detailLabel}>Trip date</Text>
+                            <Text style={styles.detailValue}>{formatDate(booking.tripDate)}</Text>
+                          </View>
+                        ) : null}
+                        <View style={styles.priceBox}>
+                          <Text style={styles.detailLabel}>Total</Text>
+                          <Text style={styles.price}>{booking.price}</Text>
+                        </View>
+                      </View>
                     </View>
-                  </View>
-                </View>
-              );
-            })}
+                  );
+                })}
+              </View>
+            ) : (
+              <View style={styles.filterEmpty}>
+                <Ionicons name="filter-outline" size={26} color={Colors.primary} />
+                <Text style={styles.filterEmptyText}>No {activeTab} bookings.</Text>
+                <TouchableOpacity onPress={() => setActiveTab('all')}><Text style={styles.linkText}>Show all</Text></TouchableOpacity>
+              </View>
+            )}
           </View>
         ) : (
-          <View style={styles.emptyCard}>
-            <View style={styles.emptyCircle}>
-              <Ionicons
-                name="airplane-outline"
-                size={35}
-                color={Colors.primary}
-              />
+          <>
+            {/* Empty state */}
+            <View style={styles.emptyCard}>
+              <View style={styles.emptyCircle}>
+                <Ionicons name="airplane-outline" size={38} color={Colors.primary} />
+              </View>
+              <Text style={styles.emptyTitle}>Your next journey could start here</Text>
+              <Text style={styles.emptyDescription}>
+                You don’t have any bookings yet. Explore flights, hotels and experiences to plan your next adventure.
+              </Text>
+              <TouchableOpacity accessibilityRole="button" style={styles.primaryButton} activeOpacity={0.85} onPress={() => router.push('/(tabs)/explore')}>
+                <Text style={styles.primaryButtonText}>Explore journeys</Text>
+                <View style={styles.primaryArrow}><Ionicons name="arrow-forward" size={18} color={Colors.primaryDark} /></View>
+              </TouchableOpacity>
             </View>
 
-            <Text style={styles.emptyTitle}>
-              Your next journey could start here.
-            </Text>
-
-            <Text style={styles.emptyDescription}>
-              You don't have any bookings yet. Explore flights,
-              hotels and experiences and plan your next adventure.
-            </Text>
-
-            <TouchableOpacity
-              style={styles.exploreButton}
-              activeOpacity={0.85}
-              onPress={() => router.push('/(tabs)/explore')}
-            >
-              <Ionicons
-                name="compass-outline"
-                size={21}
-                color="#FFFFFF"
-              />
-
-              <Text style={styles.exploreButtonText}>
-                Explore journeys
-              </Text>
-
-              <Ionicons
-                name="arrow-forward"
-                size={18}
-                color="#FFFFFF"
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.searchButton}
-              activeOpacity={0.8}
-              onPress={() => router.push('/(tabs)/explore')}
-            >
-              <Ionicons
-                name="search-outline"
-                size={19}
-                color={Colors.primaryDark}
-              />
-
-              <Text style={styles.searchButtonText}>
-                Search flights
-              </Text>
-            </TouchableOpacity>
-          </View>
+            {/* Quick links — same circle grid as Home */}
+            <View style={styles.gridCard}>
+              <Text style={styles.gridTitle}>Plan your next trip</Text>
+              <View style={styles.gridRow}>
+                {quickLinks.map((link) => (
+                  <TouchableOpacity key={link.label} accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push(link.route as never)}>
+                    <View style={styles.gridCircle}><Ionicons name={link.icon} size={28} color={Colors.primary} /></View>
+                    <Text style={styles.gridLabel}>{link.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </>
         )}
 
         <View style={styles.infoCard}>
           <View style={styles.infoIcon}>
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={21}
-              color={Colors.primary}
-            />
+            <Ionicons name="shield-checkmark" size={24} color={Colors.primary} />
           </View>
-
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>
-              Travel with confidence
-            </Text>
-
-            <Text style={styles.infoText}>
-              Your LemonTrip travel details stay organized in one
-              convenient place.
-            </Text>
+            <Text style={styles.infoTitle}>Travel with confidence</Text>
+            <Text style={styles.infoText}>Your LemonTrip travel details stay organized in one place.</Text>
           </View>
         </View>
-
-        <View style={styles.bottomSpace} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F7F9FC',
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1 },
+  content: { paddingBottom: 32, width: '100%', maxWidth: 900, alignSelf: 'center' },
 
-  container: {
-    flex: 1,
-  },
+  // Header
+  header: { minHeight: 72, paddingHorizontal: 18, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  brandLockup: { minWidth: 150, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
+  headerSpacer: { flex: 1 },
+  headerAction: { width: 38, height: 40, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent },
+  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  loginPill: { height: 42, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, borderRadius: 21, backgroundColor: Colors.white },
+  loginText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
 
-  content: {
-    paddingHorizontal: 18,
-    paddingTop: 8,
-    paddingBottom: 30,
-  },
+  // Title
+  titleStrip: { paddingHorizontal: 18, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  titleCopy: { flex: 1 },
+  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 26, fontWeight: '900' },
+  pageSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, marginTop: 3 },
+  countPill: { alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 16, backgroundColor: SOFT_GREEN },
+  countPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  countPillLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
 
-  widgetCard: {
-    flexDirection: 'row',
-    backgroundColor: '#EAF9F2',
-    borderRadius: 22,
-    padding: 17,
-    borderWidth: 1,
-    borderColor: '#CFEFE0',
-    marginBottom: 24,
-  },
+  // Widget banner
+  widgetCard: { marginTop: 16, marginHorizontal: 16, padding: 18, flexDirection: 'row', gap: 14, borderRadius: 24, backgroundColor: Colors.primaryDark },
+  widgetIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.accent },
+  widgetContent: { flex: 1, minWidth: 0 },
+  widgetTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  widgetDescription: { color: 'rgba(255,255,255,0.88)', fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 4 },
+  widgetButton: { alignSelf: 'flex-start', minHeight: 46, minWidth: 140, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 14, paddingLeft: 18, paddingRight: 5, borderRadius: 23, backgroundColor: Colors.white },
+  widgetButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
+  widgetArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
+  widgetSpinner: { paddingHorizontal: 20 },
+  disabledButton: { opacity: 0.7 },
 
-  widgetIcon: {
-    width: 51,
-    height: 51,
-    borderRadius: 16,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 13,
-  },
+  // Tabs
+  section: { paddingTop: 20 },
+  tabRow: { paddingHorizontal: 16, gap: 8 },
+  tab: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 15, paddingRight: 8, paddingVertical: 9, borderRadius: 22, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  tabSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  tabText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  tabTextSelected: { color: Colors.white },
+  tabCount: { minWidth: 24, height: 24, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: SOFT_GREEN },
+  tabCountSelected: { backgroundColor: Colors.accent },
+  tabCountText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900' },
+  tabCountTextSelected: { color: Colors.primaryDark },
 
-  widgetContent: {
-    flex: 1,
-  },
+  // Booking cards
+  bookingList: { paddingHorizontal: 16, paddingTop: 14, gap: 14 },
+  bookingCard: { padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  bookingTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  bookingIcon: { width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 26, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
+  bookingInfo: { flex: 1, minWidth: 0 },
+  serviceName: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '900' },
+  itemName: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 3 },
+  statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 12 },
+  statusText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
 
-  widgetTitle: {
-    fontSize: 17,
-    fontWeight: '900',
-    color: '#10251D',
-    marginBottom: 4,
-  },
+  ticketDivider: { height: 20, marginVertical: 12, marginHorizontal: -16, flexDirection: 'row', alignItems: 'center' },
+  notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
+  notchLeft: { marginLeft: -11 },
+  notchRight: { marginRight: -11 },
+  dash: { flex: 1, height: 0, marginHorizontal: 8, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border },
 
-  widgetDescription: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: '#527066',
-    marginBottom: 12,
-  },
+  bookingDetails: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
+  detailCol: { flexShrink: 1 },
+  detailLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', marginBottom: 3 },
+  detailValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  priceBox: { alignItems: 'flex-end', marginLeft: 'auto' },
+  price: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
 
-  widgetButton: {
-    alignSelf: 'flex-start',
-    minHeight: 42,
-    paddingHorizontal: 15,
-    borderRadius: 13,
-    backgroundColor: Colors.primaryDark,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
+  filterEmpty: { marginTop: 14, marginHorizontal: 16, padding: 24, alignItems: 'center', gap: 8, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  filterEmptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, textTransform: 'capitalize' },
+  linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
 
-  disabledButton: {
-    opacity: 0.65,
-  },
+  // Empty state
+  emptyCard: { marginTop: 16, marginHorizontal: 16, paddingHorizontal: 22, paddingVertical: 28, alignItems: 'center', borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  emptyCircle: { width: 92, height: 92, alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderRadius: 46, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
+  emptyTitle: { textAlign: 'center', color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '900' },
+  emptyDescription: { textAlign: 'center', maxWidth: 320, marginTop: 8, marginBottom: 20, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, lineHeight: 21 },
+  primaryButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 22, paddingRight: 6, borderRadius: 26, backgroundColor: Colors.primary },
+  primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
+  primaryArrow: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.accent },
 
-  widgetButtonText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '800',
-  },
+  // Quick link grid
+  gridCard: { marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', paddingHorizontal: 10, marginBottom: 10 },
+  gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
+  gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
+  gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
+  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
 
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-
-  sectionTitle: {
-    fontSize: 21,
-    fontWeight: '900',
-    color: '#111827',
-  },
-
-  sectionSubtitle: {
-    fontSize: 12,
-    color: '#7B8491',
-    marginTop: 3,
-  },
-
-  countBadge: {
-    width: 39,
-    height: 39,
-    borderRadius: 13,
-    backgroundColor: '#EAF9F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  countText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: Colors.primaryDark,
-  },
-
-  bookingCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 17,
-    marginBottom: 13,
-    borderWidth: 1,
-    borderColor: '#E9EDF2',
-  },
-
-  bookingTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  bookingIcon: {
-    width: 47,
-    height: 47,
-    borderRadius: 14,
-    backgroundColor: '#EAF9F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-
-  bookingInfo: {
-    flex: 1,
-  },
-
-  serviceName: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#17202A',
-  },
-
-  itemName: {
-    fontSize: 12,
-    color: '#7B8491',
-    marginTop: 4,
-  },
-
-  statusBadge: {
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    borderRadius: 9,
-    marginLeft: 8,
-  },
-
-  statusText: {
-    fontSize: 9,
-    fontWeight: '900',
-  },
-
-  divider: {
-    height: 1,
-    backgroundColor: '#EEF1F4',
-    marginVertical: 15,
-  },
-
-  bookingDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-
-  detailLabel: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#9AA2AC',
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-
-  detailValue: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#374151',
-  },
-
-  priceBox: {
-    alignItems: 'flex-end',
-  },
-
-  price: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: '#111827',
-  },
-
-  emptyCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 25,
-    paddingHorizontal: 22,
-    paddingVertical: 30,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E9EDF2',
-  },
-
-  emptyCircle: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: '#EAF9F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 18,
-  },
-
-  emptyTitle: {
-    textAlign: 'center',
-    fontSize: 21,
-    lineHeight: 28,
-    fontWeight: '900',
-    color: '#111827',
-    marginBottom: 9,
-  },
-
-  emptyDescription: {
-    textAlign: 'center',
-    fontSize: 13,
-    lineHeight: 20,
-    color: '#737D89',
-    maxWidth: 310,
-    marginBottom: 22,
-  },
-
-  exploreButton: {
-    width: '100%',
-    minHeight: 51,
-    borderRadius: 15,
-    backgroundColor: Colors.primaryDark,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 9,
-  },
-
-  exploreButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  searchButton: {
-    width: '100%',
-    minHeight: 48,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#D7E8E1',
-    backgroundColor: '#F5FBF8',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 10,
-  },
-
-  searchButtonText: {
-    color: Colors.primaryDark,
-    fontSize: 13,
-    fontWeight: '800',
-  },
-
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 15,
-    marginTop: 18,
-    borderWidth: 1,
-    borderColor: '#E9EDF2',
-  },
-
-  infoIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 13,
-    backgroundColor: '#EAF9F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-
-  infoContent: {
-    flex: 1,
-  },
-
-  infoTitle: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#17202A',
-    marginBottom: 3,
-  },
-
-  infoText: {
-    fontSize: 11,
-    lineHeight: 17,
-    color: '#7B8491',
-  },
-
-  bottomSpace: {
-    height: 25,
-  },
+  // Info
+  infoCard: { marginTop: 18, marginHorizontal: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, backgroundColor: '#edf5eb' },
+  infoIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surface },
+  infoContent: { flex: 1 },
+  infoTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
+  infoText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 2 },
 });
