@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { AccountArtworkIcon, type AccountArtworkName } from '@/components/AccountArtworkIcon';
 import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { logout, useAuth } from '@/utils/authStore';
 import { useThemeName } from '@/utils/themeStore';
@@ -65,35 +66,35 @@ export default function SettingsScreen() {
 
           <View style={[styles.columns, desktop && styles.columnsDesktop]}>
             <View style={styles.column}>
-              <SettingsSection title="Your preferences" subtitle="Set the way LemonTrip feels" icon="options-outline" artwork="explore">
-                <SettingRow icon="contrast-outline" title="Appearance" detail={theme === 'dark' ? 'Dark mode' : 'Light mode'} onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
-                <SettingRow icon="language-outline" title="Language" detail={language} onPress={() => setLanguage((current) => current === 'English' ? 'Hindi' : 'English')} />
-                <SettingRow icon="cash-outline" title="Currency" detail={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} last />
+              <SettingsSection title="Your preferences" subtitle="Set the way LemonTrip feels" icon="options-outline" artwork="settings">
+                <SettingRow icon="contrast-outline" artwork="appearance" title="Appearance" detail={theme === 'dark' ? 'Dark mode' : 'Light mode'} onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+                <SettingRow icon="language-outline" artwork="language" title="Language" detail={language} onPress={() => setLanguage((current) => current === 'English' ? 'Hindi' : 'English')} />
+                <SettingRow icon="cash-outline" artwork="currency" title="Currency" detail={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} last />
               </SettingsSection>
 
-              <SettingsSection title="Notifications" subtitle="Only the updates you want" icon="notifications-outline">
-                <SettingRow icon="mail-outline" title="Email updates" detail="News and account messages" trailing={<PreferenceSwitch value={emailNotifications} onValueChange={setEmailNotifications} />} />
-                <SettingRow icon="calendar-outline" title="Booking updates" detail="Changes to your trips" trailing={<PreferenceSwitch value={bookingUpdates} onValueChange={setBookingUpdates} />} />
+              <SettingsSection title="Notifications" subtitle="Only the updates you want" icon="notifications-outline" artwork="notifications">
+                <SettingRow icon="mail-outline" artwork="email" title="Email updates" detail="News and account messages" trailing={<PreferenceSwitch value={emailNotifications} onValueChange={setEmailNotifications} />} />
+                <SettingRow icon="calendar-outline" artwork="booking" title="Booking updates" detail="Changes to your trips" trailing={<PreferenceSwitch value={bookingUpdates} onValueChange={setBookingUpdates} />} />
                 <SettingRow icon="pricetag-outline" artwork="offer" title="Travel offers" detail="Handpicked deals and inspiration" trailing={<PreferenceSwitch value={offerUpdates} onValueChange={setOfferUpdates} />} last />
               </SettingsSection>
 
-              <SettingsSection title="Account" subtitle="Your LemonTrip profile" icon="person-circle-outline">
-                <SettingRow icon="person-outline" title="Personal information" detail="Name and contact details" onPress={() => Alert.alert('Personal information', user ? `Name: ${user.name}\nEmail: ${user.email ?? 'Not added'}\nPhone: ${user.phone ?? 'Not added'}` : 'Sign in to view account details.')} />
-                {user ? <SettingRow icon="log-out-outline" title="Log out" detail="Sign out on this device" danger onPress={confirmLogout} last /> : <SettingRow icon="log-in-outline" title="Sign in or create account" detail="Keep your trips close at hand" onPress={() => router.push('/login')} last />}
+              <SettingsSection title="Account" subtitle="Your LemonTrip profile" icon="person-circle-outline" artwork="profile">
+                <SettingRow icon="person-outline" artwork="profile" title="Personal information" detail="Name and contact details" onPress={() => Alert.alert('Personal information', user ? `Name: ${user.name}\nEmail: ${user.email ?? 'Not added'}\nPhone: ${user.phone ?? 'Not added'}` : 'Sign in to view account details.')} />
+                {user ? <SettingRow icon="log-out-outline" artwork="profile" title="Log out" detail="Sign out on this device" danger onPress={confirmLogout} last /> : <SettingRow icon="log-in-outline" artwork="profile" title="Sign in or create account" detail="Keep your trips close at hand" onPress={() => router.push('/login')} last />}
               </SettingsSection>
             </View>
 
             <View style={styles.column}>
-              <SettingsSection title="Security & privacy" subtitle="Your account, in your control" icon="shield-checkmark-outline">
-                <SettingRow icon="key-outline" title="Change password" detail="Not connected yet" onPress={() => Alert.alert('Change password', 'Password changes are not connected yet.')} />
-                <SettingRow icon="phone-portrait-outline" title="Login sessions" detail="Current device" onPress={() => Alert.alert('Login sessions', 'Session management is not available yet.')} />
-                <SettingRow icon="eye-outline" title="Privacy policy" onPress={() => Alert.alert('Privacy policy', 'Full policy coming soon.')} />
-                <SettingRow icon="document-text-outline" title="Terms of service" onPress={() => Alert.alert('Terms of service', 'Full terms coming soon.')} last />
+              <SettingsSection title="Security & privacy" subtitle="Your account, in your control" icon="shield-checkmark-outline" artwork="security">
+                <SettingRow icon="key-outline" artwork="password" title="Change password" detail="Not connected yet" onPress={() => Alert.alert('Change password', 'Password changes are not connected yet.')} />
+                <SettingRow icon="phone-portrait-outline" artwork="device" title="Login sessions" detail="Current device" onPress={() => Alert.alert('Login sessions', 'Session management is not available yet.')} />
+                <SettingRow icon="eye-outline" artwork="privacy" title="Privacy policy" onPress={() => Alert.alert('Privacy policy', 'Full policy coming soon.')} />
+                <SettingRow icon="document-text-outline" artwork="document" title="Terms of service" onPress={() => Alert.alert('Terms of service', 'Full terms coming soon.')} last />
               </SettingsSection>
 
-              <SettingsSection title="We’re here to help" subtitle="A little help goes a long way" icon="help-circle-outline" artwork="help">
+              <SettingsSection title="We’re here to help" subtitle="A little help goes a long way" icon="help-circle-outline" artwork="support">
                 <SettingRow icon="book-outline" artwork="help" title="Help center" detail="Find answers to common questions" onPress={() => router.push('/help' as never)} />
-                <SettingRow icon="chatbubble-ellipses-outline" artwork="help" title="Contact support" detail="hello@lemontrip.in" onPress={() => { void Linking.openURL('mailto:hello@lemontrip.in'); }} last />
+                <SettingRow icon="chatbubble-ellipses-outline" artwork="support" title="Contact support" detail="hello@lemontrip.in" onPress={() => { void Linking.openURL('mailto:hello@lemontrip.in'); }} last />
               </SettingsSection>
 
               <View style={styles.helpCard}>
@@ -119,11 +120,11 @@ function PreferenceSwitch({ value, onValueChange }: { value: boolean; onValueCha
   return <Switch value={value} onValueChange={onValueChange} trackColor={{ false: Colors.borderStrong, true: Colors.primary }} thumbColor={Colors.white} />;
 }
 
-function SettingsSection({ title, subtitle, icon, artwork, children }: { title: string; subtitle: string; icon: keyof typeof Ionicons.glyphMap; artwork?: TravelArtworkName; children: ReactNode }) {
+function SettingsSection({ title, subtitle, icon, artwork, children }: { title: string; subtitle: string; icon: keyof typeof Ionicons.glyphMap; artwork?: AccountArtworkName | TravelArtworkName; children: ReactNode }) {
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeading}>
-        <View style={styles.sectionIcon}>{artwork ? <TravelArtworkIcon name={artwork} size={28} /> : <Ionicons name={icon} size={17} color={Colors.primary} />}</View>
+        <View style={styles.sectionIcon}>{artwork ? <AccountArtworkIcon name={artwork as AccountArtworkName} size={28} /> : <Ionicons name={icon} size={17} color={Colors.primary} />}</View>
         <View style={styles.sectionHeadingCopy}>
           <Text style={styles.sectionTitle}>{title}</Text>
           <Text style={styles.sectionSubtitle}>{subtitle}</Text>
@@ -134,9 +135,9 @@ function SettingsSection({ title, subtitle, icon, artwork, children }: { title: 
   );
 }
 
-function SettingRow({ icon, artwork, title, detail, trailing, onPress, danger = false, last = false }: { icon: keyof typeof Ionicons.glyphMap; artwork?: TravelArtworkName; title: string; detail?: string; trailing?: ReactNode; onPress?: () => void; danger?: boolean; last?: boolean }) {
+function SettingRow({ icon, artwork, title, detail, trailing, onPress, danger = false, last = false }: { icon: keyof typeof Ionicons.glyphMap; artwork?: AccountArtworkName | TravelArtworkName; title: string; detail?: string; trailing?: ReactNode; onPress?: () => void; danger?: boolean; last?: boolean }) {
   const content = <>
-    <View style={[styles.rowIcon, danger && styles.rowIconDanger]}>{artwork ? <TravelArtworkIcon name={artwork} size={25} /> : <Ionicons name={icon} size={17} color={danger ? Colors.error : Colors.primary} />}</View>
+    <View style={[styles.rowIcon, danger && styles.rowIconDanger]}>{artwork ? <AccountArtworkIcon name={artwork as AccountArtworkName} size={25} /> : <Ionicons name={icon} size={17} color={danger ? Colors.error : Colors.primary} />}</View>
     <View style={styles.rowCopy}>
       <Text style={[styles.rowTitle, danger && styles.dangerText]}>{title}</Text>
       {detail ? <Text style={styles.rowDetail} numberOfLines={1}>{detail}</Text> : null}

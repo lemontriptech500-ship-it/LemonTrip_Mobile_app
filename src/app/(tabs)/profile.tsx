@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { AccountArtworkIcon } from '@/components/AccountArtworkIcon';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { logout, useAuth } from '@/utils/authStore';
@@ -13,9 +14,9 @@ const quickLinks = [
 ];
 
 const accountLinks = [
-  { label: 'Personal information', detail: 'Manage your contact details', icon: 'person-outline' as const, route: '/settings' },
-  { label: 'Payment methods', detail: 'Your saved payment options', icon: 'card-outline' as const, unavailable: true },
-  { label: 'Settings', detail: 'Preferences, privacy and notifications', icon: 'settings-outline' as const, route: '/settings' },
+  { label: 'Personal information', detail: 'Manage your contact details', artwork: 'profile' as const, route: '/settings' },
+  { label: 'Payment methods', detail: 'Your saved payment options', artwork: 'payment' as const, unavailable: true },
+  { label: 'Settings', detail: 'Preferences, privacy and notifications', artwork: 'settings' as const, route: '/settings' },
 ];
 
 export default function ProfileScreen() {
@@ -47,7 +48,7 @@ export default function ProfileScreen() {
               <Text style={styles.pageTitle}>Your profile</Text>
             </View>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={styles.settingsButton}>
-              <Ionicons name="settings-outline" size={19} color={Colors.primaryDark} />
+              <AccountArtworkIcon name="settings" size={29} />
             </TouchableOpacity>
           </View>
 
@@ -108,7 +109,7 @@ export default function ProfileScreen() {
                     onPress={() => item.unavailable ? openUnavailable(item.label) : router.push(item.route as never)}
                     style={[styles.menuRow, index < accountLinks.length - 1 && styles.menuDivider]}
                     activeOpacity={0.72}>
-                    <View style={styles.menuIcon}><Ionicons name={item.icon} size={17} color={Colors.primary} /></View>
+                    <View style={styles.menuIcon}><AccountArtworkIcon name={item.artwork} size={28} /></View>
                     <View style={styles.menuCopy}>
                       <Text style={styles.menuTitle}>{item.label}</Text>
                       <Text style={styles.menuDetail}>{item.detail}</Text>
