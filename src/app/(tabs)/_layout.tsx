@@ -1,26 +1,18 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const icon = (active: IconName, inactive: IconName) =>
-  ({
-    color,
-    focused,
-    size,
-  }: {
-    color: any;
-    focused: boolean;
-    size: number;
-  }) => (
-    <Ionicons
-      name={focused ? active : inactive}
-      size={size}
-      color={color}
-    />
+const icon = (active: IconName, inactive: IconName) => {
+  const TabIcon = ({ color, focused, size }: { color: ColorValue; focused: boolean; size: number }) => (
+    <Ionicons name={focused ? active : inactive} size={size} color={color} />
   );
+  TabIcon.displayName = `TabIcon(${active})`;
+  return TabIcon;
+};
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();

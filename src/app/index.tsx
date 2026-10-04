@@ -326,6 +326,7 @@ export default function LaunchScreen() {
             Travel • Tourism • Technology
           </Animated.Text>
         </View>
+
       </View>
     </SafeAreaView>
   );

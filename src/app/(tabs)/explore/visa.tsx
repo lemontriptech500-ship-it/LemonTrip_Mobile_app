@@ -56,7 +56,7 @@ export default function VisaScreen() {
           </View>
 
           <View style={[styles.countryGrid, desktop && styles.countryGridDesktop]}>
-          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>{error}</Text><TouchableOpacity accessibilityRole="button" onPress={retry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></TouchableOpacity></View> : visibleCountries.map((country) => (
+          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Visa services couldn’t load</Text><Text style={styles.emptyText}>{error}</Text><TouchableOpacity accessibilityRole="button" onPress={retry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></TouchableOpacity></View> : visibleCountries.map((country) => (
               <TouchableOpacity key={country.id} accessibilityRole="button" onPress={() => { blurWebNavigationFocus(); router.push({ pathname: '/(tabs)/explore/visa/[id]', params: { id: country.id } }); }} style={[styles.countryCard, desktop && styles.countryCardDesktop]}>
                 <ImageBackground source={{ uri: country.image }} style={styles.countryImage} imageStyle={styles.countryImageStyle}>
                   <View style={styles.countryShade} />
@@ -67,7 +67,7 @@ export default function VisaScreen() {
                   <Text style={styles.countryVisaType}>{country.visaType}</Text>
                   <View style={styles.countryMeta}><Ionicons name="time-outline" size={12} color={Colors.textLight} /><Text style={styles.countryMetaText}>{country.processing ?? 'Processing time not listed'}</Text></View>
                   <View style={styles.countryFooter}><Text style={styles.countryFee}>{country.fee ? `From ${country.fee}` : 'Price not listed'}</Text><Text style={styles.checkText}>Check requirements →</Text></View>
-                  <Text numberOfLines={2} style={styles.countryDocuments}>Documents: {country.documents.join(', ') || 'Requirements not listed'}</Text>
+                  <Text numberOfLines={2} style={styles.countryDocuments}>Documents: {country.documents?.join(', ') || 'Requirements not listed'}</Text>
                 </View>
               </TouchableOpacity>
             ))}

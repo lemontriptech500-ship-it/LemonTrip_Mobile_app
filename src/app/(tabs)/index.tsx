@@ -318,9 +318,9 @@ export default function HomeScreen() {
               </TouchableOpacity>
 
               <Image
-                source={require('../../../assets/images/header_logo.png')}
+                source={require('../../../assets/images/App Logo.png')}
                 style={styles.brandLogo}
-                resizeMode="contain"
+                resizeMode="cover"
               />
 
               <Text style={styles.brand}>
