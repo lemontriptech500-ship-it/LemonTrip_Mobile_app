@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import type { PackageCategory, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
@@ -31,14 +32,15 @@ export default function PackagesListScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <View style={styles.topBar}>
+          <BrandGradientBar style={styles.topBar}>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/explore')} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
+              <Ionicons name="arrow-back" size={18} color={Colors.white} />
             </TouchableOpacity>
-            <Text style={styles.breadcrumb}>LEMONTRIP / JOURNEYS</Text>
+            <LemonTripBrand size={38} />
+            <Text style={styles.breadcrumb}>JOURNEYS</Text>
             <View style={styles.topSpacer} />
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open wishlist" onPress={() => router.push('/(tabs)/wishlist')} style={styles.iconButton}><Ionicons name="heart-outline" size={18} color={Colors.primaryDark} /></TouchableOpacity>
-          </View>
+          </BrandGradientBar>
 
           <ImageBackground source={{ uri: travelPackages[0]?.image }} style={styles.hero} imageStyle={styles.heroImage}>
             <View style={styles.heroShade} />
@@ -124,11 +126,11 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1180, alignSelf: 'center' },
-  topBar: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 16 },
-  backButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surface },
-  breadcrumb: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  topBar: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
+  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.14)' },
+  breadcrumb: { color: Colors.white, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
   topSpacer: { flex: 1 },
-  iconButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surface },
+  iconButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accent },
   hero: { minHeight: 350, justifyContent: 'flex-end', marginHorizontal: 14, overflow: 'hidden', borderRadius: 21, backgroundColor: Colors.primaryDark },
   heroImage: { borderRadius: 21 },
   heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(4, 31, 22, 0.39)' },

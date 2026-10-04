@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import type { Destination, TravelPackage } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
@@ -118,9 +119,9 @@ export default function ExploreScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
-          <View style={styles.header}>
+          <BrandGradientBar style={styles.header}>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
-              <Image source={require('../../../../assets/images/App Logo.png')} style={styles.brandLogo} resizeMode="cover" />
+              <LemonTripBrand size={50} />
             </TouchableOpacity>
             {isWide ? <View style={styles.headerNav}>
               <TouchableOpacity style={[styles.navLink, styles.navLinkActive]} onPress={() => router.push('/(tabs)/explore')}><Text style={[styles.navText, styles.navTextActive]}>Explore</Text></TouchableOpacity>
@@ -134,7 +135,7 @@ export default function ExploreScreen() {
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}><Text style={styles.avatarText}>{user?.name.charAt(0).toUpperCase() ?? 'G'}</Text></TouchableOpacity>
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open cart" onPress={() => router.push('/cart')} style={styles.mobileCart}><Ionicons name="bag-outline" size={18} color={Colors.primaryDark}/></TouchableOpacity>
             </View>
-          </View>
+          </BrandGradientBar>
 
           <View style={styles.heroWrap}>
             <ImageBackground
@@ -350,18 +351,17 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   pageContent: { paddingBottom: 22 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
-  header: { minHeight: 70, paddingHorizontal: 22, paddingVertical: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  brandLockup: { width: 174, height: 56, alignItems: 'flex-start', justifyContent: 'center', overflow: 'hidden' },
-  brandLogo: { width: 174, height: 56 },
+  header: { minHeight: 70, paddingHorizontal: 22, paddingVertical: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  brandLockup: { minWidth: 166, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
   headerNav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 },
   navLink: { minHeight: 54, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' },
   navLinkActive: { borderBottomColor: Colors.accent },
-  navText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
-  navTextActive: { color: Colors.primary, fontWeight: '900' },
+  navText: { color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
+  navTextActive: { color: Colors.accent, fontWeight: '900' },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   headerAction: { width: 34, height: 38, alignItems: 'center', justifyContent: 'center' },
-  avatar: { width: 29, height: 29, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.primaryDark },
-  avatarText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  avatar: { width: 29, height: 29, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.accent },
+  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
   mobileCart: { display: 'none' },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   searchSection: { position: 'absolute', top: 14, left: 14, right: 14, zIndex: 5 },

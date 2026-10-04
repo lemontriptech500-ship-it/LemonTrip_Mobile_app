@@ -1,6 +1,4 @@
-export type ThemeName = 'light' | 'dark';
-
-const lightColors = {
+export const Colors = {
   primary: '#0b5d35',
   primaryDark: '#063b24',
   secondary: '#118047',
@@ -18,22 +16,3 @@ const lightColors = {
   error: '#EF4444',
   overlay: 'rgba(6, 59, 36, 0.58)',
 } as const;
-
-const darkColors = {
-  ...lightColors,
-  background: '#0d1713',
-  surface: '#14231d',
-  surfaceMuted: '#1b3027',
-  textDark: '#f2f7f3',
-  textLight: '#a8b9af',
-  border: '#294238',
-  borderStrong: '#3a5b4b',
-  accentSoft: '#665b12',
-  overlay: 'rgba(0, 0, 0, 0.68)',
-};
-
-export const Colors: { -readonly [K in keyof typeof lightColors]: typeof lightColors[K] } = { ...lightColors };
-
-export function applyTheme(theme: ThemeName) {
-  Object.assign(Colors, theme === 'dark' ? darkColors : lightColors);
-}

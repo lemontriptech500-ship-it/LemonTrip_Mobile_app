@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { AccountArtworkIcon } from '@/components/AccountArtworkIcon';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,15 +43,16 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={[styles.content, desktop && styles.contentDesktop]}>
-          <View style={styles.headingRow}>
+          <BrandGradientBar style={styles.headingRow}>
+            <LemonTripBrand size={42} />
             <View>
-              <Text style={styles.eyebrow}>YOUR LEMONTRIP</Text>
-              <Text style={styles.pageTitle}>Your profile</Text>
+              <Text style={[styles.eyebrow, styles.headerEyebrow]}>YOUR LEMONTRIP</Text>
+              <Text style={[styles.pageTitle, styles.headerPageTitle]}>Your profile</Text>
             </View>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={styles.settingsButton}>
               <AccountArtworkIcon name="settings" size={29} />
             </TouchableOpacity>
-          </View>
+          </BrandGradientBar>
 
           <View style={styles.heroCard}>
             <View style={styles.heroTopline}>
@@ -150,7 +152,9 @@ const styles = StyleSheet.create({
   page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 820, alignSelf: 'center' },
   contentDesktop: { maxWidth: 1040 },
-  headingRow: { minHeight: 92, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 22, paddingTop: 7, paddingBottom: 14 },
+  headingRow: { minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 16 },
+  headerEyebrow: { color: Colors.accent, fontSize: 8, letterSpacing: 1 },
+  headerPageTitle: { color: Colors.white, fontSize: 17, lineHeight: 22, marginTop: 1 },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', letterSpacing: 1.7 },
   pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, lineHeight: 38, fontWeight: '900', marginTop: 3 },
   settingsButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },

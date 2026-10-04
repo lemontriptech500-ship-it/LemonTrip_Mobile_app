@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import type { TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
@@ -63,12 +64,13 @@ export default function PackageDetailScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <View style={styles.navRow}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}><Ionicons name="arrow-back" size={18} color={Colors.primaryDark} /></TouchableOpacity>
-            <Text style={styles.breadcrumb}>JOURNEYS / {pkg.destination?.toUpperCase() ?? 'DETAILS'}</Text>
+          <BrandGradientBar style={styles.navRow}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}><Ionicons name="arrow-back" size={18} color={Colors.white} /></TouchableOpacity>
+            <LemonTripBrand size={38} />
+            <Text style={styles.breadcrumb}>{pkg.destination?.toUpperCase() ?? 'JOURNEYS'}</Text>
             <View style={styles.navSpacer} />
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open wishlist" onPress={() => router.push('/(tabs)/wishlist')} style={styles.iconButton}><Ionicons name="heart-outline" size={18} color={Colors.primaryDark} /></TouchableOpacity>
-          </View>
+          </BrandGradientBar>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>
             {gallery.map((image, index) => <Image key={`${pkg.id}-gallery-${index}`} source={{ uri: image }} style={[styles.galleryImage, { width: galleryImageWidth }, gallery.length === 1 && styles.singleGalleryImage]} />)}
@@ -189,11 +191,11 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   page: { paddingBottom: 30 },
   content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
-  navRow: { minHeight: 47, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 15 },
-  backButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surface },
-  breadcrumb: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1 },
+  navRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
+  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.14)' },
+  breadcrumb: { color: Colors.white, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1 },
   navSpacer: { flex: 1 },
-  iconButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surface },
+  iconButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accent },
   gallery: { paddingHorizontal: 15, gap: 8 },
   galleryImage: { height: 210, borderRadius: 15, backgroundColor: Colors.surfaceMuted },
   singleGalleryImage: { height: 250 },

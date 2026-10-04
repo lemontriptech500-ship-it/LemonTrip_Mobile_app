@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import type { Offer } from '@/data/offers';
 import { loadOffers, getOfferValidity } from '@/utils/offerApi';
 import type { BlogPost, Destination, TravelPackage } from '@/types/content';
@@ -213,27 +214,23 @@ export default function HomeScreen() {
         contentContainerStyle={styles.page}>
         {/* Brand header: plain white, no background image */}
         <View style={styles.hero}>
-          <View style={styles.headerRow}>
-            <View style={styles.brandWrap}>
+          <BrandGradientBar style={styles.homeNavBar}>
+            <View style={styles.headerRow}>
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="Settings"
                 onPress={() => router.push('/settings')}
                 style={styles.menuButton}>
-                <Ionicons name="menu" size={26} color="#6B7280" />
+                <Ionicons name="menu" size={26} color="#FFFFFF" />
               </TouchableOpacity>
-              <Image
-                source={require('../../../assets/images/header_logo.png')}
-                style={styles.brandLogo}
-                resizeMode="contain"
-              />
-              <Text style={styles.brand}>Lemon Trip</Text>
+              <LemonTripBrand size={50} />
+              <View style={styles.headerSpacer} />
+              <TouchableOpacity accessibilityRole="button" onPress={handleProfilePress} style={styles.profileButton}>
+                <Ionicons name="person-outline" size={16} color={Colors.primaryDark} />
+                <Text style={styles.profileText}>{user ? user.name.split(' ')[0] : 'Login'}</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity accessibilityRole="button" onPress={handleProfilePress} style={styles.profileButton}>
-              <Ionicons name="person-outline" size={16} color="#6B7280" />
-              <Text style={styles.profileText}>{user ? user.name.split(' ')[0] : 'Login'}</Text>
-            </TouchableOpacity>
-          </View>
+          </BrandGradientBar>
 
           {/* Search bar */}
           <TouchableOpacity
@@ -481,17 +478,16 @@ const styles = StyleSheet.create({
   page: { paddingBottom: 30, maxWidth: 784, width: '100%', alignSelf: 'center' },
 
   // Hero
-  hero: { backgroundColor: '#FFFFFF', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#EEF0EF' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  brandWrap: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  hero: { backgroundColor: '#FFFFFF', paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#EEF0EF' },
+  homeNavBar: { minHeight: 62, justifyContent: 'center', paddingHorizontal: 16 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   menuButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', marginLeft: -6 },
-  brandLogo: { width: 64, height: 46 },
-  brand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
+  headerSpacer: { flex: 1 },
   profileButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#D1D5DB' },
   profileText: { color: '#4B5563', fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
 
   // Search (overlaps hero)
-  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingLeft: 16, paddingRight: 6, height: 50, borderRadius: 25, backgroundColor: '#F3F4F6', borderWidth: 1, borderColor: '#E5E7EB' },
+  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 16, marginTop: 12, paddingLeft: 16, paddingRight: 6, height: 50, borderRadius: 25, backgroundColor: '#F3F4F6', borderWidth: 1, borderColor: '#E5E7EB' },
   searchTextWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
   searchPrefix: { color: '#9CA3AF', fontFamily: 'Manrope', fontSize: 14 },
   searchHint: { flexShrink: 1, color: '#374151', fontFamily: 'Manrope', fontSize: 14, fontWeight: '600' },

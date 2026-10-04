@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -72,14 +73,15 @@ export default function FlightDetailsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <View style={styles.breadcrumbRow}>
+          <BrandGradientBar style={styles.breadcrumbRow}>
             <TouchableOpacity accessibilityRole="button" onPress={() => router.back()} style={styles.backIcon}>
-              <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
+              <Ionicons name="arrow-back" size={18} color={Colors.white} />
             </TouchableOpacity>
+            <LemonTripBrand size={38} />
             <Text style={styles.breadcrumb}>Flights</Text>
-            <Ionicons name="chevron-forward" size={12} color={Colors.textLight} />
-            <Text style={styles.breadcrumbCurrent}>Choose your fare</Text>
-          </View>
+            <Ionicons name="chevron-forward" size={12} color="rgba(255,255,255,0.7)" />
+            <Text style={styles.breadcrumbCurrent}>Choose fare</Text>
+          </BrandGradientBar>
 
           <FareSummary request={selection.request} offer={selection.offer} />
 
@@ -146,10 +148,10 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   page: { paddingHorizontal: 16, paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
-  breadcrumbRow: { minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  backIcon: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surface },
-  breadcrumb: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
-  breadcrumbCurrent: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  breadcrumbRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
+  backIcon: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.14)' },
+  breadcrumb: { color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  breadcrumbCurrent: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   columns: { gap: 15, marginTop: 20 },
   columnsWide: { flexDirection: 'row', alignItems: 'flex-start' },
   mainColumn: { flex: 1, minWidth: 0 },

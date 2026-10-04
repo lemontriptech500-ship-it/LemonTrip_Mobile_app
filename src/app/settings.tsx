@@ -1,8 +1,8 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { AccountArtworkIcon, type AccountArtworkName } from '@/components/AccountArtworkIcon';
 import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { logout, useAuth } from '@/utils/authStore';
-import { useThemeName } from '@/utils/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
@@ -18,7 +18,6 @@ export default function SettingsScreen() {
   const [offerUpdates, setOfferUpdates] = useState(false);
   const [currency, setCurrency] = useState('INR (₹)');
   const [language, setLanguage] = useState('English');
-  const { theme, setTheme } = useThemeName();
 
   const confirmLogout = () => Alert.alert('Log out?', 'You will be signed out on this device.', [
     { text: 'Cancel', style: 'cancel' },
@@ -29,13 +28,14 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <View style={styles.topBar}>
+          <BrandGradientBar style={styles.topBar}>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/profile')} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={19} color={Colors.primaryDark} />
+              <Ionicons name="arrow-back" size={19} color={Colors.white} />
             </TouchableOpacity>
+            <LemonTripBrand size={42} />
             <Text style={styles.topBarLabel}>YOUR ACCOUNT</Text>
             <View style={styles.topBarSpacer} />
-          </View>
+          </BrandGradientBar>
 
           <View style={styles.intro}>
             <Text style={styles.eyebrow}>LEMONTRIP / PREFERENCES</Text>
@@ -67,7 +67,6 @@ export default function SettingsScreen() {
           <View style={[styles.columns, desktop && styles.columnsDesktop]}>
             <View style={styles.column}>
               <SettingsSection title="Your preferences" subtitle="Set the way LemonTrip feels" icon="options-outline" artwork="settings">
-                <SettingRow icon="contrast-outline" artwork="appearance" title="Appearance" detail={theme === 'dark' ? 'Dark mode' : 'Light mode'} onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
                 <SettingRow icon="language-outline" artwork="language" title="Language" detail={language} onPress={() => setLanguage((current) => current === 'English' ? 'Hindi' : 'English')} />
                 <SettingRow icon="cash-outline" artwork="currency" title="Currency" detail={currency} onPress={() => setCurrency((current) => current === 'INR (₹)' ? 'USD ($)' : 'INR (₹)')} last />
               </SettingsSection>
@@ -154,9 +153,9 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 32 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
-  topBar: { minHeight: 42, marginHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  backButton: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: Colors.surfaceMuted },
-  topBarLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.7 },
+  topBar: { minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 16 },
+  backButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)' },
+  topBarLabel: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1.2 },
   topBarSpacer: { width: 38 },
   intro: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 20 },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900', letterSpacing: 1.35 },

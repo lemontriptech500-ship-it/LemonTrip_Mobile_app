@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -17,25 +18,27 @@ type ScreenHeaderProps = {
 export function ScreenHeader({ title, subtitle, onBack, eyebrow, rightAction }: ScreenHeaderProps) {
   return (
     <View style={styles.container}>
-      {(onBack || rightAction) && (
+      <BrandGradientBar style={styles.brandBar}>
         <View style={styles.actions}>
           {onBack ? (
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.iconButton}>
-              <Ionicons name="arrow-back" size={20} color={Colors.textDark} />
+              <Ionicons name="arrow-back" size={20} color={Colors.white} />
             </TouchableOpacity>
-          ) : <View />}
-          {rightAction && (
+          ) : <View style={styles.iconSpacer} />}
+          <LemonTripBrand size={44} />
+          <View style={styles.actionSpacer} />
+          {rightAction ? (
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel={rightAction.label}
               onPress={rightAction.onPress}
               style={styles.rightAction}>
-              <Ionicons name={rightAction.icon} size={18} color={Colors.primary} />
+              <Ionicons name={rightAction.icon} size={18} color={Colors.primaryDark} />
               <Text style={styles.actionLabel}>{rightAction.label}</Text>
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
-      )}
+      </BrandGradientBar>
       <View style={styles.copy}>
         {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
         <Text style={styles.title}>{title}</Text>
@@ -49,36 +52,42 @@ export function ScreenHeader({ title, subtitle, onBack, eyebrow, rightAction }: 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
-    paddingHorizontal: 22,
-    paddingTop: 10,
   },
+  brandBar: { minHeight: 58, justifyContent: 'center', paddingHorizontal: 16 },
   actions: {
-    minHeight: 42,
+    minHeight: 58,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
+  iconSpacer: { width: 34 },
+  actionSpacer: { flex: 1 },
   iconButton: {
-    width: 40,
-    height: 40,
+    width: 34,
+    height: 34,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: -10,
+    borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.14)',
   },
   rightAction: {
-    minHeight: 40,
+    minHeight: 34,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
+    gap: 5,
+    paddingHorizontal: 9,
+    borderRadius: 17,
+    backgroundColor: Colors.accent,
   },
   actionLabel: {
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontFamily: 'Manrope',
     fontSize: 13,
     fontWeight: '700',
   },
   copy: {
-    paddingTop: 4,
+    paddingHorizontal: 22,
+    paddingTop: 12,
     paddingBottom: 18,
   },
   eyebrow: {

@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -44,15 +45,16 @@ export default function FlightSearchScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <View style={styles.breadcrumbRow}>
+          <BrandGradientBar style={styles.breadcrumbRow}>
             <TouchableOpacity onPress={() => router.replace('/(tabs)')}><Text style={styles.breadcrumb}>Home</Text></TouchableOpacity>
-            <Ionicons name="chevron-forward" size={12} color={Colors.textLight} />
+            <Ionicons name="chevron-forward" size={12} color="rgba(255,255,255,0.7)" />
+            <LemonTripBrand size={38} />
             <Text style={styles.breadcrumbCurrent}>Flights</Text>
             <View style={styles.headerSpacer} />
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open cart" onPress={() => router.push('/cart')} style={styles.cartButton}>
               <Ionicons name="bag-outline" size={18} color={Colors.primaryDark} />
             </TouchableOpacity>
-          </View>
+          </BrandGradientBar>
 
           <Text style={styles.title}>Find your flight</Text>
           <Text style={styles.subtitle}>Compare live fares and choose the journey that works for you.</Text>
@@ -109,9 +111,9 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
-  breadcrumbRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 18 },
-  breadcrumb: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
-  breadcrumbCurrent: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  breadcrumbRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
+  breadcrumb: { color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  breadcrumbCurrent: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   headerSpacer: { flex: 1 },
   cartButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, borderRadius: 12 },
   title: { paddingHorizontal: 18, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 29, fontWeight: '900' },
