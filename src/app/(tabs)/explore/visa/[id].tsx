@@ -122,7 +122,6 @@ export default function VisaApplicationScreen() {
       const payload = await response.json().catch(() => null) as { error?: string; application?: { referenceId?: string; status?: string } } | null;
       if (!response.ok || !payload?.application?.referenceId) throw new Error(payload?.error ?? 'Your application could not be submitted. Please retry.');
       setReference(payload.application.referenceId);
-      submissionKey.current = '';
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Submission failed. Please retry.'); }
     finally { submitting.current = false; setSaving(false); }
   };
