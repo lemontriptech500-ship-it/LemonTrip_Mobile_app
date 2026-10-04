@@ -2,12 +2,13 @@ import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { VisaApplicationHistory } from '@/components/visa/VisaApplicationHistory';
 import type { VisaCountry } from '@/types/content';
+import { useContentItems } from '@/utils/contentApi';
 import { getAccessToken, useAuth } from '@/utils/authStore';
-import { getVisaServices, visaApiConfigured, visaDemoMode } from '@/utils/visaService';
+import { visaApiConfigured } from '@/utils/visaService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,18 +17,7 @@ export default function VisaScreen() {
   const desktop = width >= 900;
   const [query, setQuery] = useState('');
   const user = useAuth();
-  const [supportedCountries, setSupportedCountries] = useState<VisaCountry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [retryId, setRetryId] = useState(0);
-  useEffect(() => {
-    let active = true;
-    getVisaServices().then((items) => { if (active) setSupportedCountries(items); }).catch((failure: unknown) => {
-      if (active) { setSupportedCountries([]); setError(failure instanceof Error ? failure.message : 'Visa services could not be loaded.'); }
-    }).finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [retryId]);
-  const retry = useCallback(() => { setLoading(true); setError(''); setRetryId((id) => id + 1); }, []);
+  const { items: supportedCountries, loading, error, retry } = useContentItems<VisaCountry>('visa');
 
   const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
     const search = query.trim().toLowerCase();
@@ -85,7 +75,7 @@ export default function VisaScreen() {
 
           {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
 
-          {!visaApiConfigured && visaDemoMode ? <View style={styles.serviceNotice}><Ionicons name="flask-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Demo data is shown. Requirements, processing estimates, and fees are indicative and require official confirmation.</Text></View> : <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>Visa fees and processing estimates are indicative and subject to confirmation by the relevant authorities.</Text></View>}
+          <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>{visaApiConfigured ? 'Visa requirements, processing estimates, and guidance prices are indicative and should be confirmed with an advisor.' : 'These visa listings are mock service content for browsing. Requirements, processing estimates, and fees are indicative and require advisor confirmation.'}</Text></View>
 
           {visaApiConfigured ? <VisaApplicationHistory accessToken={user ? getAccessToken() : null} /> : null}
 

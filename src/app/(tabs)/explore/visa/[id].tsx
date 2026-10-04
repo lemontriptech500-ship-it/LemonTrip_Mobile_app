@@ -45,7 +45,7 @@ export default function VisaApplicationScreen() {
   const [reference, setReference] = useState('');
   const [openingDocument, setOpeningDocument] = useState<UploadKey | null>(null);
   const submitting = useRef(false);
-  const idempotencyKey = useRef(`visa-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 18)}`);
+  const submissionKey = useRef('');
 
   useEffect(() => { if (user) { setFullName(user.name); setEmail(user.email ?? ''); } }, [user]);
   useEffect(() => {
@@ -95,6 +95,11 @@ export default function VisaApplicationScreen() {
     submitting.current = true;
     setSaving(true);
     try {
+      if (!visaApiConfigured || !visaApiRoot) {
+        setReference(`MOCK-${Date.now().toString(36).toUpperCase()}`);
+        return;
+      }
+      if (!submissionKey.current) submissionKey.current = `visa-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const form = new FormData();
       form.append('destinationId', destination.id);
       form.append('fullName', fullName.trim());
@@ -112,7 +117,7 @@ export default function VisaApplicationScreen() {
       }
       const token = getAccessToken();
       const response = await fetch(`${visaApiRoot}/applications`, {
-        method: 'POST', headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, 'Idempotency-Key': idempotencyKey.current }, body: form,
+        method: 'POST', headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, 'Idempotency-Key': submissionKey.current }, body: form,
       });
       const payload = await response.json().catch(() => null) as { error?: string; application?: { referenceId?: string; status?: string } } | null;
       if (!response.ok || !payload?.application?.referenceId) throw new Error(payload?.error ?? 'Your application could not be submitted. Please retry.');

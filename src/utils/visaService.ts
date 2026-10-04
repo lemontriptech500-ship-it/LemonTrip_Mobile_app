@@ -34,9 +34,9 @@ export async function getVisaApplications(token: string, offset = 0) {
   return result;
 }
 
-export async function openVisaApplicationDocument(applicationId: string, documentType: keyof VisaApplication['documents'], token: string) {
+export async function openVisaApplicationDocument(applicationId: string, documentType: VisaDocumentKey, token: string) {
   // Request a fresh short-lived link every time; signed URLs are never retained in app state.
-  const result = await apiRequest<{ url: string; expiresIn: number }>(`/applications/${encodeURIComponent(applicationId)}/documents/${documentType}`, token);
+  const result = await getVisaDocumentUrl(applicationId, documentType, token);
   try {
     await Linking.openURL(result.url);
   } catch {
