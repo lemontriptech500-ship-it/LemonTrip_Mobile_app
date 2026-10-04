@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -12,12 +12,12 @@ type TripSearchPanelProps = {
   onSearch?: (type: SearchType) => void;
 };
 
-const tripTabs: Array<{ id: SearchType; label: string; icon: keyof typeof Ionicons.glyphMap }> = [
-  { id: 'flights', label: 'Flights', icon: 'airplane-outline' },
-  { id: 'hotels', label: 'Hotels', icon: 'bed-outline' },
-  { id: 'buses', label: 'Buses', icon: 'bus-outline' },
-  { id: 'trains', label: 'Trains', icon: 'train-outline' },
-  { id: 'packages', label: 'Packages', icon: 'map-outline' },
+const tripTabs: { id: SearchType; label: string; artwork: TravelArtworkName }[] = [
+  { id: 'flights', label: 'Flights', artwork: 'flight' },
+  { id: 'hotels', label: 'Hotels', artwork: 'hotel' },
+  { id: 'buses', label: 'Buses', artwork: 'bus' },
+  { id: 'trains', label: 'Trains', artwork: 'train' },
+  { id: 'packages', label: 'Packages', artwork: 'package' },
 ];
 
 const tripModes = ['One way', 'Round trip', 'Multi-city'];
@@ -44,7 +44,7 @@ export default function TripSearchPanel({
             accessibilityRole="button"
             onPress={() => setSelectedType(tab.id)}
             style={[styles.tab, selectedType === tab.id && styles.tabActive]}>
-            <Ionicons name={tab.icon} size={15} color={selectedType === tab.id ? Colors.primaryDark : Colors.textLight} />
+            <TravelArtworkIcon name={tab.artwork} size={27} />
             <Text style={[styles.tabLabel, selectedType === tab.id && styles.tabLabelActive]}>{tab.label}</Text>
           </Pressable>
         ))}

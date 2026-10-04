@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import type { Destination, TravelPackage } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
 import { useContentItems } from '@/utils/contentApi';
@@ -323,8 +324,8 @@ export default function ExploreScreen() {
 
           <View style={styles.trustStrip}>
             <View style={styles.trustItem}><Ionicons name="shield-checkmark" size={22} color={Colors.primary}/><View><Text style={styles.trustTitle}>Secure bookings</Text><Text style={styles.trustSubtitle}>Your trip, our priority</Text></View></View>
-            <View style={styles.trustItem}><Ionicons name="pricetag-outline" size={22} color={Colors.primary}/><View><Text style={styles.trustTitle}>Transparent pricing</Text><Text style={styles.trustSubtitle}>No hidden charges</Text></View></View>
-            <View style={styles.trustItem}><Ionicons name="headset-outline" size={22} color={Colors.primary}/><View><Text style={styles.trustTitle}>Travel support</Text><Text style={styles.trustSubtitle}>We’re here, 24/7</Text></View></View>
+            <View style={styles.trustItem}><TravelArtworkIcon name="offer" size={34}/><View><Text style={styles.trustTitle}>Transparent pricing</Text><Text style={styles.trustSubtitle}>No hidden charges</Text></View></View>
+            <View style={styles.trustItem}><TravelArtworkIcon name="help" size={34}/><View><Text style={styles.trustTitle}>Travel support</Text><Text style={styles.trustSubtitle}>We’re here, 24/7</Text></View></View>
           </View>
 
           <View style={styles.footer}>

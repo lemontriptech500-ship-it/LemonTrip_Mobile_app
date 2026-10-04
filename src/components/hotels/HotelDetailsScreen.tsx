@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { addBooking } from '@/utils/bookingStore';
 import { getHotelSearch, getSelectedHotel } from '@/utils/hotelSearchStore';
@@ -46,7 +47,7 @@ export default function HotelDetailsScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.notFound}>
-          <Ionicons name="bed-outline" size={25} color={Colors.primary} />
+          <TravelArtworkIcon name="hotel" size={44} />
           <Text style={styles.notFoundTitle}>Choose a stay to continue</Text>
           <Text style={styles.notFoundText}>Return to hotel search and open a property to see its details.</Text>
           <TouchableOpacity onPress={() => router.replace('/(tabs)/explore/hotels')} style={styles.backButton}><Text style={styles.backButtonText}>Search hotels</Text></TouchableOpacity>

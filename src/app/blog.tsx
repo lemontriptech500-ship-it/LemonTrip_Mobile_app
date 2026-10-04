@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { BlogPost } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
@@ -44,7 +45,7 @@ export default function BlogScreen() {
           <View style={[styles.articleGrid, desktop && styles.articleGridDesktop]}>
             {visiblePosts.map((post) => <ArticleCard key={post.id} post={post} desktop={desktop} />)}
           </View>
-          {loading || error || !visiblePosts.length ? <View style={styles.emptyState}><Ionicons name="book-outline" size={24} color={Colors.primary} /><Text style={styles.emptyTitle}>{loading ? 'Loading stories…' : error ?? 'More stories are on the way'}</Text><Text style={styles.emptyText}>{error ? 'Please try again later.' : 'Try another journal category.'}</Text></View> : null}
+          {loading || error || !visiblePosts.length ? <View style={styles.emptyState}><TravelArtworkIcon name="stories" size={40} /><Text style={styles.emptyTitle}>{loading ? 'Loading stories…' : error ?? 'More stories are on the way'}</Text><Text style={styles.emptyText}>{error ? 'Please try again later.' : 'Try another journal category.'}</Text></View> : null}
         </View>
       </ScrollView>
     </SafeAreaView>
