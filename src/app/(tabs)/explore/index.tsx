@@ -130,10 +130,10 @@ export default function ExploreScreen() {
               <TouchableOpacity style={styles.navLink} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.navText}>Visa Services</Text></TouchableOpacity>
             </View> : null}
             <View style={styles.headerActions}>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Search destinations" onPress={() => setShowSuggestions(true)} style={styles.headerAction}><Ionicons name="search-outline" size={20} color={Colors.primaryDark}/></TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}><Ionicons name="heart-outline" size={20} color={Colors.primaryDark}/></TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Search destinations" onPress={() => setShowSuggestions(true)} style={styles.headerAction}><Ionicons name="search-outline" size={20} color={Colors.white}/></TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}><Ionicons name="heart-outline" size={20} color={Colors.white}/></TouchableOpacity>
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}><Text style={styles.avatarText}>{user?.name.charAt(0).toUpperCase() ?? 'G'}</Text></TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open cart" onPress={() => router.push('/cart')} style={styles.mobileCart}><Ionicons name="bag-outline" size={18} color={Colors.primaryDark}/></TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open cart" onPress={() => router.push('/cart')} style={styles.mobileCart}><Ionicons name="bag-outline" size={18} color={Colors.white}/></TouchableOpacity>
             </View>
           </BrandGradientBar>
 

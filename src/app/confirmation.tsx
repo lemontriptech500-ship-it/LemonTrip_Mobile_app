@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { useBookings, type Booking } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -32,7 +33,44 @@ export default function ConfirmationScreen() {
   const shareBooking = () => Share.share({ title: 'LemonTrip booking confirmation', message: `LemonTrip booking ${booking.id}\n${booking.itemName}\n${formatDate(booking.tripDate)}` });
   const emailConfirmation = () => Linking.openURL(`mailto:?subject=${encodeURIComponent(`LemonTrip booking ${booking.id}`)}&body=${encodeURIComponent(`Booking ID: ${booking.id}\n${booking.itemName}\nTravel date: ${formatDate(booking.tripDate)}\nAmount: ${booking.price}`)}`);
 
-  return <SafeAreaView style={styles.safeArea} edges={['top']}><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}><View style={styles.content}><View style={styles.topBar}><TouchableOpacity accessibilityRole="button" accessibilityLabel="Go to bookings" onPress={() => router.replace('/(tabs)/bookings')} style={styles.backButton}><Ionicons name="arrow-back" size={18} color={Colors.primaryDark} /></TouchableOpacity><Text style={styles.breadcrumb}>LEMONTRIP / CONFIRMATION</Text></View><View style={styles.successHero}><View style={styles.successIcon}><Ionicons name="checkmark" size={34} color={Colors.primaryDark} /></View><Text style={styles.successTitle}>Your trip is confirmed</Text><Text style={styles.successText}>Your booking has been added to your LemonTrip travel record.</Text><View style={styles.bookingId}><Text style={styles.bookingIdLabel}>BOOKING ID</Text><Text style={styles.bookingIdValue}>{booking.id}</Text></View><View style={styles.statusPill}><Ionicons name="shield-checkmark-outline" size={14} color={Colors.secondary} /><Text style={styles.statusText}>{booking.status === 'confirmed' ? 'Payment confirmed' : 'Booking recorded'}</Text></View></View><View style={styles.progress}>{['Search', 'Select', 'Passenger', 'Payment', 'Confirmation'].map((step, index) => <View key={step} style={styles.progressItem}><View style={styles.progressDot}><Text style={styles.progressNumber}>{index + 1}</Text></View><Text style={[styles.progressLabel, index === 4 && styles.progressLabelActive]}>{step}</Text>{index < 4 ? <View style={styles.progressLine} /> : null}</View>)}</View><View style={styles.panel}><View style={styles.panelHeading}><View><Text style={styles.eyebrow}>ITINERARY</Text><Text style={styles.panelTitle}>Your booking details</Text></View><View style={styles.serviceIcon}><Ionicons name={getServiceIcon(booking.serviceName)} size={20} color={Colors.primary} /></View></View><Text style={styles.itemName}>{booking.itemName}</Text><Text style={styles.serviceName}>{booking.serviceName}</Text><View style={styles.detailGrid}><Detail icon="calendar-outline" label="Date" value={formatDate(booking.tripDate)} /><Detail icon="time-outline" label="Time" value="As shown in itinerary" /><Detail icon="location-outline" label="Location" value="Included in booking details" /><Detail icon="person-outline" label="Traveller" value="Passenger details provided" /></View><View style={styles.amountRow}><Text style={styles.amountLabel}>Amount</Text><Text style={styles.amount}>{booking.price}</Text></View></View><View style={styles.actions}><Action icon="download-outline" title="Download ticket" onPress={() => Linking.openURL(`mailto:?subject=${encodeURIComponent(`Ticket request for ${booking.id}`)}&body=${encodeURIComponent(`Please send the ticket for booking ${booking.id}.`)}`)} /><Action icon="ticket-outline" title="View booking" onPress={() => router.replace('/(tabs)/bookings')} /><Action icon="mail-outline" title="Email confirmation" onPress={emailConfirmation} /><Action icon="share-social-outline" title="Share" onPress={shareBooking} /><Action icon="calendar-outline" title="Add to calendar" onPress={() => Linking.openURL(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(booking.itemName)}&dates=&details=${encodeURIComponent(`LemonTrip booking ${booking.id}`)}`)} /></View><View style={styles.support}><Ionicons name="headset-outline" size={21} color={Colors.primary} /><View style={styles.supportCopy}><Text style={styles.eyebrow}>NEED A HAND?</Text><Text style={styles.supportTitle}>Need help with your booking?</Text><Text style={styles.supportText}>Our support team can help with itinerary questions or booking changes.</Text></View><TouchableOpacity onPress={() => router.push('/help')} style={styles.supportButton}><Text style={styles.supportButtonText}>Contact support</Text></TouchableOpacity></View><TouchableOpacity onPress={() => router.replace('/(tabs)/explore')} style={styles.exploreButton}><Text style={styles.exploreButtonText}>Continue exploring</Text><Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} /></TouchableOpacity></View></ScrollView></SafeAreaView>;
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
+        <View style={styles.content}>
+          <BrandGradientBar style={styles.topBar}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go to bookings" onPress={() => router.replace('/(tabs)/bookings')} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
+            </TouchableOpacity>
+            <LemonTripBrand size={42} />
+            <Text style={[styles.breadcrumb, { color: Colors.white }]}>CONFIRMATION</Text>
+          </BrandGradientBar>
+          <View style={styles.successHero}>
+            <View style={styles.successIcon}><Ionicons name="checkmark" size={34} color={Colors.primaryDark} /></View>
+            <Text style={styles.successTitle}>Your trip is confirmed</Text>
+            <Text style={styles.successText}>Your booking has been added to your LemonTrip travel record.</Text>
+            <View style={styles.bookingId}><Text style={styles.bookingIdLabel}>BOOKING ID</Text><Text style={styles.bookingIdValue}>{booking.id}</Text></View>
+            <View style={styles.statusPill}><Ionicons name="shield-checkmark-outline" size={14} color={Colors.secondary} /><Text style={styles.statusText}>{booking.status === 'confirmed' ? 'Payment confirmed' : 'Booking recorded'}</Text></View>
+          </View>
+          <View style={styles.progress}>{['Search', 'Select', 'Passenger', 'Payment', 'Confirmation'].map((step, index) => <View key={step} style={styles.progressItem}><View style={styles.progressDot}><Text style={styles.progressNumber}>{index + 1}</Text></View><Text style={[styles.progressLabel, index === 4 && styles.progressLabelActive]}>{step}</Text>{index < 4 ? <View style={styles.progressLine} /> : null}</View>)}</View>
+          <View style={styles.panel}>
+            <View style={styles.panelHeading}><View><Text style={styles.eyebrow}>ITINERARY</Text><Text style={styles.panelTitle}>Your booking details</Text></View><View style={styles.serviceIcon}><Ionicons name={getServiceIcon(booking.serviceName)} size={20} color={Colors.primary} /></View></View>
+            <Text style={styles.itemName}>{booking.itemName}</Text><Text style={styles.serviceName}>{booking.serviceName}</Text>
+            <View style={styles.detailGrid}><Detail icon="calendar-outline" label="Date" value={formatDate(booking.tripDate)} /><Detail icon="time-outline" label="Time" value="As shown in itinerary" /><Detail icon="location-outline" label="Location" value="Included in booking details" /><Detail icon="person-outline" label="Traveller" value="Passenger details provided" /></View>
+            <View style={styles.amountRow}><Text style={styles.amountLabel}>Amount</Text><Text style={styles.amount}>{booking.price}</Text></View>
+          </View>
+          <View style={styles.actions}>
+            <Action icon="download-outline" title="Download ticket" onPress={() => Linking.openURL(`mailto:?subject=${encodeURIComponent(`Ticket request for ${booking.id}`)}&body=${encodeURIComponent(`Please send the ticket for booking ${booking.id}.`)}`)} />
+            <Action icon="ticket-outline" title="View booking" onPress={() => router.replace('/(tabs)/bookings')} />
+            <Action icon="mail-outline" title="Email confirmation" onPress={emailConfirmation} />
+            <Action icon="share-social-outline" title="Share" onPress={shareBooking} />
+            <Action icon="calendar-outline" title="Add to calendar" onPress={() => Linking.openURL(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(booking.itemName)}&dates=&details=${encodeURIComponent(`LemonTrip booking ${booking.id}`)}`)} />
+          </View>
+          <View style={styles.support}><Ionicons name="headset-outline" size={21} color={Colors.primary} /><View style={styles.supportCopy}><Text style={styles.eyebrow}>NEED A HAND?</Text><Text style={styles.supportTitle}>Need help with your booking?</Text><Text style={styles.supportText}>Our support team can help with itinerary questions or booking changes.</Text></View><TouchableOpacity onPress={() => router.push('/help')} style={styles.supportButton}><Text style={styles.supportButtonText}>Contact support</Text></TouchableOpacity></View>
+          <TouchableOpacity onPress={() => router.replace('/(tabs)/explore')} style={styles.exploreButton}><Text style={styles.exploreButtonText}>Continue exploring</Text><Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} /></TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 function Detail({ icon, label, value }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string }) { return <View style={styles.detail}><Ionicons name={icon} size={16} color={Colors.primary} /><View style={styles.detailCopy}><Text style={styles.detailLabel}>{label}</Text><Text style={styles.detailValue}>{value}</Text></View></View>; }

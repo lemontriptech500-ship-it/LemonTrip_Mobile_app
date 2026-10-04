@@ -207,7 +207,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar style="dark" backgroundColor="#FFFFFF" />
+      <StatusBar style="light" />
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -412,14 +412,14 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <SectionHeader title="Travel Services" action="View all" onPress={() => router.push('/(tabs)/explore')} />
           <View style={styles.travelServices}>
-            {[
+            {([
               { title: 'Bus Tickets', icon: 'bus-outline' as IconName, route: '/(tabs)/explore/buses' },
               { title: 'Hotel Bookings', icon: 'bed-outline' as IconName, route: '/(tabs)/explore/hotels' },
               { title: 'Visa Services', icon: 'id-card-outline' as IconName, route: '/(tabs)/explore/visa' },
               { title: 'Travel Insurance', icon: 'shield-checkmark-outline' as IconName, route: '/(tabs)/explore' },
               { title: 'Car Rentals', icon: 'car-outline' as IconName, route: '/(tabs)/explore' },
               { title: 'Custom Packages', icon: 'gift-outline' as IconName, route: '/packages' },
-            ].map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route)}>
+            ] as const).map((item) => <TouchableOpacity key={item.title} style={styles.travelService} onPress={() => router.push(item.route)}>
               <View style={styles.travelServiceIcon}><Ionicons name={item.icon} size={24} color={Colors.primary}/></View><Text style={styles.travelServiceText}>{item.title}</Text>
             </TouchableOpacity>)}
           </View>
@@ -507,8 +507,8 @@ const styles = StyleSheet.create({
   // Promo banner
   promo: { height: 212, marginHorizontal: 16, marginTop: 14, borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.primaryDark, ...cardShadow },
   promoSlide: { height: 212, overflow: 'hidden' },
-  promoImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
-  promoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,25,23,0.32)' },
+  promoImage: { ...StyleSheet.absoluteFill, width: '100%', height: '100%' },
+  promoShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,25,23,0.32)' },
   promoFade: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '0%', flexDirection: 'row' },
   promoCopy: { position: 'absolute', left: 20, top: 20, width: '66%' },
   promoEyebrow: { color: '#FFFFFF', fontFamily: 'Caveat', fontSize: 24, lineHeight: 26, textShadowColor: 'rgba(0,0,0,0.6)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 6 },

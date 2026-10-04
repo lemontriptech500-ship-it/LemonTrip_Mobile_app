@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -45,9 +46,12 @@ export function AuthLayout({ eyebrow, title, subtitle, onBack, children }: AuthL
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>
               <View style={styles.formWrap}>
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.backButton}>
-                  <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
-                </TouchableOpacity>
+                <BrandGradientBar style={styles.authNav}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.backButton}>
+                    <Ionicons name="arrow-back" size={18} color={Colors.white} />
+                  </TouchableOpacity>
+                  <LemonTripBrand size={42} />
+                </BrandGradientBar>
                 <Text style={styles.eyebrow}>{eyebrow}</Text>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
@@ -70,10 +74,7 @@ function TravelVisual({ style, compact = false }: { style: object; compact?: boo
       imageStyle={styles.visualImage}>
       <View style={styles.visualShade} />
       <View style={[styles.visualCopy, compact && styles.visualCopyCompact]}>
-        <View style={styles.brandRow}>
-          <View style={styles.brandMark}><Text style={styles.brandMarkText}>L</Text></View>
-          <Text style={styles.brandName}>LemonTrip</Text>
-        </View>
+        <View style={styles.brandRow}><LemonTripBrand size={54} /></View>
         {!compact ? (
           <View style={styles.visualMessage}>
             <Text style={styles.visualEyebrow}>YOUR NEXT STORY IS OUT THERE</Text>
@@ -250,7 +251,8 @@ const styles = StyleSheet.create({
   formScrollContent: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 18 },
   formScrollContentDesktop: { paddingHorizontal: 38 },
   formWrap: { width: '100%', maxWidth: 430, alignSelf: 'center' },
-  backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', marginBottom: 14, marginLeft: -7, borderRadius: 11, backgroundColor: Colors.surface },
+  authNav: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, marginBottom: 14, borderRadius: 12 },
+  backButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)' },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.1 },
   title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 26, lineHeight: 32, fontWeight: '900', marginTop: 5 },
   subtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 17, marginTop: 4, marginBottom: 20 },
