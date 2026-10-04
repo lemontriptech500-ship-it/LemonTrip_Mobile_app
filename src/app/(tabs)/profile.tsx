@@ -1,17 +1,23 @@
-import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { AccountArtworkIcon } from '@/components/AccountArtworkIcon';
+import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
-import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/constants/colors';
 import { logout, useAuth } from '@/utils/authStore';
+import { useBookings } from '@/utils/bookingStore';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const quickLinks = [
+const SOFT_GREEN = '#f1f7ee';
+const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 } as const;
+
+// Same circle-icon grid pattern as the Home screen.
+const travelLinks = [
   { label: 'My trips', artwork: 'flight' as const, route: '/(tabs)/bookings' },
   { label: 'Saved places', artwork: 'saved' as const, route: '/(tabs)/wishlist' },
   { label: 'Visa updates', artwork: 'visa' as const, route: '/(tabs)/explore/visa/applications' },
+  { label: 'Offers', artwork: 'offer' as const, route: '/offers' },
 ];
 
 const accountLinks = [
@@ -22,19 +28,17 @@ const accountLinks = [
 
 export default function ProfileScreen() {
   const user = useAuth();
+  const bookings = useBookings();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const firstName = user?.name?.trim()?.split(/\s+/)[0] || 'traveller';
+  const initial = user?.name?.trim()?.charAt(0)?.toUpperCase() || 'G';
 
-  const handleAuthAction = () => {
-    if (user) {
-      Alert.alert('Log out?', 'You will be signed out on this device.', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Log out', style: 'destructive', onPress: logout },
-      ]);
-    } else {
-      router.push('/login');
-    }
+  const confirmLogout = () => {
+    Alert.alert('Log out?', 'You will be signed out on this device.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Log out', style: 'destructive', onPress: logout },
+    ]);
   };
 
   const openUnavailable = (label: string) => Alert.alert(label, 'This feature is not available yet.');
@@ -43,104 +47,137 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={[styles.content, desktop && styles.contentDesktop]}>
-          <BrandGradientBar style={styles.headingRow}>
-            <LemonTripBrand size={42} />
-            <View>
-              <Text style={[styles.eyebrow, styles.headerEyebrow]}>YOUR LEMONTRIP</Text>
-              <Text style={[styles.pageTitle, styles.headerPageTitle]}>Your profile</Text>
-            </View>
+
+          {/* Header — same as Home / Explore / My Trips */}
+          <BrandGradientBar style={styles.header}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
+              <LemonTripBrand size={50} />
+            </TouchableOpacity>
+            <View style={styles.headerSpacer} />
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={styles.settingsButton}>
-              <AccountArtworkIcon name="settings" size={29} />
+              <AccountArtworkIcon name="settings" size={28} />
             </TouchableOpacity>
           </BrandGradientBar>
 
+          {/* Title strip */}
+          <View style={styles.titleStrip}>
+            <Text style={styles.pageTitle}>Profile</Text>
+            <Text style={styles.pageSubtitle}>Your account, trips and preferences.</Text>
+          </View>
+
+          {/* Identity card */}
           <View style={styles.heroCard}>
-            <View style={styles.heroTopline}>
-              <View style={styles.memberPill}>
-                {user ? <Ionicons name="sparkles" size={12} color={Colors.primaryDark} /> : <TravelArtworkIcon name="explore" size={21} />}
-                <Text style={styles.memberPillText}>{user ? 'LEMONTRIP MEMBER' : 'YOUR NEXT JOURNEY STARTS HERE'}</Text>
-              </View>
-              <View style={styles.heroRing} />
-            </View>
+            <View pointerEvents="none" style={styles.heroRing} />
             <View style={styles.identityRow}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{user?.name?.trim()?.charAt(0)?.toUpperCase() || 'G'}</Text>
+                <Text style={styles.avatarText}>{initial}</Text>
               </View>
               <View style={styles.identityCopy}>
-                <Text style={styles.greeting}>{user ? `Welcome back, ${firstName}` : 'Welcome, traveller'}</Text>
-                <Text style={styles.name}>{user?.name ?? 'Guest User'}</Text>
+                {user ? (
+                  <View style={styles.memberPill}>
+                    <Ionicons name="sparkles" size={12} color={Colors.primaryDark} />
+                    <Text style={styles.memberPillText}>LemonTrip member</Text>
+                  </View>
+                ) : null}
+                <Text style={styles.name} numberOfLines={1}>{user?.name ?? `Welcome, ${firstName}`}</Text>
                 <Text style={styles.emailText} numberOfLines={1}>{user?.email ?? 'Sign in to keep your trips together'}</Text>
               </View>
             </View>
-            <View style={styles.heroBottom}>
-              <Text style={styles.heroNote}>{user ? 'Your travel plans, all in one place.' : 'Sign in to save places and manage your bookings.'}</Text>
-              <TouchableOpacity accessibilityRole="button" onPress={handleAuthAction} style={styles.authButton}>
-                <Text style={styles.authButtonText}>{user ? 'Log out' : 'Sign in'}</Text>
-                <Ionicons name={user ? 'log-out-outline' : 'arrow-forward'} size={15} color={Colors.primaryDark} />
-              </TouchableOpacity>
-            </View>
+
+            {user ? (
+              <View style={styles.statRow}>
+                <View style={styles.stat}>
+                  <Text style={styles.statValue}>{bookings.length}</Text>
+                  <Text style={styles.statLabel}>{bookings.length === 1 ? 'Booking' : 'Bookings'}</Text>
+                </View>
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/bookings')} style={styles.heroButton} activeOpacity={0.85}>
+                  <Text style={styles.heroButtonText}>View my trips</Text>
+                  <View style={styles.heroButtonArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.guestBlock}>
+                <Text style={styles.guestText}>Sign in to save places, track bookings and get trip updates.</Text>
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/login')} style={styles.heroButton} activeOpacity={0.85}>
+                  <Text style={styles.heroButtonText}>Sign in</Text>
+                  <View style={styles.heroButtonArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
-          <View style={styles.quickSection}>
-            <View style={styles.sectionIntro}>
-              <Text style={styles.sectionTitle}>Your travel, at a glance</Text>
-              <Text style={styles.sectionSubtitle}>Pick up where you left off</Text>
-            </View>
-            <View style={styles.quickLinks}>
-              {quickLinks.map((item) => (
-                <TouchableOpacity key={item.label} accessibilityRole="button" onPress={() => router.push(item.route as never)} style={styles.quickCard} activeOpacity={0.75}>
-                  <View style={styles.quickIcon}><TravelArtworkIcon name={item.artwork} size={29} /></View>
-                  <Text style={styles.quickLabel}>{item.label}</Text>
-                  <Ionicons name="open-outline" size={14} color={Colors.textLight} style={styles.quickArrow} />
+          {/* Travel shortcuts */}
+          <View style={styles.gridCard}>
+            <Text style={styles.gridTitle}>Your travel</Text>
+            <View style={styles.gridRow}>
+              {travelLinks.map((item) => (
+                <TouchableOpacity key={item.label} accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push(item.route as never)}>
+                  <View style={styles.gridCircle}>
+                    <TravelArtworkIcon name={item.artwork} size={36} />
+                    {item.label === 'My trips' && bookings.length > 0 ? (
+                      <View style={styles.gridBadge}><Text style={styles.gridBadgeText}>{bookings.length}</Text></View>
+                    ) : null}
+                  </View>
+                  <Text style={styles.gridLabel}>{item.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
 
           <View style={[styles.lowerLayout, desktop && styles.lowerLayoutDesktop]}>
+            {/* Account list */}
             <View style={styles.menuSection}>
-              <View style={styles.sectionIntro}>
-                <Text style={styles.sectionTitle}>Account details</Text>
-                <Text style={styles.sectionSubtitle}>Your details and preferences</Text>
-              </View>
+              <Text style={styles.sectionTitle}>Account</Text>
               <View style={styles.menuCard}>
-                {accountLinks.map((item, index) => (
+                {accountLinks.map((item) => (
                   <TouchableOpacity
                     key={item.label}
                     accessibilityRole="button"
                     onPress={() => item.unavailable ? openUnavailable(item.label) : router.push(item.route as never)}
-                    style={[styles.menuRow, index < accountLinks.length - 1 && styles.menuDivider]}
-                    activeOpacity={0.72}>
+                    style={[styles.menuRow, styles.menuDivider]}
+                    activeOpacity={0.75}>
                     <View style={styles.menuIcon}><AccountArtworkIcon name={item.artwork} size={28} /></View>
                     <View style={styles.menuCopy}>
                       <Text style={styles.menuTitle}>{item.label}</Text>
                       <Text style={styles.menuDetail}>{item.detail}</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={16} color={Colors.textLight} />
+                    {item.unavailable ? <Text style={styles.soonTag}>Soon</Text> : null}
+                    <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
                   </TouchableOpacity>
                 ))}
-                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore/visa')} style={styles.menuRow} activeOpacity={0.72}>
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore/visa')} style={styles.menuRow} activeOpacity={0.75}>
                   <View style={styles.menuIcon}><TravelArtworkIcon name="visa" size={29} /></View>
                   <View style={styles.menuCopy}>
                     <Text style={styles.menuTitle}>Visa services</Text>
                     <Text style={styles.menuDetail}>Get help planning your next trip</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={16} color={Colors.textLight} />
+                  <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
                 </TouchableOpacity>
               </View>
             </View>
 
-            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore')} style={styles.discoverCard} activeOpacity={0.8}>
+            {/* Discover banner — same treatment as Home banner */}
+            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore')} style={styles.discoverCard} activeOpacity={0.9}>
+              <View pointerEvents="none" style={styles.discoverRing} />
               <View style={styles.discoverIcon}><TravelArtworkIcon name="explore" size={32} /></View>
-              <Text style={styles.discoverEyebrow}>A WORLD TO DISCOVER</Text>
               <Text style={styles.discoverTitle}>Where will you go next?</Text>
               <Text style={styles.discoverText}>Find a new favourite with handpicked destinations and stays.</Text>
-              <View style={styles.discoverLink}><Text style={styles.discoverLinkText}>Explore destinations</Text><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
-              <View pointerEvents="none" style={styles.discoverRing} />
+              <View style={styles.discoverCta}>
+                <Text style={styles.discoverCtaText}>Explore destinations</Text>
+                <View style={styles.discoverCtaArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
+              </View>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.footer}>LEMONTRIP · MADE FOR THE WAY YOU TRAVEL</Text>
+          {/* Log out */}
+          {user ? (
+            <TouchableOpacity accessibilityRole="button" onPress={confirmLogout} style={styles.logoutButton} activeOpacity={0.8}>
+              <Ionicons name="log-out-outline" size={20} color="#C62828" />
+              <Text style={styles.logoutText}>Log out</Text>
+            </TouchableOpacity>
+          ) : null}
+
+          <Text style={styles.footer}>LemonTrip. Made for the way you travel.</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -149,57 +186,78 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
-  page: { paddingBottom: 34 },
+  page: { paddingBottom: 32 },
   content: { width: '100%', maxWidth: 820, alignSelf: 'center' },
   contentDesktop: { maxWidth: 1040 },
-  headingRow: { minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 16 },
-  headerEyebrow: { color: Colors.accent, fontSize: 8, letterSpacing: 1 },
-  headerPageTitle: { color: Colors.white, fontSize: 17, lineHeight: 22, marginTop: 1 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', letterSpacing: 1.7 },
-  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, lineHeight: 38, fontWeight: '900', marginTop: 3 },
-  settingsButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
-  heroCard: { marginHorizontal: 16, padding: 20, borderRadius: 23, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
-  heroTopline: { minHeight: 28, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
-  memberPill: { minHeight: 27, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 11, borderRadius: 14, backgroundColor: Colors.accent },
-  memberPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900', letterSpacing: 0.7 },
-  heroRing: { position: 'absolute', width: 150, height: 150, right: -72, top: -87, borderRadius: 75, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
-  identityRow: { flexDirection: 'row', alignItems: 'center', gap: 15, marginTop: 14 },
-  avatar: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.accent },
-  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 28, fontWeight: '900' },
+
+  // Header
+  header: { minHeight: 72, paddingHorizontal: 18, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  brandLockup: { minWidth: 150, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
+  headerSpacer: { flex: 1 },
+  settingsButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surface },
+
+  // Title
+  titleStrip: { paddingHorizontal: 18, paddingVertical: 16, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 26, fontWeight: '900' },
+  pageSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, marginTop: 3 },
+
+  // Identity card
+  heroCard: { marginTop: 16, marginHorizontal: 16, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
+  heroRing: { position: 'absolute', width: 190, height: 190, right: -80, top: -90, borderRadius: 95, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
+  identityRow: { flexDirection: 'row', alignItems: 'center', gap: 15 },
+  avatar: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accent, borderWidth: 3, borderColor: 'rgba(255,255,255,0.25)' },
+  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, fontWeight: '900' },
   identityCopy: { flex: 1, minWidth: 0 },
-  greeting: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginBottom: 3 },
-  name: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 21, fontWeight: '900' },
-  emailText: { color: 'rgba(255,255,255,0.76)', fontFamily: 'Manrope', fontSize: 12, marginTop: 4 },
-  heroBottom: { minHeight: 55, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 18, paddingTop: 13, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.18)' },
-  heroNote: { flex: 1, color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 11, lineHeight: 17 },
-  authButton: { minHeight: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 14, borderRadius: 13, backgroundColor: Colors.accent },
-  authButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
-  quickSection: { marginTop: 28, paddingHorizontal: 16 },
-  sectionIntro: { marginHorizontal: 2, marginBottom: 13 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
-  sectionSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 4 },
-  quickLinks: { flexDirection: 'row', gap: 10 },
-  quickCard: { flex: 1, minWidth: 0, minHeight: 104, justifyContent: 'center', padding: 12, borderWidth: 1, borderColor: Colors.border, borderRadius: 17, backgroundColor: Colors.surface },
-  quickIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
-  quickLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginTop: 9 },
-  quickArrow: { position: 'absolute', right: 9, top: 10 },
-  lowerLayout: { gap: 19, marginTop: 27, paddingHorizontal: 16 },
+  memberPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 6, borderRadius: 12, backgroundColor: Colors.accent },
+  memberPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
+  name: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '900' },
+  emailText: { color: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
+  statRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.18)' },
+  stat: { minWidth: 0 },
+  statValue: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 28, lineHeight: 32, fontWeight: '900' },
+  statLabel: { color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  guestBlock: { gap: 14, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.18)' },
+  guestText: { color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 },
+  heroButton: { alignSelf: 'flex-start', minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 18, paddingRight: 5, borderRadius: 23, backgroundColor: Colors.white },
+  heroButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
+  heroButtonArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
+
+  // Circle grid card
+  gridCard: { marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', paddingHorizontal: 10, marginBottom: 10 },
+  gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
+  gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
+  gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
+  gridBadge: { position: 'absolute', top: -2, right: -2, minWidth: 22, height: 22, paddingHorizontal: 5, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
+  gridBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
+  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
+
+  // Lower layout
+  lowerLayout: { gap: 16, marginTop: 24, paddingHorizontal: 16 },
   lowerLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
   menuSection: { flex: 1, minWidth: 0 },
-  menuCard: { overflow: 'hidden', paddingHorizontal: 14, borderWidth: 1, borderColor: Colors.border, borderRadius: 18, backgroundColor: Colors.surface },
-  menuRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900', marginHorizontal: 2, marginBottom: 12 },
+  menuCard: { overflow: 'hidden', paddingHorizontal: 14, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  menuRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 10 },
   menuDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
-  menuIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
+  menuIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
   menuCopy: { flex: 1, minWidth: 0 },
-  menuTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  menuDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 4 },
-  discoverCard: { minHeight: 220, flex: 0.76, overflow: 'hidden', padding: 19, borderRadius: 20, backgroundColor: Colors.accentSoft },
-  discoverIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: Colors.surface, borderWidth: 1, borderColor: '#e6f4e8' },
-  discoverEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900', letterSpacing: 1.2, marginTop: 16 },
-  discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, lineHeight: 26, fontWeight: '900', marginTop: 5 },
-  discoverText: { maxWidth: 280, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 7 },
-  discoverLink: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 15 },
-  discoverLinkText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900' },
-  discoverRing: { position: 'absolute', width: 110, height: 110, right: -56, bottom: -72, borderRadius: 55, borderWidth: 1, borderColor: 'rgba(6,59,36,0.15)' },
-  footer: { marginTop: 26, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.1, textAlign: 'center' },
+  menuTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  menuDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 2 },
+  soonTag: { overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 9, backgroundColor: SOFT_GREEN, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+
+  // Discover banner
+  discoverCard: { flex: 0.8, minWidth: 0, overflow: 'hidden', padding: 20, borderRadius: 24, backgroundColor: '#fff4bf' },
+  discoverRing: { position: 'absolute', width: 150, height: 150, right: -70, bottom: -80, borderRadius: 75, borderWidth: 1, borderColor: 'rgba(6,59,36,0.15)' },
+  discoverIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 27, backgroundColor: Colors.surface },
+  discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '900', marginTop: 14 },
+  discoverText: { maxWidth: 300, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6 },
+  discoverCta: { alignSelf: 'flex-start', minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingLeft: 18, paddingRight: 5, borderRadius: 24, backgroundColor: Colors.white },
+  discoverCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
+  discoverCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
+
+  // Log out + footer
+  logoutButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, marginHorizontal: 16, borderRadius: 26, borderWidth: 1, borderColor: '#F3C9C9', backgroundColor: '#FDF2F2' },
+  logoutText: { color: '#C62828', fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  footer: { marginTop: 22, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, textAlign: 'center' },
 });
