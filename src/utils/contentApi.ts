@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { getVisaServices, visaApiConfigured } from '@/utils/visaService';
-
 const apiRoot = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api`;
 
 export type ContentType = 'package' | 'blog' | 'visa' | 'service' | 'destination' | 'listing' | 'hotel';
@@ -17,9 +15,7 @@ export function useContentItems<T>(type: ContentType) {
 
   useEffect(() => {
     let active = true;
-    const load = type === 'visa' && !visaApiConfigured
-      ? getVisaServices() as Promise<T[]>
-      : fetch(`${type === 'visa' ? `${apiRoot}/v1/visa/destinations` : `${apiRoot}/content/${type}`}`, { headers: { Accept: 'application/json' } }).then(async (response) => {
+    const load = fetch(`${apiRoot}/content/${type}`, { headers: { Accept: 'application/json' } }).then(async (response) => {
         if (!response.ok) throw new Error(`Content service returned an error (${response.status}).`);
         const payload: unknown = await response.json();
         if (typeof payload !== 'object' || payload === null || !('items' in payload) || !Array.isArray(payload.items)) {

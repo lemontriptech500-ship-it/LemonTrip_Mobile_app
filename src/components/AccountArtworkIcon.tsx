@@ -4,7 +4,6 @@ export type AccountArtworkName =
   | 'profile'
   | 'payment'
   | 'settings'
-  | 'appearance'
   | 'language'
   | 'currency'
   | 'email'
@@ -39,10 +38,6 @@ export function AccountArtworkIcon({ name, size = 30 }: { name: AccountArtworkNa
         <Circle cx="24" cy="24" r="7" stroke={darkGreen} strokeWidth="1.8" />
         <Circle cx="24" cy="24" r="2.5" fill={yellow} stroke={green} strokeWidth="1.5" />
         <Path d="M24 12v4m0 16v4m12-12h-4m-16 0h-4m20.5-8.5-2.8 2.8m-11.4 11.4-2.8 2.8m17 0-2.8-2.8M16.3 16.3l-2.8-2.8" stroke={darkGreen} strokeWidth="1.8" strokeLinecap="round" />
-      </> : null}
-      {name === 'appearance' ? <>
-        <Circle cx="24" cy="24" r="10" stroke={darkGreen} strokeWidth="1.8" />
-        <Path d="M24 14a10 10 0 0 1 0 20V14Z" fill={yellow} stroke={green} strokeWidth="1.4" />
       </> : null}
       {name === 'language' ? <>
         <Circle cx="24" cy="24" r="10" stroke={darkGreen} strokeWidth="1.8" />

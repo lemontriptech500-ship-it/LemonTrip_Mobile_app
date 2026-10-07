@@ -101,27 +101,28 @@ export default function VisaApplicationScreen() {
       }
       if (!submissionKey.current) submissionKey.current = `visa-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const form = new FormData();
-      form.append('destinationId', destination.id);
-      form.append('fullName', fullName.trim());
-      form.append('email', email.trim());
-      form.append('passportNumber', passportNumber.trim());
-      form.append('intendedEntryDate', entryDate);
+      // The website visa API accepts the established nested multipart contract.
+      form.append('serviceId', destination.id);
+      form.append('personalDetails', JSON.stringify({ fullName: fullName.trim(), email: email.trim() }));
+      form.append('passportDetails', JSON.stringify({ passportNumber: passportNumber.trim() }));
+      form.append('travelDetails', JSON.stringify({ intendedEntryDate: entryDate }));
       for (const key of Object.keys(uploadSpecs) as UploadKey[]) {
         const file = files[key]!;
         if (Platform.OS === 'web') {
           const blob = await fetch(file.uri).then((result) => result.blob());
-          form.append(key, blob, file.name);
+          form.append(key === 'applicantPhoto' ? 'photograph' : key, blob, file.name);
         } else {
-          form.append(key, { uri: file.uri, name: file.name, type: file.mimeType } as unknown as Blob);
+          form.append(key === 'applicantPhoto' ? 'photograph' : key, { uri: file.uri, name: file.name, type: file.mimeType } as unknown as Blob);
         }
       }
       const token = getAccessToken();
       const response = await fetch(`${visaApiRoot}/applications`, {
         method: 'POST', headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, 'Idempotency-Key': submissionKey.current }, body: form,
       });
-      const payload = await response.json().catch(() => null) as { error?: string; application?: { referenceId?: string; status?: string } } | null;
-      if (!response.ok || !payload?.application?.referenceId) throw new Error(payload?.error ?? 'Your application could not be submitted. Please retry.');
-      setReference(payload.application.referenceId);
+      const payload = await response.json().catch(() => null) as { error?: string; data?: { applicationId?: string }; application?: { referenceId?: string } } | null;
+      const referenceId = payload?.application?.referenceId ?? payload?.data?.applicationId;
+      if (!response.ok || !referenceId) throw new Error(payload?.error ?? 'Your application could not be submitted. Please retry.');
+      setReference(referenceId);
     } catch (error) { setNotice(error instanceof Error ? error.message : 'Submission failed. Please retry.'); }
     finally { submitting.current = false; setSaving(false); }
   };

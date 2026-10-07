@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { useEffect, useState } from 'react';
 
 export const BOOKINGS_KEY = 'lemontrip-bookings';
@@ -43,7 +44,9 @@ export async function loadBookings() {
   }
 }
 
-loadBookings();
+if (Platform.OS !== 'web' || typeof window !== 'undefined') {
+  void loadBookings();
+}
 
 export function addBooking(booking: Booking) {
   bookings = [booking, ...bookings];

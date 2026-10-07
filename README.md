@@ -4,6 +4,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Get started
 
+Copy `.env.example` to `.env` and set the public API base URLs for your device or emulator. `EXPO_PUBLIC_API_URL` points to the mobile backend (port 4000); `EXPO_PUBLIC_VISA_API_URL` points to the website backend (port 5000), which owns visa application submission and documents. Use a reachable host address when running on a physical device.
+
 1. Install dependencies
 
    ```bash

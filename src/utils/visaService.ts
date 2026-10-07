@@ -2,8 +2,9 @@ import type { VisaCountry } from '@/types/content';
 import { Linking } from 'react-native';
 
 const configuredBaseUrl = process.env.EXPO_PUBLIC_API_URL?.trim().replace(/\/$/, '');
-export const visaApiConfigured = Boolean(configuredBaseUrl);
-export const visaApiRoot = configuredBaseUrl ? `${configuredBaseUrl}/api/v1/visa` : null;
+const configuredVisaBaseUrl = (process.env.EXPO_PUBLIC_VISA_API_URL ?? process.env.EXPO_PUBLIC_API_URL)?.trim().replace(/\/$/, '');
+export const visaApiConfigured = Boolean(configuredVisaBaseUrl);
+export const visaApiRoot = configuredVisaBaseUrl ? `${configuredVisaBaseUrl}/api/v1/visa` : null;
 export const visaDemoMode = process.env.EXPO_PUBLIC_VISA_DEMO_MODE === 'true';
 
 export type VisaApplication = {
@@ -63,7 +64,8 @@ export async function getVisaServices() {
     if (visaDemoMode) return mockVisaServices;
     throw new Error('Visa services are unavailable because the API is not configured.');
   }
-  const response = await fetch(`${visaApiRoot}/destinations`, { headers: { Accept: 'application/json' } });
+  if (!configuredBaseUrl) throw new Error('Visa services are unavailable because the API is not configured.');
+  const response = await fetch(`${configuredBaseUrl}/api/content/visa`, { headers: { Accept: 'application/json' } });
   if (!response.ok) throw new Error('Visa destinations could not be loaded.');
   const payload = await response.json() as { items?: VisaCountry[] };
   if (!Array.isArray(payload.items)) throw new Error('Visa service returned invalid content.');
