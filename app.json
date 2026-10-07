@@ -13,8 +13,8 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
-      "package": "com.lemontrip.mobile",
-      "googleServicesFile": "./google-services.json",
+      "package": "com.gokul.lemontrip",
+            "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

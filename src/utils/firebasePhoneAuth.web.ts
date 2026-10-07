@@ -37,7 +37,7 @@ export async function sendFirebasePhoneCode(phone: string): Promise<FirebasePhon
   }
   await resetFirebasePhoneCode();
   const auth = firebaseAuth();
-  verifier = new RecaptchaVerifier(auth, 'lemontrip-phone-recaptcha', { size: 'invisible' });
+  verifier = new RecaptchaVerifier(auth, 'lemontrip-phone-recaptcha', { size: 'normal' });
   let confirmation: ConfirmationResult;
   try {
     confirmation = await signInWithPhoneNumber(auth, phone, verifier);
