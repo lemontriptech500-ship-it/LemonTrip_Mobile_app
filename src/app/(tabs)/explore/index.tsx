@@ -30,7 +30,7 @@ const TABS: { key: string; label: string; icon: IconName; route: AppRoute }[] = 
   { key: 'hotels', label: 'Hotels', icon: 'business-outline', route: '/(tabs)/explore/hotels' },
   { key: 'packages', label: 'Packages', icon: 'sunny-outline', route: '/packages' },
   { key: 'visa', label: 'Visa', icon: 'id-card-outline', route: '/(tabs)/explore/visa' },
-  { key: 'ai', label: 'AI Plan', icon: 'sparkles-outline', route: '/help' },
+  { key: 'ai', label: 'AI Plan', icon: 'sparkles-outline', route: '/ai-planner' },
 ];
 
 const CATEGORIES = ['Honeymoon', 'Beach & Boating', 'Mountain Treks', 'City Tours', 'Luxury Resorts'];
