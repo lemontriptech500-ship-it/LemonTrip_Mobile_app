@@ -1,6 +1,6 @@
-import { Colors } from '@/constants/colors';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
 import type { Destination, TravelPackage } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
 import { useContentItems } from '@/utils/contentApi';
@@ -409,7 +409,7 @@ const SOFT_GREEN = '#f1f7ee';
 const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 } as const;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f7f8f4 },
+  safeArea: { flex: 1, backgroundColor: '#f7f8f4' },
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },

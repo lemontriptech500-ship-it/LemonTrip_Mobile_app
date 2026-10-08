@@ -1,4 +1,5 @@
-import { Colors } from '@/constants/colors';
+import { Brand, Colors } from '@/constants/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts } from 'expo-font';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -189,8 +190,10 @@ export default function LaunchScreen() {
 
     entrance.start();
 
-    const transitionTimeout = setTimeout(() => {
-      router.replace('/(tabs)');
+    // First launch -> onboarding, otherwise straight to the app
+    const transitionTimeout = setTimeout(async () => {
+      const seen = await AsyncStorage.getItem('onboardingSeen');
+      router.replace(seen ? '/(tabs)' : '/onboarding');
     }, SPLASH_DURATION);
 
     return () => {
@@ -339,7 +342,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     overflow: 'hidden',
-    backgroundColor: Colors.primaryDark,
+    backgroundColor: Brand.forest,
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
