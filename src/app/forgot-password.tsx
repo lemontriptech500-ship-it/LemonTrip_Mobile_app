@@ -1,0 +1,12 @@
+import { AppScreen } from '@/components/AppScreen';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+export default function AccountRecoveryScreen() {
+  return <AppScreen><ScrollView contentContainerStyle={styles.page}><ScreenHeader title="Let’s get you back in." subtitle="Choose a way to access your LemonTrip account." eyebrow="ACCOUNT RECOVERY" onBack={() => router.replace('/login')} /><View style={styles.card}><Ionicons name="key-outline" size={42} color={Colors.primary} /><Text style={styles.title}>Forgot your password?</Text><Text style={styles.copy}>If your account has a verified phone number, you can sign in with a one-time SMS code. For help with email access or password recovery, contact the LemonTrip team.</Text><TouchableOpacity accessibilityRole="button" onPress={() => router.replace({ pathname: '/login', params: { mode: 'phone' } })} style={styles.button}><Text style={styles.buttonText}>Sign in with phone OTP</Text><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></TouchableOpacity><TouchableOpacity accessibilityRole="button" onPress={() => router.push('/contact')} style={styles.secondary}><Text style={styles.buttonText}>Get account support</Text><Ionicons name="headset-outline" size={18} color={Colors.primary} /></TouchableOpacity></View></ScrollView></AppScreen>;
+}
+const styles = StyleSheet.create({ page: { maxWidth: 760, width: '100%', alignSelf: 'center', paddingBottom: 24 }, card: { ...Ui.card, padding: 24, marginHorizontal: 18 }, title: { fontFamily: 'Manrope', color: Colors.primary, fontSize: 23, fontWeight: '800', marginTop: 18 }, copy: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 23, color: Colors.textLight, marginVertical: 18 }, button: { ...Ui.button, backgroundColor: Colors.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 }, buttonText: { fontFamily: 'Manrope', color: Colors.primary, fontWeight: '800', fontSize: 13 }, secondary: { ...Ui.button, borderWidth: 1, borderColor: Colors.border, marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 } });

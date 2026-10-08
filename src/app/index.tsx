@@ -1,409 +1,49 @@
+import { LemonTripBrand } from '@/components/BrandGradientBar';
 import { Colors } from '@/constants/colors';
-import { useFonts } from 'expo-font';
-import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Platform,
-  StyleSheet,
-  View,
-  useWindowDimensions
-} from 'react-native';
+import { useEffect, useState } from 'react';
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const SPLASH_DURATION = 3100;
-
-const lemonImage = require('../../assets/images/lemon-slice.png');
-
-const useNativeDriver = Platform.OS !== 'web';
-
-export default function LaunchScreen() {
-  const { width, height } = useWindowDimensions();
-
-  const [fontsLoaded] = useFonts({
-    Manrope: require('../../assets/fonts/Manrope[wght].ttf'),
-  });
-
-  // --------------------------------------------------
-  // Animation values
-  // --------------------------------------------------
-
-  const imageOpacity = useRef(
-    new Animated.Value(0)
-  ).current;
-
-  const imageScale = useRef(
-    new Animated.Value(0.88)
-  ).current;
-
-  const imageRotation = useRef(
-    new Animated.Value(1)
-  ).current;
-
-  const revealProgress = useRef(
-    new Animated.Value(0)
-  ).current;
-
-  const strokeOpacity = useRef(
-    new Animated.Value(0)
-  ).current;
-
-  const wordmarkOpacity = useRef(
-    new Animated.Value(0)
-  ).current;
-
-  const wordmarkScale = useRef(
-    new Animated.Value(0.98)
-  ).current;
-
-  const taglineOpacity = useRef(
-    new Animated.Value(0)
-  ).current;
-
-  // --------------------------------------------------
-  // Responsive sizing
-  // --------------------------------------------------
-
-  const imageSize = Math.max(
-    150,
-    Math.min(width - 80, height * 0.32, 250)
-  );
-
-  const lockupWidth = Math.min(
-    width - 48,
-    360
-  );
-
-  // --------------------------------------------------
-  // Reveal animation
-  // --------------------------------------------------
-
-  const revealWidth =
-    revealProgress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, lockupWidth],
-    });
-
-  const strokeWidth =
-    revealProgress.interpolate({
-      inputRange: [0, 0.5, 1],
-      outputRange: [0, lockupWidth, 0],
-    });
-
-  const imageRotationDegrees =
-    imageRotation.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['-4deg', '0deg'],
-    });
-
-  // --------------------------------------------------
-  // Splash animation
-  // --------------------------------------------------
-
+export default function OnboardingScreen() {
+  const [slide, setSlide] = useState(0);
+  const slides = [
+    { eyebrow: 'INDIA’S CURATED TRAVEL COMPANY', title: 'Unforgettable Journeys,', accent: 'Handpicked for You.', description: 'Thoughtful escapes, transparent prices and a travel expert beside you—every step of the way.', image: require('../../assets/images/onboarding-alps.jpg'), caption: 'THE SWISS ALPS · YOUR NEXT ESCAPE', icon: 'airplane-outline' as const },
+    { eyebrow: 'ONE APP. ENDLESS POSSIBILITIES.', title: 'Your whole journey,', accent: 'Beautifully together.', description: 'Find flights, stays, road journeys, rail adventures, holidays and visa assistance—all in one place.', image: require('../../assets/images/onboarding-islands.jpg'), caption: 'ISLAND ESCAPES · MADE FOR YOU', icon: 'compass-outline' as const },
+    { eyebrow: 'TRAVEL WITH CONFIDENCE', title: 'Less to worry about,', accent: 'More to look forward to.', description: 'Keep your trips close, save your favourites, and reach our travel team whenever you need a little help.', image: require('../../assets/images/onboarding-bali.jpg'), caption: 'SOMEWHERE NEW · SOMETHING WONDERFUL', icon: 'heart-outline' as const },
+  ];
+  const current = slides[slide];
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (!fontsLoaded) return;
-
-    const entrance = Animated.parallel([
-      // Lemon image
-      Animated.sequence([
-        Animated.delay(350),
-
-        Animated.parallel([
-          Animated.timing(imageOpacity, {
-            toValue: 1,
-            duration: 420,
-            useNativeDriver,
-          }),
-
-          Animated.timing(imageScale, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver,
-          }),
-
-          Animated.timing(imageRotation, {
-            toValue: 0,
-            duration: 700,
-            useNativeDriver,
-          }),
-        ]),
-      ]),
-
-      // Line reveal
-      Animated.sequence([
-        Animated.delay(1450),
-
-        Animated.parallel([
-          Animated.timing(revealProgress, {
-            toValue: 1,
-            duration: 650,
-            useNativeDriver: false,
-          }),
-
-          Animated.timing(strokeOpacity, {
-            toValue: 1,
-            duration: 120,
-            useNativeDriver,
-          }),
-        ]),
-      ]),
-
-      // Logo text
-      Animated.sequence([
-        Animated.delay(1750),
-
-        Animated.parallel([
-          Animated.timing(wordmarkOpacity, {
-            toValue: 1,
-            duration: 340,
-            useNativeDriver,
-          }),
-
-          Animated.timing(wordmarkScale, {
-            toValue: 1,
-            duration: 340,
-            useNativeDriver,
-          }),
-        ]),
-
-        Animated.timing(strokeOpacity, {
-          toValue: 0,
-          duration: 220,
-          useNativeDriver,
-        }),
-      ]),
-
-      // Tagline
-      Animated.sequence([
-        Animated.delay(2350),
-
-        Animated.timing(taglineOpacity, {
-          toValue: 1,
-          duration: 320,
-          useNativeDriver,
-        }),
-      ]),
-    ]);
-
-    entrance.start();
-
-    const transitionTimeout = setTimeout(() => {
-      router.replace('/(tabs)');
-    }, SPLASH_DURATION);
-
-    return () => {
-      entrance.stop();
-      clearTimeout(transitionTimeout);
-    };
-  }, [
-    fontsLoaded,
-    imageOpacity,
-    imageScale,
-    imageRotation,
-    revealProgress,
-    strokeOpacity,
-    taglineOpacity,
-    wordmarkOpacity,
-    wordmarkScale,
-  ]);
-
-  // --------------------------------------------------
-  // Wait for font
-  // --------------------------------------------------
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  // --------------------------------------------------
-  // UI
-  // --------------------------------------------------
-
-  return (
-    <SafeAreaView
-      style={styles.container}
-      onLayout={() => {
-        SplashScreen.hide();
-      }}
-    >
-      <View style={styles.composition}>
-
-        {/* Lemon Image */}
-        <Animated.View
-          style={[
-            styles.lemonWrapper,
-            {
-              width: imageSize,
-              height: imageSize,
-              opacity: imageOpacity,
-              transform: [
-                {
-                  scale: imageScale,
-                },
-                {
-                  rotate: imageRotationDegrees,
-                },
-              ],
-            },
-          ]}
-        >
-          <Image
-            source={lemonImage}
-            contentFit="contain"
-            style={styles.lemonImage}
-          />
-        </Animated.View>
-
-        {/* Brand */}
-        <View
-          style={[
-            styles.brandLockup,
-            {
-              width: lockupWidth,
-            },
-          ]}
-        >
-          {/* Wordmark frame */}
-          <View
-            style={[
-              styles.wordmarkFrame,
-              {
-                width: lockupWidth,
-              },
-            ]}
-          >
-            {/* Animated accent line */}
-            <Animated.View
-              style={[
-                styles.strokeReveal,
-                {
-                  width: strokeWidth,
-                  opacity: strokeOpacity,
-                },
-              ]}
-            />
-
-            {/* Logo reveal */}
-            <Animated.View
-              style={[
-                styles.wordmarkReveal,
-                {
-                  width: revealWidth,
-                  opacity: wordmarkOpacity,
-                },
-              ]}
-            >
-              <Animated.Text
-                style={[
-                  styles.brandName,
-                  {
-                    width: lockupWidth,
-                    transform: [
-                      {
-                        scale: wordmarkScale,
-                      },
-                    ],
-                  },
-                ]}
-                numberOfLines={1}
-              >
-                LEMON TRIP
-              </Animated.Text>
-            </Animated.View>
-          </View>
-
-          {/* Tagline */}
-          <Animated.Text
-            style={[
-              styles.tagline,
-              {
-                opacity: taglineOpacity,
-              },
-            ]}
-          >
-            Travel • Tourism • Technology
-          </Animated.Text>
-        </View>
-      </View>
-    </SafeAreaView>
-  );
+    let active = true;
+    AsyncStorage.getItem('lemontrip-onboarded').then(value => {
+      if (!active) return;
+      if (value) router.replace('/(tabs)');
+      else setReady(true);
+    }).catch(() => { if (active) setReady(true); }).finally(() => { void SplashScreen.hideAsync(); });
+    return () => { active = false; };
+  }, []);
+  const enter = async () => {
+    try { await AsyncStorage.setItem('lemontrip-onboarded', 'true'); } catch { /* Navigation remains available if storage is unavailable. */ }
+    router.replace('/(tabs)');
+  };
+  if (!ready) return <View style={{ flex: 1, backgroundColor: Colors.primaryDark, alignItems: 'center', justifyContent: 'center' }}><LemonTripBrand size={72} /></View>;
+  return <SafeAreaView style={styles.safe}><StatusBar style="light" /><ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+    <View style={styles.brand}><LemonTripBrand size={70} /><Text style={styles.language}>EN</Text></View>
+    <ImageBackground source={current.image} style={styles.hero} imageStyle={styles.heroImage}><View style={styles.shade} /><Ionicons name={current.icon} size={65} color={Colors.white} /><Text style={styles.caption}>{current.caption}</Text></ImageBackground>
+    <Text style={styles.eyebrow}>{current.eyebrow}</Text>
+    <Text style={styles.title}>{current.title}{'\n'}<Text style={{ color: Colors.accent }}>{current.accent}</Text></Text>
+    <Text style={styles.description}>{current.description}</Text>
+    <View style={styles.promises}>{['Clear prices', 'Travel support', 'Custom trips'].map(label => <View key={label} style={styles.pill}><Ionicons name="checkmark" color={Colors.white} size={12} /><Text style={styles.pillText}>{label}</Text></View>)}</View>
+    <View style={{ flex: 1, minHeight: 30 }} />
+    <View style={{ flexDirection: "row", gap: 8, marginBottom: 18 }}>{slides.map((_, index) => <TouchableOpacity key={index} accessibilityRole="button" accessibilityLabel={`Onboarding ${index + 1}`} accessibilityState={{ selected: slide === index }} onPress={() => setSlide(index)} style={{ width: slide === index ? 24 : 8, height: 8, borderRadius: 4, backgroundColor: slide === index ? Colors.accent : "#416356", paddingVertical: 8 }} />)}</View><TouchableOpacity accessibilityRole="button" style={styles.cta} onPress={() => slide < 2 ? setSlide(slide + 1) : void enter()}><Text style={styles.ctaText}>{slide < 2 ? "Next: your journey" : "Explore Handpicked Packages"}</Text><Ionicons name="arrow-forward" size={20} color={Colors.primaryDark} /></TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" style={styles.signin} onPress={() => router.push('/login')}><Text style={styles.signinText}>Already a LemonTrip traveler? <Text style={{ color: Colors.white, fontWeight: '800' }}>Sign in</Text></Text></TouchableOpacity>
+  </ScrollView></SafeAreaView>;
 }
-
-// ======================================================
-// STYLES
-// ======================================================
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    overflow: 'hidden',
-    backgroundColor: Colors.primaryDark,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-
-  composition: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  lemonWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  lemonImage: {
-    width: '100%',
-    height: '100%',
-  },
-
-  brandLockup: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-
-  wordmarkFrame: {
-    height: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  strokeReveal: {
-    position: 'absolute',
-    height: 1.5,
-    borderRadius: 2,
-    backgroundColor: Colors.accent,
-  },
-
-  wordmarkReveal: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    height: 54,
-    overflow: 'hidden',
-  },
-
-  brandName: {
-    color: Colors.accent,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    fontFamily: 'Manrope',
-    fontSize: 32,
-    fontWeight: '800',
-    lineHeight: 54,
-    textAlign: 'center',
-    includeFontPadding: false,
-  },
-
-  tagline: {
-    color: Colors.white,
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 2,
-    textAlign: 'center',
-    letterSpacing: 0.4,
-  },
+  safe: { flex: 1, backgroundColor: Colors.primaryDark }, page: { flexGrow: 1, padding: 24, width: '100%', maxWidth: 520, alignSelf: 'center' }, brand: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }, language: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, borderWidth: 1, borderColor: '#416356', borderRadius: 20, padding: 10 }, hero: { height: 300, alignItems: 'center', justifyContent: 'center', borderTopLeftRadius: 150, borderTopRightRadius: 150, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, overflow: 'hidden', backgroundColor: Colors.primary }, heroImage: { borderTopLeftRadius: 150, borderTopRightRadius: 150 }, shade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(10,35,26,0.2)' }, caption: { position: 'absolute', bottom: 20, left: 20, fontFamily: 'Manrope', color: Colors.white, fontSize: 9, letterSpacing: 1 }, eyebrow: { fontFamily: 'Manrope', color: Colors.accent, fontSize: 9, fontWeight: '800', letterSpacing: 1.5, marginTop: 24 }, title: { fontFamily: 'Manrope', color: Colors.white, fontSize: 29, lineHeight: 36, fontWeight: '800', marginTop: 12 }, description: { fontFamily: 'Manrope', color: '#A6BDB4', fontSize: 13, lineHeight: 21, marginTop: 12 }, promises: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 16 }, pill: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderColor: '#416356', borderRadius: 20, padding: 8 }, pillText: { fontFamily: 'Manrope', fontSize: 9, color: Colors.white }, cta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: Colors.accent, borderRadius: 18, minHeight: 58, padding: 12 }, ctaText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primaryDark }, signin: { alignItems: 'center', paddingTop: 18 }, signinText: { fontFamily: 'Manrope', fontSize: 11, color: '#A6BDB4' },
 });

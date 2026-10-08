@@ -1,10 +1,12 @@
+import { recordRecentSearch } from '@/utils/personalStore';
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import FareSummary from './FareSummary';
 import FlightResults from './FlightResults';
 import FlightSearchForm from './FlightSearchForm';
@@ -13,6 +15,8 @@ import { setFlightSelection } from './flightSelectionStore';
 import type { FlightOffer, FlightSearchRequest } from './types';
 
 export default function FlightSearchScreen() {
+  const { search } = useLocalSearchParams<{ search?: string }>();
+  const lastSearch = useRef<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +24,7 @@ export default function FlightSearchScreen() {
   const [offers, setOffers] = useState<FlightOffer[]>([]);
 
   const handleSearch = async (searchRequest: FlightSearchRequest) => {
+    void recordRecentSearch('Flights', `${searchRequest.origin} → ${searchRequest.destination}`, JSON.stringify(searchRequest));
     setLoading(true);
     setHasSearched(true);
     setError(null);
@@ -35,6 +40,22 @@ export default function FlightSearchScreen() {
     }
   };
 
+  useEffect(() => {
+    if (!search || search === lastSearch.current) return;
+    let active = true;
+    // Route changes launch a search after this render has completed.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      lastSearch.current = search;
+      try {
+        const parsed = JSON.parse(search) as FlightSearchRequest;
+        if (typeof parsed.origin !== 'string' || typeof parsed.destination !== 'string' || typeof parsed.departureDate !== 'string' || !['oneWay', 'roundTrip', 'multiCity'].includes(parsed.tripType) || !Number.isInteger(parsed.travellers) || parsed.travellers < 1 || parsed.travellers > 9) throw new Error('Invalid search');
+        void handleSearch(parsed);
+      } catch { setError('Please enter your journey details and search again.'); }
+    });
+    return () => { active = false; };
+  }, [search]);
+
   const handleSelectFlight = (offer: FlightOffer) => {
     if (!request) return;
     setFlightSelection(request, offer);
@@ -45,32 +66,9 @@ export default function FlightSearchScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <BrandGradientBar style={styles.breadcrumbRow}>
-            <TouchableOpacity onPress={() => router.replace('/(tabs)')}><Text style={styles.breadcrumb}>Home</Text></TouchableOpacity>
-            <Ionicons name="chevron-forward" size={12} color="rgba(255,255,255,0.7)" />
-            <LemonTripBrand size={38} />
-            <Text style={styles.breadcrumbCurrent}>Flights</Text>
-            <View style={styles.headerSpacer} />
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open cart" onPress={() => router.push('/cart')} style={styles.cartButton}>
-              <Ionicons name="bag-outline" size={18} color={Colors.primaryDark} />
-            </TouchableOpacity>
-          </BrandGradientBar>
+          <ScreenHeader title="Find your flight" subtitle="Compare live fares and find your next adventure." eyebrow="THE JOURNEY STARTS HERE" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} rightAction={{ label: 'Cart', icon: 'bag-outline', onPress: () => router.push('/cart') }} />
 
-          <Text style={styles.title}>Find your flight</Text>
-          <Text style={styles.subtitle}>Compare live fares and choose the journey that works for you.</Text>
-
-          <ImageBackground
-            source={{ uri: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1500&q=90' }}
-            style={styles.hero}
-            imageStyle={styles.heroImage}>
-            <View style={styles.heroShade} />
-            <View style={styles.heroCopy}>
-              <Text style={styles.heroEyebrow}>THE JOURNEY STARTS HERE</Text>
-              <Text style={styles.heroText}>A better way to get there.</Text>
-            </View>
-          </ImageBackground>
-
-          <FlightSearchForm loading={loading} onSearch={handleSearch} />
+          <View style={{ paddingTop: 25 }}><FlightSearchForm loading={loading} onSearch={handleSearch} /></View>
 
           {request && hasSearched ? (
             <View style={styles.resultsSection}>
@@ -122,17 +120,17 @@ const styles = StyleSheet.create({
   heroImage: { borderRadius: 18 },
   heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(6, 38, 27, 0.3)' },
   heroCopy: { paddingHorizontal: 18, paddingBottom: 21, maxWidth: 430 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
+  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   heroText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 23, fontWeight: '800', marginTop: 6 },
   resultsSection: { gap: 13, marginTop: 24 },
   resultsTitle: { paddingHorizontal: 16, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
-  errorPanel: { marginHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 13, borderWidth: 1, borderColor: '#f1d3d3', borderRadius: 14, backgroundColor: Colors.surface },
+  errorPanel: { ...Ui.card, marginHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 10, padding: Ui.space.card, borderWidth: 1, borderColor: '#f1d3d3', borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   errorIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: '#fff1f1' },
   errorCopy: { flex: 1, minWidth: 0 },
-  errorTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  errorMessage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14, marginTop: 3 },
-  retryButton: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 8, borderRadius: 9, backgroundColor: Colors.accent },
-  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  errorTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  errorMessage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 3 },
+  retryButton: { minHeight: 44,  flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 8, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
+  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 24, paddingHorizontal: 20 },
-  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, textAlign: 'center' },
+  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, textAlign: 'center' },
 });

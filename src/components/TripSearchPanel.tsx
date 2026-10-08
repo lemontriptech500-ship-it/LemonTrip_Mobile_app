@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { useState } from 'react';
@@ -103,14 +104,14 @@ export default function TripSearchPanel({
 }
 
 const styles = StyleSheet.create({
-  card: {
+  card: { ...Ui.card,
     marginTop: -42,
     marginHorizontal: 18,
-    padding: 16,
+    padding: Ui.space.card,
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 18,
+    borderRadius: Ui.radius.card,
   },
   tabsRow: {
     flexDirection: 'row',
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
   modeButtonText: {
     color: Colors.textDark,
     fontFamily: 'Manrope',
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
   },
   modeButtonTextActive: {
@@ -189,17 +190,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 5,
   },
-  input: {
+  input: { minHeight: Ui.field.minHeight,
     color: Colors.textDark,
     fontFamily: 'Manrope',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '700',
     paddingVertical: 0,
   },
   errorText: {
     color: Colors.error,
     fontFamily: 'Manrope',
-    fontSize: 11,
+    fontSize: 13,
     marginTop: 10,
   },
   ctaButton: {

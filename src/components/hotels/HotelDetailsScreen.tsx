@@ -1,14 +1,15 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { addBooking } from '@/utils/bookingStore';
+import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { getHotelSearch, getSelectedHotel } from '@/utils/hotelSearchStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { formatINR, getNightCount, parseNightlyPrice } from './HotelCard';
 
 export default function HotelDetailsScreen() {
@@ -18,7 +19,9 @@ export default function HotelDetailsScreen() {
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [selectedRoomId, setSelectedRoomId] = useState(hotel?.roomOptions?.[0]?.id ?? null);
-  const [booked, setBooked] = useState(false);
+  useCart();
+  const cartId = hotel ? `hotel-${hotel.id}-${selectedRoomId ?? 'standard'}-${search.checkIn}` : '';
+  const booked = isInCart(cartId);
   const nights = getNightCount(search.checkIn, search.checkOut);
   const selectedRoom = hotel?.roomOptions?.find((room) => room.id === selectedRoomId);
   const selectedNightlyPrice = hotel ? selectedRoom?.pricePerNight ?? hotel.price : '';
@@ -27,20 +30,9 @@ export default function HotelDetailsScreen() {
 
   const handleBook = () => {
     if (!hotel) return;
-    const room = hotel.roomOptions?.find((item) => item.id === selectedRoomId);
-    const price = room?.pricePerNight ?? hotel.price;
-    const roomName = room?.name ? ` · ${room.name}` : '';
-    const confirmedPrice = total !== null ? formatINR(total) : price;
-    addBooking({
-      id: `hotel-${hotel.id}-${Date.now()}`,
-      serviceName: 'Hotels',
-      itemName: `${hotel.name}${roomName}`,
-      price: confirmedPrice,
-      bookedAt: new Date().toLocaleDateString(),
-      ...(search.checkIn ? { tripDate: search.checkIn } : {}),
-    });
-    setBooked(true);
-    Alert.alert('Stay added', `${hotel.name} has been added to your bookings.`);
+    const roomName = selectedRoom?.name ? ` · ${selectedRoom.name}` : '';
+    if (!booked) addToCart({ id: cartId, serviceName: 'Hotels', itemName: `${hotel.name}${roomName}`, price: total !== null ? formatINR(total) : selectedNightlyPrice, ...(search.checkIn ? { tripDate: search.checkIn } : {}) });
+    router.push('/cart');
   };
 
   if (!hotel) {
@@ -76,7 +68,7 @@ export default function HotelDetailsScreen() {
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>
             {gallery.map((image, index) => (
-              <Image key={`${hotel.id}-gallery-${index}`} source={{ uri: image }} style={[styles.galleryImage, gallery.length === 1 && styles.singleImage]} />
+              <Image key={`${hotel.id}-gallery-${index}`} source={{ uri: image }} style={[styles.galleryImage, gallery.length === 1 && styles.singleImage, gallery.length === 1 && { width: Math.min(width, 1120) - 32 }]} />
             ))}
           </ScrollView>
 
@@ -163,7 +155,7 @@ export default function HotelDetailsScreen() {
       {!desktop ? (
         <View style={styles.mobileBookingBar}>
           <View style={styles.mobilePriceBlock}><Text style={styles.mobilePrice}>{total !== null ? formatINR(total) : hotel.price}</Text><Text style={styles.mobilePriceLabel}>{total !== null ? `${nights} nights total` : 'per night · dates optional'}</Text></View>
-          <TouchableOpacity disabled={booked} onPress={handleBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookButtonText}>{booked ? 'Added' : 'Book stay'}</Text></TouchableOpacity>
+          <TouchableOpacity onPress={handleBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookButtonText}>{booked ? 'View cart' : 'Book stay'}</Text></TouchableOpacity>
         </View>
       ) : null}
     </SafeAreaView>
@@ -217,7 +209,7 @@ function BookingSummary({
         <View style={[styles.priceRow, styles.totalRow]}><Text style={styles.totalLabel}>Total</Text><Text style={styles.totalValue}>{total !== null ? formatINR(total) : 'Dates required'}</Text></View>
       </View>
       <Text style={styles.summaryNote}>Taxes and fees are not itemized in the available listing.</Text>
-      <TouchableOpacity disabled={booked} onPress={onBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookButtonText}>{booked ? 'Added to bookings' : 'Book this stay'}</Text></TouchableOpacity>
+      <TouchableOpacity onPress={onBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookButtonText}>{booked ? 'View cart' : 'Book this stay'}</Text></TouchableOpacity>
     </View>
   );
 }
@@ -237,70 +229,70 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
   hotelName: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 20, lineHeight: 26, fontWeight: '900' },
   propertyBadge: { paddingHorizontal: 9, paddingVertical: 6, borderRadius: 9, backgroundColor: Colors.accentSoft },
-  propertyBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  propertyBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 7 },
-  location: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
+  location: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   reviewsSummary: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
-  reviewScore: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  reviewCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
-  description: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 17, marginTop: 12 },
+  reviewScore: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  reviewCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  description: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 12 },
   section: { marginHorizontal: 16, marginTop: 22 },
-  sectionEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  sectionEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 3 },
   sectionBody: { marginTop: 10 },
   amenitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   amenityItem: { width: '46%', minHeight: 30, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  amenityText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9 },
+  amenityText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13 },
   roomList: { gap: 8 },
-  roomCard: { flexDirection: 'row', alignItems: 'center', gap: 9, padding: 12, borderRadius: 13, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  roomCard: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 9, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   roomCardSelected: { borderColor: Colors.primary },
   roomSelectIcon: { width: 22 },
   roomCopy: { flex: 1, minWidth: 0 },
-  roomName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  roomAmenities: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 4 },
-  roomPolicy: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700', marginTop: 3 },
-  roomPrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  roomName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  roomAmenities: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 4 },
+  roomPolicy: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', marginTop: 3 },
+  roomPrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
   unavailable: { flexDirection: 'row', alignItems: 'center', gap: 7, padding: 11, borderRadius: 11, backgroundColor: Colors.surfaceMuted },
-  unavailableText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14 },
+  unavailableText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
   infoRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: Colors.border },
   infoIcon: { width: 29, height: 29, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.accentSoft },
-  infoLabel: { width: 88, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
-  infoValue: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
-  locationPanel: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 13, borderRadius: 13, backgroundColor: Colors.surface },
+  infoLabel: { width: 88, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
+  infoValue: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  locationPanel: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 10, padding: Ui.space.card, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   locationIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accentSoft },
   locationCopy: { flex: 1 },
-  locationAddress: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  locationNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
+  locationAddress: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  locationNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 3 },
   reviewCard: { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: Colors.border },
   reviewTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  reviewAuthor: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  reviewAuthor: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   reviewRating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  reviewRatingText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
-  reviewComment: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 15, marginTop: 5 },
+  reviewRatingText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  reviewComment: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 5 },
   summaryColumn: { width: 310, marginHorizontal: 0, marginTop: 21, marginRight: 16, position: 'sticky' as 'relative', top: 14 },
-  summaryCard: { padding: 16, borderRadius: 15, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  summaryEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  summaryCard: { ...Ui.card, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  summaryEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   summaryHotel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, fontWeight: '800', marginTop: 5 },
   summaryDates: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 12 },
-  summaryDateText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
+  summaryDateText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
   priceBreakdown: { marginTop: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border },
   priceRow: { minHeight: 29, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  priceLabel: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
-  priceValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  priceLabel: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
+  priceValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '700' },
   totalRow: { minHeight: 40, marginTop: 5, borderTopWidth: 1, borderTopColor: Colors.border },
   totalLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
   totalValue: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900' },
-  summaryNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13 },
-  bookButton: { minHeight: 43, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: 10, backgroundColor: Colors.accent },
+  summaryNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
+  bookButton: { minWidth: 132, paddingHorizontal: 20, minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
   bookedButton: { backgroundColor: Colors.success },
-  bookButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  bookButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   mobileBookingBar: { minHeight: 67, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 16, paddingVertical: 9, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.surface },
   mobilePriceBlock: { flex: 1 },
-  mobilePrice: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
-  mobilePriceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 2 },
+  mobilePrice: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  mobilePriceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 2 },
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  notFoundTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 11 },
-  notFoundText: { maxWidth: 290, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 16, textAlign: 'center', marginTop: 5 },
-  backButton: { marginTop: 13, paddingHorizontal: 13, paddingVertical: 9, borderRadius: 9, backgroundColor: Colors.accent },
-  backButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  notFoundTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 11 },
+  notFoundText: { maxWidth: 290, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, textAlign: 'center', marginTop: 5 },
+  backButton: { minHeight: 44,  marginTop: 13, paddingHorizontal: 13, paddingVertical: 9, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
+  backButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 });

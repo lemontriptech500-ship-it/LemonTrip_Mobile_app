@@ -1,5 +1,7 @@
+import { Ui } from '@/constants/theme';
+import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -18,7 +20,8 @@ type ScreenHeaderProps = {
 export function ScreenHeader({ title, subtitle, onBack, eyebrow, rightAction }: ScreenHeaderProps) {
   return (
     <View style={styles.container}>
-      <BrandGradientBar style={styles.brandBar}>
+      <BrandMotif />
+      <View style={styles.brandBar}>
         <View style={styles.actions}>
           {onBack ? (
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.iconButton}>
@@ -38,24 +41,27 @@ export function ScreenHeader({ title, subtitle, onBack, eyebrow, rightAction }: 
             </TouchableOpacity>
           ) : null}
         </View>
-      </BrandGradientBar>
+      </View>
       <View style={styles.copy}>
         {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
         <Text style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </View>
-      <View style={styles.rule} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryDark,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    marginBottom: Ui.space.section,
+    overflow: 'hidden',
   },
-  brandBar: { minHeight: 58, justifyContent: 'center', paddingHorizontal: 16 },
+  brandBar: { minHeight: 72, justifyContent: 'center', paddingHorizontal: 20 },
   actions: {
-    minHeight: 58,
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -63,50 +69,51 @@ const styles = StyleSheet.create({
   iconSpacer: { width: 34 },
   actionSpacer: { flex: 1 },
   iconButton: {
-    width: 34,
-    height: 34,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 17,
+    borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.14)',
   },
   rightAction: {
-    minHeight: 34,
+    minHeight: 40,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     paddingHorizontal: 9,
-    borderRadius: 17,
+    borderRadius: 20,
     backgroundColor: Colors.accent,
   },
   actionLabel: {
     color: Colors.primaryDark,
     fontFamily: 'Manrope',
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '700',
   },
   copy: {
     paddingHorizontal: 22,
-    paddingTop: 12,
-    paddingBottom: 18,
+    paddingTop: 10,
+    paddingBottom: 26,
   },
   eyebrow: {
-    color: Colors.secondary,
+    ...Ui.eyebrow,
+    color: Colors.accent,
     fontFamily: 'Manrope',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
     marginBottom: 6,
     textTransform: 'uppercase',
   },
   title: {
-    color: Colors.textDark,
+    color: Colors.white,
     fontFamily: 'Manrope',
     fontSize: 28,
     fontWeight: '800',
     lineHeight: 34,
   },
   subtitle: {
-    color: Colors.textLight,
+    color: Colors.onDarkMuted,
     fontFamily: 'Manrope',
     fontSize: 13,
     lineHeight: 19,

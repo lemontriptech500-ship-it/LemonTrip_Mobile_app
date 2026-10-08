@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -63,7 +64,7 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
 
       <View style={styles.purchase}>
         <View style={styles.purchaseInfo}>
-          <Text style={styles.price}>{formatPrice(offer.price.amount, offer.price.currency)}</Text>
+          <Text style={{ color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginBottom: 3 }}>FARE</Text><Text style={styles.price}>{formatPrice(offer.price.amount, offer.price.currency)}</Text>
           <Text style={styles.baggage} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}</Text>
           {fareNote ? <Text style={styles.fareNote}>{fareNote}</Text> : null}
         </View>
@@ -76,30 +77,30 @@ export default function FlightCard({ offer, onSelect }: FlightCardProps) {
 }
 
 const styles = StyleSheet.create({
-  card: { padding: 14, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
-  airline: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  card: { ...Ui.card, padding: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card },
+  airline: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingBottom: 8 },
   logo: { width: 34, height: 34, borderRadius: 9, backgroundColor: Colors.background },
   logoFallback: { width: 34, height: 34, borderRadius: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   airlineCopy: { flex: 1 },
-  airlineName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  flightNumber: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, marginTop: 2 },
+  airlineName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  flightNumber: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 2 },
   route: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, gap: 8 },
   airport: { flex: 1, minWidth: 62 },
   arrival: { alignItems: 'flex-end' },
   time: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
-  airportCode: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', marginTop: 3 },
-  airportName: { maxWidth: 92, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
+  airportCode: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginTop: 3 },
+  airportName: { maxWidth: 92, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 16, marginTop: 3 },
   durationBlock: { flex: 1.2, alignItems: 'center', minWidth: 80 },
-  duration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
+  duration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
   routeLine: { width: '100%', flexDirection: 'row', alignItems: 'center', marginVertical: 5 },
   routeDot: { width: 5, height: 5, borderWidth: 1, borderColor: Colors.primary, borderRadius: 3 },
   line: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
-  stops: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
+  stops: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
   purchase: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 9, paddingTop: 11, borderTopWidth: 1, borderTopColor: Colors.border },
   purchaseInfo: { flex: 1, minWidth: 0 },
-  price: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
-  baggage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
-  fareNote: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', marginTop: 3 },
-  selectButton: { minWidth: 82, minHeight: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent, paddingHorizontal: 12 },
-  selectText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  price: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  baggage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
+  fareNote: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginTop: 3 },
+  selectButton: { minWidth: 82, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.control, backgroundColor: Colors.primary, paddingHorizontal: 18 },
+  selectText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 });

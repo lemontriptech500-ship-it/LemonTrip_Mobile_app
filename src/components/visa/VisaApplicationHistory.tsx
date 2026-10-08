@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -102,23 +103,23 @@ const styles = StyleSheet.create({
   headingCopy: { gap: 3 },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
   title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '900' },
-  refreshButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: 9, backgroundColor: Colors.surface },
-  body: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
+  refreshButton: { minHeight: 44,  width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surface },
+  body: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
   loader: { marginVertical: 18 },
   state: { alignItems: 'flex-start', gap: 8 },
-  retryButton: { minHeight: 34, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 8, backgroundColor: Colors.accent },
-  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  error: { color: '#B42318', fontFamily: 'Manrope', fontSize: 12, marginBottom: 8 },
+  retryButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 12, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
+  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  error: { color: '#B42318', fontFamily: 'Manrope', fontSize: 13, marginBottom: 8 },
   application: { marginTop: 8, padding: 13, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, backgroundColor: Colors.surface },
   applicationTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 },
   applicationTitle: { flex: 1, minWidth: 0 },
   country: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
-  visaType: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 16, marginTop: 2 },
-  status: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', textTransform: 'capitalize' },
-  reference: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, marginTop: 8 },
-  date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 3 },
+  visaType: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 2 },
+  status: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', textTransform: 'capitalize' },
+  reference: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, marginTop: 8 },
+  date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 3 },
   documents: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 11 },
   documentButton: { minHeight: 34, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: 8, backgroundColor: Colors.background },
-  documentText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  documentText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   dimmed: { opacity: 0.6 },
 });

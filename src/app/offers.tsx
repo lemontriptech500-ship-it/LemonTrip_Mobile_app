@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -8,7 +9,7 @@ import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 const categories = ['Flights', 'Hotels', 'Buses', 'Packages', 'Visa'] as const;
 type OfferCategory = typeof categories[number];
@@ -172,7 +173,7 @@ function OfferCard({ offer, desktop, copied, source, onCopy }: { offer: Offer; d
         </View>
         {copied ? <Text accessibilityRole="alert" style={styles.copyConfirmation}>Coupon copied to clipboard</Text> : null}
 
-        <View style={styles.termsArea}><Text style={styles.termsLabel}>TERMS</Text><Text style={styles.termsText} numberOfLines={2}>{offer.terms ?? 'Terms not provided by the offer source.'}</Text></View>
+        <TouchableOpacity accessibilityRole="button" onPress={() => router.push({ pathname: '/offers/[id]', params: { id: offer.id } })} style={{ paddingVertical: 12 }}><Text style={{ fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary }}>View full offer →</Text></TouchableOpacity><View style={styles.termsArea}><Text style={styles.termsLabel}>TERMS</Text><Text style={styles.termsText} numberOfLines={2}>{offer.terms ?? 'Terms not provided by the offer source.'}</Text></View>
         <TouchableOpacity disabled={!isBookable} onPress={() => route && router.push(route)} style={[styles.bookButton, !isBookable && styles.bookButtonDisabled]}>
           <Text style={[styles.bookButtonText, !isBookable && styles.bookButtonTextDisabled]}>{isBookable ? 'Book now' : validity === 'expired' ? 'Offer expired' : 'Not bookable yet'}</Text>
           {isBookable ? <Ionicons name="arrow-forward" size={14} color={Colors.primaryDark} /> : <Ionicons name="lock-closed-outline" size={13} color={Colors.textLight} />}
@@ -190,68 +191,68 @@ const styles = StyleSheet.create({
   heroImage: { borderRadius: 20 },
   heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(7, 34, 24, 0.42)' },
   heroContent: { maxWidth: 520, padding: 19 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1.2 },
+  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   heroTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 29, lineHeight: 35, fontWeight: '900', marginTop: 7 },
-  heroText: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Manrope', fontSize: 9, marginTop: 6 },
+  heroText: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Manrope', fontSize: 13, marginTop: 6 },
   sourceNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 7, marginHorizontal: 16, marginTop: 12, padding: 10, borderRadius: 11, backgroundColor: Colors.surfaceMuted },
-  sourceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13 },
+  sourceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
   categorySection: { marginTop: 19 },
-  filterLabel: { paddingHorizontal: 16, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 0.9 },
+  filterLabel: { paddingHorizontal: 16, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9 },
   categoryRow: { gap: 6, paddingHorizontal: 16, paddingTop: 8 },
-  categoryChip: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  categoryChip: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: Ui.radius.pill, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   categoryChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary },
-  categoryText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  categoryText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
   categoryTextActive: { color: Colors.white },
   resultsHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: 16, marginTop: 22, marginBottom: 11 },
-  resultsEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 0.9 },
+  resultsEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9 },
   resultsTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', marginTop: 3 },
-  resultsCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
+  resultsCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   offerGrid: { gap: 11, paddingHorizontal: 15 },
   offerGridDesktop: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  offerCard: { overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: 15, backgroundColor: Colors.surface },
+  offerCard: { ...Ui.card, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   offerCardDesktop: { width: '48.8%', marginBottom: 2 },
   imageWrap: { height: 165, position: 'relative', backgroundColor: Colors.surfaceMuted },
   offerImage: { width: '100%', height: '100%' },
   discountBadge: { position: 'absolute', top: 10, left: 10, maxWidth: '82%', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 7, backgroundColor: Colors.accent },
-  discountText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 7, fontWeight: '900' },
+  discountText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900' },
   offerBody: { padding: 12 },
   offerMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 7 },
-  offerCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 0.7 },
-  validityBadge: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '900', letterSpacing: 0.6 },
+  offerCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.7 },
+  validityBadge: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', letterSpacing: 0.6 },
   validityActive: { color: Colors.secondary },
   validityExpired: { color: Colors.error },
-  offerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, fontWeight: '800', marginTop: 6 },
-  offerDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13, marginTop: 5 },
+  offerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 24, fontWeight: '800', marginTop: 6 },
+  offerDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 5 },
   validityRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 9 },
-  validityText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7 },
+  validityText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   couponRow: { minHeight: 47, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 7, marginTop: 9, paddingHorizontal: 9, borderWidth: 1, borderColor: Colors.border, borderStyle: 'dashed', borderRadius: 10, backgroundColor: Colors.background },
   couponInfo: { flex: 1 },
-  couponLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800', letterSpacing: 0.6 },
-  couponCode: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', marginTop: 2 },
-  noCoupon: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
-  copyButton: { minHeight: 31, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 8, borderWidth: 1, borderColor: Colors.border, borderRadius: 8, backgroundColor: Colors.surface },
+  couponLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.6 },
+  couponCode: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900', marginTop: 2 },
+  noCoupon: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  copyButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 8, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surface },
   copyButtonDone: { borderColor: Colors.primary, backgroundColor: Colors.primary },
-  copyText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800' },
+  copyText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   copyTextDone: { color: Colors.white },
-  copyConfirmation: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', marginTop: 4 },
+  copyConfirmation: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginTop: 4 },
   termsArea: { marginTop: 9 },
-  termsLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800', letterSpacing: 0.7 },
-  termsText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, lineHeight: 11, marginTop: 3 },
-  bookButton: { minHeight: 39, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 11, borderRadius: 9, backgroundColor: Colors.accent },
+  termsLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.7 },
+  termsText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 3 },
+  bookButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 11, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
   bookButtonDisabled: { backgroundColor: Colors.surfaceMuted },
-  bookButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  bookButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   bookButtonTextDisabled: { color: Colors.textLight },
-  skeletonCard: { overflow: 'hidden', borderRadius: 15, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  skeletonCard: { ...Ui.card, overflow: 'hidden', borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   skeletonCardDesktop: { width: '48.8%' },
   skeletonImage: { height: 165, backgroundColor: Colors.surfaceMuted },
   skeletonLine: { width: '60%', height: 11, marginTop: 13, marginHorizontal: 12, borderRadius: 6, backgroundColor: Colors.surfaceMuted },
   skeletonLineShort: { width: '38%', height: 8, marginTop: 8, marginBottom: 15, marginHorizontal: 12, borderRadius: 6, backgroundColor: Colors.surfaceMuted },
-  stateCard: { minHeight: 175, alignItems: 'center', justifyContent: 'center', gap: 7, marginHorizontal: 15, padding: 20, borderRadius: 15, backgroundColor: Colors.surface },
-  stateTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', textAlign: 'center' },
-  stateText: { maxWidth: 300, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13, textAlign: 'center' },
+  stateCard: { ...Ui.card, minHeight: 175, alignItems: 'center', justifyContent: 'center', gap: 7, marginHorizontal: 15, padding: 20, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
+  stateTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', textAlign: 'center' },
+  stateText: { maxWidth: 300, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, textAlign: 'center' },
   validityNote: { flexDirection: 'row', gap: 6, alignItems: 'center', marginHorizontal: 16, marginTop: 10 },
-  validityNoteText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, lineHeight: 12 },
+  validityNoteText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
   footer: { marginTop: 25, paddingHorizontal: 16, paddingTop: 13, borderTopWidth: 1, borderTopColor: Colors.border },
-  footerBrand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
-  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, marginTop: 3 },
+  footerBrand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900' },
+  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
 });

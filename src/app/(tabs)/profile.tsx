@@ -1,15 +1,16 @@
+import { Ui } from '@/constants/theme';
 import { AccountArtworkIcon } from '@/components/AccountArtworkIcon';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
 import { logout, useAuth } from '@/utils/authStore';
-import { useBookings } from '@/utils/bookingStore';
+import { useAccountBookings } from '@/utils/accountBookings';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
-const SOFT_GREEN = '#f1f7ee';
+const SOFT_GREEN = Colors.surfaceMuted;
 const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 } as const;
 
 // Same circle-icon grid pattern as the Home screen.
@@ -21,14 +22,22 @@ const travelLinks = [
 ];
 
 const accountLinks = [
-  { label: 'Personal information', detail: 'Manage your contact details', artwork: 'profile' as const, route: '/settings' },
-  { label: 'Payment methods', detail: 'Your saved payment options', artwork: 'payment' as const, unavailable: true },
+  { label: 'Personal information', detail: 'Manage your contact details', artwork: 'profile' as const, route: '/manage/personal-information' },
+  { label: 'Wallet', detail: 'Balance and transactions on LemonTrip', artwork: 'payment' as const, route: '/wallet' },
+  { label: 'Contact LemonTrip', detail: 'Help with bookings and travel plans', artwork: 'help' as const, route: '/contact' },
+  { label: 'Travel services', detail: 'Flights, hotels, trains, buses, holidays and visas', artwork: 'booking' as const, route: '/services' },
+  { label: 'Payment methods', detail: 'Choose how to pay', artwork: 'payment' as const, route: '/wallet/payment-methods' },
+  { label: 'Saved travellers', detail: 'Names for your next journey', artwork: 'profile' as const, route: '/manage/travellers' },
+  { label: 'Saved searches', detail: 'Pick up where you left off', artwork: 'booking' as const, route: '/manage/saved-searches' },
+  { label: 'Notifications', detail: 'Updates about your journeys', artwork: 'notifications' as const, route: '/notifications' },
+  { label: 'Travel assistant', detail: 'One assistant for every service', artwork: 'support' as const, route: '/assistant' },
+  { label: 'About LemonTrip', detail: 'Travel smarter. Travel better.', artwork: 'help' as const, route: '/manage/about' },
   { label: 'Settings', detail: 'Preferences, privacy and notifications', artwork: 'settings' as const, route: '/settings' },
 ];
 
 export default function ProfileScreen() {
   const user = useAuth();
-  const bookings = useBookings();
+  const { bookings } = useAccountBookings();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const firstName = user?.name?.trim()?.split(/\s+/)[0] || 'traveller';
@@ -41,7 +50,6 @@ export default function ProfileScreen() {
     ]);
   };
 
-  const openUnavailable = (label: string) => Alert.alert(label, 'This feature is not available yet.');
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -49,21 +57,7 @@ export default function ProfileScreen() {
         <View style={[styles.content, desktop && styles.contentDesktop]}>
 
           {/* Header — same as Home / Explore / My Trips */}
-          <BrandGradientBar style={styles.header}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
-              <LemonTripBrand size={50} />
-            </TouchableOpacity>
-            <View style={styles.headerSpacer} />
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open settings" onPress={() => router.push('/settings')} style={styles.settingsButton}>
-              <AccountArtworkIcon name="settings" size={28} />
-            </TouchableOpacity>
-          </BrandGradientBar>
-
-          {/* Title strip */}
-          <View style={styles.titleStrip}>
-            <Text style={styles.pageTitle}>Profile</Text>
-            <Text style={styles.pageSubtitle}>Your account, trips and preferences.</Text>
-          </View>
+          <ScreenHeader title="Your profile" subtitle="Your account, trips and preferences." eyebrow="MAKE YOURSELF AT HOME" rightAction={{ label: 'Settings', icon: 'options-outline', onPress: () => router.push('/settings') }} />
 
           {/* Identity card */}
           <View style={styles.heroCard}>
@@ -133,7 +127,7 @@ export default function ProfileScreen() {
                   <TouchableOpacity
                     key={item.label}
                     accessibilityRole="button"
-                    onPress={() => item.unavailable ? openUnavailable(item.label) : router.push(item.route as never)}
+                    onPress={() => router.push(item.route as never)}
                     style={[styles.menuRow, styles.menuDivider]}
                     activeOpacity={0.75}>
                     <View style={styles.menuIcon}><AccountArtworkIcon name={item.artwork} size={28} /></View>
@@ -141,7 +135,7 @@ export default function ProfileScreen() {
                       <Text style={styles.menuTitle}>{item.label}</Text>
                       <Text style={styles.menuDetail}>{item.detail}</Text>
                     </View>
-                    {item.unavailable ? <Text style={styles.soonTag}>Soon</Text> : null}
+
                     <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
                   </TouchableOpacity>
                 ))}
@@ -194,7 +188,7 @@ const styles = StyleSheet.create({
   header: { minHeight: 72, paddingHorizontal: 18, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12 },
   brandLockup: { minWidth: 150, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
   headerSpacer: { flex: 1 },
-  settingsButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surface },
+  settingsButton: { minHeight: 44,  width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.control, backgroundColor: Colors.surface },
 
   // Title
   titleStrip: { paddingHorizontal: 18, paddingVertical: 16, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
@@ -208,8 +202,8 @@ const styles = StyleSheet.create({
   avatar: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accent, borderWidth: 3, borderColor: 'rgba(255,255,255,0.25)' },
   avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, fontWeight: '900' },
   identityCopy: { flex: 1, minWidth: 0 },
-  memberPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 6, borderRadius: 12, backgroundColor: Colors.accent },
-  memberPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
+  memberPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 6, borderRadius: Ui.radius.pill, backgroundColor: Colors.accent },
+  memberPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900' },
   name: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '900' },
   emailText: { color: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
   statRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.18)' },
@@ -218,16 +212,16 @@ const styles = StyleSheet.create({
   statLabel: { color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
   guestBlock: { gap: 14, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.18)' },
   guestText: { color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 },
-  heroButton: { alignSelf: 'flex-start', minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 18, paddingRight: 5, borderRadius: 23, backgroundColor: Colors.white },
+  heroButton: { alignSelf: 'flex-start', minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 18, paddingRight: 5, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
   heroButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
   heroButtonArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
 
   // Circle grid card
-  gridCard: { marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', paddingHorizontal: 10, marginBottom: 10 },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
+  gridCircle: { width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
   gridBadge: { position: 'absolute', top: -2, right: -2, minWidth: 22, height: 22, paddingHorizontal: 5, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
   gridBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
   gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
@@ -237,17 +231,17 @@ const styles = StyleSheet.create({
   lowerLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
   menuSection: { flex: 1, minWidth: 0 },
   sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900', marginHorizontal: 2, marginBottom: 12 },
-  menuCard: { overflow: 'hidden', paddingHorizontal: 14, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  menuCard: { ...Ui.card, overflow: 'hidden', paddingHorizontal: 14, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   menuRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 10 },
   menuDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   menuIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
   menuCopy: { flex: 1, minWidth: 0 },
-  menuTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  menuTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
   menuDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 2 },
-  soonTag: { overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 9, backgroundColor: SOFT_GREEN, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  soonTag: { overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 4, borderRadius: Ui.radius.pill, backgroundColor: SOFT_GREEN, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
 
   // Discover banner
-  discoverCard: { flex: 0.8, minWidth: 0, overflow: 'hidden', padding: 20, borderRadius: 24, backgroundColor: '#fff4bf' },
+  discoverCard: { flexGrow: 1, minWidth: 0, overflow: 'hidden', padding: 20, borderRadius: 24, backgroundColor: Colors.accentSoft },
   discoverRing: { position: 'absolute', width: 150, height: 150, right: -70, bottom: -80, borderRadius: 75, borderWidth: 1, borderColor: 'rgba(6,59,36,0.15)' },
   discoverIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 27, backgroundColor: Colors.surface },
   discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '900', marginTop: 14 },
@@ -259,5 +253,5 @@ const styles = StyleSheet.create({
   // Log out + footer
   logoutButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, marginHorizontal: 16, borderRadius: 26, borderWidth: 1, borderColor: '#F3C9C9', backgroundColor: '#FDF2F2' },
   logoutText: { color: '#C62828', fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  footer: { marginTop: 22, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, textAlign: 'center' },
+  footer: { marginTop: 22, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, textAlign: 'center' },
 });

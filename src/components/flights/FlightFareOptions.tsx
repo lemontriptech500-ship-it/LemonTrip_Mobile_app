@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -91,21 +92,21 @@ export default function FlightFareOptions({ options, selectedId, onSelect, onFar
 const styles = StyleSheet.create({
   grid: { gap: 9 },
   gridWide: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start' },
-  card: { overflow: 'hidden', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 14 },
+  card: { ...Ui.card, overflow: 'hidden', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card },
   cardWide: { width: '48.5%' },
   cardThreeColumns: { width: '32%' },
   cardSelected: { borderColor: Colors.primary, borderWidth: 1.5 },
   cardHeader: { minHeight: 65, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 13, paddingVertical: 11 },
   nameWrap: { flex: 1 },
-  name: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  price: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900', marginTop: 4 },
+  name: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  price: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', marginTop: 4 },
   details: { paddingHorizontal: 13, paddingBottom: 12, borderTopWidth: 1, borderTopColor: Colors.border },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8, paddingTop: 9 },
-  detailLabel: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
-  detailValue: { flex: 1.25, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700', textAlign: 'right' },
+  detailLabel: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
+  detailValue: { flex: 1.25, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', textAlign: 'right' },
   missing: { color: Colors.textLight, fontWeight: '400' },
   conditionsButton: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', marginTop: 12 },
-  conditionsText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  conditionsText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   noFares: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 9, padding: 13, borderRadius: 13, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  noFaresText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 15 },
+  noFaresText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
 });

@@ -1,7 +1,8 @@
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { Ui } from '@/constants/theme';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/utils/authStore';
-import { useBookings } from '@/utils/bookingStore';
+import { useAccountBookings } from '@/utils/accountBookings';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -17,7 +18,7 @@ import {
   View,
 } from 'react-native';
 // SafeAreaView from 'react-native' is deprecated — use the safe-area-context version.
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { requestPinWidget } from 'react-native-android-widget';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -47,7 +48,7 @@ const normalizeStatus = (status?: string): Exclude<StatusFilter, 'all'> => {
 };
 
 const statusStyles = {
-  upcoming: { label: 'Confirmed', bg: '#EAF9F2', fg: Colors.primaryDark, icon: 'checkmark-circle' as IconName },
+  upcoming: { label: 'Upcoming', bg: '#EAF9F2', fg: Colors.primaryDark, icon: 'checkmark-circle' as IconName },
   completed: { label: 'Completed', bg: '#EEF1F4', fg: '#56616F', icon: 'flag' as IconName },
   cancelled: { label: 'Cancelled', bg: '#FDECEC', fg: '#C62828', icon: 'close-circle' as IconName },
 };
@@ -73,10 +74,11 @@ const formatDate = (value?: string) => {
 };
 
 export default function BookingsScreen() {
-  const bookings = useBookings();
+  const account = useAccountBookings();
+  const bookings = account.bookings;
   const user = useAuth();
 
-  const [refreshing, setRefreshing] = useState(false);
+
   const [addingWidget, setAddingWidget] = useState(false);
   const [activeTab, setActiveTab] = useState<StatusFilter>('all');
 
@@ -90,12 +92,6 @@ export default function BookingsScreen() {
     () => bookings.filter((booking) => activeTab === 'all' || normalizeStatus(booking.status) === activeTab),
     [bookings, activeTab],
   );
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setRefreshing(false);
-  };
 
   const handleAddWidget = async () => {
     if (Platform.OS !== 'android') {
@@ -127,43 +123,13 @@ export default function BookingsScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} colors={[Colors.primary]} />}
+        refreshControl={<RefreshControl refreshing={account.loading} onRefresh={account.refresh} tintColor={Colors.primary} colors={[Colors.primary]} />}
       >
         {/* Header — same as Home / Explore */}
-        <BrandGradientBar style={styles.header}>
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
-            <LemonTripBrand size={50} />
-          </TouchableOpacity>
-          <View style={styles.headerSpacer} />
-          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}>
-            <Ionicons name="heart-outline" size={24} color={Colors.white} />
-          </TouchableOpacity>
-          {user ? (
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}>
-              <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => router.push('/login')} style={styles.loginPill}>
-              <Ionicons name="person-outline" size={18} color={Colors.primaryDark} />
-              <Text style={styles.loginText}>Login</Text>
-            </TouchableOpacity>
-          )}
-        </BrandGradientBar>
+        <ScreenHeader title="Your journeys" subtitle="Every detail of your journey, in one place." eyebrow="GOOD TIMES AHEAD" rightAction={{ label: 'Saved', icon: 'heart-outline', onPress: () => router.push('/(tabs)/wishlist') }} />
 
-        {/* Title strip */}
-        <View style={styles.titleStrip}>
-          <View style={styles.titleCopy}>
-            <Text style={styles.pageTitle}>My Trips</Text>
-            <Text style={styles.pageSubtitle}>Every detail of your journey, in one place.</Text>
-          </View>
-          {bookings.length > 0 ? (
-            <View style={styles.countPill}>
-              <Text style={styles.countPillText}>{bookings.length}</Text>
-              <Text style={styles.countPillLabel}>{bookings.length === 1 ? 'booking' : 'bookings'}</Text>
-            </View>
-          ) : null}
-        </View>
-
+        {account.error ? <View style={styles.filterEmpty}><Text style={styles.filterEmptyText}>{account.error}</Text><TouchableOpacity accessibilityRole="button" onPress={account.refresh}><Text style={styles.linkText}>Try again</Text></TouchableOpacity></View> : null}
+        {!user ? <View style={styles.filterEmpty}><Text style={styles.filterEmptyText}>Sign in to see your trips and booking updates.</Text><TouchableOpacity accessibilityRole="button" onPress={() => router.push('/login')}><Text style={styles.linkText}>Sign in</Text></TouchableOpacity></View> : null}
         {/* Widget banner — same style as Home banner */}
         <View style={styles.widgetCard}>
           <View style={styles.widgetIcon}>
@@ -218,7 +184,7 @@ export default function BookingsScreen() {
                 {visibleBookings.map((booking) => {
                   const status = statusStyles[normalizeStatus(booking.status)];
                   return (
-                    <View key={booking.id} style={styles.bookingCard}>
+                    <TouchableOpacity key={booking.id} accessibilityRole="button" accessibilityLabel={`View booking ${booking.itemName}`} onPress={() => router.push({ pathname: "/booking/[id]", params: { id: booking.id } })} style={styles.bookingCard}>
                       <View style={styles.bookingTop}>
                         <View style={styles.bookingIcon}>
                           <Ionicons name={serviceIcon(booking.serviceName)} size={26} color={Colors.primary} />
@@ -255,7 +221,7 @@ export default function BookingsScreen() {
                           <Text style={styles.price}>{booking.price}</Text>
                         </View>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   );
                 })}
               </View>
@@ -333,7 +299,7 @@ const styles = StyleSheet.create({
   titleCopy: { flex: 1 },
   pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 26, fontWeight: '900' },
   pageSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, marginTop: 3 },
-  countPill: { alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 16, backgroundColor: SOFT_GREEN },
+  countPill: { alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: Ui.radius.pill, backgroundColor: SOFT_GREEN },
   countPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
   countPillLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
 
@@ -343,7 +309,7 @@ const styles = StyleSheet.create({
   widgetContent: { flex: 1, minWidth: 0 },
   widgetTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
   widgetDescription: { color: 'rgba(255,255,255,0.88)', fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 4 },
-  widgetButton: { alignSelf: 'flex-start', minHeight: 46, minWidth: 140, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 14, paddingLeft: 18, paddingRight: 5, borderRadius: 23, backgroundColor: Colors.white },
+  widgetButton: { alignSelf: 'flex-start', minHeight: 44, minWidth: 140, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 14, paddingLeft: 18, paddingRight: 5, borderRadius: Ui.radius.control, backgroundColor: Colors.white },
   widgetButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
   widgetArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
   widgetSpinner: { paddingHorizontal: 20 },
@@ -358,19 +324,19 @@ const styles = StyleSheet.create({
   tabTextSelected: { color: Colors.white },
   tabCount: { minWidth: 24, height: 24, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: SOFT_GREEN },
   tabCountSelected: { backgroundColor: Colors.accent },
-  tabCountText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900' },
+  tabCountText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900' },
   tabCountTextSelected: { color: Colors.primaryDark },
 
   // Booking cards
   bookingList: { paddingHorizontal: 16, paddingTop: 14, gap: 14 },
-  bookingCard: { padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  bookingCard: { ...Ui.card, padding: Ui.space.card, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   bookingTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   bookingIcon: { width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 26, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
   bookingInfo: { flex: 1, minWidth: 0 },
   serviceName: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '900' },
-  itemName: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 3 },
+  itemName: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 16, lineHeight: 24, marginTop: 3 },
   statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 12 },
-  statusText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  statusText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 
   ticketDivider: { height: 20, marginVertical: 12, marginHorizontal: -16, flexDirection: 'row', alignItems: 'center' },
   notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
@@ -390,16 +356,16 @@ const styles = StyleSheet.create({
   linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
 
   // Empty state
-  emptyCard: { marginTop: 16, marginHorizontal: 16, paddingHorizontal: 22, paddingVertical: 28, alignItems: 'center', borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  emptyCard: { ...Ui.card, marginTop: 16, marginHorizontal: 16, paddingHorizontal: 22, paddingVertical: 28, alignItems: 'center', borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   emptyCircle: { width: 92, height: 92, alignItems: 'center', justifyContent: 'center', marginBottom: 16, borderRadius: 46, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
   emptyTitle: { textAlign: 'center', color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '900' },
   emptyDescription: { textAlign: 'center', maxWidth: 320, marginTop: 8, marginBottom: 20, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, lineHeight: 21 },
-  primaryButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 22, paddingRight: 6, borderRadius: 26, backgroundColor: Colors.primary },
+  primaryButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 22, paddingRight: 6, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
   primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
   primaryArrow: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.accent },
 
   // Quick link grid
-  gridCard: { marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', paddingHorizontal: 10, marginBottom: 10 },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
@@ -410,6 +376,6 @@ const styles = StyleSheet.create({
   infoCard: { marginTop: 18, marginHorizontal: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, backgroundColor: '#edf5eb' },
   infoIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surface },
   infoContent: { flex: 1 },
-  infoTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
+  infoTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
   infoText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 2 },
 });

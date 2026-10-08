@@ -1,11 +1,12 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { addToCart } from '@/utils/cartStore';
 import FareSummary from './FareSummary';
 import FlightFareOptions from './FlightFareOptions';
@@ -73,15 +74,7 @@ export default function FlightDetailsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <BrandGradientBar style={styles.breadcrumbRow}>
-            <TouchableOpacity accessibilityRole="button" onPress={() => router.back()} style={styles.backIcon}>
-              <Ionicons name="arrow-back" size={18} color={Colors.white} />
-            </TouchableOpacity>
-            <LemonTripBrand size={38} />
-            <Text style={styles.breadcrumb}>Flights</Text>
-            <Ionicons name="chevron-forward" size={12} color="rgba(255,255,255,0.7)" />
-            <Text style={styles.breadcrumbCurrent}>Choose fare</Text>
-          </BrandGradientBar>
+          <ScreenHeader title="Your flight" subtitle="Choose the fare that fits your journey." eyebrow="ONE STEP CLOSER" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}  />
 
           <FareSummary request={selection.request} offer={selection.offer} />
 
@@ -94,7 +87,7 @@ export default function FlightDetailsScreen() {
               <FlightItineraryCard offer={selection.offer} />
 
               <View style={styles.sectionHeading}>
-                <Text style={styles.eyebrow}>COMPARE WHAT'S INCLUDED</Text>
+                <Text style={styles.eyebrow}>COMPARE WHAT’S INCLUDED</Text>
                 <Text style={styles.sectionTitle}>Choose a fare</Text>
               </View>
               <FlightFareOptions
@@ -158,26 +151,26 @@ const styles = StyleSheet.create({
   summaryColumn: { gap: 10, marginTop: 18 },
   summaryColumnWide: { width: 300, marginTop: 36 },
   sectionHeading: { marginTop: 21, marginBottom: 11 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 19, fontWeight: '800', marginTop: 3 },
   secureNote: { flexDirection: 'row', alignItems: 'flex-start', gap: 7, paddingHorizontal: 4 },
-  secureText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14 },
+  secureText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
   missingSelection: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 26 },
   missingTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', marginTop: 12 },
-  missingText: { maxWidth: 310, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 17, textAlign: 'center', marginTop: 6 },
-  backButton: { marginTop: 15, paddingHorizontal: 16, paddingVertical: 11, borderRadius: 10, backgroundColor: Colors.accent },
-  backButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  missingText: { maxWidth: 310, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, textAlign: 'center', marginTop: 6 },
+  backButton: { minHeight: 44,  marginTop: 15, paddingHorizontal: 16, paddingVertical: 11, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
+  backButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   modalBackdrop: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 18, backgroundColor: 'rgba(8, 26, 18, 0.48)' },
-  modalCard: { width: '100%', maxWidth: 480, padding: 18, borderRadius: 18, backgroundColor: Colors.surface },
+  modalCard: { ...Ui.card, width: '100%', maxWidth: 480, padding: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   modalHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: Colors.border },
   modalTitleWrap: { flex: 1 },
-  modalEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  modalEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   modalTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 4 },
-  modalFareName: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 3 },
+  modalFareName: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 3 },
   modalClose: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.background },
   conditionRow: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  conditionLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
-  conditionValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, lineHeight: 16, marginTop: 4 },
-  doneButton: { minHeight: 42, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: 10, backgroundColor: Colors.accent },
-  doneText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  conditionLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  conditionValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 4 },
+  doneButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  doneText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 });
