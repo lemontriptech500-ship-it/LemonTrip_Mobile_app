@@ -1,5 +1,5 @@
-import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import FlightCard from './FlightCard';
@@ -34,6 +34,11 @@ export default function FlightResults({ offers, loading, onSelect }: FlightResul
     return filtered;
   }, [offers, filters, sort]);
 
+  // Cheapest visible flight gets the "LemonTrip best deal" highlight
+  const bestId = visibleOffers.length > 1
+    ? visibleOffers.reduce((a, b) => (b.price.amount < a.price.amount ? b : a)).id
+    : null;
+
   return (
     <View style={[styles.resultsLayout, desktop && styles.resultsLayoutDesktop]}>
       <View style={[styles.filterColumn, desktop && styles.filterColumnDesktop]}>
@@ -63,7 +68,7 @@ export default function FlightResults({ offers, loading, onSelect }: FlightResul
               <FlightSort selected={sort} onChange={setSort} />
             </View>
             <View style={styles.listContent}>
-              {visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={onSelect} />)}
+              {visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={onSelect} best={offer.id === bestId} />)}
             </View>
           </>
         )}
@@ -80,7 +85,7 @@ const styles = StyleSheet.create({
   resultColumn: { flex: 1, minWidth: 0 },
   listHeading: { paddingHorizontal: 16, gap: 11, marginBottom: 12 },
   resultCount: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  listContent: { paddingHorizontal: 16, paddingBottom: 30, gap: 10 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 30, gap: 22 },
   skeletonList: { paddingHorizontal: 16, gap: 10 },
   skeletonCard: { minHeight: 170, padding: 15, borderWidth: 1, borderColor: Colors.border, borderRadius: 15, backgroundColor: Colors.surface, justifyContent: 'space-between' },
   skeletonLine: { width: '42%', height: 11, backgroundColor: Colors.surfaceMuted, borderRadius: 6 },

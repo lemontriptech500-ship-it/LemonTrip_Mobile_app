@@ -1,9 +1,20 @@
-import { Colors } from '@/constants/colors';
+import { Brand, Colors, Radius } from '@/constants/colors';
+import {
+  PlusJakartaSans_500Medium,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+  useFonts,
+} from '@expo-google-fonts/plus-jakarta-sans';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { FlightOffer } from './types';
 
-type FlightCardProps = { offer: FlightOffer; onSelect: (offer: FlightOffer) => void };
+type FlightCardProps = {
+  offer: FlightOffer;
+  onSelect: (offer: FlightOffer) => void;
+  /** Highlights the card as the best deal (yellow border + tag). */
+  best?: boolean;
+};
 
 function formatTime(value: string) {
   const parsed = new Date(value);
@@ -19,87 +30,161 @@ function formatDuration(minutes: number) {
 
 function formatPrice(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount);
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
   } catch {
     return `${currency} ${amount.toLocaleString('en-IN')}`;
   }
 }
 
-export default function FlightCard({ offer, onSelect }: FlightCardProps) {
-  const stopLabel = offer.stops === 0 ? 'Nonstop' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
-  const fareNote = offer.fareInfo ?? (offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null);
+export default function FlightCard({ offer, onSelect, best = false }: FlightCardProps) {
+  // Cached after first load; the card renders fine with the system font meanwhile.
+  useFonts({ PlusJakartaSans_500Medium, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold });
+
+  const stopLabel = offer.stops === 0 ? 'Direct' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
+  const fareNote =
+    offer.fareInfo ??
+    (offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null);
+  const subtitle = [offer.flightNumber, fareNote].filter(Boolean).join(' · ');
 
   return (
-    <View style={styles.card}>
-      <View style={styles.airline}>
+    <View style={[styles.card, best && styles.cardBest]}>
+      {best ? (
+        <View style={styles.bestTag}>
+          <Ionicons name="sparkles" size={12} color={Brand.forest} />
+          <Text style={styles.bestTagText}>LEMONTRIP BEST DEAL</Text>
+        </View>
+      ) : null}
+
+      {/* Airline */}
+      <Pressable accessibilityRole="button" onPress={() => onSelect(offer)} style={styles.airlineRow}>
         {offer.airline.logoUrl ? (
-          <Image source={{ uri: offer.airline.logoUrl }} style={styles.logo} resizeMode="contain" accessibilityLabel={`${offer.airline.name} logo`} />
+          <Image
+            source={{ uri: offer.airline.logoUrl }}
+            style={styles.logo}
+            resizeMode="contain"
+            accessibilityLabel={`${offer.airline.name} logo`}
+          />
         ) : (
-          <View style={styles.logoFallback}><Ionicons name="airplane" size={18} color={Colors.primary} /></View>
+          <View style={[styles.logo, styles.logoFallback]}>
+            <Text style={styles.logoFallbackText}>{offer.airline.code}</Text>
+          </View>
         )}
         <View style={styles.airlineCopy}>
           <Text style={styles.airlineName} numberOfLines={1}>{offer.airline.name}</Text>
-          <Text style={styles.flightNumber}>{offer.flightNumber}</Text>
+          <Text style={styles.airlineSub} numberOfLines={1}>{subtitle}</Text>
         </View>
-      </View>
+        <Ionicons name="chevron-forward" size={20} color={Colors.textDark} />
+      </Pressable>
 
+      {/* Route */}
       <View style={styles.route}>
         <View style={styles.airport}>
           <Text style={styles.time}>{formatTime(offer.departure.time)}</Text>
           <Text style={styles.airportCode}>{offer.departure.airportCode}</Text>
-          {offer.departure.airportName ? <Text style={styles.airportName} numberOfLines={1}>{offer.departure.airportName}</Text> : null}
         </View>
+
         <View style={styles.durationBlock}>
-          <Text style={styles.duration}>{formatDuration(offer.durationMinutes)}</Text>
-          <View style={styles.routeLine}><View style={styles.routeDot} /><View style={styles.line} /><Ionicons name="airplane" size={13} color={Colors.primary} /><View style={styles.line} /><View style={styles.routeDot} /></View>
-          <Text style={styles.stops}>{stopLabel}</Text>
+          <Text style={styles.duration}>{formatDuration(offer.durationMinutes)} · {stopLabel}</Text>
+          <View style={styles.routeLine}>
+            <View style={styles.line} />
+            <Ionicons name="airplane" size={14} color={Brand.forest} />
+            <View style={styles.line} />
+          </View>
         </View>
+
         <View style={[styles.airport, styles.arrival]}>
           <Text style={styles.time}>{formatTime(offer.arrival.time)}</Text>
           <Text style={styles.airportCode}>{offer.arrival.airportCode}</Text>
-          {offer.arrival.airportName ? <Text style={styles.airportName} numberOfLines={1}>{offer.arrival.airportName}</Text> : null}
         </View>
       </View>
 
+      <View style={styles.divider} />
+
+      {/* Price + select */}
       <View style={styles.purchase}>
         <View style={styles.purchaseInfo}>
+          <Text style={styles.priceLabel}>PER TRAVELER · INCL. TAXES</Text>
           <Text style={styles.price}>{formatPrice(offer.price.amount, offer.price.currency)}</Text>
-          <Text style={styles.baggage} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}</Text>
-          {fareNote ? <Text style={styles.fareNote}>{fareNote}</Text> : null}
+          <View style={styles.baggageRow}>
+            <Ionicons name="briefcase-outline" size={12} color={Colors.textLight} />
+            <Text style={styles.baggage} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}</Text>
+          </View>
         </View>
-        <TouchableOpacity accessibilityRole="button" onPress={() => onSelect(offer)} style={styles.selectButton}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => onSelect(offer)}
+          style={({ pressed }) => [styles.selectButton, pressed && { opacity: 0.9 }]}
+        >
           <Text style={styles.selectText}>Select</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { padding: 14, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
-  airline: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  logo: { width: 34, height: 34, borderRadius: 9, backgroundColor: Colors.background },
-  logoFallback: { width: 34, height: 34, borderRadius: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  airlineCopy: { flex: 1 },
-  airlineName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  flightNumber: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, marginTop: 2 },
-  route: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, gap: 8 },
-  airport: { flex: 1, minWidth: 62 },
+  card: {
+    padding: 18,
+    backgroundColor: '#FFFFFF',
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    shadowColor: '#0F3D2E',
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+  },
+  cardBest: { borderColor: Brand.lemon, borderWidth: 1.5 },
+
+  bestTag: {
+    position: 'absolute',
+    top: -13,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: Radius.pill,
+    backgroundColor: Brand.lemon,
+  },
+  bestTagText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 10, letterSpacing: 0.5, color: Brand.forest },
+
+  airlineRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  logo: { width: 50, height: 50, borderRadius: 14, backgroundColor: Colors.surfaceMuted },
+  logoFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
+  logoFallbackText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 15, color: '#FFFFFF' },
+  airlineCopy: { flex: 1, minWidth: 0 },
+  airlineName: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 16, color: Colors.textDark },
+  airlineSub: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: Colors.textLight, marginTop: 2 },
+
+  route: { flexDirection: 'row', alignItems: 'center', paddingTop: 20, gap: 10 },
+  airport: { minWidth: 64 },
   arrival: { alignItems: 'flex-end' },
-  time: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
-  airportCode: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', marginTop: 3 },
-  airportName: { maxWidth: 92, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
-  durationBlock: { flex: 1.2, alignItems: 'center', minWidth: 80 },
-  duration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
-  routeLine: { width: '100%', flexDirection: 'row', alignItems: 'center', marginVertical: 5 },
-  routeDot: { width: 5, height: 5, borderWidth: 1, borderColor: Colors.primary, borderRadius: 3 },
+  time: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 26, color: Colors.textDark },
+  airportCode: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 12, color: Colors.textLight, marginTop: 4 },
+  durationBlock: { flex: 1, alignItems: 'center' },
+  duration: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: Colors.textLight },
+  routeLine: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
   line: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
-  stops: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
-  purchase: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 9, paddingTop: 11, borderTopWidth: 1, borderTopColor: Colors.border },
+
+  divider: { height: 1, backgroundColor: Colors.border, marginVertical: 16 },
+
+  purchase: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   purchaseInfo: { flex: 1, minWidth: 0 },
-  price: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
-  baggage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
-  fareNote: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', marginTop: 3 },
-  selectButton: { minWidth: 82, minHeight: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent, paddingHorizontal: 12 },
-  selectText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  priceLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, letterSpacing: 1, color: Colors.textLight },
+  price: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 28, color: Colors.textDark, marginTop: 4 },
+  baggageRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 },
+  baggage: { flexShrink: 1, fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: Colors.textLight },
+  selectButton: {
+    minWidth: 124,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    backgroundColor: Brand.forest,
+    paddingHorizontal: 18,
+  },
+  selectText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 14, color: '#FFFFFF' },
 });

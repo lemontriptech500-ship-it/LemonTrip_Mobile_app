@@ -35,8 +35,8 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-                tabBarLabelPosition: 'below-icon',
         headerShown: false,
+        tabBarLabelPosition: 'below-icon',
         tabBarActiveTintColor: Brand.forest,
         tabBarInactiveTintColor: Colors.textLight,
         tabBarLabelStyle: styles.label,
@@ -85,11 +85,12 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'PlusJakartaSans_800ExtraBold',
     fontSize: 11,
+    marginTop: 4,
   },
   iconWrap: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
