@@ -1,10 +1,4 @@
 import { Brand, Colors } from '@/constants/colors';
-import {
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-  useFonts,
-} from '@expo-google-fonts/plus-jakarta-sans';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
@@ -29,13 +23,6 @@ const icon = (active: IconName, inactive: IconName) => {
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
-
-  // Cached after first load; tabs render fine with the system font meanwhile.
-  useFonts({
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_700Bold,
-    PlusJakartaSans_800ExtraBold,
-  });
 
   return (
     <Tabs
