@@ -1,12 +1,12 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
-import { addBooking } from '@/utils/bookingStore';
-import { clearCart, removeFromCart, useCart } from '@/utils/cartStore';
+import { removeFromCart, useCart } from '@/utils/cartStore';
 import { router } from 'expo-router';
-import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function CartScreen() {
   const cart = useCart();
@@ -19,21 +19,7 @@ export default function CartScreen() {
     }
   };
 
-  const handleCheckout = () => {
-    cart.forEach((item) => {
-      addBooking({
-        id: `${item.id}-${Date.now()}`,
-        serviceName: item.serviceName,
-        itemName: item.itemName,
-        price: item.price,
-        bookedAt: new Date().toLocaleDateString(),
-      });
-    });
-    clearCart();
-    Alert.alert('Checkout Complete!', 'Your bookings have been confirmed.', [
-      { text: 'View Bookings', onPress: () => router.replace('/(tabs)/bookings') },
-    ]);
-  };
+  const handleCheckout = () => router.push('/checkout');
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -89,18 +75,18 @@ const styles = StyleSheet.create({
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
   emptyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginBottom: 8 },
   emptySubtitle: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, textAlign: 'center', lineHeight: 19, marginBottom: 20 },
-  browseButton: { backgroundColor: Colors.accent, borderRadius: 2, paddingVertical: 13, paddingHorizontal: 24 },
-  browseButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontWeight: '800', fontSize: 12 },
+  browseButton: { minHeight: Ui.button.minHeight,  backgroundColor: Colors.accent, borderRadius: Ui.radius.button, paddingVertical: 13, paddingHorizontal: 24 },
+  browseButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontWeight: '800', fontSize: 13 },
   list: { paddingHorizontal: 22, paddingTop: 15, paddingBottom: 20, gap: 10 },
-  card: {
+  card: { ...Ui.card, paddingHorizontal: 18,
     flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.white,
     borderBottomWidth: 1, borderBottomColor: Colors.border, paddingVertical: 15,
   },
   serviceTag: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', color: Colors.secondary, marginBottom: 4 },
-  itemName: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark, marginBottom: 4 },
-  price: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.primary },
+  itemName: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark, marginBottom: 4 },
+  price: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.primary },
   footer: { padding: 16, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.white },
-  checkoutButton: { backgroundColor: Colors.accent, borderRadius: 2, paddingVertical: 15, alignItems: 'center' },
+  checkoutButton: { minHeight: Ui.button.minHeight,  backgroundColor: Colors.accent, borderRadius: Ui.radius.button, paddingVertical: 15, alignItems: 'center' },
   checkoutButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  emptyIcon: { width: 58, height: 58, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
+  emptyIcon: { borderRadius: 29, width: 58, height: 58, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
 });

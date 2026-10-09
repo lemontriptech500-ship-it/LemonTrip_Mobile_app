@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
 import { getAccessToken, useAuth } from '@/utils/authStore';
@@ -6,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 const documentLabels = { passportFront: 'Passport front', passportBack: 'Passport back', applicantPhoto: 'Applicant photo' } as const;
 
@@ -57,7 +58,7 @@ export default function VisaApplicationsScreen() {
       {!loading && !error ? items.map((item) => <View key={item.id} style={styles.card}>
         <View style={styles.row}><View style={styles.tag}><Text style={styles.tagText}>{item.status}</Text></View><Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text></View>
         <Text style={styles.heading}>{item.country}</Text><Text style={styles.copy}>{item.visaType}</Text>
-        <Text style={styles.reference}>Reference: {item.referenceId}</Text>
+        <Text style={styles.reference}>Reference: {item.referenceId}</Text><TouchableOpacity accessibilityRole="button" style={styles.button} onPress={() => router.push({ pathname: "/visa-application/[id]", params: { id: item.id } })}><Text style={styles.buttonText}>View details & track status</Text></TouchableOpacity>
         <View style={styles.documents}>{(Object.keys(documentLabels) as (keyof typeof documentLabels)[]).filter((key) => item.documents[key]).map((key) => {
           const busy = opening === `${item.id}:${key}`;
           return <TouchableOpacity key={key} accessibilityRole="button" accessibilityLabel={`Open ${documentLabels[key]}`} disabled={Boolean(opening)} style={styles.document} onPress={() => void openDocument(item, key)}>
@@ -72,6 +73,6 @@ export default function VisaApplicationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background }, page: { paddingBottom: 32 }, content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: 16 },
-  loader: { marginTop: 48 }, card: { padding: 17, marginTop: 12, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface }, row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, tag: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: 8, backgroundColor: Colors.accentSoft }, tagText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900', textTransform: 'capitalize' }, date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11 }, heading: { marginTop: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '900' }, copy: { marginTop: 5, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 }, reference: { marginTop: 10, color: Colors.primary, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' }, documents: { gap: 7, marginTop: 14 }, document: { minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, borderRadius: 9, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border }, documentText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' }, empty: { alignItems: 'center', marginTop: 45, padding: 24, borderRadius: 14, backgroundColor: Colors.surfaceMuted }, errorPanel: { marginTop: 24, padding: 15, borderRadius: 12, backgroundColor: Colors.surfaceMuted }, button: { minHeight: 40, alignItems: 'center', justifyContent: 'center', marginTop: 13, paddingHorizontal: 15, borderRadius: 9, backgroundColor: Colors.accent }, moreButton: { minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: 9, backgroundColor: Colors.accent }, buttonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900' },
+  safe: { flex: 1, backgroundColor: Colors.background }, page: { paddingBottom: 32 }, content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: Ui.space.page },
+  loader: { marginTop: 48 }, card: { ...Ui.card, padding: Ui.space.card, marginTop: 12, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface }, row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, tag: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: Ui.radius.pill, backgroundColor: Colors.accentSoft }, tagText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', textTransform: 'capitalize' }, date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 }, heading: { marginTop: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' }, copy: { marginTop: 5, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 }, reference: { marginTop: 10, color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' }, documents: { gap: 7, marginTop: 14 }, document: { minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, borderRadius: 9, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border }, documentText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' }, empty: { alignItems: 'center', marginTop: 45, padding: 24, borderRadius: 14, backgroundColor: Colors.surfaceMuted }, errorPanel: { marginTop: 24, padding: 15, borderRadius: 12, backgroundColor: Colors.surfaceMuted }, button: { minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 13, paddingHorizontal: 15, borderRadius: Ui.radius.control, backgroundColor: Colors.accent }, moreButton: { minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.control, backgroundColor: Colors.accent }, buttonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 });

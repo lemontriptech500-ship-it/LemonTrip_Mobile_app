@@ -1,5 +1,6 @@
+import { Ui } from '@/constants/theme';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
@@ -11,7 +12,7 @@ export default function WishlistScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScreenHeader title="Saved places" subtitle="Keep the places you want to come back to." eyebrow="YOUR SHORTLIST" onBack={() => router.back()} />
+      <ScreenHeader title="Saved places" subtitle="Keep the places you want to come back to." eyebrow="YOUR SHORTLIST" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} />
 
       {wishlist.length === 0 ? (
         <View style={styles.emptyState}>
@@ -20,6 +21,7 @@ export default function WishlistScreen() {
           <Text style={styles.emptySubtitle}>
             Tap the heart icon on any destination to save it here.
           </Text>
+          <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/packages')} style={{ ...Ui.button, backgroundColor: Colors.accent, paddingHorizontal: 24, marginTop: 20, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontFamily: 'Manrope', fontWeight: '800', color: Colors.primaryDark }}>Find your next escape</Text></TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     gap: 12,
   },
-  card: {
+  card: { ...Ui.card,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
@@ -110,14 +112,14 @@ const styles = StyleSheet.create({
   },
   cardName: {
     fontFamily: 'Manrope',
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 4,
   },
   cardPrice: {
     fontFamily: 'Manrope',
-    fontSize: 11,
+    fontSize: 18,
     color: Colors.textLight,
   },
   removeButton: {
@@ -129,5 +131,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-  emptyIcon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
+  emptyIcon: { borderRadius: 28, width: 56, height: 56, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
 });

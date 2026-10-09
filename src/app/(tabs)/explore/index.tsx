@@ -1,3 +1,5 @@
+import { Ui } from '@/constants/theme';
+import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
@@ -9,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -41,6 +43,18 @@ const experienceTypes: { name: string; filter: string; icon: IconName }[] = [
   { name: 'Weekend', filter: 'Weekend', icon: 'calendar-outline' },
   { name: 'Luxury', filter: 'Luxury', icon: 'diamond-outline' },
 ];
+
+const travelServices = [
+  { label: 'Flights', icon: 'airplane-outline', route: '/(tabs)/explore/flights' },
+  { label: 'Hotels', icon: 'bed-outline', route: '/(tabs)/explore/hotels' },
+  { label: 'Packages', icon: 'sunny-outline', route: '/packages' },
+  { label: 'Buses', icon: 'bus-outline', route: '/(tabs)/explore/buses' },
+  { label: 'Trains', icon: 'train-outline', route: '/(tabs)/explore/trains' },
+  { label: 'Visa', icon: 'id-card-outline', route: '/(tabs)/explore/visa' },
+  { label: 'Stories', icon: 'book-outline', route: '/blog' },
+  { label: 'Trip cart', icon: 'bag-outline', route: '/cart' },
+  { label: 'Support', icon: 'headset-outline', route: '/contact' },
+] as const;
 
 const popularSearches = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Weekend getaways'];
 const filterOptions = {
@@ -157,6 +171,7 @@ export default function ExploreScreen() {
               )}
             </View>
           </BrandGradientBar>
+          <View style={styles.exploreIntro}><BrandMotif /><Text style={styles.exploreEyebrow}>THE WORLD IS CALLING</Text><Text style={styles.exploreTitle}>Find your next escape.</Text><Text style={styles.exploreSubtitle}>Somewhere new. Something unforgettable.</Text></View>
 
           {/* Search strip — same pill as Home, filter button replaces the arrow */}
           <View style={styles.searchStrip}>
@@ -226,6 +241,11 @@ export default function ExploreScreen() {
             ) : null}
           </View>
 
+          <View style={styles.servicesPanel}>
+            <Text style={styles.gridTitle}>Every part of your journey</Text>
+            <View style={styles.servicesGrid}>{travelServices.map(service => <TouchableOpacity key={service.label} accessibilityRole="button" onPress={() => router.push(service.route)} style={styles.serviceTile}><Ionicons name={service.icon} size={25} color={Colors.primary} /><Text style={styles.serviceTileText}>{service.label}</Text></TouchableOpacity>)}</View>
+          </View>
+
           {/* Travel style — white rounded icon grid, matching Home's service card */}
           <View style={styles.gridCard}>
             <View style={styles.gridHeader}>
@@ -271,14 +291,14 @@ export default function ExploreScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
               <Text style={styles.sectionTitle}>Trending destinations</Text>
-              <TouchableOpacity onPress={() => { setQuery(''); setShowSuggestions(false); }}><Text style={styles.linkText}>Discover all</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/destinations')}><Text style={styles.linkText}>Discover all</Text></TouchableOpacity>
             </View>
             {filteredDestinations.length ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.destinationRow}>
                 {filteredDestinations.map((item) => {
                   const saved = isInWishlist(item.id);
                   return (
-                    <TouchableOpacity key={item.id} style={styles.destinationCard} activeOpacity={0.9} onPress={() => selectSearch(item.name)}>
+                    <TouchableOpacity key={item.id} style={styles.destinationCard} activeOpacity={0.9} onPress={() => router.push({ pathname: "/destinations/[id]", params: { id: item.id } })}>
                       <ImageBackground source={{ uri: item.image }} style={styles.destinationImage} imageStyle={styles.destinationImageStyle}>
                         <View style={styles.destinationShade} />
                         <TouchableOpacity
@@ -395,7 +415,7 @@ export default function ExploreScreen() {
               <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}><Text style={styles.footerLink}>Explore</Text></TouchableOpacity>
               <TouchableOpacity onPress={() => router.push('/packages')}><Text style={styles.footerLink}>Packages</Text></TouchableOpacity>
               <TouchableOpacity onPress={() => router.push('/offers')}><Text style={styles.footerLink}>Offers</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}><Text style={styles.footerLink}>Support</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/contact')}><Text style={styles.footerLink}>Support</Text></TouchableOpacity>
             </View>
             <Text style={styles.footerCopyright}>© LemonTrip. Made for the journey.</Text>
           </View>
@@ -405,11 +425,19 @@ export default function ExploreScreen() {
   );
 }
 
-const SOFT_GREEN = '#f1f7ee';
-const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 } as const;
+const SOFT_GREEN = Colors.surfaceMuted;
+const SHADOW = Ui.shadow;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f7f8f4 },
+  exploreIntro: { paddingHorizontal: Ui.space.page, paddingTop: 14, paddingBottom: 38, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
+  exploreEyebrow: { ...Ui.eyebrow, color: Colors.accent },
+  exploreTitle: { fontFamily: 'Manrope', fontSize: 28, lineHeight: 35, fontWeight: '800', color: Colors.white, marginTop: 8 },
+  exploreSubtitle: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 6 },
+  servicesPanel: { marginHorizontal: Ui.space.page, marginTop: 24 },
+  servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
+  serviceTile: { flexGrow: 1, flexBasis: '28%', ...Ui.card, minHeight: 96, alignItems: 'center', justifyContent: 'center', gap: 9 },
+  serviceTileText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.primary },
+  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
@@ -421,8 +449,8 @@ const styles = StyleSheet.create({
   headerNav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 },
   navLink: { minHeight: 54, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' },
   navLinkActive: { borderBottomColor: Colors.accent },
-  navText: { color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 14, fontWeight: '700' },
-  navTextActive: { color: Colors.accent, fontWeight: '900' },
+  navText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 14, fontWeight: '700' },
+  navTextActive: { color: Colors.accent, fontWeight: '800' },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   headerAction: { width: 38, height: 40, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent },
@@ -431,16 +459,16 @@ const styles = StyleSheet.create({
   loginText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
 
   // Search
-  searchStrip: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 14, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border, zIndex: 5 },
-  searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: '#eef0f1', borderWidth: 1, borderColor: Colors.border },
+  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: -18, padding: 12, zIndex: 5 },
+  searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, paddingVertical: 10 },
   clearSearch: { padding: 4 },
   filterCircle: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.primary },
   filterCircleActive: { backgroundColor: Colors.primaryDark },
   filterBadge: { position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
-  filterBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900' },
-  dropPanel: { marginTop: 10, padding: 14, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
-  dropHeading: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginBottom: 4 },
+  filterBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  dropPanel: { ...Ui.card, marginTop: 10, padding: Ui.space.card, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  dropHeading: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginBottom: 4 },
   suggestionRow: { minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
   suggestionRowLast: { borderBottomWidth: 0 },
   suggestionText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '700' },
@@ -454,13 +482,13 @@ const styles = StyleSheet.create({
   filterChipTextSelected: { color: Colors.white },
   filterActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
   resetText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', padding: 6 },
-  applyButton: { paddingHorizontal: 18, paddingVertical: 11, borderRadius: 22, backgroundColor: Colors.primary },
+  applyButton: { minHeight: 44,  paddingHorizontal: 18, paddingVertical: 11, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
   applyText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
 
   // Travel style grid card
-  gridCard: { marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: 26, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, marginBottom: 10 },
-  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
   gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
@@ -469,23 +497,23 @@ const styles = StyleSheet.create({
   gridLabelSelected: { color: Colors.primary },
 
   // Banner
-  bannerWrap: { marginTop: 16, marginHorizontal: 16 },
+  bannerWrap: { marginTop: 16, marginHorizontal: Ui.space.page },
   banner: { minHeight: 230, justifyContent: 'flex-end', borderRadius: 24, overflow: 'hidden', backgroundColor: Colors.primaryDark },
   bannerWide: { minHeight: 260 },
   bannerImage: { borderRadius: 24 },
-  bannerShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(3, 39, 30, 0.36)' },
+  bannerShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
   bannerContent: { padding: 20, maxWidth: 560 },
   bannerKicker: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '500' },
-  bannerTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 36, lineHeight: 42, fontWeight: '900' },
-  bannerSubtitle: { color: 'rgba(255,255,255,0.94)', fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6, maxWidth: 380 },
+  bannerTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 36, lineHeight: 42, fontWeight: '800' },
+  bannerSubtitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6, maxWidth: 380 },
   bannerCta: { alignSelf: 'flex-start', minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 14, paddingLeft: 20, paddingRight: 6, borderRadius: 25, backgroundColor: Colors.white },
-  bannerCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
+  bannerCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
   bannerCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
 
   // Sections
   section: { paddingTop: 24 },
   sectionHeading: { paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '800' },
   linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
 
   // Destinations
@@ -493,11 +521,11 @@ const styles = StyleSheet.create({
   destinationCard: { width: 290, height: 170, borderRadius: 20, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
   destinationImage: { flex: 1, justifyContent: 'space-between', padding: 14 },
   destinationImageStyle: { borderRadius: 20 },
-  destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(4, 30, 25, 0.42)' },
-  saveButton: { alignSelf: 'flex-end', width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(255,255,255,0.96)', alignItems: 'center', justifyContent: 'center' },
-  destinationCountry: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
-  destinationName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '900', marginTop: 1 },
-  destinationPrice: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '600', marginTop: 2 },
+  destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
+  saveButton: { alignSelf: 'flex-end', width: 38, height: 38, borderRadius: 19, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center' },
+  destinationCountry: { color: Colors.white, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  destinationName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', marginTop: 1 },
+  destinationPrice: { color: Colors.white, fontFamily: 'Manrope', fontSize: 18, fontWeight: '600', marginTop: 2 },
 
   // Active filters
   activeFilters: { paddingHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 12 },
@@ -507,33 +535,33 @@ const styles = StyleSheet.create({
 
   // Packages
   packageRow: { paddingHorizontal: 16, gap: 12 },
-  packageCard: { width: 264, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 20, overflow: 'hidden', ...SHADOW },
+  packageCard: { ...Ui.card, width: 264, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, overflow: 'hidden', ...SHADOW },
   packageImage: { height: 130, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start', padding: 10 },
   packageImageStyle: { borderTopLeftRadius: 19, borderTopRightRadius: 19 },
-  packageBadge: { overflow: 'hidden', color: Colors.primaryDark, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
-  packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(20, 31, 25, 0.72)', paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
+  packageBadge: { overflow: 'hidden', color: Colors.primaryDark, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.strongOverlay, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
   packageRatingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
   packageBody: { padding: 14 },
-  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 21, fontWeight: '900' },
+  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 21, fontWeight: '800' },
   packageMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   packageDuration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   packageBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
   priceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
-  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', marginTop: 1 },
+  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 1 },
   packageArrow: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.primary },
 
-  emptyState: { marginHorizontal: 16, padding: 20, alignItems: 'flex-start', gap: 12, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  emptyState: { marginHorizontal: Ui.space.page, padding: 20, alignItems: 'flex-start', gap: 12, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   emptyStateText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 },
-  emptyButton: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, backgroundColor: Colors.primary },
+  emptyButton: { minHeight: 44,  paddingHorizontal: 16, paddingVertical: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
 
   // Personal panel
-  personalPanel: { marginTop: 24, marginHorizontal: 16, padding: 18, flexDirection: 'row', gap: 14, alignItems: 'flex-start', borderRadius: 22, backgroundColor: '#fff4bf' },
+  personalPanel: { marginTop: 24, marginHorizontal: Ui.space.page, padding: 18, flexDirection: 'row', gap: 14, alignItems: 'flex-start', borderRadius: 22, backgroundColor: Colors.accentSoft },
   personalLogo: { width: 52, height: 52, borderRadius: 12 },
   personalCopy: { flex: 1, minWidth: 0 },
-  personalTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 19, lineHeight: 24, fontWeight: '900' },
+  personalTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 19, lineHeight: 24, fontWeight: '800' },
   personalSubtitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 4 },
   preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 12 },
-  preferenceChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(6,59,36,0.14)', backgroundColor: 'rgba(255,255,255,0.8)' },
+  preferenceChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: Colors.decorativeGreen, backgroundColor: Colors.surface },
   preferenceChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   preferenceText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   preferenceTextActive: { color: Colors.white },
@@ -541,15 +569,15 @@ const styles = StyleSheet.create({
   signInText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 
   // Trust + footer
-  trustStrip: { marginTop: 18, marginHorizontal: 16, padding: 14, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: '#edf5eb', borderRadius: 18 },
+  trustStrip: { marginTop: 18, marginHorizontal: Ui.space.page, padding: 14, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 18 },
   trustItem: { flexGrow: 1, flexBasis: 150, flexDirection: 'row', alignItems: 'center', gap: 10 },
   trustCopy: { flexShrink: 1 },
-  trustTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
+  trustTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
   trustSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 2 },
   footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
   footerLogoImage: { width: 118, height: 38 },
   footerTagline: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   footerLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 18 },
   footerLink: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
-  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
 });

@@ -1,0 +1,17 @@
+import { Action, Copy, Empty, FeatureScreen, Panel, Row } from '@/components/FeatureScreen';
+import { useAccountBookings } from '@/utils/accountBookings';
+import { supportContact } from '@/constants/navigation';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
+import { Linking, Share } from 'react-native';
+
+export default function BookingDetailsScreen() {
+  const { id, view } = useLocalSearchParams<{ id: string; view?: string }>();
+  const account = useAccountBookings();
+  const booking = account.bookings.find(item => item.id === id);
+  const [message, setMessage] = useState('');
+  const share = async () => { if (!booking) return; try { await Share.share({ message: `LemonTrip trip details\n${booking.itemName}\nReference: ${booking.id}\nTravel date: ${booking.tripDate ?? 'Not supplied'}\n${booking.price}\nStatus: ${booking.status ?? 'Not supplied'}` }); } catch { setMessage('Could not open sharing. Please try again.'); } };
+  const requestTicket = async () => { try { await Linking.openURL(`mailto:${supportContact.email}?subject=${encodeURIComponent(`Ticket / voucher request: ${id}`)}`); } catch { setMessage(`Contact ${supportContact.email} with reference ${id}.`); } };
+  const title = view === 'ticket' ? 'Ticket & voucher' : view === 'refund' ? 'Cancellation & refunds' : 'Your trip details';
+  return <FeatureScreen title={title} eyebrow="MY TRIPS" subtitle="Everything you need for the journey ahead.">{!booking ? <Empty title={account.loading ? "Loading your trip…" : "This trip isn’t available"} copy={account.error || "Sign in and open My Trips to choose a booking."} action="Go to My Trips" route="/(tabs)/bookings" icon="ticket-outline" /> : <><Panel title={booking.itemName}><Copy>{booking.serviceName}</Copy><Copy>Booking reference: {booking.id}</Copy><Copy>Travel date: {booking.tripDate ?? 'Not supplied'}</Copy><Copy>Booked on: {booking.bookedAt}</Copy><Copy>Status: {booking.status ?? 'Not supplied'}</Copy><Copy>Total: {booking.price}</Copy><Copy>Payment: {booking.paymentStatus ?? "Not supplied"}</Copy></Panel>{view === 'refund' ? <Panel title="Your cancellation request"><Copy>Cancellation eligibility, charges, and refunds depend on your provider’s booking terms. No verified refund status was supplied for this booking.</Copy><Action label="Ask about cancellation / refund" onPress={() => router.push({ pathname: '/contact', params: { reference: booking.id } })} /></Panel> : view === 'ticket' ? <Panel title="Travel documents"><Copy>A provider-issued ticket or voucher has not been supplied for this booking. Request the document from support using your booking reference.</Copy><Action label="Request ticket / voucher" onPress={() => void requestTicket()} /><Action label="Share trip details" secondary onPress={() => void share()} /></Panel> : <Panel title="Manage this journey"><Row title="Ticket / voucher" icon="document-text-outline" onPress={() => router.push({ pathname: '/booking/[id]', params: { id, view: 'ticket' } })} /><Row title="Cancellation & refund status" icon="refresh-outline" onPress={() => router.push({ pathname: '/booking/[id]', params: { id, view: 'refund' } })} /><Row title="Share trip details" icon="share-social-outline" onPress={() => void share()} /><Row title="Get help with this booking" icon="headset-outline" route={{ pathname: '/contact', params: { reference: id } }} /></Panel>}</>}{message ? <Copy>{message}</Copy> : null}</FeatureScreen>;
+}

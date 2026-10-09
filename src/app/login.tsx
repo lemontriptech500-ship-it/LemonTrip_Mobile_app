@@ -1,17 +1,19 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
 import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput } from '@/utils/authApi';
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
+  const { mode: initialMode } = useLocalSearchParams<{ mode?: string }>();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const phoneOtp = useFirebasePhoneOtp();
-  const [mode, setMode] = useState<'email' | 'phone'>('email');
+  const [mode, setMode] = useState<'email' | 'phone'>(initialMode === 'phone' ? 'phone' : 'email');
   const [loading, setLoading] = useState(false);
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -65,9 +67,7 @@ export default function LoginScreen() {
     else router.replace('/(tabs)');
   };
 
-  const showUnavailable = (feature: string) => {
-    Alert.alert(feature, `${feature} is not connected yet. Contact hello@lemontrip.in for help.`);
-  };
+
 
   return (
     <AuthLayout
@@ -110,7 +110,7 @@ export default function LoginScreen() {
       {mode === 'phone' ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
       {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <Text accessibilityRole="alert" style={styles.phoneError}>{phoneOtp.error}</Text> : null}
 
-      {mode === 'email' ? <TouchableOpacity onPress={() => showUnavailable('Password reset')} style={styles.forgotRow}>
+      {mode === 'email' ? <TouchableOpacity onPress={() => router.push('/forgot-password')} style={styles.forgotRow}>
         <Text style={styles.forgotText}>Forgot password?</Text>
       </TouchableOpacity> : null}
 
@@ -124,32 +124,32 @@ export default function LoginScreen() {
       <TouchableOpacity onPress={() => router.push('/signup')} style={styles.switchLink}>
         <Text style={styles.switchText}>New to LemonTrip? <Text style={styles.switchTextStrong}>Create an account</Text></Text>
       </TouchableOpacity>
-      <AuthLegalLinks onTerms={() => showUnavailable('Terms')} onPrivacy={() => showUnavailable('Privacy policy')} />
+      <AuthLegalLinks onTerms={() => router.push('/terms')} onPrivacy={() => router.push('/privacy')} />
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
   modeSwitch: { flexDirection: 'row', padding: 3, marginBottom: 12, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
-  modeButton: { flex: 1, minHeight: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  modeButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
   modeButtonActive: { backgroundColor: Colors.surface },
-  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
-  modeTextActive: { color: Colors.primary, fontWeight: '900' },
+  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  modeTextActive: { color: Colors.primary, fontWeight: '800' },
   otpActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 7, marginBottom: 10 },
-  otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   otpActionDisabled: { color: Colors.textLight },
   recaptcha: { minHeight: 78, alignItems: 'flex-start', marginTop: 8, marginBottom: 8 },
-  smsNotice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14, marginBottom: 8 },
-  phoneError: { color: '#B42318', fontFamily: 'Manrope', fontSize: 10, lineHeight: 15, marginBottom: 8 },
+  smsNotice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginBottom: 8 },
+  phoneError: { color: Colors.error, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginBottom: 8 },
   disabledButton: { opacity: 0.6 },
   forgotRow: { alignSelf: 'flex-end', marginTop: -3, marginBottom: 11, paddingVertical: 5 },
-  forgotText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
-  primaryButton: { minHeight: 45, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.primary },
-  primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  forgotText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  primaryButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  primaryButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 14 },
   divider: { flex: 1, height: 1, backgroundColor: Colors.border },
-  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   switchLink: { alignItems: 'center', marginTop: 15, paddingVertical: 5 },
-  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
+  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   switchTextStrong: { color: Colors.primary, fontWeight: '800' },
 });

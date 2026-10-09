@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 14, padding: 15, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
   routeBlock: { flexGrow: 1, minWidth: 150 },
   route: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 4 },
+  date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 4 },
   detail: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  detailText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
+  detailText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
 });

@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +8,7 @@ import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function ServiceListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -130,6 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   searchForm: {
+    ...Ui.card,
     marginHorizontal: 22,
     marginTop: 18,
     padding: 17,
@@ -144,21 +146,21 @@ const styles = StyleSheet.create({
     color: Colors.textDark,
     marginBottom: 6,
   },
-  input: {
+  input: { minHeight: Ui.field.minHeight,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 2,
+    borderRadius: Ui.radius.control,
     backgroundColor: Colors.background,
     paddingHorizontal: 13,
     paddingVertical: 13,
     fontFamily: 'Manrope',
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.textDark,
     marginBottom: 16,
   },
-  searchButton: {
+  searchButton: { minHeight: Ui.button.minHeight,
     backgroundColor: Colors.accent,
-    borderRadius: 2,
+    borderRadius: Ui.radius.button,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 8,
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
   },
   editSearchText: {
     fontFamily: 'Manrope',
-    fontSize: 11,
+    fontSize: 13,
     color: Colors.primary,
     fontWeight: '600',
   },
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
     paddingBottom: 26,
     gap: 11,
   },
-  card: {
+  card: { ...Ui.card,
     backgroundColor: Colors.white,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -202,27 +204,27 @@ const styles = StyleSheet.create({
   },
   cardName: {
     fontFamily: 'Manrope',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
     color: Colors.textDark,
     marginBottom: 4,
   },
   cardDetail: {
     fontFamily: 'Manrope',
-    fontSize: 10,
+    fontSize: 12,
     color: Colors.textLight,
     marginBottom: 6,
   },
   cardPrice: {
     fontFamily: 'Manrope',
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '800',
     color: Colors.primary,
     marginBottom: 12,
   },
-  bookButton: {
+  bookButton: { minHeight: Ui.button.minHeight,
     backgroundColor: Colors.accent,
-    borderRadius: 2,
+    borderRadius: Ui.radius.button,
     paddingVertical: 10,
     alignItems: 'center',
   },
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
     color: Colors.primaryDark,
     fontFamily: 'Manrope',
     fontWeight: '800',
-    fontSize: 11,
+    fontSize: 13,
   },
   addedButtonText: {
     color: Colors.white,

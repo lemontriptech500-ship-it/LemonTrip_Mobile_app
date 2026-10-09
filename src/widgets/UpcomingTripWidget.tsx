@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/colors';
 import { FlexWidget, TextWidget } from 'react-native-android-widget';
 
 export interface Trip {
@@ -27,7 +28,7 @@ export function UpcomingTripWidget({
           width: 'match_parent',
           height: 'match_parent',
           padding: 18,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: Colors.surface,
           borderRadius: 22,
           flexDirection: 'column',
           justifyContent: 'center',
@@ -38,7 +39,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 11,
             fontWeight: 'bold',
-            color: '#16856F',
+            color: Colors.primary,
             marginBottom: 7,
           }}
         />
@@ -48,7 +49,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 18,
             fontWeight: 'bold',
-            color: '#172033',
+            color: Colors.textDark,
           }}
         />
 
@@ -56,7 +57,7 @@ export function UpcomingTripWidget({
           text="Plan your next journey with LemonTrip"
           style={{
             fontSize: 12,
-            color: '#697386',
+            color: Colors.textLight,
             marginTop: 5,
           }}
         />
@@ -74,7 +75,7 @@ export function UpcomingTripWidget({
         width: 'match_parent',
         height: 'match_parent',
         padding: 18,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.surface,
         borderRadius: 22,
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -95,7 +96,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 11,
             fontWeight: 'bold',
-            color: '#6B7280',
+            color: Colors.textLight,
           }}
         />
 
@@ -104,7 +105,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 9,
             fontWeight: 'bold',
-            color: '#16856F',
+            color: Colors.primary,
           }}
         />
       </FlexWidget>
@@ -123,7 +124,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 24,
             fontWeight: 'bold',
-            color: '#111827',
+            color: Colors.textDark,
           }}
         />
 
@@ -132,7 +133,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 13,
             fontWeight: 'bold',
-            color: '#596579',
+            color: Colors.textLight,
             marginTop: 4,
           }}
         />
@@ -159,7 +160,7 @@ export function UpcomingTripWidget({
             style={{
               fontSize: 9,
               fontWeight: 'bold',
-              color: '#8A94A6',
+              color: Colors.textLight,
             }}
           />
 
@@ -168,7 +169,7 @@ export function UpcomingTripWidget({
             style={{
               fontSize: 14,
               fontWeight: 'bold',
-              color: '#1F2937',
+              color: Colors.textDark,
               marginTop: 2,
             }}
           />
@@ -178,7 +179,7 @@ export function UpcomingTripWidget({
           style={{
             paddingHorizontal: 10,
             paddingVertical: 6,
-            backgroundColor: '#EEF7F5',
+            backgroundColor: Colors.surfaceMuted,
             borderRadius: 12,
           }}
         >
@@ -191,7 +192,7 @@ export function UpcomingTripWidget({
             style={{
               fontSize: 11,
               fontWeight: 'bold',
-              color: '#16856F',
+              color: Colors.primary,
             }}
           />
         </FlexWidget>
@@ -212,7 +213,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 9,
             fontWeight: 'bold',
-            color: '#8A94A6',
+            color: Colors.textLight,
           }}
         />
 
@@ -221,7 +222,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 12,
             fontWeight: 'bold',
-            color: '#166534',
+            color: Colors.success,
             marginLeft: 3,
           }}
         />
@@ -235,7 +236,7 @@ export function UpcomingTripWidget({
           marginTop: 10,
           paddingTop: 10,
           borderTopWidth: 1,
-          borderTopColor: '#E5E7EB',
+          borderTopColor: Colors.border,
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -246,7 +247,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 12,
             fontWeight: 'bold',
-            color: '#172033',
+            color: Colors.textDark,
           }}
         />
 
@@ -255,7 +256,7 @@ export function UpcomingTripWidget({
           style={{
             fontSize: 12,
             fontWeight: 'bold',
-            color: '#16856F',
+            color: Colors.primary,
           }}
         />
       </FlexWidget>

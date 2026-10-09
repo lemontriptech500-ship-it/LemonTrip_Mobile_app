@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
@@ -5,7 +6,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -75,13 +76,13 @@ function TravelVisual({ style, compact = false }: { style: object; compact?: boo
       <View style={styles.visualShade} />
       <View style={[styles.visualCopy, compact && styles.visualCopyCompact]}>
         <View style={styles.brandRow}><LemonTripBrand size={54} /></View>
-        {!compact ? (
-          <View style={styles.visualMessage}>
+        <View style={[styles.visualMessage, compact && { paddingBottom: 8 }]}>
+          {!compact ? <>
             <Text style={styles.visualEyebrow}>YOUR NEXT STORY IS OUT THERE</Text>
             <Text style={styles.visualTitle}>Make room for somewhere new.</Text>
             <Text style={styles.visualSubtitle}>Thoughtful travel starts with a single step.</Text>
-          </View>
-        ) : null}
+          </> : <><Text style={styles.visualEyebrow}>YOUR NEXT STORY STARTS HERE</Text><Text style={[styles.visualTitle, { fontSize: 24, lineHeight: 30 }]}>Welcome to a world of possibilities.</Text></>}
+        </View>
       </View>
     </ImageBackground>
   );
@@ -233,43 +234,43 @@ const styles = StyleSheet.create({
   layoutDesktop: { flexDirection: 'row' },
   visual: { overflow: 'hidden', backgroundColor: Colors.primaryDark },
   desktopVisual: { flex: 1.05, minWidth: 0 },
-  mobileVisual: { height: 132 },
+  mobileVisual: { height: 220, borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
   visualImage: {},
-  visualShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(5, 35, 23, 0.38)' },
+  visualShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
   visualCopy: { flex: 1, justifyContent: 'space-between', padding: 30 },
-  visualCopyCompact: { justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 13 },
+  visualCopyCompact: { justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 13 },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   brandMark: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent },
-  brandMarkText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
-  brandName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
+  brandMarkText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  brandName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
   visualMessage: { maxWidth: 480, paddingBottom: 22 },
-  visualEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.3 },
-  visualTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 34, lineHeight: 41, fontWeight: '900', marginTop: 9 },
-  visualSubtitle: { color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 12, marginTop: 9 },
+  visualEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.3 },
+  visualTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 34, lineHeight: 41, fontWeight: '800', marginTop: 9 },
+  visualSubtitle: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 12, marginTop: 9 },
   formPane: { flex: 1, minWidth: 0, backgroundColor: Colors.background },
   formScroll: { flex: 1 },
-  formScrollContent: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 18 },
+  formScrollContent: { flexGrow: 1, justifyContent: 'flex-start', paddingHorizontal: 18, paddingVertical: 24 },
   formScrollContentDesktop: { paddingHorizontal: 38 },
-  formWrap: { width: '100%', maxWidth: 430, alignSelf: 'center' },
-  authNav: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, marginBottom: 14, borderRadius: 12 },
-  backButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)' },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.1 },
-  title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 26, lineHeight: 32, fontWeight: '900', marginTop: 5 },
-  subtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 17, marginTop: 4, marginBottom: 20 },
+  formWrap: { ...Ui.card, padding: 20, width: '100%', maxWidth: 460, alignSelf: 'center' },
+  authNav: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, marginBottom: 14, borderRadius: 18 },
+  backButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.onDarkSurface },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.1 },
+  title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 26, lineHeight: 32, fontWeight: '800', marginTop: 5 },
+  subtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 17, marginTop: 4, marginBottom: 20 },
   fieldGroup: { marginBottom: 12 },
-  fieldLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', marginBottom: 6 },
-  inputWrap: { minHeight: 46, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.surface },
+  fieldLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', marginBottom: 6 },
+  inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.background },
   inputWrapError: { borderColor: Colors.error },
-  input: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, paddingHorizontal: 12, paddingVertical: 10 },
+  input: { minHeight: Ui.field.minHeight,  flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, paddingHorizontal: 12, paddingVertical: 10 },
   visibilityButton: { width: 40, height: 42, alignItems: 'center', justifyContent: 'center' },
-  errorText: { color: Colors.error, fontFamily: 'Manrope', fontSize: 9, marginTop: 4 },
-  googleButton: { minHeight: 43, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.surface },
+  errorText: { color: Colors.error, fontFamily: 'Manrope', fontSize: 13, marginTop: 4 },
+  googleButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.button, backgroundColor: Colors.surface },
   googleButtonDisabled: { opacity: 0.55 },
-  googleError: { color: Colors.error, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14, marginTop: 6, textAlign: 'center' },
+  googleError: { color: Colors.error, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 6, textAlign: 'center' },
   googleMark: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
-  googleMarkText: { color: '#4285F4', fontFamily: 'Manrope', fontSize: 17, fontWeight: '900' },
-  googleButtonText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  googleMarkText: { color: Colors.googleBlue, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
+  googleButtonText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   legalRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginTop: 14 },
-  legalText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13 },
-  legalLink: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13, fontWeight: '800' },
+  legalText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
+  legalLink: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, fontWeight: '800' },
 });
