@@ -1,14 +1,14 @@
-import { Colors } from '@/constants/colors';
+import { AppScreen } from '@/components/AppScreen';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import FlightSearchForm from '@/components/flights/FlightSearchForm';
+import { Colors } from '@/constants/colors';
 import type { Offer } from '@/data/offers';
-import { loadOffers, getOfferValidity } from '@/utils/offerApi';
 import type { BlogPost, Destination, TravelPackage } from '@/types/content';
-import { useContentItems } from '@/utils/contentApi';
 import { getUser, useAuth } from '@/utils/authStore';
 import { useCart } from '@/utils/cartStore';
+import { useContentItems } from '@/utils/contentApi';
+import { getOfferValidity, loadOffers } from '@/utils/offerApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
-import { AppScreen } from '@/components/AppScreen';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -231,6 +231,23 @@ export default function HomeScreen() {
 
         <HomeServiceWidget service={activeService} story={visibleStories[0]} offer={visibleOffers[0]} travelPackage={visiblePackages[0]} />
 
+        {/* AI Trip Planner entry */}
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.9}
+          style={styles.aiCard}
+          onPress={() => router.push('/ai-planner' as never)}>
+          <View style={styles.aiIcon}>
+            <Ionicons name="sparkles" size={22} color={Colors.primaryDark} />
+          </View>
+          <View style={styles.aiCopy}>
+            <Text style={styles.aiEyebrow}>AI TRIP PLANNER</Text>
+            <Text style={styles.aiTitle}>Dream it. I'll design it.</Text>
+            <Text style={styles.aiSub}>Plan flights, stays and moments in seconds.</Text>
+          </View>
+          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+        </TouchableOpacity>
+
         {/* Inspiration banner: 3 auto-sliding, swipeable slides */}
         <View style={styles.promo}>
           <ScrollView
@@ -391,7 +408,7 @@ export default function HomeScreen() {
         {/* Stories */}
         {visibleStories.length > 0 ? (
           <View style={styles.section}>
-            <SectionHeader title="Travel stories" action="Read all" onPress={() => router.push('/blog')} />
+            <SectionHeader title="Travel stories" action="Read all" onPress={() => router.push('/blog')}/>
             <View style={styles.storyList}>
               {visibleStories.map((story) => (
                 <TouchableOpacity
@@ -496,7 +513,7 @@ function getWidgetDescription(service: string, cartCount: number, story?: BlogPo
   if (service === 'Holiday Packages') return 'Choose a thoughtfully planned escape, with the details of your journey together.';
   if (service === 'Visa') return 'Check destination guidance and prepare for the entry requirements on your itinerary.';
   if (service === 'Offers') return 'Browse current savings across flights, stays and handpicked holidays.';
-  if (service === 'Saved Places') return 'Keep the stays and destinations you like together for when you are ready.';
+  if (service === 'Saved Places') return "Keep the stays and destinations you like together for when you're ready.";
   if (service === 'Travel Stories') return story?.title ?? 'Read destination guides and ideas from the LemonTrip journal.';
   if (service === 'Cart') return cartCount ? 'Review the travel items you have collected before checkout.' : 'Your trip cart is empty. Browse travel options and add a journey to keep planning.';
   if (service === 'Help') return 'Get practical help from a LemonTrip travel expert before or during your journey.';
@@ -584,6 +601,14 @@ const styles = StyleSheet.create({
   widgetInput: { minHeight: 44, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12 },
   widgetButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 2, paddingHorizontal: 14, borderRadius: 14, backgroundColor: Colors.accent },
   widgetButtonText: { flex: 1, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+
+  // AI Trip Planner card
+  aiCard: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.primaryDark, ...cardShadow },
+  aiIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.accent },
+  aiCopy: { flex: 1, minWidth: 0 },
+  aiEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
+  aiTitle: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 2 },
+  aiSub: { color: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 11, marginTop: 2 },
 
   // Promo banner
   promo: { height: 212, marginHorizontal: 16, marginTop: 14, borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.primaryDark, ...cardShadow },
