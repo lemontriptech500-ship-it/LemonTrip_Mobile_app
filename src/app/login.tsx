@@ -127,7 +127,7 @@ export default function LoginScreen() {
 
       {!phoneOtp.challenge ? <>
       <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
-      <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken)); router.replace('/(tabs)/profile'); }} />
+      <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'login')); router.replace('/(tabs)/profile'); }} />
 
       <TouchableOpacity onPress={() => router.push('/signup')} style={styles.switchLink}>
         <Text style={styles.switchText}>Don’t have an account? <Text style={styles.switchTextStrong}>Sign Up</Text></Text>

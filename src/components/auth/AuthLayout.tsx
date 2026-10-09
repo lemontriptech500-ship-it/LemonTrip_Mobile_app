@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { getGoogleIdToken, signOutGoogleUser } from '@/utils/googleNativeAuth';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
@@ -135,13 +136,13 @@ export function GoogleAuthButton({ label, onSuccess }: { label: string; onSucces
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim(),
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID?.trim(),
   };
-  const platformClientId = Platform.OS === 'web'
-    ? clientIds.webClientId
-    : Platform.OS === 'ios'
-      ? clientIds.iosClientId
-      : clientIds.androidClientId;
+  const isPlaceholder = (value?: string) => !value || value.startsWith('your-google-');
+  // Native Google Sign-In needs the WEB client ID (it is the token audience); iOS also needs its own client ID.
+  const configured = Platform.OS === 'ios'
+    ? !isPlaceholder(clientIds.webClientId) && !isPlaceholder(clientIds.iosClientId)
+    : !isPlaceholder(clientIds.webClientId);
 
-  if (!platformClientId || platformClientId.startsWith('your-google-')) {
+  if (!configured) {
     return (
       <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: true }} disabled style={[styles.googleButton, styles.googleButtonDisabled]}>
         <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
@@ -150,7 +151,39 @@ export function GoogleAuthButton({ label, onSuccess }: { label: string; onSucces
     );
   }
 
-  return <ConfiguredGoogleAuthButton label={label} onSuccess={onSuccess} {...clientIds} />;
+  if (Platform.OS === 'web') return <ConfiguredGoogleAuthButton label={label} onSuccess={onSuccess} {...clientIds} />;
+  return <NativeGoogleAuthButton label={label} onSuccess={onSuccess} />;
+}
+
+function NativeGoogleAuthButton({ label, onSuccess }: { label: string; onSuccess: (idToken: string) => Promise<void> }) {
+  const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  const startGoogleAuth = async () => {
+    if (loading) return;
+    setAuthError('');
+    setLoading(true);
+    try {
+      const idToken = await getGoogleIdToken();
+      if (!idToken) return; // cancelled by the user
+      await onSuccess(idToken); // backend exchange + navigation happen in the screen
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'Google sign-in failed. Please try again.');
+      void signOutGoogleUser(); // so the next attempt shows the account picker (e.g. to pick a different account)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View>
+      <TouchableOpacity accessibilityRole="button" disabled={loading} onPress={() => void startGoogleAuth()} style={[styles.googleButton, loading && styles.googleButtonDisabled]}>
+        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <Text style={styles.googleButtonText}>{loading ? 'Connecting to Google…' : label}</Text>
+      </TouchableOpacity>
+      {authError ? <Text accessibilityRole="alert" style={styles.googleError}>{authError}</Text> : null}
+    </View>
+  );
 }
 
 function ConfiguredGoogleAuthButton({

@@ -4,15 +4,15 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -36,6 +36,35 @@ const WELCOME: Message = {
   role: 'assistant',
   text: 'Hi! I am your LemonTrip AI Planner. Tell me where you want to go, your budget and dates, and I will help plan your trip.',
 };
+
+// Renders **bold** text and turns "- " / "* " lines into bullets.
+function RichText({ text, style, boldStyle }: { text: string; style: object; boldStyle: object }) {
+  const lines = text.split('\n');
+  return (
+    <Text style={style}>
+      {lines.map((rawLine, lineIndex) => {
+        const bulletMatch = rawLine.match(/^\s*[-*]\s+(.*)$/);
+        const content = bulletMatch ? bulletMatch[1] : rawLine;
+        const parts = content.split(/(\*\*[^*]+\*\*)/g).filter((part) => part !== '');
+        return (
+          <Text key={lineIndex}>
+            {bulletMatch ? '•  ' : ''}
+            {parts.map((part, partIndex) =>
+              part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
+                <Text key={partIndex} style={boldStyle}>
+                  {part.slice(2, -2)}
+                </Text>
+              ) : (
+                <Text key={partIndex}>{part}</Text>
+              ),
+            )}
+            {lineIndex < lines.length - 1 ? '\n' : ''}
+          </Text>
+        );
+      })}
+    </Text>
+  );
+}
 
 export default function AiPlannerScreen() {
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
@@ -117,7 +146,11 @@ export default function AiPlannerScreen() {
                     </View>
                   ) : null}
                   <View style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleBot]}>
-                    <Text style={[styles.bubbleText, mine && styles.bubbleTextMine]}>{message.text}</Text>
+                    {mine ? (
+                      <Text style={[styles.bubbleText, styles.bubbleTextMine]}>{message.text}</Text>
+                    ) : (
+                      <RichText text={message.text} style={styles.bubbleText} boldStyle={styles.boldText} />
+                    )}
                   </View>
                 </View>
               );
@@ -232,6 +265,7 @@ const styles = StyleSheet.create({
   bubbleMine: { backgroundColor: Brand.forest, borderBottomRightRadius: 4 },
   bubbleText: { color: Colors.textDark, fontFamily: FONT.medium, fontSize: 14, lineHeight: 21 },
   bubbleTextMine: { color: Colors.white },
+  boldText: { fontFamily: FONT.extra, color: Brand.forest },
 
   suggestions: { gap: 8, marginTop: 4 },
   suggestLabel: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.4 },

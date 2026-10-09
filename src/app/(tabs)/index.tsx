@@ -1,14 +1,14 @@
-import { Colors } from '@/constants/colors';
+import { AppScreen } from '@/components/AppScreen';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import FlightSearchForm from '@/components/flights/FlightSearchForm';
+import { Colors } from '@/constants/colors';
 import type { Offer } from '@/data/mock/offers';
-import { loadOffers, getOfferValidity } from '@/utils/offerApi';
 import type { BlogPost, Destination, TravelPackage } from '@/types/content';
-import { useContentItems } from '@/utils/contentApi';
 import { getUser, useAuth } from '@/utils/authStore';
 import { useCart } from '@/utils/cartStore';
+import { useContentItems } from '@/utils/contentApi';
+import { getOfferValidity, loadOffers } from '@/utils/offerApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
-import { AppScreen } from '@/components/AppScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -152,9 +152,27 @@ export default function HomeScreen() {
               <View style={[styles.serviceTabIndicator, activeService.label === item.label && styles.serviceTabIndicatorSelected]} />
             </TouchableOpacity>
           ))}
-          </View>
-          <HomeServiceWidget service={activeService} story={visibleStories[0]} offer={visibleOffers[0]} travelPackage={visiblePackages[0]} />
         </View>
+
+        <HomeServiceWidget service={activeService} story={visibleStories[0]} offer={visibleOffers[0]} travelPackage={visiblePackages[0]} />
+        </View>
+
+        {/* AI Trip Planner entry */}
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.9}
+          style={styles.aiCard}
+          onPress={() => router.push('/ai-planner' as never)}>
+          <View style={styles.aiIcon}>
+            <Ionicons name="sparkles" size={22} color={Colors.primaryDark} />
+          </View>
+          <View style={styles.aiCopy}>
+            <Text style={styles.aiEyebrow}>AI TRIP PLANNER</Text>
+            <Text style={styles.aiTitle}>Dream it. I'll design it.</Text>
+            <Text style={styles.aiSub}>Plan flights, stays and moments in seconds.</Text>
+          </View>
+          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+        </TouchableOpacity>
 
         {/* Destinations */}
         <View style={styles.section}>
@@ -362,7 +380,7 @@ function getWidgetDescription(service: string, cartCount: number, story?: BlogPo
   if (service === 'AI Plan') return 'Build an itinerary around your destination, dates, interests and budget.';
   if (service === 'Visa') return 'Check destination guidance and prepare for the entry requirements on your itinerary.';
   if (service === 'Offers') return 'Browse current savings across flights, stays and handpicked holidays.';
-  if (service === 'Saved Places') return 'Keep the stays and destinations you like together for when you are ready.';
+  if (service === 'Saved Places') return "Keep the stays and destinations you like together for when you're ready.";
   if (service === 'Travel Stories') return story?.title ?? 'Read destination guides and ideas from the LemonTrip journal.';
   if (service === 'Cart') return cartCount ? 'Review the travel items you have collected before checkout.' : 'Your trip cart is empty. Browse travel options and add a journey to keep planning.';
   if (service === 'Help') return 'Get practical help from a LemonTrip travel expert before or during your journey.';
