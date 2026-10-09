@@ -38,8 +38,6 @@ const services: ServiceItem[] = [
   { label: 'Help', icon: 'headset-outline', route: '/help' },
   { label: 'Explore All', icon: 'compass-outline', route: '/(tabs)/explore' },
 ];
-const primaryServices = services.slice(0, 5);
-const additionalServices = services.slice(5);
 const packageCategories = ['Honeymoon', 'Beach & Boating', 'Mountain Treks', 'City Tours', 'Luxury Resorts'];
 const packageCategoryAliases: Record<string, string[]> = {
   Honeymoon: ['honeymoon'],
@@ -135,25 +133,25 @@ export default function HomeScreen() {
         </View>
 
 
-        {/* Primary search modes */}
+        {/* All travel services use the same icon and label treatment. */}
         <View style={styles.searchCard}>
-          <View style={styles.serviceTabs}>
-          {primaryServices.map((item) => (
+          <Text style={styles.servicesHeading}>TRAVEL SERVICES</Text>
+          <View style={styles.servicesGrid}>
+          {services.map((item) => (
             <TouchableOpacity
               key={item.label}
               activeOpacity={0.8}
-              style={styles.serviceTab}
+              style={styles.serviceGridItem}
               accessibilityRole="button"
               accessibilityLabel={`Show ${item.label.replace('\n', ' ')} options`}
               accessibilityState={{ selected: activeService.label === item.label }}
               onPress={() => setActiveService(item)}>
-              <Ionicons name={item.icon} size={19} color={activeService.label === item.label ? Colors.primaryDark : Colors.textLight} />
-              <Text style={[styles.serviceTabLabel, activeService.label === item.label && styles.serviceTabLabelSelected]}>{item.label}</Text>
-              <View style={[styles.serviceTabIndicator, activeService.label === item.label && styles.serviceTabIndicatorSelected]} />
+              <Ionicons name={item.icon} size={22} color={activeService.label === item.label ? Colors.primaryDark : Colors.textLight} />
+              <Text numberOfLines={2} style={[styles.serviceGridLabel, activeService.label === item.label && styles.serviceGridLabelSelected]}>{item.label}</Text>
+              <View style={[styles.serviceGridIndicator, activeService.label === item.label && styles.serviceGridIndicatorSelected]} />
             </TouchableOpacity>
           ))}
         </View>
-
         <HomeServiceWidget service={activeService} story={visibleStories[0]} offer={visibleOffers[0]} travelPackage={visiblePackages[0]} />
         </View>
 
@@ -248,15 +246,6 @@ export default function HomeScreen() {
             <View style={styles.promiseBadge}><Text style={styles.promiseBadgeText}>24/7</Text></View>
             <Ionicons name="call-outline" size={68} color="rgba(255,255,255,0.18)" style={styles.promiseDecoration} />
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <SectionHeader eyebrow="PLAN EVERY PART OF THE TRIP" title="Travel services" action="View all" onPress={() => router.push('/(tabs)/explore')} />
-          <View style={styles.travelServices}>
-            {additionalServices.map((item) => <TouchableOpacity key={item.label} style={styles.travelService} onPress={() => { setActiveService(item); mainScrollRef.current?.scrollTo({ y: 0, animated: true }); }}>
-              <View style={styles.travelServiceIcon}><Ionicons name={item.icon} size={22} color={Colors.primary}/></View><Text style={styles.travelServiceText}>{item.label}</Text>
-            </TouchableOpacity>)}
-          </View>
         </View>
 
         <TouchableOpacity style={styles.bottomCta} onPress={() => router.push('/(tabs)/explore')}>
@@ -445,12 +434,13 @@ const styles = StyleSheet.create({
 
   // Services grid
   searchCard: { zIndex: 2, marginHorizontal: 16, marginTop: -18, paddingHorizontal: 13, paddingTop: 7, paddingBottom: 14, borderRadius: 23, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
-  serviceTabs: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: Colors.border },
-  serviceTab: { flex: 1, minWidth: 0, minHeight: 62, alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 1, position: 'relative' },
-  serviceTabLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700', textAlign: 'center' },
-  serviceTabLabelSelected: { color: Colors.primaryDark, fontWeight: '800' },
-  serviceTabIndicator: { position: 'absolute', bottom: 0, width: 28, height: 3, borderRadius: 2 },
-  serviceTabIndicatorSelected: { backgroundColor: Colors.accent },
+  servicesHeading: { marginTop: 5, marginBottom: 7, color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 5 },
+  serviceGridItem: { width: '24%', minHeight: 67, alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 2, paddingVertical: 6, position: 'relative' },
+  serviceGridLabel: { minHeight: 23, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  serviceGridLabelSelected: { color: Colors.primaryDark, fontWeight: '800' },
+  serviceGridIndicator: { position: 'absolute', bottom: 0, width: 24, height: 3, borderRadius: 2 },
+  serviceGridIndicatorSelected: { backgroundColor: Colors.accent },
   serviceWidget: { marginTop: 13 },
   widgetHeading: { flexDirection: 'row', alignItems: 'center', gap: 11, marginBottom: 13 },
   widgetIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: Colors.border },
@@ -468,6 +458,13 @@ const styles = StyleSheet.create({
   widgetInput: { minHeight: 44, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12 },
   widgetButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 2, paddingHorizontal: 14, borderRadius: 14, backgroundColor: Colors.accent },
   widgetButtonText: { flex: 1, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+
+  aiCard: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.primaryDark, ...cardShadow },
+  aiIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.accent },
+  aiCopy: { flex: 1, minWidth: 0 },
+  aiEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
+  aiTitle: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 2 },
+  aiSub: { color: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 11, marginTop: 2 },
 
   // Sections
   section: { paddingTop: 24 },
@@ -526,10 +523,6 @@ const styles = StyleSheet.create({
   promiseBadge: { alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 6, borderRadius: 10, backgroundColor: Colors.accent },
   promiseBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
   promiseDecoration: { position: 'absolute', right: 25, bottom: -14, transform: [{ rotate: '-20deg' }] },
-  travelServices: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: 16 },
-  travelService: { width: '31.7%', minHeight: 92, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 4, gap: 7 },
-  travelServiceIcon: { width: 42, height: 42, borderRadius: 14, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
-  travelServiceText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', color: Colors.primaryDark, textAlign: 'center' },
   bottomCta: { minHeight: 58, marginHorizontal: 16, marginTop: 16, borderRadius: 28, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 7 },
   ctaLogo: { width: 46, height: 42 },
   ctaText: { color: '#fff', fontFamily: 'Caveat', fontSize: 19, flex: 1 },
