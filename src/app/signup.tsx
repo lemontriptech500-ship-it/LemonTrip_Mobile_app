@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
 import { exchangeFirebasePhoneIdentity, loginWithGoogle, normalizePhoneInput, signupWithEmail } from '@/utils/authApi';
@@ -65,9 +66,7 @@ export default function SignupScreen() {
     else router.replace('/(tabs)');
   };
 
-  const showUnavailable = (feature: string) => {
-    Alert.alert(feature, `${feature} is not connected yet. Contact hello@lemontrip.in for help.`);
-  };
+
 
   return (
     <AuthLayout
@@ -139,32 +138,32 @@ export default function SignupScreen() {
       <TouchableOpacity onPress={() => router.push('/login')} style={styles.switchLink}>
         <Text style={styles.switchText}>Already have an account? <Text style={styles.switchTextStrong}>Login</Text></Text>
       </TouchableOpacity>
-      <AuthLegalLinks onTerms={() => showUnavailable('Terms')} onPrivacy={() => showUnavailable('Privacy policy')} />
+      <AuthLegalLinks onTerms={() => router.push('/terms')} onPrivacy={() => router.push('/privacy')} />
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
   modeSwitch: { flexDirection: 'row', padding: 3, marginBottom: 12, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
-  modeButton: { flex: 1, minHeight: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  modeButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
   modeButtonActive: { backgroundColor: Colors.surface },
-  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
-  modeTextActive: { color: Colors.primary, fontWeight: '900' },
+  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  modeTextActive: { color: Colors.primary, fontWeight: '800' },
   otpActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 7, marginBottom: 10 },
-  otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   otpActionDisabled: { color: Colors.textLight },
   recaptcha: { minHeight: 78, alignItems: 'flex-start', marginTop: 8, marginBottom: 8 },
-  smsNotice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 14, marginBottom: 8 },
-  phoneError: { color: '#B42318', fontFamily: 'Manrope', fontSize: 10, lineHeight: 15, marginBottom: 8 },
+  smsNotice: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginBottom: 8 },
+  phoneError: { color: Colors.error, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginBottom: 8 },
   accountLink: { alignItems: 'center', paddingVertical: 8 },
-  accountLinkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  accountLinkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   disabledButton: { opacity: 0.6 },
-  primaryButton: { minHeight: 45, alignItems: 'center', justifyContent: 'center', marginTop: 1, borderRadius: 11, backgroundColor: Colors.primary },
-  primaryButtonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  primaryButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 1, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  primaryButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 12 },
   divider: { flex: 1, height: 1, backgroundColor: Colors.border },
-  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  dividerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   switchLink: { alignItems: 'center', marginTop: 13, paddingVertical: 4 },
-  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
+  switchText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   switchTextStrong: { color: Colors.primary, fontWeight: '800' },
 });

@@ -1,3 +1,4 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import type { FlightFareOption } from './types';
@@ -44,17 +45,17 @@ export default function FlightTripSummary({ fareOption, onContinue }: FlightTrip
 }
 
 const styles = StyleSheet.create({
-  card: { padding: 16, borderWidth: 1, borderColor: Colors.border, borderRadius: 15, backgroundColor: Colors.surface },
-  title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
-  subtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginTop: 4, marginBottom: 9 },
+  card: { ...Ui.card, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
+  title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  subtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 4, marginBottom: 9 },
   row: { minHeight: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   totalRow: { minHeight: 48, marginTop: 5, borderTopWidth: 1, borderTopColor: Colors.border },
   label: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
-  amount: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  amount: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '700' },
   totalLabel: { color: Colors.textDark, fontSize: 12, fontWeight: '800' },
-  totalAmount: { color: Colors.primaryDark, fontSize: 16, fontWeight: '900' },
-  disclaimer: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13, marginTop: 1 },
-  continueButton: { minHeight: 45, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: 11, backgroundColor: Colors.accent },
+  totalAmount: { color: Colors.primaryDark, fontSize: 16, fontWeight: '800' },
+  disclaimer: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 1 },
+  continueButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
   continueDisabled: { opacity: 0.5 },
-  continueText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  continueText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 });

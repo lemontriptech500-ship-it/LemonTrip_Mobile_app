@@ -6,15 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
-// Active tab: yellow circle behind the icon (as in the Figma design)
 const icon = (active: IconName, inactive: IconName) => {
   const TabIcon = ({ focused }: { color: string; focused: boolean; size: number }) => (
     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
-      <Ionicons
-        name={focused ? active : inactive}
-        size={22}
-        color={focused ? Brand.forest : Colors.textLight}
-      />
+      <Ionicons name={focused ? active : inactive} size={22} color={focused ? Brand.forest : Colors.textLight} />
     </View>
   );
   TabIcon.displayName = `TabIcon(${active})`;
@@ -28,6 +23,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarLabelPosition: 'below-icon',
         tabBarActiveTintColor: Brand.forest,
         tabBarInactiveTintColor: Colors.textLight,
@@ -48,26 +44,13 @@ export default function TabsLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{ title: 'Home', tabBarIcon: icon('home', 'home-outline') }}
-      />
-
-      <Tabs.Screen
-        name="explore"
-        options={{ title: 'Explore', tabBarIcon: icon('compass', 'compass-outline') }}
-      />
-
-      <Tabs.Screen
-        name="bookings"
-        options={{ title: 'My Trips', tabBarIcon: icon('briefcase', 'briefcase-outline') }}
-      />
-
-      <Tabs.Screen
-        name="profile"
-        options={{ title: 'Profile', tabBarIcon: icon('person', 'person-outline') }}
-      />
-
+      <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: icon('home', 'home-outline') }} />
+      <Tabs.Screen name="explore" options={{ title: 'Explore', tabBarIcon: icon('compass', 'compass-outline') }} />
+      <Tabs.Screen name="bookings" options={{ title: 'My Trips', tabBarIcon: icon('briefcase', 'briefcase-outline') }} />
+      <Tabs.Screen name="wallet" options={{ title: 'Wallet', tabBarIcon: icon('wallet', 'wallet-outline') }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profile', tabBarIcon: icon('person', 'person-outline') }} />
+      <Tabs.Screen name="planner" options={{ href: null }} />
+      <Tabs.Screen name="deals" options={{ href: null }} />
       <Tabs.Screen name="wishlist" options={{ href: null }} />
     </Tabs>
   );

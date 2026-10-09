@@ -1,13 +1,15 @@
+import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import type { Listing } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 function getRoute(detail: string) {
   const route = detail.split('·')[0] ?? '';
@@ -37,14 +39,16 @@ function validDate(value: string) {
 }
 
 export default function TrainsScreen() {
+  const { query } = useLocalSearchParams<{ query?: string }>();
+  const initial = parseSavedQuery(query);
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const { items: allListings, loading, error } = useContentItems<Listing>('listing');
   const trainListings = allListings.filter((item) => item.serviceId === 'trains');
   const availableClasses = [...new Set(trainListings.flatMap((train) => getClasses(train.detail)))];
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [travelDate, setTravelDate] = useState('');
+  const [from, setFrom] = useState(typeof initial.from === 'string' ? initial.from : '');
+  const [to, setTo] = useState(typeof initial.to === 'string' ? initial.to : '');
+  const [travelDate, setTravelDate] = useState(typeof initial.travelDate === 'string' ? initial.travelDate : '');
   const [selectedClass, setSelectedClass] = useState('Any class');
   const [searched, setSearched] = useState(false);
   const [activeClassFilter, setActiveClassFilter] = useState<string | null>(null);
@@ -66,6 +70,7 @@ export default function TrainsScreen() {
       Alert.alert('Travel date', 'Enter the travel date as YYYY-MM-DD.');
       return;
     }
+    void recordRecentSearch('Trains', `${from || 'Origin'} → ${to || 'Destination'}`, JSON.stringify({ from, to, travelDate }));
     setSearched(true);
   };
 
@@ -138,7 +143,7 @@ function TrainResult({ train }: { train: Listing }) {
           <View style={styles.trainNumber}><TravelArtworkIcon name="train" size={28} /><Text style={styles.trainNumberText}>Number not provided</Text></View>
           <View style={styles.demoTag}><Text style={styles.demoTagText}>DEMO</Text></View>
         </View>
-        <Text style={styles.trainName}>{train.name}</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={`View ${train.name} details`} onPress={() => router.push({ pathname: '/(tabs)/explore/train-details', params: { id: train.id } })}><Text style={styles.trainName}>{train.name}</Text><Text style={{ fontFamily: 'Manrope', fontSize: 12, color: Colors.primary, marginTop: 6 }}>View journey details →</Text></TouchableOpacity>
         <View style={styles.routeRow}><Text style={styles.station}>{route.from || 'Station unavailable'}</Text><View style={styles.routeTrack}><View style={styles.trackLine} /><Ionicons name="train" size={14} color={Colors.primary} /><View style={styles.trackLine} /></View><Text style={[styles.station, styles.stationRight]}>{route.to || 'Station unavailable'}</Text></View>
 
         <View style={styles.railStats}>
@@ -166,75 +171,75 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 28 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
-  demoBanner: { flexDirection: 'row', alignItems: 'center', gap: 9, marginHorizontal: 16, padding: 11, borderRadius: 12, backgroundColor: Colors.accentSoft },
-  demoIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: 'rgba(255,255,255,0.7)' },
+  demoBanner: { flexDirection: 'row', alignItems: 'center', gap: 9, marginHorizontal: Ui.space.page, padding: 11, borderRadius: 12, backgroundColor: Colors.accentSoft },
+  demoIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.surface },
   demoCopy: { flex: 1 },
-  demoTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900' },
-  demoText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, lineHeight: 13, marginTop: 2 },
-  searchPanel: { marginHorizontal: 16, marginTop: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  demoTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  demoText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 2 },
+  searchPanel: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 12, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   searchHeading: { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 12 },
   railIcon: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surfaceMuted },
-  searchTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  searchSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
+  searchTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  searchSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 3 },
   fields: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-end', gap: 8 },
   field: { flex: 1, minWidth: 145, marginBottom: 4 },
-  fieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 0.8, marginBottom: 5 },
-  inputWrap: { minHeight: 41, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: 9, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  input: { flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8 },
+  fieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 5 },
+  inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
+  input: { minHeight: Ui.field.minHeight,  flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
   swapIcon: { width: 18, height: 41, alignItems: 'center', justifyContent: 'center' },
-  classLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 0.8, marginTop: 9 },
+  classLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginTop: 9 },
   classOptions: { gap: 6, paddingTop: 6 },
-  classChip: { paddingHorizontal: 10, paddingVertical: 7, borderWidth: 1, borderColor: Colors.border, borderRadius: 14 },
+  classChip: { paddingHorizontal: 10, paddingVertical: 7, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.pill },
   classChipSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  classChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  classChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
   classChipTextSelected: { color: Colors.white },
-  searchButton: { minHeight: 41, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 11, borderRadius: 10, backgroundColor: Colors.accent },
-  searchButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 11, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  searchButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   resultsLayout: { gap: 13, marginTop: 19, paddingHorizontal: 16 },
   resultsLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
-  filterPanel: { padding: 12, borderWidth: 1, borderColor: Colors.border, borderRadius: 13, backgroundColor: Colors.surface },
+  filterPanel: { ...Ui.card, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   filterPanelDesktop: { width: 215 },
   filterHeading: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingBottom: 9, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  filterTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  filterGroup: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', marginTop: 12, marginBottom: 5 },
-  unavailable: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, lineHeight: 12 },
+  filterTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  filterGroup: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginTop: 12, marginBottom: 5 },
+  unavailable: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
   filterOption: { minHeight: 27, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  filterOptionText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
+  filterOptionText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   resultColumn: { flex: 1, minWidth: 0 },
   resultHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 10 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   resultTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 3 },
-  clearText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  clearText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   trainList: { gap: 9 },
-  trainCard: { flexDirection: 'row', overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: 14, backgroundColor: Colors.surface },
+  trainCard: { ...Ui.card, flexDirection: 'row', overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   trainAccent: { width: 4, backgroundColor: Colors.accent },
   trainCardContent: { flex: 1, minWidth: 0, padding: 12 },
   trainTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   trainNumber: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  trainNumberText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, fontWeight: '700' },
-  demoTag: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: 7, backgroundColor: Colors.accentSoft },
-  demoTagText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 6, fontWeight: '900', letterSpacing: 0.8 },
-  trainName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900', marginTop: 6 },
+  trainNumberText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  demoTag: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: Ui.radius.pill, backgroundColor: Colors.accentSoft },
+  demoTagText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
+  trainName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 6 },
   routeRow: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 12 },
-  station: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  station: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   stationRight: { textAlign: 'right' },
   routeTrack: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 5 },
   trackLine: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
   railStats: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12, paddingVertical: 9, borderTopWidth: 1, borderBottomWidth: 1, borderColor: Colors.border },
   railStat: { width: '48%', minHeight: 31 },
-  statLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800', letterSpacing: 0.7 },
-  statValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700', marginTop: 4 },
+  statLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.7 },
+  statValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', marginTop: 4 },
   availableRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 9 },
   classWrap: { flex: 1 },
-  classHeading: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800', letterSpacing: 0.7 },
+  classHeading: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', letterSpacing: 0.7 },
   classList: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 5 },
   availableClass: { paddingHorizontal: 7, paddingVertical: 4, borderRadius: 7, backgroundColor: Colors.surfaceMuted },
-  availableClassText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800' },
+  availableClassText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   fareBlock: { alignItems: 'flex-end' },
-  fare: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900', marginTop: 4 },
+  fare: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginTop: 4 },
   availability: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 9 },
-  availabilityText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7 },
+  availabilityText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   empty: { minHeight: 150, alignItems: 'center', justifyContent: 'center', gap: 7, borderRadius: 13, backgroundColor: Colors.surface },
-  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  resultsNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7, lineHeight: 12, marginTop: 12 },
+  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  resultsNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 12 },
 });
