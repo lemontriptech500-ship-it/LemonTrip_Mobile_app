@@ -8,7 +8,7 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 const icon = (active: IconName, inactive: IconName) => {
   const TabIcon = ({ color, focused, size }: { color: ColorValue; focused: boolean; size: number }) => (
-    <View style={{ backgroundColor: focused ? Colors.accent : 'transparent', borderRadius: 20, width: 38, height: 32, alignItems: 'center', justifyContent: 'center' }}><Ionicons name={focused ? active : inactive} size={size - 2} color={color} /></View>
+    <View style={{ backgroundColor: focused ? '#E5F1EC' : 'transparent', borderRadius: 20, width: 38, height: 32, alignItems: 'center', justifyContent: 'center' }}><Ionicons name={focused ? active : inactive} size={size - 2} color={color} /></View>
   );
   TabIcon.displayName = `TabIcon(${active})`;
   return TabIcon;

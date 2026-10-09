@@ -44,18 +44,6 @@ const experienceTypes: { name: string; filter: string; icon: IconName }[] = [
   { name: 'Luxury', filter: 'Luxury', icon: 'diamond-outline' },
 ];
 
-const travelServices = [
-  { label: 'Flights', icon: 'airplane-outline', route: '/(tabs)/explore/flights' },
-  { label: 'Hotels', icon: 'bed-outline', route: '/(tabs)/explore/hotels' },
-  { label: 'Packages', icon: 'sunny-outline', route: '/packages' },
-  { label: 'Buses', icon: 'bus-outline', route: '/(tabs)/explore/buses' },
-  { label: 'Trains', icon: 'train-outline', route: '/(tabs)/explore/trains' },
-  { label: 'Visa', icon: 'id-card-outline', route: '/(tabs)/explore/visa' },
-  { label: 'Stories', icon: 'book-outline', route: '/blog' },
-  { label: 'Trip cart', icon: 'bag-outline', route: '/cart' },
-  { label: 'Support', icon: 'headset-outline', route: '/contact' },
-] as const;
-
 const popularSearches = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Weekend getaways'];
 const filterOptions = {
   duration: ['Any', '1-5 nights', '6+ nights'],
@@ -171,9 +159,22 @@ export default function ExploreScreen() {
               )}
             </View>
           </BrandGradientBar>
-          <View style={styles.exploreIntro}><BrandMotif /><Text style={styles.exploreEyebrow}>THE WORLD IS CALLING</Text><Text style={styles.exploreTitle}>Find your next escape.</Text><Text style={styles.exploreSubtitle}>Somewhere new. Something unforgettable.</Text></View>
+          <View style={styles.exploreIntro}>
+            <BrandMotif />
+            <Text style={styles.exploreEyebrow}>DESTINATION DISCOVERY</Text>
+            <Text style={styles.exploreTitle}>Discover somewhere new.</Text>
+            <Text style={styles.exploreSubtitle}>Search by place, then narrow your journey by travel style.</Text>
+            <View style={styles.quickSearchRow}>
+              <Text style={styles.quickSearchLabel}>POPULAR</Text>
+              {popularSearches.slice(0, 3).map((destination) => (
+                <TouchableOpacity key={destination} accessibilityRole="button" onPress={() => selectSearch(destination)} style={styles.quickSearchChip}>
+                  <Text style={styles.quickSearchText}>{destination}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
 
-          {/* Search strip — same pill as Home, filter button replaces the arrow */}
+          {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
             <View style={styles.searchPill}>
               <Ionicons name="search-outline" size={22} color={Colors.textLight} />
@@ -241,12 +242,7 @@ export default function ExploreScreen() {
             ) : null}
           </View>
 
-          <View style={styles.servicesPanel}>
-            <Text style={styles.gridTitle}>Every part of your journey</Text>
-            <View style={styles.servicesGrid}>{travelServices.map(service => <TouchableOpacity key={service.label} accessibilityRole="button" onPress={() => router.push(service.route)} style={styles.serviceTile}><Ionicons name={service.icon} size={25} color={Colors.primary} /><Text style={styles.serviceTileText}>{service.label}</Text></TouchableOpacity>)}</View>
-          </View>
-
-          {/* Travel style — white rounded icon grid, matching Home's service card */}
+          {/* Explore-specific filters */}
           <View style={styles.gridCard}>
             <View style={styles.gridHeader}>
               <Text style={styles.gridTitle}>Travel style</Text>
@@ -269,22 +265,6 @@ export default function ExploreScreen() {
                 <Text style={styles.gridLabel}>All journeys</Text>
               </TouchableOpacity>
             </View>
-          </View>
-
-          {/* Promo banner — same treatment as Home carousel */}
-          <View style={styles.bannerWrap}>
-            <ImageBackground source={{ uri: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1800&q=92' }} style={[styles.banner, isWide && styles.bannerWide]} imageStyle={styles.bannerImage}>
-              <View style={styles.bannerShade} />
-              <View style={styles.bannerContent}>
-                <Text style={styles.bannerKicker}>Find your kind of</Text>
-                <Text style={styles.bannerTitle}>Escape</Text>
-                <Text style={styles.bannerSubtitle}>Discover destinations, handpicked stays and unforgettable experiences.</Text>
-                <TouchableOpacity accessibilityRole="button" style={styles.bannerCta} onPress={() => router.push('/packages')}>
-                  <Text style={styles.bannerCtaText}>View Packages</Text>
-                  <View style={styles.bannerCtaArrow}><Ionicons name="arrow-forward" size={18} color={Colors.white} /></View>
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
           </View>
 
           {/* Trending destinations */}
@@ -429,14 +409,14 @@ const SOFT_GREEN = Colors.surfaceMuted;
 const SHADOW = Ui.shadow;
 
 const styles = StyleSheet.create({
-  exploreIntro: { paddingHorizontal: Ui.space.page, paddingTop: 14, paddingBottom: 38, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
+  exploreIntro: { paddingHorizontal: Ui.space.page, paddingTop: 14, paddingBottom: 34, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
   exploreEyebrow: { ...Ui.eyebrow, color: Colors.accent },
   exploreTitle: { fontFamily: 'Manrope', fontSize: 28, lineHeight: 35, fontWeight: '800', color: Colors.white, marginTop: 8 },
   exploreSubtitle: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 6 },
-  servicesPanel: { marginHorizontal: Ui.space.page, marginTop: 24 },
-  servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
-  serviceTile: { flexGrow: 1, flexBasis: '28%', ...Ui.card, minHeight: 96, alignItems: 'center', justifyContent: 'center', gap: 9 },
-  serviceTileText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.primary },
+  quickSearchRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 7, marginTop: 14 },
+  quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  quickSearchChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 11, borderRadius: 16, backgroundColor: Colors.onDarkSurface, borderWidth: 1, borderColor: Colors.onDarkBorder },
+  quickSearchText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
   safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
@@ -495,20 +475,6 @@ const styles = StyleSheet.create({
   gridCircleSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
   gridLabelSelected: { color: Colors.primary },
-
-  // Banner
-  bannerWrap: { marginTop: 16, marginHorizontal: Ui.space.page },
-  banner: { minHeight: 230, justifyContent: 'flex-end', borderRadius: 24, overflow: 'hidden', backgroundColor: Colors.primaryDark },
-  bannerWide: { minHeight: 260 },
-  bannerImage: { borderRadius: 24 },
-  bannerShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
-  bannerContent: { padding: 20, maxWidth: 560 },
-  bannerKicker: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '500' },
-  bannerTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 36, lineHeight: 42, fontWeight: '800' },
-  bannerSubtitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6, maxWidth: 380 },
-  bannerCta: { alignSelf: 'flex-start', minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 14, paddingLeft: 20, paddingRight: 6, borderRadius: 25, backgroundColor: Colors.white },
-  bannerCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  bannerCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
 
   // Sections
   section: { paddingTop: 24 },
