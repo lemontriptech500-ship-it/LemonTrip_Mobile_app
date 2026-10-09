@@ -1,8 +1,9 @@
-import { Ui } from '@/constants/theme';
-import { BrandMotif } from '@/components/BrandMotif';
-import { Colors } from '@/constants/colors';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { BrandMotif } from '@/components/BrandMotif';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
 import type { Destination, TravelPackage } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
 import { useContentItems } from '@/utils/contentApi';
@@ -11,7 +12,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
