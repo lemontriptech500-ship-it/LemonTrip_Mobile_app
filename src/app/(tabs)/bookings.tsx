@@ -23,9 +23,9 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
 
 const FONT = {
-  medium: 'PlusJakartaSans_500Medium',
-  bold: 'PlusJakartaSans_700Bold',
-  extra: 'PlusJakartaSans_800ExtraBold',
+  medium: 'Manrope',
+  bold: 'Manrope',
+  extra: 'Manrope',
 } as const;
 
 const SHADOW = {

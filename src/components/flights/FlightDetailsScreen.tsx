@@ -102,7 +102,7 @@ export default function FlightDetailsScreen() {
               <FlightTripSummary fareOption={selectedFare} onContinue={handleContinue} />
               <View style={styles.secureNote}>
                 <Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} />
-                <Text style={styles.secureText}>Fare details are shown as supplied by the airline.</Text>
+                <Text style={styles.secureText}>{selection.offer.isDemo ? 'Sample fare details only. This journey cannot be booked until the flight service is connected.' : 'Fare details are shown as supplied by the airline.'}</Text>
               </View>
             </View>
           </View>

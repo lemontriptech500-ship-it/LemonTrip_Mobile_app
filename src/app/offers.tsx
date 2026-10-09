@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors';
-import type { Offer } from '@/data/offers';
+import type { Offer } from '@/data/mock/offers';
 import {
   getOfferCategory,
   getOfferValidity,
@@ -261,7 +261,7 @@ export default function OffersScreen() {
 
                 <TouchableOpacity
                   style={styles.tripsButton}
-                  onPress={() => router.push('/(tabs)/booking')}
+                  onPress={() => router.push('/(tabs)/bookings')}
                 >
                   <Text style={styles.tripsText}>My trips</Text>
                 </TouchableOpacity>

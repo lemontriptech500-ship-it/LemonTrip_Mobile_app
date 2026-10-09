@@ -18,43 +18,52 @@ const fares: { id: SpecialFare; label: string }[] = [
   { id: 'armedForces', label: 'Armed Forces' },
 ];
 
-type FlightSearchFormProps = { compact?: boolean; loading: boolean; onSearch: (request: FlightSearchRequest) => void };
+type FlightSearchFormProps = {
+  compact?: boolean;
+  hideTripTypeSelector?: boolean;
+  searchButtonLabel?: string;
+  initialOrigin?: string;
+  initialTravellers?: number;
+  loading: boolean;
+  onSearch: (request: FlightSearchRequest) => void;
+};
 
-function Field({ label, value, placeholder, onChangeText, keyboardType, grid = false }: {
+function Field({ label, value, placeholder, onChangeText, keyboardType, grid = false, compact = false }: {
   label: string;
   value: string;
   placeholder: string;
   onChangeText: (value: string) => void;
   keyboardType?: 'default' | 'numbers-and-punctuation';
   grid?: boolean;
+  compact?: boolean;
 }) {
   return (
-    <View style={[styles.field, grid && styles.gridField]}>
-      <Text style={styles.fieldLabel}>{label}</Text>
+    <View style={[styles.field, grid && styles.gridField, compact && styles.compactField, grid && compact && styles.compactGridField]}>
+      <Text style={[styles.fieldLabel, compact && styles.compactFieldLabel]}>{label}</Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={Colors.textLight}
         autoCapitalize="characters"
-        style={styles.input}
+        style={[styles.input, compact && styles.compactInput]}
         keyboardType={keyboardType}
       />
     </View>
   );
 }
 
-export default function FlightSearchForm({ compact = false, loading, onSearch }: FlightSearchFormProps) {
+export default function FlightSearchForm({ compact = false, hideTripTypeSelector = false, searchButtonLabel = 'Search Flights', initialOrigin = '', initialTravellers = 1, loading, onSearch }: FlightSearchFormProps) {
   const [showOptions, setShowOptions] = useState(!compact);
   const [tripType, setTripType] = useState<TripType>('roundTrip');
-  const [origin, setOrigin] = useState('');
+  const [origin, setOrigin] = useState(initialOrigin);
   const [destination, setDestination] = useState('');
   const [departureDate, setDepartureDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
   const [secondOrigin, setSecondOrigin] = useState('');
   const [secondDestination, setSecondDestination] = useState('');
   const [secondDate, setSecondDate] = useState('');
-  const [travellers, setTravellers] = useState(1);
+  const [travellers, setTravellers] = useState(Math.max(1, Math.min(9, initialTravellers)));
   const [cabinClass, setCabinClass] = useState('Economy');
   const [specialFare, setSpecialFare] = useState<SpecialFare>('regular');
   const [validationError, setValidationError] = useState('');
@@ -94,28 +103,28 @@ export default function FlightSearchForm({ compact = false, loading, onSearch }:
 
   return (
     <View style={[styles.panel, compact && { marginTop: 0, marginHorizontal: 0, borderWidth: 0, backgroundColor: Colors.surface }]}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tripTabs}>
+      {!hideTripTypeSelector ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tripTabs}>
         {tripTypes.map((item) => (
           <TouchableOpacity key={item.id} onPress={() => { setTripType(item.id); setValidationError(''); }} style={[styles.tripTab, tripType === item.id && styles.tripTabSelected]}>
             <Text style={[styles.tripTabText, tripType === item.id && styles.tripTabTextSelected]}>{item.label}</Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </ScrollView> : null}
 
       <View style={styles.locationRow}>
-        <Field label="FROM" value={origin} placeholder="City / airport" onChangeText={setOrigin} />
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap origin and destination" onPress={swapLocations} style={styles.swapButton}>
+        <Field compact={compact} label="FROM" value={origin} placeholder="City / airport" onChangeText={setOrigin} />
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap origin and destination" onPress={swapLocations} style={[styles.swapButton, compact && styles.compactSwapButton]}>
           <Ionicons name="swap-horizontal" size={19} color={Colors.primary} />
         </TouchableOpacity>
-        <Field label="TO" value={destination} placeholder="City / airport" onChangeText={setDestination} />
+        <Field compact={compact} label="TO" value={destination} placeholder="City / airport" onChangeText={setDestination} />
       </View>
 
       <View style={styles.fieldGrid}>
-        <Field grid label="DEPARTURE" value={departureDate} placeholder="YYYY-MM-DD" onChangeText={setDepartureDate} keyboardType="numbers-and-punctuation" />
-        {tripType === 'roundTrip' ? <Field grid label="RETURN" value={returnDate} placeholder="YYYY-MM-DD" onChangeText={setReturnDate} keyboardType="numbers-and-punctuation" /> : null}
-        <View style={[styles.field, styles.gridField]}>
-          <Text style={styles.fieldLabel}>TRAVELLERS</Text>
-          <View style={styles.counter}>
+        <Field compact={compact} grid label="DEPARTURE" value={departureDate} placeholder={compact ? 'Add date' : 'YYYY-MM-DD'} onChangeText={setDepartureDate} keyboardType="numbers-and-punctuation" />
+        {tripType === 'roundTrip' ? <Field compact={compact} grid label="RETURN" value={returnDate} placeholder={compact ? 'Add date' : 'YYYY-MM-DD'} onChangeText={setReturnDate} keyboardType="numbers-and-punctuation" /> : null}
+        <View style={[styles.field, styles.gridField, compact && styles.compactField, compact && styles.compactGridField]}>
+          <Text style={[styles.fieldLabel, compact && styles.compactFieldLabel]}>TRAVELLERS</Text>
+          <View style={[styles.counter, compact && styles.compactCounter]}>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove traveller" disabled={travellers <= 1} onPress={() => setTravellers((count) => Math.max(1, count - 1))} style={styles.counterButton}>
               <Ionicons name="remove" size={16} color={travellers <= 1 ? Colors.borderStrong : Colors.primary} />
             </TouchableOpacity>
@@ -150,7 +159,7 @@ export default function FlightSearchForm({ compact = false, loading, onSearch }:
         </View>
       ) : null}
 
-      {compact ? <TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded: showOptions }} onPress={() => setShowOptions(value => !value)} style={{ paddingBottom: 12 }}><Text style={styles.fareHint}>{showOptions ? 'Fewer options' : 'Cabin class & special fares'}</Text></TouchableOpacity> : null}
+      {compact && !hideTripTypeSelector ? <TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded: showOptions }} onPress={() => setShowOptions(value => !value)} style={{ paddingBottom: 12 }}><Text style={styles.fareHint}>{showOptions ? 'Fewer options' : 'Cabin class & special fares'}</Text></TouchableOpacity> : null}
       {showOptions ? <>
       <View style={styles.fareHeader}><Text style={styles.fieldLabel}>SPECIAL FARES</Text><Text style={styles.fareHint}>Optional</Text></View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.fareOptions}>
@@ -165,7 +174,7 @@ export default function FlightSearchForm({ compact = false, loading, onSearch }:
       {validationError ? <Text accessibilityRole="alert" style={styles.validationError}>{validationError}</Text> : null}
       <TouchableOpacity accessibilityRole="button" disabled={loading} onPress={submit} style={[styles.searchButton, loading && styles.searchButtonDisabled]}>
         <Ionicons name={loading ? 'hourglass-outline' : 'search-outline'} size={17} color={Colors.primaryDark} />
-        <Text style={styles.searchButtonText}>{loading ? 'Searching flights…' : 'Search Flights'}</Text>
+        <Text style={styles.searchButtonText}>{loading ? 'Searching flights…' : searchButtonLabel}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -183,8 +192,14 @@ const styles = StyleSheet.create({
   fieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 6 },
   input: { minHeight: Ui.field.minHeight, paddingHorizontal: 10, paddingVertical: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surfaceMuted, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
   swapButton: { width: 36, height: 36, marginBottom: 17, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.accentSoft },
+  compactSwapButton: { backgroundColor: '#E7F1EC' },
   gridField: { flexBasis: '46%', flexGrow: 1, flexShrink: 0 },
   fieldGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 5 },
+  compactField: { marginBottom: 7 },
+  compactGridField: { flexBasis: 0, flexGrow: 1, flexShrink: 1 },
+  compactFieldLabel: { fontSize: 8, marginBottom: 3 },
+  compactInput: { minHeight: 30, paddingHorizontal: 0, paddingVertical: 3, borderWidth: 0, borderBottomWidth: 1, borderColor: Colors.border, borderRadius: 0, backgroundColor: 'transparent', fontSize: 12 },
+  compactCounter: { minHeight: 32, paddingHorizontal: 0, borderWidth: 0, borderBottomWidth: 1, borderRadius: 0, backgroundColor: 'transparent' },
   counter: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: Colors.border, borderRadius: 10, backgroundColor: Colors.background, paddingHorizontal: 5 },
   counterButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   counterText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },

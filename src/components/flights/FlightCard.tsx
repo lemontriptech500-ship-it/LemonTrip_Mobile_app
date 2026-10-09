@@ -1,10 +1,4 @@
 import { Brand, Colors, Radius } from '@/constants/colors';
-import {
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-  useFonts,
-} from '@expo-google-fonts/plus-jakarta-sans';
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { FlightOffer } from './types';
@@ -37,9 +31,6 @@ function formatPrice(amount: number, currency: string) {
 }
 
 export default function FlightCard({ offer, onSelect, best = false }: FlightCardProps) {
-  // Cached after first load; the card renders fine with the system font meanwhile.
-  useFonts({ PlusJakartaSans_500Medium, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold });
-
   const stopLabel = offer.stops === 0 ? 'Direct' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
   const fareNote =
     offer.fareInfo ??
@@ -48,10 +39,10 @@ export default function FlightCard({ offer, onSelect, best = false }: FlightCard
 
   return (
     <View style={[styles.card, best && styles.cardBest]}>
-      {best ? (
+      {best || offer.isDemo ? (
         <View style={styles.bestTag}>
-          <Ionicons name="sparkles" size={12} color={Brand.forest} />
-          <Text style={styles.bestTagText}>LEMONTRIP BEST DEAL</Text>
+          <Ionicons name={offer.isDemo ? 'information-circle' : 'sparkles'} size={12} color={Brand.forest} />
+          <Text style={styles.bestTagText}>{offer.isDemo ? (best ? 'SAMPLE · BEST PRICE' : 'SAMPLE RESULT') : 'LEMONTRIP BEST DEAL'}</Text>
         </View>
       ) : null}
 
@@ -149,23 +140,23 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     backgroundColor: Brand.lemon,
   },
-  bestTagText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 10, letterSpacing: 0.5, color: Brand.forest },
+  bestTagText: { fontFamily: 'Manrope', fontSize: 10, letterSpacing: 0.5, color: Brand.forest },
 
   airlineRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   logo: { width: 50, height: 50, borderRadius: 14, backgroundColor: Colors.surfaceMuted },
   logoFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
-  logoFallbackText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 15, color: '#FFFFFF' },
+  logoFallbackText: { fontFamily: 'Manrope', fontSize: 15, color: '#FFFFFF' },
   airlineCopy: { flex: 1, minWidth: 0 },
-  airlineName: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 16, color: Colors.textDark },
-  airlineSub: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: Colors.textLight, marginTop: 2 },
+  airlineName: { fontFamily: 'Manrope', fontSize: 16, color: Colors.textDark },
+  airlineSub: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 2 },
 
   route: { flexDirection: 'row', alignItems: 'center', paddingTop: 20, gap: 10 },
   airport: { minWidth: 64 },
   arrival: { alignItems: 'flex-end' },
-  time: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 26, color: Colors.textDark },
-  airportCode: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 12, color: Colors.textLight, marginTop: 4 },
+  time: { fontFamily: 'Manrope', fontSize: 26, color: Colors.textDark },
+  airportCode: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 4 },
   durationBlock: { flex: 1, alignItems: 'center' },
-  duration: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: Colors.textLight },
+  duration: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
   routeLine: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
   line: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
 
@@ -173,10 +164,10 @@ const styles = StyleSheet.create({
 
   purchase: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   purchaseInfo: { flex: 1, minWidth: 0 },
-  priceLabel: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 9, letterSpacing: 1, color: Colors.textLight },
-  price: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 28, color: Colors.textDark, marginTop: 4 },
+  priceLabel: { fontFamily: 'Manrope', fontSize: 9, letterSpacing: 1, color: Colors.textLight },
+  price: { fontFamily: 'Manrope', fontSize: 28, color: Colors.textDark, marginTop: 4 },
   baggageRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 },
-  baggage: { flexShrink: 1, fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: Colors.textLight },
+  baggage: { flexShrink: 1, fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
   selectButton: {
     minWidth: 124,
     height: 48,
@@ -186,5 +177,5 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.forest,
     paddingHorizontal: 18,
   },
-  selectText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 14, color: '#FFFFFF' },
+  selectText: { fontFamily: 'Manrope', fontSize: 14, color: '#FFFFFF' },
 });

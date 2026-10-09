@@ -1,13 +1,13 @@
 import { Brand, Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 const icon = (active: IconName, inactive: IconName) => {
-  const TabIcon = ({ focused }: { color: string; focused: boolean; size: number }) => (
+  const TabIcon = ({ focused }: { color: ColorValue; focused: boolean; size: number }) => (
     <View style={[styles.iconWrap, focused && styles.iconWrapActive]}>
       <Ionicons name={focused ? active : inactive} size={22} color={focused ? Brand.forest : Colors.textLight} />
     </View>
@@ -58,7 +58,7 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   label: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: 'Manrope',
     fontSize: 11,
     marginTop: 4,
   },

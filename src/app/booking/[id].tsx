@@ -9,9 +9,9 @@ import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const FONT = {
-  medium: 'PlusJakartaSans_500Medium',
-  bold: 'PlusJakartaSans_700Bold',
-  extra: 'PlusJakartaSans_800ExtraBold',
+  medium: 'Manrope',
+  bold: 'Manrope',
+  extra: 'Manrope',
 } as const;
 
 const SHADOW = {
