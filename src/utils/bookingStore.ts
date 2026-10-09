@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
 export const BOOKINGS_KEY = 'lemontrip-bookings';
 
@@ -14,6 +14,8 @@ export interface Booking {
   destination?: string;
   status?: 'upcoming' | 'completed' | 'cancelled' | 'confirmed';
 }
+
+export type BookingStatus = NonNullable<Booking['status']>;
 
 let bookings: Booking[] = [];
 let listeners: (() => void)[] = [];
@@ -52,6 +54,16 @@ export function addBooking(booking: Booking) {
   bookings = [booking, ...bookings];
   notify();
   persist();
+}
+
+export function updateBookingStatus(id: string, status: BookingStatus) {
+  const exists = bookings.some((b) => b.id === id);
+  if (!exists) return false;
+
+  bookings = bookings.map((b) => (b.id === id ? { ...b, status } : b));
+  notify();
+  persist();
+  return true;
 }
 
 export function getBookings() {

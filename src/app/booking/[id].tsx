@@ -50,6 +50,7 @@ export default function BookingDetailScreen() {
   const bookingId = shortId(booking.id);
   const hasPhone = SUPPORT_PHONE.trim().length > 0;
   const hasWhatsapp = SUPPORT_WHATSAPP.trim().length > 0;
+  const canCancel = booking.status !== 'cancelled' && booking.status !== 'completed';
 
   const handleShare = async () => {
     try {
@@ -67,6 +68,10 @@ export default function BookingDetailScreen() {
 
   const handleWhatsapp = () => {
     if (hasWhatsapp) Linking.openURL(`https://wa.me/${SUPPORT_WHATSAPP.replace(/\D/g, '')}`);
+  };
+
+  const handleCancel = () => {
+    router.push({ pathname: '/booking/cancel', params: { id: String(booking.id) } } as never);
   };
 
   return (
@@ -174,6 +179,13 @@ export default function BookingDetailScreen() {
           <Ionicons name="share-social-outline" size={18} color={Brand.forest} />
           <Text style={styles.shareButtonText}>Share booking</Text>
         </TouchableOpacity>
+
+        {canCancel ? (
+          <TouchableOpacity accessibilityRole="button" style={styles.cancelButton} onPress={handleCancel}>
+            <Ionicons name="close-circle-outline" size={18} color="#C0392B" />
+            <Text style={styles.cancelButtonText}>Cancel booking</Text>
+          </TouchableOpacity>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -186,7 +198,7 @@ const styles = StyleSheet.create({
 
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   notFoundText: { color: Colors.white, fontFamily: FONT.extra, fontSize: 18 },
-  lemonButton: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: Radius.pill, backgroundColor: Brand.lemon },
+  lemonButton: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: Radius.pill, backgroundColor:Brand.lemon },
   lemonButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 14 },
 
   header: {
@@ -302,4 +314,19 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.lemon,
   },
   shareButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 15 },
+
+  cancelButton: {
+    minHeight: 52,
+    marginTop: 10,
+    marginHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderRadius: Radius.pill,
+    borderWidth: 1.5,
+    borderColor: '#C0392B',
+    backgroundColor: Colors.white,
+  },
+  cancelButtonText: { color: '#C0392B', fontFamily: FONT.extra, fontSize: 15 },
 });
