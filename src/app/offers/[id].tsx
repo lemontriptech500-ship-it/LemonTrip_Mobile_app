@@ -2,7 +2,7 @@ import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
-import type { Offer } from '@/data/offers';
+import type { Offer } from '@/data/mock/offers';
 import { getOfferValidity, loadOffers, type OfferSource } from '@/utils/offerApi';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';

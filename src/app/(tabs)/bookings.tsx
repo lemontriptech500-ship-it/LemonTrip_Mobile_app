@@ -1,5 +1,6 @@
 import { Brand, Colors, Radius } from '@/constants/colors';
 import { formatDate, normalizeStatus, serviceIcon, shortId, statusStyles } from '@/utils/bookingFormat';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
@@ -23,9 +24,9 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
 
 const FONT = {
-  medium: 'PlusJakartaSans_500Medium',
-  bold: 'PlusJakartaSans_700Bold',
-  extra: 'PlusJakartaSans_800ExtraBold',
+  medium: 'Manrope',
+  bold: 'Manrope',
+  extra: 'Manrope',
 } as const;
 
 const SHADOW = {
@@ -110,20 +111,13 @@ export default function BookingsScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Brand.lemon} colors={[Brand.forest]} />
         }
       >
-        {/* Green header */}
-        <View style={styles.header}>
-          <View style={styles.headerCopy}>
-            <Text style={styles.eyebrowLemon}>YOUR JOURNEYS</Text>
-            <Text style={styles.pageTitle}>My Trips</Text>
-            <Text style={styles.pageSubtitle}>Every detail of your journey, in one place.</Text>
+        <ScreenHeader title="My Trips" subtitle="Every detail of your journey, in one place." eyebrow="YOUR JOURNEYS" />
+        {bookings.length > 0 ? (
+          <View style={styles.countPill}>
+            <Text style={styles.countPillText}>{bookings.length}</Text>
+            <Text style={styles.countPillLabel}>{bookings.length === 1 ? 'BOOKING' : 'BOOKINGS'}</Text>
           </View>
-          {bookings.length > 0 ? (
-            <View style={styles.countPill}>
-              <Text style={styles.countPillText}>{bookings.length}</Text>
-              <Text style={styles.countPillLabel}>{bookings.length === 1 ? 'BOOKING' : 'BOOKINGS'}</Text>
-            </View>
-          ) : null}
-        </View>
+        ) : null}
 
         {/* Widget banner */}
         <View style={styles.widgetCard}>
@@ -296,9 +290,7 @@ export default function BookingsScreen() {
                     activeOpacity={0.85}
                     onPress={() => router.push(link.route as never)}
                   >
-                    <View style={styles.gridCircle}>
-                      <Ionicons name={link.icon} size={26} color={Brand.forest} />
-                    </View>
+                    <Ionicons name={link.icon} size={23} color={Colors.primary} />
                     <Text style={styles.gridLabel}>{link.label}</Text>
                   </TouchableOpacity>
                 ))}
@@ -322,46 +314,26 @@ export default function BookingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Brand.forest },
-  container: { flex: 1, backgroundColor: Brand.cream },
+  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
+  container: { flex: 1, backgroundColor: Colors.surfaceMuted },
   content: { paddingBottom: 32, width: '100%', maxWidth: 900, alignSelf: 'center' },
 
-  // Header
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 56,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    backgroundColor: Brand.forest,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-  },
-  headerCopy: { flex: 1 },
-  eyebrowLemon: { color: Brand.lemon, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.6 },
   eyebrowDark: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.4 },
-  pageTitle: { color: Colors.white, fontFamily: FONT.extra, fontSize: 30, marginTop: 4 },
-  pageSubtitle: { color: 'rgba(255,255,255,0.78)', fontFamily: FONT.medium, fontSize: 13, marginTop: 4 },
-  countPill: {
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: Radius.md,
-    backgroundColor: Brand.lemon,
-  },
-  countPillText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 20 },
-  countPillLabel: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 9, letterSpacing: 1 },
+  countPill: { alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: 7, marginHorizontal: 16, marginTop: -6, marginBottom: 10, paddingHorizontal: 12, paddingVertical: 7, borderRadius: Radius.pill, backgroundColor: Brand.lemon },
+  countPillText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 14 },
+  countPillLabel: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 9, letterSpacing: 0.8 },
 
-  // Widget banner (overlaps header)
+  // Widget banner
   widgetCard: {
-    marginTop: -34,
+    marginTop: 0,
     marginHorizontal: 16,
     padding: 16,
     flexDirection: 'row',
     gap: 14,
-    borderRadius: Radius.lg,
-    backgroundColor: Brand.forestLight,
+    borderRadius: 22,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
     ...SHADOW,
   },
   widgetIcon: {
@@ -370,11 +342,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.md,
-    backgroundColor: Brand.lemon,
+    backgroundColor: Colors.accentSoft,
   },
   widgetContent: { flex: 1, minWidth: 0 },
-  widgetTitle: { color: Colors.white, fontFamily: FONT.extra, fontSize: 16 },
-  widgetDescription: { color: 'rgba(255,255,255,0.85)', fontFamily: FONT.medium, fontSize: 12, lineHeight: 18, marginTop: 3 },
+  widgetTitle: { color: Colors.primaryDark, fontFamily: FONT.extra, fontSize: 16 },
+  widgetDescription: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12, lineHeight: 18, marginTop: 3 },
   widgetButton: {
     alignSelf: 'flex-start',
     minHeight: 40,
@@ -385,9 +357,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingHorizontal: 18,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.lemon,
+    backgroundColor: Colors.accent,
   },
-  widgetButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 13 },
+  widgetButtonText: { color: Colors.primaryDark, fontFamily: FONT.extra, fontSize: 13 },
   widgetSpinner: { paddingHorizontal: 20 },
   disabledButton: { opacity: 0.7 },
 
@@ -409,10 +381,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.md,
-    backgroundColor: Brand.lemon,
+    backgroundColor: Colors.accentSoft,
   },
   txCopy: { flex: 1 },
-  txTitle: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 15 },
+  txTitle: { color: Colors.primaryDark, fontFamily: FONT.extra, fontSize: 15 },
   txSub: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12, marginTop: 2 },
 
   // Tabs
@@ -448,7 +420,7 @@ const styles = StyleSheet.create({
 
   // Voucher cards
   bookingList: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
-  bookingCard: { padding: 16, borderRadius: Radius.lg, backgroundColor: Colors.white, ...SHADOW },
+  bookingCard: { padding: 16, borderRadius: 22, backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   bookingTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   bookingIcon: {
     width: 50,
@@ -456,7 +428,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: Radius.md,
-    backgroundColor: Brand.cream,
+    backgroundColor: Colors.surfaceMuted,
   },
   bookingInfo: { flex: 1, minWidth: 0 },
   itemName: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 16, lineHeight: 21, marginTop: 3 },
@@ -546,24 +518,19 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 8,
     paddingHorizontal: 12,
-    borderRadius: Radius.lg,
+    borderRadius: 22,
     backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
     ...SHADOW,
   },
   gridTitle: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 18, marginTop: 3, marginBottom: 10 },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: {
-    width: 62,
-    height: 62,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 31,
-    backgroundColor: Brand.cream,
-  },
-  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: FONT.bold, fontSize: 12, lineHeight: 16 },
+  gridLabel: { marginTop: 6, textAlign: 'center', color: Colors.textLight, fontFamily: FONT.bold, fontSize: 10, lineHeight: 14 },
 
   // Info
+  eyebrowLemon: { color: Brand.lemon, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.2 },
   infoCard: {
     marginTop: 20,
     marginHorizontal: 16,

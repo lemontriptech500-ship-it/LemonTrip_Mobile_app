@@ -1,28 +1,42 @@
-import { Brand, Radius } from '@/constants/colors';
-import {
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_700Bold,
-    PlusJakartaSans_800ExtraBold,
-    useFonts,
-} from '@expo-google-fonts/plus-jakarta-sans';
+import { Brand } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AppRoute = Parameters<typeof router.replace>[0];
 
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1596229898948-1fd2d1bd0273?w=1000';
-
-const perks = [
-  { icon: 'checkmark', label: 'Best Price' },
-  { icon: 'call-outline', label: '24/7 Assist' },
-  { icon: 'sparkles-outline', label: 'Custom Trips' },
-] as const;
+const slides = [
+  {
+    image: require('../../assets/images/onboarding1.png'),
+    title: 'Discover',
+    accent: 'New Destinations',
+    description: 'Explore the world with exclusive deals and unforgettable experiences.',
+  },
+  {
+    image: require('../../assets/images/onboarding2.png'),
+    title: 'Best Deals',
+    accent: 'on Hotels',
+    description: 'Find beautiful stays and unforgettable escapes at great prices.',
+  },
+  {
+    image: require('../../assets/images/onboarding3.png'),
+    title: 'Explore More',
+    accent: 'Travel Further',
+    description: 'Make every trip memorable with experiences worth travelling for.',
+  },
+  {
+    image: require('../../assets/images/onboarding4.png'),
+    title: 'Your Journey',
+    accent: 'Our Priority',
+    description: 'Flights, hotels, buses, trains and more — all in one place.',
+  },
+];
 
 async function leave(path: AppRoute) {
   await AsyncStorage.setItem('onboardingSeen', '1');
@@ -30,149 +44,95 @@ async function leave(path: AppRoute) {
 }
 
 export default function OnboardingScreen() {
-  const [fontsLoaded] = useFonts({
-    PlusJakartaSans_500Medium,
-    PlusJakartaSans_700Bold,
-    PlusJakartaSans_800ExtraBold,
-  });
+  const { width } = useWindowDimensions();
+  const [activeSlide, setActiveSlide] = useState(0);
+  const carouselRef = useRef<ScrollView>(null);
+  const slideWidth = width;
+  const compact = width < 360;
 
-  if (!fontsLoaded) return null;
+  function goToSlide(index: number) {
+    setActiveSlide(index);
+    carouselRef.current?.scrollTo({ x: index * slideWidth, animated: true });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
+      <ScrollView
+        ref={carouselRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
+        onMomentumScrollEnd={(event) => {
+          const index = Math.round(event.nativeEvent.contentOffset.x / slideWidth);
+          setActiveSlide(Math.max(0, Math.min(slides.length - 1, index)));
+        }}
+        style={styles.carousel}
+      >
+        {slides.map((item, index) => (
+          <View key={item.title} style={[styles.slide, { width: slideWidth }]}>
+            <Image source={item.image} contentFit="cover" style={StyleSheet.absoluteFill} />
+            <LinearGradient
+              colors={['rgba(5,31,24,0.03)', 'rgba(5,31,24,0.08)', 'rgba(7,43,32,0.84)', Brand.forest]}
+              locations={[0, 0.42, 0.72, 1]}
+              style={StyleSheet.absoluteFill}
+            />
 
-      {/* Top bar */}
-      <View style={styles.topBar}>
-        <View style={styles.brandRow}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoLetter}>L</Text>
-          </View>
-          <Text style={styles.brandText}>LemonTrip</Text>
-        </View>
-        <View style={styles.langPill}>
-          <Text style={styles.langText}>EN</Text>
-        </View>
-      </View>
+            {index === 0 ? <View pointerEvents="none" style={styles.planeDecoration}>
+              <Ionicons name="airplane" size={48} color="#FFFFFF" />
+            </View> : null}
 
-      {/* Hero image (arch shape) */}
-      <View style={styles.hero}>
-        <Image source={HERO_IMAGE} contentFit="cover" style={StyleSheet.absoluteFill} />
-        <View style={styles.heroShade} />
-        <View style={styles.planeWrap}>
-          <Ionicons name="airplane" size={64} color="#FFFFFF" />
-        </View>
-        <View style={styles.captionRow}>
-          <Text style={styles.captionTitle}>THE SWISS ALPS</Text>
-          <Text style={styles.captionCoord}>46.8182° N</Text>
-        </View>
-      </View>
+            <View style={styles.content}>
+              <Text style={[styles.heading, compact && styles.headingCompact]}>
+                {item.title}{'\n'}<Text style={styles.headingAccent}>{item.accent}</Text>
+              </Text>
+              <Text style={styles.description}>{item.description}</Text>
 
-      {/* Text block */}
-      <Text style={styles.eyebrow}>INDIA'S CURATED TRAVEL COMPANY</Text>
-      <Text style={styles.heading}>
-        Unforgettable Journeys,{'\n'}
-        <Text style={styles.headingAccent}>Handpicked for You.</Text>
-      </Text>
-      <Text style={styles.subtext}>
-        Thoughtful escapes, transparent prices and a travel expert beside you—every step of the way.
-      </Text>
-
-      {/* Perk chips */}
-      <View style={styles.chipRow}>
-        {perks.map((p) => (
-          <View key={p.label} style={styles.chip}>
-            <Ionicons name={p.icon} size={12} color="#FFFFFF" />
-            <Text style={styles.chipText}>{p.label}</Text>
+              <View style={styles.controls}>
+                <View style={styles.pagination} accessibilityLabel={`Slide ${index + 1} of ${slides.length}`}>
+                  {slides.map((slide, dotIndex) => (
+                    <Pressable
+                      key={slide.title}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Show introduction ${dotIndex + 1}`}
+                      onPress={() => goToSlide(dotIndex)}
+                      hitSlop={8}
+                      style={[styles.dot, dotIndex === activeSlide && styles.dotActive]}
+                    />
+                  ))}
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={index === slides.length - 1 ? 'Create account' : 'Next introduction'}
+                  onPress={() => index < slides.length - 1 ? goToSlide(index + 1) : leave('/signup')}
+                  style={({ pressed }) => [styles.nextButton, pressed && styles.nextButtonPressed]}
+                >
+                  <Ionicons name="arrow-forward" size={23} color={Brand.forest} />
+                </Pressable>
+              </View>
+            </View>
           </View>
         ))}
-      </View>
-
-      {/* Dots */}
-      <View style={styles.dots}>
-        <View style={styles.dotActive} />
-        <View style={styles.dot} />
-        <View style={styles.dot} />
-      </View>
-
-      {/* CTA */}
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => leave('/(tabs)')}
-        style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}
-      >
-        <Text style={styles.ctaText}>Explore Handpicked Packages</Text>
-        <Ionicons name="arrow-forward" size={20} color={Brand.forest} />
-      </Pressable>
-
-      <Pressable accessibilityRole="button" onPress={() => leave('/login')} hitSlop={8}>
-        <Text style={styles.signInText}>
-          Already a LemonTrip traveler? <Text style={styles.signInBold}>Sign In</Text>
-        </Text>
-      </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Brand.forest, paddingHorizontal: 24, paddingBottom: 12 },
-
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  logoCircle: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: Brand.lemon,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  logoLetter: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 16, color: Brand.forest },
-  brandText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 22, color: '#FFFFFF' },
-  langPill: {
-    paddingHorizontal: 14, paddingVertical: 6, borderRadius: Radius.pill,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)',
-  },
-  langText: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 12, color: '#FFFFFF' },
-
-  hero: {
-    flex: 1, minHeight: 180, marginTop: 20, overflow: 'hidden',
-    borderTopLeftRadius: 140, borderTopRightRadius: 140,
-    borderBottomLeftRadius: Radius.lg, borderBottomRightRadius: Radius.lg,
-  },
-  heroShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.12)' },
-  planeWrap: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
-  captionRow: { position: 'absolute', left: 24, bottom: 18, flexDirection: 'row', gap: 12 },
-  captionTitle: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 11, letterSpacing: 1.5, color: '#FFFFFF' },
-  captionCoord: { fontFamily: 'PlusJakartaSans_500Medium', fontSize: 11, color: 'rgba(255,255,255,0.8)' },
-
-  eyebrow: {
-    marginTop: 22, fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 11,
-    letterSpacing: 2, color: Brand.lemon,
-  },
-  heading: { marginTop: 8, fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 32, lineHeight: 38, color: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: Brand.forest },
+  carousel: { flex: 1 },
+  slide: { flex: 1, overflow: 'hidden', backgroundColor: Brand.forest },
+  planeDecoration: { position: 'absolute', top: '31%', left: '47%', transform: [{ rotate: '-24deg' }], opacity: 0.95 },
+  content: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 27, paddingBottom: 18 },
+  heading: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 34, lineHeight: 41, fontWeight: '800' },
+  headingCompact: { fontSize: 26, lineHeight: 32 },
   headingAccent: { color: Brand.lemon },
-  subtext: {
-    marginTop: 10, fontFamily: 'PlusJakartaSans_500Medium', fontSize: 14, lineHeight: 21,
-    color: 'rgba(255,255,255,0.78)',
-  },
-
-  chipRow: { flexDirection: 'row', gap: 8, marginTop: 14 },
-  chip: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 10, paddingVertical: 6, borderRadius: Radius.pill,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
-  },
-  chipText: { fontFamily: 'PlusJakartaSans_700Bold', fontSize: 10, color: '#FFFFFF' },
-
-  dots: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 18 },
-  dotActive: { width: 36, height: 5, borderRadius: 3, backgroundColor: Brand.lemon },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.4)' },
-
-  cta: {
-    marginTop: 16, height: 58, borderRadius: Radius.lg, backgroundColor: Brand.lemon,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-  },
-  ctaText: { fontFamily: 'PlusJakartaSans_800ExtraBold', fontSize: 16, color: Brand.forest },
-  signInText: {
-    marginTop: 14, textAlign: 'center', fontFamily: 'PlusJakartaSans_500Medium',
-    fontSize: 13, color: 'rgba(255,255,255,0.8)',
-  },
-  signInBold: { fontFamily: 'PlusJakartaSans_800ExtraBold', color: '#FFFFFF' },
+  description: { maxWidth: 350, marginTop: 11, color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 14, lineHeight: 21 },
+  controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 25 },
+  pagination: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.55)' },
+  dotActive: { width: 8, height: 8, backgroundColor: Brand.lemon },
+  nextButton: { width: 54, height: 54, borderRadius: 27, backgroundColor: Brand.lemon, alignItems: 'center', justifyContent: 'center' },
+  nextButtonPressed: { transform: [{ scale: 0.96 }], opacity: 0.9 },
 });

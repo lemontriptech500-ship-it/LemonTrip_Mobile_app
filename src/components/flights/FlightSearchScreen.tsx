@@ -20,6 +20,7 @@ export default function FlightSearchScreen() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resultSource, setResultSource] = useState<'live' | 'mock' | null>(null);
   const [request, setRequest] = useState<FlightSearchRequest | null>(null);
   const [offers, setOffers] = useState<FlightOffer[]>([]);
 
@@ -28,11 +29,13 @@ export default function FlightSearchScreen() {
     setLoading(true);
     setHasSearched(true);
     setError(null);
+    setResultSource(null);
     setRequest(searchRequest);
     setOffers([]);
     try {
       const response = await searchFlights(searchRequest);
       setOffers(response.offers);
+      setResultSource(response.source ?? 'live');
     } catch (searchError) {
       setError(searchError instanceof Error ? searchError.message : 'Flight search failed. Please try again.');
     } finally {
@@ -73,6 +76,12 @@ export default function FlightSearchScreen() {
           {request && hasSearched ? (
             <View style={styles.resultsSection}>
               <FareSummary request={request} offer={offers[0]} />
+              {resultSource === 'mock' ? (
+                <View style={styles.demoNotice}>
+                  <Ionicons name="information-circle-outline" size={18} color={Colors.primaryDark} />
+                  <Text style={styles.demoNoticeText}>Sample flight data for preview only. Prices and availability are not real; payment is disabled.</Text>
+                </View>
+              ) : null}
               {error ? (
                 <View style={styles.errorPanel}>
                   <View style={styles.errorIcon}><Ionicons name="cloud-offline-outline" size={21} color={Colors.error} /></View>
@@ -96,7 +105,7 @@ export default function FlightSearchScreen() {
 
           <View style={styles.footer}>
             <Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} />
-            <Text style={styles.footerText}>Secure search. Prices and availability come directly from the flight service.</Text>
+            <Text style={styles.footerText}>Live prices appear when the flight service is connected. Sample results are clearly marked.</Text>
           </View>
         </View>
       </ScrollView>
@@ -133,4 +142,6 @@ const styles = StyleSheet.create({
   retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 24, paddingHorizontal: 20 },
   footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, textAlign: 'center' },
+  demoNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginHorizontal: 16, padding: 12, borderRadius: 12, backgroundColor: Colors.accentSoft },
+  demoNoticeText: { flex: 1, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, lineHeight: 17, fontWeight: '700' },
 });

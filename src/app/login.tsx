@@ -1,6 +1,5 @@
-import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
+import { AuthField, AuthLayout, GoogleAuthButton, OtpCodeField } from '@/components/auth/AuthLayout';
 import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput } from '@/utils/authApi';
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
@@ -30,23 +29,24 @@ export default function LoginScreen() {
       setIdentifierError(mode === 'email' ? 'Email is required' : 'Mobile number is required');
       return;
     }
-    if (mode === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim())) {
+    if (identifier.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim())) {
       setIdentifierError('Enter a valid email address');
       return;
     }
-    const phoneNumber = mode === 'phone' ? normalizePhoneInput(identifier) : null;
-    if (mode === 'phone' && !phoneNumber) {
+    const authMode = identifier.includes('@') ? 'email' : 'phone';
+    const phoneNumber = authMode === 'phone' ? normalizePhoneInput(identifier) : null;
+    if (authMode === 'phone' && !phoneNumber) {
       setIdentifierError('Enter a valid number. India (+91) is used when no country code is entered.');
       return;
     }
 
-    if (mode === 'email' && !password) {
+    if (authMode === 'email' && !password) {
       setPasswordError('Password is required');
       return;
     }
     setLoading(true);
     try {
-      if (mode === 'email') await login(await loginWithEmail({ email: identifier.trim(), password }));
+      if (authMode === 'email') await login(await loginWithEmail({ email: identifier.trim(), password }));
       else if (!phoneOtp.challenge) { await phoneOtp.sendCode(phoneNumber!); return; }
       else {
         const idToken = await phoneOtp.verifyCode();
@@ -55,7 +55,7 @@ export default function LoginScreen() {
       }
       router.replace('/(tabs)/profile');
     } catch (error) {
-      if (mode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.');
+      if (authMode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.');
       else Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
     } finally {
       setLoading(false);
@@ -72,22 +72,28 @@ export default function LoginScreen() {
   return (
     <AuthLayout
       eyebrow="LEMONTRIP / LOGIN"
-      title="Welcome back"
-      subtitle="Sign in to pick up where your journey left off."
+      title={mode === 'phone' && phoneOtp.challenge ? 'Verify Your Number' : 'Welcome Back'}
+      subtitle={mode === 'phone' && phoneOtp.challenge
+        ? `Enter the six-digit code sent to ${normalizePhoneInput(identifier) ?? identifier}.`
+        : 'Log in to continue your journey.'}
       onBack={handleBack}>
+      {!phoneOtp.challenge ? <>
       <AuthField
-        label={mode === 'email' ? 'Email' : 'Mobile number'}
+        label="Email or Mobile Number"
         value={identifier}
-        placeholder={mode === 'email' ? 'you@example.com' : 'Phone number (+91 default)'}
-        onChangeText={(value) => { setIdentifier(value); if (phoneOtp.challenge) void phoneOtp.reset(); if (identifierError) setIdentifierError(''); }}
+        placeholder="Email or mobile number"
+        onChangeText={(value) => {
+          setIdentifier(value);
+          setMode(value.trim() && /^[+\d\s()-]+$/.test(value.trim()) ? 'phone' : 'email');
+          if (phoneOtp.challenge) void phoneOtp.reset();
+          if (identifierError) setIdentifierError('');
+        }}
         error={identifierError}
         autoCapitalize="none"
-        keyboardType={mode === 'email' ? 'email-address' : 'phone-pad'}
+        keyboardType="email-address"
+        icon={mode === 'email' ? 'mail-outline' : 'call-outline'}
       />
-      <View style={styles.modeSwitch}>
-        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('email'); void phoneOtp.reset(); }} style={[styles.modeButton, mode === 'email' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email</Text></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('phone'); void phoneOtp.reset(); }} style={[styles.modeButton, mode === 'phone' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone OTP</Text></TouchableOpacity>
-      </View>
+      </> : null}
       {mode === 'email' ? <AuthField
         label="Password"
         value={password}
@@ -97,8 +103,9 @@ export default function LoginScreen() {
         secure={!showPassword}
         onToggleSecure={() => setShowPassword((visible) => !visible)}
         autoCapitalize="none"
+        icon="lock-closed-outline"
       /> : phoneOtp.challenge ? <>
-        <AuthField label="Verification code" value={phoneOtp.code} placeholder="Six-digit code" onChangeText={phoneOtp.setCode} error={phoneOtp.error} keyboardType="phone-pad" autoCapitalize="none" />
+        <OtpCodeField value={phoneOtp.code} onChangeText={phoneOtp.setCode} error={phoneOtp.error} />
         <View style={styles.otpActions}>
           <TouchableOpacity accessibilityRole="button" onPress={() => void phoneOtp.reset()}><Text style={styles.otpActionText}>Edit phone</Text></TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" disabled={phoneOtp.busy || phoneOtp.resendSeconds > 0} onPress={() => { const phone = normalizePhoneInput(identifier); if (phone) void phoneOtp.sendCode(phone); }}>
@@ -106,35 +113,31 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </> : null}
-      {mode === 'phone' && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
-      {mode === 'phone' ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
+      {mode === 'phone' && !phoneOtp.challenge && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
+      {mode === 'phone' && !phoneOtp.challenge ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
       {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <Text accessibilityRole="alert" style={styles.phoneError}>{phoneOtp.error}</Text> : null}
 
       {mode === 'email' ? <TouchableOpacity onPress={() => router.push('/forgot-password')} style={styles.forgotRow}>
-        <Text style={styles.forgotText}>Forgot password?</Text>
+        <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity> : null}
 
       <TouchableOpacity accessibilityRole="button" disabled={loading || phoneOtp.busy} style={[styles.primaryButton, (loading || phoneOtp.busy) && styles.disabledButton]} onPress={() => void validateAndLogin()}>
-        <Text style={styles.primaryButtonText}>{loading || phoneOtp.busy ? 'Please wait…' : mode === 'phone' && !phoneOtp.challenge ? 'Send code' : mode === 'phone' ? 'Verify & sign in' : 'Login'}</Text>
+        <Text style={styles.primaryButtonText}>{loading || phoneOtp.busy ? 'Please wait…' : mode === 'phone' && !phoneOtp.challenge ? 'Send OTP' : mode === 'phone' ? 'Verify' : 'Log In'}</Text>
       </TouchableOpacity>
 
+      {!phoneOtp.challenge ? <>
       <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
       <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'login')); router.replace('/(tabs)/profile'); }} />
 
       <TouchableOpacity onPress={() => router.push('/signup')} style={styles.switchLink}>
-        <Text style={styles.switchText}>New to LemonTrip? <Text style={styles.switchTextStrong}>Create an account</Text></Text>
+        <Text style={styles.switchText}>Don’t have an account? <Text style={styles.switchTextStrong}>Sign Up</Text></Text>
       </TouchableOpacity>
-      <AuthLegalLinks onTerms={() => router.push('/terms')} onPrivacy={() => router.push('/privacy')} />
+      </> : null}
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  modeSwitch: { flexDirection: 'row', padding: 3, marginBottom: 12, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
-  modeButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
-  modeButtonActive: { backgroundColor: Colors.surface },
-  modeText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
-  modeTextActive: { color: Colors.primary, fontWeight: '800' },
   otpActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 7, marginBottom: 10 },
   otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   otpActionDisabled: { color: Colors.textLight },
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
   disabledButton: { opacity: 0.6 },
   forgotRow: { alignSelf: 'flex-end', marginTop: -3, marginBottom: 11, paddingVertical: 5 },
   forgotText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  primaryButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  primaryButton: { minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accent },
   primaryButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 14 },
   divider: { flex: 1, height: 1, backgroundColor: Colors.border },

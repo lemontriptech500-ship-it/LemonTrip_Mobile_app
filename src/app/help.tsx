@@ -8,8 +8,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
-
-type Faq = { question: string; answer: string; category: string };
+import { mockHelpFaqs } from '@/data/mock/faqs';
 
 type QuickHelpItem = { title: string; query: string } & (
   | { artwork: TravelArtworkName }
@@ -26,15 +25,6 @@ const quickHelp: QuickHelpItem[] = [
   { title: 'Visa', artwork: 'visa', query: 'visa' },
 ];
 
-const faqs: Faq[] = [
-  { category: 'Bookings', question: 'Where can I find my booking details?', answer: 'Open Your bookings from the profile tab. Select a trip to see its booking ID, status, date, and amount.' },
-  { category: 'Bookings', question: 'Can I change or cancel a booking?', answer: 'Booking changes and cancellations depend on the provider and fare rules. Enter your booking ID below so our team can guide you to the right option.' },
-  { category: 'Payments', question: 'What payment methods can I use?', answer: 'Payment method availability is shown during checkout. LemonTrip does not store your card details in this app.' },
-  { category: 'Flights', question: 'When will I receive my flight confirmation?', answer: 'Your booking record appears in Your bookings after checkout. Keep the booking ID handy if you need help locating a confirmation.' },
-  { category: 'Hotels', question: 'Can I request a special hotel arrangement?', answer: 'Send your request to lemontripindia@gmail.com with your booking ID and the property name. The hotel team will confirm what is possible.' },
-  { category: 'Visa', question: 'How long does visa assistance take?', answer: 'Indicative processing times vary by destination and visa type. Review the destination guidance, then contact an advisor before applying.' },
-];
-
 export default function HelpScreen() {
   const bookings = useBookings();
   const { width } = useWindowDimensions();
@@ -46,8 +36,8 @@ export default function HelpScreen() {
 
   const visibleFaqs = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return faqs;
-    return faqs.filter((faq) => `${faq.category} ${faq.question} ${faq.answer}`.toLowerCase().includes(query));
+    if (!query) return mockHelpFaqs;
+    return mockHelpFaqs.filter((faq) => `${faq.category} ${faq.question} ${faq.answer}`.toLowerCase().includes(query));
   }, [search]);
 
   const findBooking = () => {
@@ -92,7 +82,7 @@ export default function HelpScreen() {
           <View style={[styles.mainLayout, desktop && styles.mainLayoutDesktop]}>
             <View style={styles.primaryColumn}>
               <View style={styles.panel}>
-                <View style={styles.panelHeading}><View><Text style={styles.eyebrow}>ANSWERS, AT A GLANCE</Text><Text style={styles.sectionTitle}>Frequently asked questions</Text></View><Text style={styles.resultCount}>{visibleFaqs.length} answers</Text></View>
+                <View style={styles.panelHeading}><View><Text style={styles.eyebrow}>GENERAL GUIDANCE</Text><Text style={styles.sectionTitle}>Frequently asked questions</Text></View><Text style={styles.resultCount}>{visibleFaqs.length} answers</Text></View>
                 {visibleFaqs.length ? visibleFaqs.map((faq) => {
                   const expanded = openFaq === faq.question;
                   return <View key={faq.question} style={styles.faqItem}><TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded }} onPress={() => setOpenFaq(expanded ? null : faq.question)} style={styles.faqButton}><View style={styles.faqCategory}><Text style={styles.faqCategoryText}>{faq.category}</Text></View><Text style={styles.faqQuestion}>{faq.question}</Text><Ionicons name={expanded ? 'remove' : 'add'} size={18} color={Colors.primary} /></TouchableOpacity>{expanded ? <Text style={styles.faqAnswer}>{faq.answer}</Text> : null}</View>;
