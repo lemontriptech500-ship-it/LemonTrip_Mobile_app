@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconWrapActive: {
-    backgroundColor: Brand.lemon,
+    backgroundColor: "#E5F1EC",
   },
 });
