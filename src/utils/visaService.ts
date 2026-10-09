@@ -71,3 +71,10 @@ export async function getVisaServices() {
   if (!Array.isArray(payload.items)) throw new Error('Visa service returned invalid content.');
   return payload.items;
 }
+
+export type VisaTracking = { id: string; country: string; visaType: string; applicantName: string; status: string; submittedDate: string };
+export async function getVisaApplication(id: string, token: string) {
+  const result = await apiRequest<{ data: VisaTracking }>(`/applications/${encodeURIComponent(id)}`, token);
+  if (!result.data || result.data.id !== id || typeof result.data.status !== 'string') throw new Error('Application details could not be verified.');
+  return result.data;
+}

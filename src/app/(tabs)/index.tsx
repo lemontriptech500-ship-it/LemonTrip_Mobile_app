@@ -1,48 +1,43 @@
 import { Colors } from '@/constants/colors';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import FlightSearchForm from '@/components/flights/FlightSearchForm';
 import type { Offer } from '@/data/offers';
 import { loadOffers, getOfferValidity } from '@/utils/offerApi';
 import type { BlogPost, Destination, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { getUser, useAuth } from '@/utils/authStore';
+import { useCart } from '@/utils/cartStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
-import { Ionicons } from '@expo/vector-icons';
+import { AppScreen } from '@/components/AppScreen';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
-import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
-import { Animated, Easing, Image, ImageSourcePropType, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
+type TileIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 type ServiceItem = {
   label: string;
   icon: IconName;
-  // Optional custom image. When set, it is shown instead of the Ionicons icon.
-  image?: ImageSourcePropType;
+  tileIcon: TileIconName;
   badge?: string;
   route: Parameters<typeof router.push>[0];
 };
 
-// One unified services grid (4 columns), thin outline icons
+// Keep the home service grid consistent with the app's outline icon system.
 const services: ServiceItem[] = [
-  {
-    label: 'Flights',
-    icon: 'airplane-outline',
-    image: require('../../../assets/images/flight.png'),
-    route: '/(tabs)/explore/flights',
-  },
-  { label: 'Hotels', icon: 'bed-outline', image: require('../../../assets/images/hotels_new.png'), route: '/(tabs)/explore/hotels' },
-  { label: 'Holiday\nPackages', icon: 'umbrella-outline', image: require('../../../assets/images/holiday.png'), route: '/packages' },
-  { label: 'Trains', icon: 'train-outline', image: require('../../../assets/images/trains.png'), route: '/(tabs)/explore/trains' },
-  { label: 'Buses', icon: 'bus-outline', image: require('../../../assets/images/buses.png'), route: '/(tabs)/explore/buses' },
-  { label: 'Visa', icon: 'id-card-outline', image: require('../../../assets/images/visa.png'), route: '/(tabs)/explore/visa' },
-  { label: 'Offers', icon: 'pricetag-outline', image: require('../../../assets/images/offers.png'), badge: 'NEW', route: '/offers' },
-  { label: 'Saved\nPlaces', icon: 'heart-outline', image: require('../../../assets/images/saved.png'), route: '/(tabs)/wishlist' },
-  { label: 'Travel\nStories', icon: 'newspaper-outline', image: require('../../../assets/images/travel_stories.png'), route: '/blog' },
-  { label: 'Cart', icon: 'cart-outline', image: require('../../../assets/images/cart.png'), route: '/cart' },
-  { label: 'Help', icon: 'headset-outline', image: require('../../../assets/images/help.png'), route: '/help' },
-  { label: 'Explore\nAll', icon: 'compass-outline', image: require('../../../assets/images/exploreall.png'), route: '/(tabs)/explore' },
+  { label: 'Flights', icon: 'airplane-outline', tileIcon: 'airplane', route: '/(tabs)/explore/flights' },
+  { label: 'Hotels', icon: 'bed-outline', tileIcon: 'bed', route: '/(tabs)/explore/hotels' },
+  { label: 'Holiday\nPackages', icon: 'umbrella-outline', tileIcon: 'beach', route: '/packages' },
+  { label: 'Trains', icon: 'train-outline', tileIcon: 'train', route: '/(tabs)/explore/trains' },
+  { label: 'Buses', icon: 'bus-outline', tileIcon: 'bus', route: '/(tabs)/explore/buses' },
+  { label: 'Visa', icon: 'id-card-outline', tileIcon: 'passport', route: '/(tabs)/explore/visa' },
+  { label: 'Offers', icon: 'pricetag-outline', tileIcon: 'tag', badge: 'NEW', route: '/offers' },
+  { label: 'Saved\nPlaces', icon: 'heart-outline', tileIcon: 'heart', route: '/(tabs)/wishlist' },
+  { label: 'Travel\nStories', icon: 'newspaper-outline', tileIcon: 'book-open-page-variant', route: '/blog' },
+  { label: 'Cart', icon: 'cart-outline', tileIcon: 'cart', route: '/cart' },
+  { label: 'Help', icon: 'headset-outline', tileIcon: 'headset', route: '/help' },
+  { label: 'Explore\nAll', icon: 'compass-outline', tileIcon: 'compass', route: '/(tabs)/explore' },
 ];
 
 const trustPoints: { icon: IconName; title: string; subtitle: string }[] = [
@@ -112,17 +107,6 @@ const PROMO_SLIDES: PromoSlide[] = [
 
 const PROMO_AUTOPLAY_MS = 4500;
 
-// Rotating search suggestions shown inside the search bar. Edit freely.
-const SEARCH_HINTS = [
-  'Goa hotels',
-  'Delhi to Mumbai flights',
-  'Bali holiday packages',
-  'Chennai to Bengaluru trains',
-  'Dubai visa',
-  'Chennai to Madurai buses',
-];
-const SEARCH_HINT_INTERVAL_MS = 2800;
-
 function SectionHeader({ title, action, onPress }: { title: string; action: string; onPress: () => void }) {
   return (
     <View style={styles.sectionHeader}>
@@ -139,6 +123,7 @@ export default function HomeScreen() {
   const { width: viewportWidth } = useWindowDimensions();
   const promoScrollRef = useRef<ScrollView>(null);
   const [promoIndex, setPromoIndex] = useState(0);
+  const [activeService, setActiveService] = useState<ServiceItem>(services[0]);
   // Banner width = page width (max 784) minus the 16px side margins
   const promoWidth = Math.min(viewportWidth, 784) - 32;
 
@@ -155,25 +140,6 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promoIndex, promoWidth]);
-  // Search bar hint: slides up and fades out, then the next suggestion slides in from below.
-  const [hintIndex, setHintIndex] = useState(0);
-  const hintAnim = useRef(new Animated.Value(0)).current; // 0 = visible, -1 = leaving, 1 = entering
-  useEffect(() => {
-    const timer = setInterval(() => {
-      Animated.timing(hintAnim, { toValue: -1, duration: 260, easing: Easing.in(Easing.quad), useNativeDriver: true }).start(({ finished }) => {
-        if (!finished) return;
-        setHintIndex((current) => (current + 1) % SEARCH_HINTS.length);
-        hintAnim.setValue(1);
-        Animated.timing(hintAnim, { toValue: 0, duration: 320, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-      });
-    }, SEARCH_HINT_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [hintAnim]);
-  const hintStyle = {
-    opacity: hintAnim.interpolate({ inputRange: [-1, 0, 1], outputRange: [0, 1, 0] }),
-    transform: [{ translateY: hintAnim.interpolate({ inputRange: [-1, 0, 1], outputRange: [-10, 0, 10] }) }],
-  };
-
   useWishlist();
   const user = useAuth();
   const [verifiedOffers, setVerifiedOffers] = useState<Offer[]>([]);
@@ -206,22 +172,21 @@ export default function HomeScreen() {
   const visibleStories = blogPosts.slice(0, 3);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar style="light" />
+    <AppScreen edges={['top']}>
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.page}>
-        {/* Brand header: plain white, no background image */}
+        {/* Brand header */}
         <View style={styles.hero}>
           <BrandGradientBar style={styles.homeNavBar}>
             <View style={styles.headerRow}>
               <TouchableOpacity
                 accessibilityRole="button"
-                accessibilityLabel="Settings"
-                onPress={() => router.push('/settings')}
+                accessibilityLabel="Saved places"
+                onPress={() => router.push('/(tabs)/wishlist')}
                 style={styles.menuButton}>
-                <Ionicons name="menu" size={26} color="#FFFFFF" />
+                <Ionicons name="heart-outline" size={22} color="#FFFFFF" />
               </TouchableOpacity>
               <LemonTripBrand size={50} />
               <View style={styles.headerSpacer} />
@@ -230,24 +195,13 @@ export default function HomeScreen() {
                 <Text style={styles.profileText}>{user ? user.name.split(' ')[0] : 'Login'}</Text>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Change your departure city" style={styles.locationRow} onPress={() => router.push('/(tabs)/explore/flights')}>
+              <Ionicons name="location-outline" size={14} color={Colors.onDarkMuted} />
+              <Text style={styles.locationText}>New Delhi, IN</Text>
+              <Text style={styles.locationChange}>· Change</Text>
+            </TouchableOpacity>
           </BrandGradientBar>
 
-          {/* Search bar */}
-          <TouchableOpacity
-            accessibilityRole="search"
-            accessibilityLabel="Search flights, hotels, packages and more"
-            activeOpacity={0.92}
-            style={styles.searchBar}
-            onPress={() => router.push('/(tabs)/explore')}>
-            <Ionicons name="search-outline" size={20} color="#6B7280" />
-            <View style={styles.searchTextWrap}>
-              <Text style={styles.searchPrefix}>Search </Text>
-              <Animated.Text style={[styles.searchHint, hintStyle]} numberOfLines={1}>'{SEARCH_HINTS[hintIndex]}'</Animated.Text>
-            </View>
-            <View style={styles.searchGo}>
-              <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
-            </View>
-          </TouchableOpacity>
         </View>
 
 
@@ -257,17 +211,13 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={item.label}
               activeOpacity={0.8}
-              style={styles.serviceCell}
-              onPress={() => {
-                if (item.label === 'Visa') blurWebNavigationFocus();
-                router.push(item.route);
-              }}>
-              <View style={[styles.serviceIconWrap, item.image ? styles.serviceIconWrapImage : null]}>
-                {item.image ? (
-                  <Image source={item.image} style={styles.serviceImage} resizeMode="contain" />
-                ) : (
-                  <Ionicons name={item.icon} size={26} color={Colors.primary} />
-                )}
+              style={[styles.serviceCell, activeService.label === item.label && styles.serviceCellSelected]}
+              accessibilityRole="button"
+              accessibilityLabel={`Show ${item.label.replace('\n', ' ')} options`}
+              accessibilityState={{ selected: activeService.label === item.label }}
+              onPress={() => setActiveService(item)}>
+              <View style={[styles.serviceIconWrap, activeService.label === item.label && styles.serviceIconWrapSelected]}>
+                <MaterialCommunityIcons name={item.tileIcon} size={30} color={activeService.label === item.label ? Colors.primaryDark : Colors.secondary} />
                 {item.badge ? (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>{item.badge}</Text>
@@ -278,6 +228,8 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
         </View>
+
+        <HomeServiceWidget service={activeService} story={visibleStories[0]} offer={visibleOffers[0]} travelPackage={visiblePackages[0]} />
 
         {/* Inspiration banner: 3 auto-sliding, swipeable slides */}
         <View style={styles.promo}>
@@ -459,7 +411,125 @@ export default function HomeScreen() {
           </View>
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </AppScreen>
+  );
+}
+
+function HomeServiceWidget({ service, story, offer, travelPackage }: { service: ServiceItem; story?: BlogPost; offer?: Offer; travelPackage?: TravelPackage }) {
+  const cart = useCart();
+  const [destination, setDestination] = useState('');
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [travelDate, setTravelDate] = useState('');
+  const name = service.label.replace('\n', ' ');
+
+  const searchHotels = () => router.push({ pathname: '/(tabs)/explore/hotels', params: { query: JSON.stringify({ destination, checkIn, checkOut }) } });
+  const searchGroundTravel = () => {
+    const pathname = name === 'Trains' ? '/(tabs)/explore/trains' : '/(tabs)/explore/buses';
+    router.push({ pathname, params: { query: JSON.stringify({ from, to, travelDate }) } });
+  };
+
+  return (
+    <View style={styles.serviceWidget}>
+      <View style={styles.widgetHeading}>
+        <View style={styles.widgetIcon}><Ionicons name={service.icon} size={20} color={Colors.primary} /></View>
+        <View style={styles.widgetHeadingCopy}>
+          <Text style={styles.widgetEyebrow}>{name.toUpperCase()}</Text>
+          <Text style={styles.widgetTitle}>{getWidgetTitle(name, cart.length)}</Text>
+        </View>
+      </View>
+      {name === 'Flights' ? (
+        <FlightSearchForm compact loading={false} onSearch={(request) => router.push({ pathname: '/(tabs)/explore/flights', params: { search: JSON.stringify(request) } })} />
+      ) : name === 'Hotels' ? (
+        <View>
+          <WidgetField label="DESTINATION" value={destination} onChangeText={setDestination} placeholder="City, region or property" />
+          <View style={styles.widgetFieldRow}>
+            <WidgetField label="CHECK IN" value={checkIn} onChangeText={setCheckIn} placeholder="YYYY-MM-DD" />
+            <WidgetField label="CHECK OUT" value={checkOut} onChangeText={setCheckOut} placeholder="YYYY-MM-DD" />
+          </View>
+          <WidgetButton label="Search hotels" onPress={searchHotels} />
+        </View>
+      ) : name === 'Trains' || name === 'Buses' ? (
+        <View>
+          <View style={styles.widgetFieldRow}>
+            <WidgetField label="FROM" value={from} onChangeText={setFrom} placeholder={name === 'Trains' ? 'Departure station' : 'Departure city'} />
+            <WidgetField label="TO" value={to} onChangeText={setTo} placeholder={name === 'Trains' ? 'Arrival station' : 'Destination city'} />
+          </View>
+          <WidgetField label="TRAVEL DATE" value={travelDate} onChangeText={setTravelDate} placeholder="YYYY-MM-DD" />
+          <WidgetButton label={`Search ${name.toLowerCase()}`} onPress={searchGroundTravel} />
+        </View>
+      ) : (
+        <View style={styles.widgetContent}>
+          <Text style={styles.widgetDescription}>{getWidgetDescription(name, cart.length, story)}</Text>
+          {name === 'Holiday Packages' ? (
+            <View style={styles.widgetHighlights}>
+              {travelPackage ? <Text style={styles.widgetHighlight}>{travelPackage.title} · From {travelPackage.price}</Text> : <Text style={styles.widgetHighlight}>Handpicked stays and experiences</Text>}
+              <Text style={styles.widgetHighlight}>Clear trip pricing</Text>
+            </View>
+          ) : null}
+          {name === 'Offers' && offer ? <Text style={styles.widgetFeatured}>{offer.title}{offer.code ? ` · Code ${offer.code}` : ''}</Text> : null}
+          <WidgetButton label={getWidgetAction(name)} onPress={() => router.push(service.route)} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function getWidgetTitle(service: string, cartCount: number) {
+  if (service === 'Flights') return 'Plan a flight';
+  if (service === 'Hotels') return 'Find your stay';
+  if (service === 'Trains') return 'Plan a rail journey';
+  if (service === 'Buses') return 'Plan your bus trip';
+  if (service === 'Holiday Packages') return 'Find a holiday';
+  if (service === 'Visa') return 'Visa help for your trip';
+  if (service === 'Offers') return 'Travel deals for you';
+  if (service === 'Saved Places') return 'Your saved places';
+  if (service === 'Travel Stories') return 'Ideas for your next trip';
+  if (service === 'Cart') return `Your trip cart · ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`;
+  if (service === 'Help') return 'Travel support';
+  return 'Explore LemonTrip services';
+}
+
+function getWidgetDescription(service: string, cartCount: number, story?: BlogPost) {
+  if (service === 'Holiday Packages') return 'Choose a thoughtfully planned escape, with the details of your journey together.';
+  if (service === 'Visa') return 'Check destination guidance and prepare for the entry requirements on your itinerary.';
+  if (service === 'Offers') return 'Browse current savings across flights, stays and handpicked holidays.';
+  if (service === 'Saved Places') return 'Keep the stays and destinations you like together for when you are ready.';
+  if (service === 'Travel Stories') return story?.title ?? 'Read destination guides and ideas from the LemonTrip journal.';
+  if (service === 'Cart') return cartCount ? 'Review the travel items you have collected before checkout.' : 'Your trip cart is empty. Browse travel options and add a journey to keep planning.';
+  if (service === 'Help') return 'Get practical help from a LemonTrip travel expert before or during your journey.';
+  return 'Open the full service directory to find the right way to plan your trip.';
+}
+
+function getWidgetAction(service: string) {
+  if (service === 'Holiday Packages') return 'Browse holidays';
+  if (service === 'Visa') return 'Explore visa support';
+  if (service === 'Offers') return 'View offers';
+  if (service === 'Saved Places') return 'View saved places';
+  if (service === 'Travel Stories') return 'Read travel stories';
+  if (service === 'Cart') return 'Open trip cart';
+  if (service === 'Help') return 'Get travel help';
+  return 'Browse all services';
+}
+
+function WidgetField({ label, value, onChangeText, placeholder }: { label: string; value: string; onChangeText: (value: string) => void; placeholder: string }) {
+  return (
+    <View style={styles.widgetField}>
+      <Text style={styles.widgetFieldLabel}>{label}</Text>
+      <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={Colors.textLight} style={styles.widgetInput} />
+    </View>
+  );
+}
+
+function WidgetButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity accessibilityRole="button" onPress={onPress} style={styles.widgetButton}>
+      <Ionicons name="search-outline" size={17} color={Colors.primaryDark} />
+      <Text style={styles.widgetButtonText}>{label}</Text>
+      <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
+    </TouchableOpacity>
   );
 }
 
@@ -473,36 +543,47 @@ const cardShadow = {
 
 const styles = StyleSheet.create({
   // Dark brand colour behind the status bar; the scroll area paints the light page background
-  safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
   scroll: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 30, maxWidth: 784, width: '100%', alignSelf: 'center' },
 
   // Hero
   hero: { backgroundColor: '#FFFFFF', paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#EEF0EF' },
-  homeNavBar: { minHeight: 62, justifyContent: 'center', paddingHorizontal: 16 },
+  homeNavBar: { minHeight: 92, justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 10, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   menuButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', marginLeft: -6 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
+  locationText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
+  locationChange: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
   headerSpacer: { flex: 1 },
   profileButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#D1D5DB' },
   profileText: { color: '#4B5563', fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
 
-  // Search (overlaps hero)
-  searchBar: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 16, marginTop: 12, paddingLeft: 16, paddingRight: 6, height: 50, borderRadius: 25, backgroundColor: '#F3F4F6', borderWidth: 1, borderColor: '#E5E7EB' },
-  searchTextWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', overflow: 'hidden' },
-  searchPrefix: { color: '#9CA3AF', fontFamily: 'Manrope', fontSize: 14 },
-  searchHint: { flexShrink: 1, color: '#374151', fontFamily: 'Manrope', fontSize: 14, fontWeight: '600' },
-  searchGo: { width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-
   // Services grid
   servicesCard: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 16, marginTop: 14, paddingVertical: 2, paddingHorizontal: 4, borderRadius: 19, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
   serviceCell: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  serviceIconWrap: { width: 54, height: 54, borderRadius: 27, backgroundColor: '#e6f4e8', alignItems: 'center', justifyContent: 'center' },
-  // Used when a service shows a custom image (e.g. flight.png). White background so a non-transparent PNG blends in.
-  serviceIconWrapImage: { backgroundColor: '#FFFFFF', overflow: 'hidden', borderWidth: 1, borderColor: '#e6f4e8' },
-  serviceImage: { width: 44, height: 44 },
+  serviceCellSelected: { backgroundColor: '#F0F6F3', borderRadius: 14 },
+  serviceIconWrap: { width: 56, height: 56, borderRadius: 18, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
+  serviceIconWrapSelected: { backgroundColor: '#E2EFE9', borderWidth: 2, borderColor: '#A9CBB9' },
   serviceLabel: { marginTop: 6, fontSize: 12, lineHeight: 15, fontFamily: 'Manrope', fontWeight: '700', textAlign: 'center', color: Colors.textDark },
   badge: { position: 'absolute', top: -5, right: -9, backgroundColor: Colors.error, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1.5 },
   badgeText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 8, fontWeight: '900', letterSpacing: 0.3 },
+  serviceWidget: { marginHorizontal: 16, marginTop: 12, padding: 16, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
+  widgetHeading: { flexDirection: 'row', alignItems: 'center', gap: 11, marginBottom: 13 },
+  widgetIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.accentSoft },
+  widgetHeadingCopy: { flex: 1 },
+  widgetEyebrow: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  widgetTitle: { marginTop: 2, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
+  widgetContent: { gap: 13 },
+  widgetDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
+  widgetFeatured: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, fontWeight: '800' },
+  widgetHighlights: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+  widgetHighlight: { overflow: 'hidden', paddingHorizontal: 10, paddingVertical: 7, borderRadius: 14, backgroundColor: Colors.surfaceMuted, color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  widgetField: { flex: 1, minWidth: 0, marginBottom: 10 },
+  widgetFieldRow: { flexDirection: 'row', gap: 9 },
+  widgetFieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 0.7, marginBottom: 5 },
+  widgetInput: { minHeight: 44, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12 },
+  widgetButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 2, paddingHorizontal: 14, borderRadius: 14, backgroundColor: Colors.accent },
+  widgetButtonText: { flex: 1, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 
   // Promo banner
   promo: { height: 212, marginHorizontal: 16, marginTop: 14, borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.primaryDark, ...cardShadow },

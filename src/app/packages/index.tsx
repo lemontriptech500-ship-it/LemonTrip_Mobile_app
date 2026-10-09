@@ -1,5 +1,6 @@
+import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import type { PackageCategory, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
@@ -7,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function PackagesListScreen() {
   const { width } = useWindowDimensions();
@@ -32,15 +33,7 @@ export default function PackagesListScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <BrandGradientBar style={styles.topBar}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/explore')} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={18} color={Colors.white} />
-            </TouchableOpacity>
-            <LemonTripBrand size={38} />
-            <Text style={styles.breadcrumb}>JOURNEYS</Text>
-            <View style={styles.topSpacer} />
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open wishlist" onPress={() => router.push('/(tabs)/wishlist')} style={styles.iconButton}><Ionicons name="heart-outline" size={18} color={Colors.primaryDark} /></TouchableOpacity>
-          </BrandGradientBar>
+          <ScreenHeader title="Handpicked journeys" subtitle="Thoughtful escapes, made for the way you travel." eyebrow="FIND YOUR NEXT ESCAPE" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} rightAction={{ label: 'Saved', icon: 'heart-outline', onPress: () => router.push('/(tabs)/wishlist') }} />
 
           <ImageBackground source={{ uri: travelPackages[0]?.image }} style={styles.hero} imageStyle={styles.heroImage}>
             <View style={styles.heroShade} />
@@ -127,66 +120,66 @@ const styles = StyleSheet.create({
   page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1180, alignSelf: 'center' },
   topBar: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.14)' },
-  breadcrumb: { color: Colors.white, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
+  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.onDarkSurface },
+  breadcrumb: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   topSpacer: { flex: 1 },
   iconButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accent },
   hero: { minHeight: 350, justifyContent: 'flex-end', marginHorizontal: 14, overflow: 'hidden', borderRadius: 21, backgroundColor: Colors.primaryDark },
   heroImage: { borderRadius: 21 },
-  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(4, 31, 22, 0.39)' },
+  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
   heroContent: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 60, maxWidth: 650 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1.2 },
-  heroTitle: { maxWidth: 440, color: Colors.white, fontFamily: 'Manrope', fontSize: 30, lineHeight: 36, fontWeight: '900', marginTop: 7 },
-  heroSubtitle: { color: 'rgba(255,255,255,0.88)', fontFamily: 'Manrope', fontSize: 10, lineHeight: 15, marginTop: 6, marginBottom: 13 },
+  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  heroTitle: { maxWidth: 440, color: Colors.white, fontFamily: 'Manrope', fontSize: 30, lineHeight: 36, fontWeight: '800', marginTop: 7 },
+  heroSubtitle: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 6, marginBottom: 13 },
   searchBar: { minHeight: 47, maxWidth: 500, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 12, borderRadius: 12, backgroundColor: Colors.surface },
-  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, paddingVertical: 9 },
+  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, paddingVertical: 9 },
   section: { marginTop: 25 },
   sectionHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 11 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 7, fontWeight: '800', letterSpacing: 1 },
+  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', marginTop: 3 },
   categoryRow: { gap: 7, paddingHorizontal: 16 },
-  categoryChip: { paddingHorizontal: 11, paddingVertical: 8, borderRadius: 15, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  categoryChip: { paddingHorizontal: 11, paddingVertical: 8, borderRadius: Ui.radius.pill, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   categoryChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  categoryText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  categoryText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
   categoryTextActive: { color: Colors.white },
   destinationRow: { gap: 10, paddingHorizontal: 16 },
   destinationCard: { width: 210, height: 145, overflow: 'hidden', borderRadius: 15, backgroundColor: Colors.surfaceMuted },
   destinationImage: { flex: 1, justifyContent: 'flex-end', padding: 12 },
   destinationImageStyle: { borderRadius: 15 },
-  destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(8, 31, 21, 0.27)' },
+  destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.imageOverlay },
   destinationCopy: { position: 'relative' },
-  destinationOverline: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800', letterSpacing: 0.9 },
-  destinationName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900', marginTop: 3 },
-  destinationPrice: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Manrope', fontSize: 8, fontWeight: '700', marginTop: 3 },
-  resultCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, fontWeight: '700' },
+  destinationOverline: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', letterSpacing: 0.9 },
+  destinationName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 3 },
+  destinationPrice: { color: Colors.white, fontFamily: 'Manrope', fontSize: 18, fontWeight: '700', marginTop: 3 },
+  resultCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
   packageGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 11, paddingHorizontal: 16 },
-  packageCard: { width: '100%', overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: 16, backgroundColor: Colors.surface },
+  packageCard: { ...Ui.card, width: '100%', overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   packageCardDesktop: { width: '48.8%' },
   packageImage: { height: 190, justifyContent: 'space-between', padding: 11 },
   packageImageStyle: { borderTopLeftRadius: 15, borderTopRightRadius: 15 },
   imageTop: { flexDirection: 'row', justifyContent: 'space-between' },
-  packageBadge: { color: Colors.primaryDark, backgroundColor: Colors.accent, overflow: 'hidden', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 7, fontFamily: 'Manrope', fontSize: 7, fontWeight: '900' },
-  rating: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 10, backgroundColor: 'rgba(9, 26, 18, 0.72)' },
-  ratingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  packageBadge: { color: Colors.primaryDark, backgroundColor: Colors.accent, overflow: 'hidden', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 7, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  rating: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 10, backgroundColor: Colors.strongOverlay },
+  ratingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
   imageArrow: { alignSelf: 'flex-end', width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accent },
   packageBody: { padding: 12 },
   packageDestination: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  packageDestinationText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
-  packageTitle: { minHeight: 38, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, fontWeight: '800', marginTop: 5 },
+  packageDestinationText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  packageTitle: { minHeight: 38, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 24, fontWeight: '800', marginTop: 5 },
   packageMeta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 5 },
-  packageDuration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8 },
+  packageDuration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
   highlights: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 9 },
   highlight: { maxWidth: '70%', paddingHorizontal: 7, paddingVertical: 5, borderRadius: 7, backgroundColor: Colors.background },
-  highlightText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 7 },
+  highlightText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   packageFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 11, paddingTop: 9, borderTopWidth: 1, borderTopColor: Colors.border },
-  priceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 6, fontWeight: '800', letterSpacing: 0.7 },
-  packagePrice: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900', marginTop: 3 },
-  emptyState: { minHeight: 160, alignItems: 'center', justifyContent: 'center', marginHorizontal: 16, padding: 20, borderRadius: 15, backgroundColor: Colors.surface },
-  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginTop: 9 },
-  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 4 },
-  clearButton: { marginTop: 10, paddingHorizontal: 11, paddingVertical: 8, borderRadius: 9, backgroundColor: Colors.accent },
-  clearButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800' },
+  priceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.7 },
+  packagePrice: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 3 },
+  emptyState: { minHeight: 160, alignItems: 'center', justifyContent: 'center', marginHorizontal: Ui.space.page, padding: 20, borderRadius: 15, backgroundColor: Colors.surface },
+  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 9 },
+  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 4 },
+  clearButton: { minHeight: 44,  marginTop: 10, paddingHorizontal: 11, paddingVertical: 8, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
+  clearButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   footer: { marginTop: 27, paddingHorizontal: 16, paddingVertical: 15, borderTopWidth: 1, borderColor: Colors.border },
-  footerBrand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
-  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 3 },
+  footerBrand: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
 });

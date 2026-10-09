@@ -1,8 +1,10 @@
+import { clearCheckoutDetails } from '@/utils/checkoutStore';
 import { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { refreshAuthSession, revokeAuthSession, type AuthSession, type AuthUser } from '@/utils/authApi';
 import { signOutFirebasePhoneUser } from '@/utils/firebasePhoneAuthService';
+import { signOutGoogleUser } from '@/utils/googleNativeAuth';
 
 export type User = AuthUser;
 
@@ -17,6 +19,7 @@ function notify() {
 }
 
 export async function login(session: AuthSession) {
+  if (currentUser?.id !== session.user.id) clearCheckoutDetails();
   currentUser = session.user;
   accessToken = session.accessToken;
   if (Platform.OS !== 'web' && session.refreshToken) await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken);
@@ -24,8 +27,10 @@ export async function login(session: AuthSession) {
 }
 
 export function logout() {
+  clearCheckoutDetails();
   if (accessToken) void revokeAuthSession(accessToken);
   void signOutFirebasePhoneUser().catch(() => undefined);
+  if (Platform.OS !== 'web') void signOutGoogleUser();
   if (Platform.OS !== 'web') void SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
   currentUser = null;
   accessToken = null;
