@@ -152,6 +152,25 @@ export default function BookingsScreen() {
           </View>
         </View>
 
+        {/* Transactions entry */}
+        {bookings.length > 0 ? (
+          <TouchableOpacity
+            accessibilityRole="button"
+            activeOpacity={0.9}
+            style={styles.txCard}
+            onPress={() => router.push('/transactions' as never)}
+          >
+            <View style={styles.txIcon}>
+              <Ionicons name="receipt-outline" size={22} color={Brand.forest} />
+            </View>
+            <View style={styles.txCopy}>
+              <Text style={styles.txTitle}>Transactions</Text>
+              <Text style={styles.txSub}>Payments and refunds</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Brand.forest} />
+          </TouchableOpacity>
+        ) : null}
+
         {bookings.length > 0 ? (
           <View style={styles.section}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRow}>
@@ -371,6 +390,30 @@ const styles = StyleSheet.create({
   widgetButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 13 },
   widgetSpinner: { paddingHorizontal: 20 },
   disabledButton: { opacity: 0.7 },
+
+  // Transactions entry
+  txCard: {
+    marginTop: 14,
+    marginHorizontal: 16,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.white,
+    ...SHADOW,
+  },
+  txIcon: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    backgroundColor: Brand.lemon,
+  },
+  txCopy: { flex: 1 },
+  txTitle: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 15 },
+  txSub: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12, marginTop: 2 },
 
   // Tabs
   section: { paddingTop: 20 },
