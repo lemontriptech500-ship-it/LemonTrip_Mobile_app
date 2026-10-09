@@ -15,10 +15,10 @@ const SHADOW = Ui.shadow;
 
 // Same circle-icon grid pattern as the Home screen.
 const travelLinks = [
-  { label: 'My trips', artwork: 'flight' as const, route: '/(tabs)/bookings' },
-  { label: 'Saved places', artwork: 'saved' as const, route: '/(tabs)/wishlist' },
-  { label: 'Visa updates', artwork: 'visa' as const, route: '/(tabs)/explore/visa/applications' },
-  { label: 'Offers', artwork: 'offer' as const, route: '/offers' },
+  { label: 'My trips', icon: 'briefcase-outline' as const, route: '/(tabs)/bookings' },
+  { label: 'Saved places', icon: 'heart-outline' as const, route: '/(tabs)/wishlist' },
+  { label: 'Visa updates', icon: 'document-text-outline' as const, route: '/(tabs)/explore/visa/applications' },
+  { label: 'Offers', icon: 'pricetag-outline' as const, route: '/offers' },
 ];
 
 const accountLinks = [
@@ -106,11 +106,9 @@ export default function ProfileScreen() {
             <View style={styles.gridRow}>
               {travelLinks.map((item) => (
                 <TouchableOpacity key={item.label} accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push(item.route as never)}>
-                  <View style={styles.gridCircle}>
-                    <TravelArtworkIcon name={item.artwork} size={36} />
-                    {item.label === 'My trips' && bookings.length > 0 ? (
-                      <View style={styles.gridBadge}><Text style={styles.gridBadgeText}>{bookings.length}</Text></View>
-                    ) : null}
+                  <View style={styles.gridIconWrap}>
+                    <Ionicons name={item.icon} size={23} color={Colors.primary} />
+                    {item.label === 'My trips' && bookings.length > 0 ? <View style={styles.gridBadge}><Text style={styles.gridBadgeText}>{bookings.length}</Text></View> : null}
                   </View>
                   <Text style={styles.gridLabel}>{item.label}</Text>
                 </TouchableOpacity>
@@ -221,10 +219,10 @@ const styles = StyleSheet.create({
   gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', paddingHorizontal: 10, marginBottom: 10 },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: { width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
-  gridBadge: { position: 'absolute', top: -2, right: -2, minWidth: 22, height: 22, paddingHorizontal: 5, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
+  gridIconWrap: { width: 44, height: 40, alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  gridBadge: { position: 'absolute', top: -2, right: -2, minWidth: 20, height: 20, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
   gridBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
+  gridLabel: { marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 13, fontWeight: '700' },
 
   // Lower layout
   lowerLayout: { gap: 16, marginTop: 24, paddingHorizontal: 16 },
