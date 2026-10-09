@@ -215,7 +215,14 @@ export default function HomeScreen() {
               accessibilityRole="button"
               accessibilityLabel={`Show ${item.label.replace('\n', ' ')} options`}
               accessibilityState={{ selected: activeService.label === item.label }}
-              onPress={() => setActiveService(item)}>
+             onPress={() => {
+  if (item.label === 'Buses') {
+    router.push('/(tabs)/explore/buses');
+  } else {
+    setActiveService(item);
+  }
+}}
+>
               <View style={[styles.serviceIconWrap, activeService.label === item.label && styles.serviceIconWrapSelected]}>
                 <MaterialCommunityIcons name={item.tileIcon} size={30} color={activeService.label === item.label ? Colors.primaryDark : Colors.secondary} />
                 {item.badge ? (

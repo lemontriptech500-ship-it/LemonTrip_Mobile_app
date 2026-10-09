@@ -1,587 +1,551 @@
-import { Brand, Colors, Radius } from '@/constants/colors';
-import { formatDate, normalizeStatus, serviceIcon, shortId, statusStyles } from '@/utils/bookingFormat';
-import { useBookings } from '@/utils/bookingStore';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+
+import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  RefreshControl,
+  SafeAreaView,
   ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
-} from 'react-native';
-// SafeAreaView from 'react-native' is deprecated, use the safe-area-context version.
-import { requestPinWidget } from 'react-native-android-widget';
-import { SafeAreaView } from 'react-native-safe-area-context';
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
-type IconName = React.ComponentProps<typeof Ionicons>['name'];
-type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
+const GREEN = "#075638";
+const DARK = "#153C2D";
+const BG = "#F4F8F4";
+const BORDER = "#DCE8DF";
+const YELLOW = "#FFD83D";
 
-const FONT = {
-  medium: 'PlusJakartaSans_500Medium',
-  bold: 'PlusJakartaSans_700Bold',
-  extra: 'PlusJakartaSans_800ExtraBold',
-} as const;
+export default function BookingScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
 
-const SHADOW = {
-  shadowColor: '#0F3D2E',
-  shadowOpacity: 0.1,
-  shadowRadius: 14,
-  shadowOffset: { width: 0, height: 6 },
-  elevation: 4,
-} as const;
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("Male");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [payment, setPayment] = useState("UPI");
+  const [agree, setAgree] = useState(false);
 
-const statusTabs: { key: StatusFilter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'upcoming', label: 'Upcoming' },
-  { key: 'completed', label: 'Completed' },
-  { key: 'cancelled', label: 'Cancelled' },
-];
+  const from = String(params.from || "Delhi");
+  const to = String(params.to || "Jaipur");
+  const operator = String(params.operator || "GreenLine Travels");
+  const date = String(params.date || "09 Oct 2026");
+  const seats = String(params.seats || "L1");
+  const price = Number(params.price || 899);
+  const passengerCount = Number(params.passengers || 1);
 
-const quickLinks: { label: string; icon: IconName; route: string }[] = [
-  { label: 'Explore', icon: 'compass-outline', route: '/(tabs)/explore' },
-  { label: 'Holiday Packages', icon: 'umbrella-outline', route: '/packages' },
-  { label: 'Offers', icon: 'pricetag-outline', route: '/offers' },
-  { label: 'Visa', icon: 'document-text-outline', route: '/(tabs)/explore/visa' },
-];
-
-export default function BookingsScreen() {
-  const bookings = useBookings();
-
-  const [refreshing, setRefreshing] = useState(false);
-  const [addingWidget, setAddingWidget] = useState(false);
-  const [activeTab, setActiveTab] = useState<StatusFilter>('all');
-
-  const counts = useMemo(() => {
-    const base = { all: bookings.length, upcoming: 0, completed: 0, cancelled: 0 };
-    bookings.forEach((booking) => {
-      base[normalizeStatus(booking.status)] += 1;
-    });
-    return base;
-  }, [bookings]);
-
-  const visibleBookings = useMemo(
-    () => bookings.filter((booking) => activeTab === 'all' || normalizeStatus(booking.status) === activeTab),
-    [bookings, activeTab],
-  );
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setRefreshing(false);
-  };
-
-  const handleAddWidget = async () => {
-    if (Platform.OS !== 'android') {
-      Alert.alert('Android feature', 'The Upcoming Trip widget is currently available on Android.');
+  const handleContinue = () => {
+    if (!name.trim()) {
+      Alert.alert("Required", "Please enter the passenger's full name.");
       return;
     }
-    if (addingWidget) return;
 
-    try {
-      setAddingWidget(true);
-      const requested = await requestPinWidget({ widgetName: 'UpcomingTrip' });
-      if (!requested) {
-        Alert.alert(
-          'Widget not supported',
-          'Your launcher does not support direct widget pinning. You can add the LemonTrip widget from the Android Home Screen widget picker.',
-        );
-      }
-    } catch (error) {
-      console.error('Widget request failed:', error);
-      Alert.alert('Unable to add widget', 'Please try adding the LemonTrip widget manually from the Android Home Screen.');
-    } finally {
-      setAddingWidget(false);
+    if (!age.trim() || Number(age) < 1 || Number(age) > 120) {
+      Alert.alert("Invalid age", "Please enter a valid passenger age.");
+      return;
     }
+
+    if (!phone.trim() || !/^[0-9]{10}$/.test(phone)) {
+      Alert.alert("Invalid mobile number", "Enter a 10-digit mobile number.");
+      return;
+    }
+
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert("Invalid email", "Please check your email address.");
+      return;
+    }
+
+    if (!agree) {
+      Alert.alert("Confirmation required", "Please accept the booking terms.");
+      return;
+    }
+
+    router.push({
+      pathname: "/(tabs)/explore/payment" as any,
+      params: {
+        name,
+        age,
+        gender,
+        phone,
+        email,
+        payment,
+        from,
+        to,
+        operator,
+        date,
+        seats,
+        price: String(price),
+        passengers: String(passengerCount),
+      },
+    });
   };
 
+  const Field = ({
+    label,
+    value,
+    onChangeText,
+    placeholder,
+    keyboardType = "default",
+  }: {
+    label: string;
+    value: string;
+    onChangeText: (text: string) => void;
+    placeholder: string;
+    keyboardType?: "default" | "numeric" | "phone-pad" | "email-address";
+  }) => (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#9AA69D"
+        keyboardType={keyboardType}
+        style={styles.input}
+      />
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safe}>
       <ScrollView
-        style={styles.container}
         contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Brand.lemon} colors={[Brand.forest]} />
-        }
       >
-        {/* Green header */}
         <View style={styles.header}>
-          <View style={styles.headerCopy}>
-            <Text style={styles.eyebrowLemon}>YOUR JOURNEYS</Text>
-            <Text style={styles.pageTitle}>My Trips</Text>
-            <Text style={styles.pageSubtitle}>Every detail of your journey, in one place.</Text>
-          </View>
-          {bookings.length > 0 ? (
-            <View style={styles.countPill}>
-              <Text style={styles.countPillText}>{bookings.length}</Text>
-              <Text style={styles.countPillLabel}>{bookings.length === 1 ? 'BOOKING' : 'BOOKINGS'}</Text>
+          <Pressable onPress={() => router.back()} style={styles.back}>
+            <Text style={styles.backText}>‹</Text>
+          </Pressable>
+          <View style={styles.brand}>
+            <Text style={styles.logo}>🍋</Text>
+            <View>
+              <Text style={styles.brandName}>LemonTrip</Text>
+              <Text style={styles.brandSub}>YOUR JOURNEY, SIMPLIFIED</Text>
             </View>
-          ) : null}
+          </View>
+          <View style={{ width: 30 }} />
         </View>
 
-        {/* Widget banner */}
-        <View style={styles.widgetCard}>
-          <View style={styles.widgetIcon}>
-            <Ionicons name="grid-outline" size={24} color={Brand.forest} />
+        <Text style={styles.eyebrow}>BUS BOOKING · STEP 3</Text>
+        <Text style={styles.title}>Passenger details</Text>
+        <Text style={styles.subtitle}>
+          Enter the passenger information for your trip.
+        </Text>
+
+        <View style={styles.steps}>
+          <View style={styles.stepDone}>
+            <Text style={styles.stepDoneText}>✓</Text>
           </View>
-          <View style={styles.widgetContent}>
-            <Text style={styles.widgetTitle}>Upcoming Trip widget</Text>
-            <Text style={styles.widgetDescription}>See your next trip right on your Android Home Screen.</Text>
-            <TouchableOpacity
-              accessibilityRole="button"
-              style={[styles.widgetButton, addingWidget && styles.disabledButton]}
-              activeOpacity={0.85}
-              onPress={handleAddWidget}
-              disabled={addingWidget}
-            >
-              {addingWidget ? (
-                <ActivityIndicator size="small" color={Brand.forest} style={styles.widgetSpinner} />
-              ) : (
-                <>
-                  <Text style={styles.widgetButtonText}>Add widget</Text>
-                  <Ionicons name="arrow-forward" size={16} color={Brand.forest} />
-                </>
-              )}
-            </TouchableOpacity>
+          <View style={styles.stepLine} />
+          <View style={styles.stepDone}>
+            <Text style={styles.stepDoneText}>✓</Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={styles.stepCurrent}>
+            <Text style={styles.stepCurrentText}>3</Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={styles.stepPending}>
+            <Text style={styles.stepPendingText}>4</Text>
           </View>
         </View>
 
-        {/* Transactions entry */}
-        {bookings.length > 0 ? (
-          <TouchableOpacity
-            accessibilityRole="button"
-            activeOpacity={0.9}
-            style={styles.txCard}
-            onPress={() => router.push('/transactions' as never)}
-          >
-            <View style={styles.txIcon}>
-              <Ionicons name="receipt-outline" size={22} color={Brand.forest} />
+        <View style={styles.tripCard}>
+          <View style={styles.tripTop}>
+            <Text style={styles.tripLabel}>YOUR TRIP</Text>
+            <Text style={styles.confirmBadge}>Bus selected</Text>
+          </View>
+          <Text style={styles.operator}>{operator}</Text>
+          <View style={styles.route}>
+            <View>
+              <Text style={styles.city}>{from}</Text>
+              <Text style={styles.routeCaption}>Departure</Text>
             </View>
-            <View style={styles.txCopy}>
-              <Text style={styles.txTitle}>Transactions</Text>
-              <Text style={styles.txSub}>Payments and refunds</Text>
+            <Text style={styles.routeArrow}>→</Text>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text style={styles.city}>{to}</Text>
+              <Text style={styles.routeCaption}>Destination</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={Brand.forest} />
-          </TouchableOpacity>
-        ) : null}
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.tripBottom}>
+            <View>
+              <Text style={styles.smallLabel}>TRAVEL DATE</Text>
+              <Text style={styles.smallValue}>{date}</Text>
+            </View>
+            <View>
+              <Text style={styles.smallLabel}>SEATS</Text>
+              <Text style={styles.smallValue}>{seats}</Text>
+            </View>
+            <View>
+              <Text style={styles.smallLabel}>TOTAL</Text>
+              <Text style={styles.price}>₹{price.toLocaleString("en-IN")}</Text>
+            </View>
+          </View>
+        </View>
 
-        {bookings.length > 0 ? (
-          <View style={styles.section}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRow}>
-              {statusTabs.map((tab) => {
-                const selected = activeTab === tab.key;
-                return (
-                  <TouchableOpacity
-                    key={tab.key}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                    onPress={() => setActiveTab(tab.key)}
-                    style={[styles.tab, selected && styles.tabSelected]}
+        <View style={styles.card}>
+          <View style={styles.cardHeading}>
+            <View style={styles.iconCircle}>
+              <Text style={styles.iconText}>♙</Text>
+            </View>
+            <View>
+              <Text style={styles.cardTitle}>Lead passenger</Text>
+              <Text style={styles.cardSub}>Passenger 1 of {passengerCount}</Text>
+            </View>
+          </View>
+
+          <Field
+            label="FULL NAME *"
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter full name"
+          />
+
+          <View style={styles.twoColumns}>
+            <View style={{ flex: 1 }}>
+              <Field
+                label="AGE *"
+                value={age}
+                onChangeText={setAge}
+                placeholder="Enter age"
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.label}>GENDER *</Text>
+              <View style={styles.genderRow}>
+                {["Male", "Female", "Other"].map((item) => (
+                  <Pressable
+                    key={item}
+                    onPress={() => setGender(item)}
+                    style={[
+                      styles.genderButton,
+                      gender === item && styles.optionActive,
+                    ]}
                   >
-                    <Text style={[styles.tabText, selected && styles.tabTextSelected]}>{tab.label}</Text>
-                    <View style={[styles.tabCount, selected && styles.tabCountSelected]}>
-                      <Text style={[styles.tabCountText, selected && styles.tabCountTextSelected]}>{counts[tab.key]}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-
-            {visibleBookings.length ? (
-              <View style={styles.bookingList}>
-                {visibleBookings.map((booking) => {
-                  const status = statusStyles[normalizeStatus(booking.status)];
-                  return (
-                    <TouchableOpacity
-                      key={booking.id}
-                      accessibilityRole="button"
-                      activeOpacity={0.9}
-                      style={styles.bookingCard}
-                      onPress={() => router.push(`/booking/${booking.id}` as never)}
+                    <Text
+                      style={[
+                        styles.genderText,
+                        gender === item && styles.optionTextActive,
+                      ]}
                     >
-                      <View style={styles.bookingTop}>
-                        <View style={styles.bookingIcon}>
-                          <Ionicons name={serviceIcon(booking.serviceName)} size={24} color={Brand.forest} />
-                        </View>
-                        <View style={styles.bookingInfo}>
-                          <Text style={styles.eyebrowDark} numberOfLines={1}>
-                            {(booking.serviceName ?? '').toUpperCase()}
-                          </Text>
-                          <Text style={styles.itemName} numberOfLines={2}>{booking.itemName}</Text>
-                          {booking.destination ? (
-                            <View style={styles.destRow}>
-                              <Ionicons name="location-outline" size={13} color={Colors.textLight} />
-                              <Text style={styles.destText} numberOfLines={1}>{booking.destination}</Text>
-                            </View>
-                          ) : null}
-                        </View>
-                        <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
-                          <Ionicons name={status.icon} size={12} color={status.fg} />
-                          <Text style={[styles.statusText, { color: status.fg }]}>{status.label}</Text>
-                        </View>
-                      </View>
-
-                      <View style={styles.ticketDivider}>
-                        <View style={[styles.notch, styles.notchLeft]} />
-                        <View style={styles.dash} />
-                        <View style={[styles.notch, styles.notchRight]} />
-                      </View>
-
-                      <View style={styles.bookingDetails}>
-                        <View style={styles.detailCol}>
-                          <Text style={styles.detailLabel}>BOOKING ID</Text>
-                          <Text style={styles.detailValue}>{shortId(booking.id)}</Text>
-                        </View>
-                        <View style={styles.detailCol}>
-                          <Text style={styles.detailLabel}>{booking.tripDate ? 'TRIP DATE' : 'BOOKED ON'}</Text>
-                          <Text style={styles.detailValue}>{formatDate(booking.tripDate ?? booking.bookedAt)}</Text>
-                        </View>
-                        <View style={styles.priceBox}>
-                          <Text style={styles.detailLabel}>TOTAL</Text>
-                          <Text style={styles.price}>{booking.price}</Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ) : (
-              <View style={styles.filterEmpty}>
-                <Ionicons name="filter-outline" size={26} color={Brand.forest} />
-                <Text style={styles.filterEmptyText}>No {activeTab} bookings.</Text>
-                <TouchableOpacity onPress={() => setActiveTab('all')}>
-                  <Text style={styles.linkText}>Show all</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-        ) : (
-          <>
-            {/* Empty state */}
-            <View style={styles.emptyCard}>
-              <View style={styles.emptyCircle}>
-                <Ionicons name="airplane-outline" size={38} color={Brand.forest} />
-              </View>
-              <Text style={styles.emptyTitle}>Your next journey could start here</Text>
-              <Text style={styles.emptyDescription}>
-                You don’t have any bookings yet. Explore flights, hotels and experiences to plan your next adventure.
-              </Text>
-              <TouchableOpacity
-                accessibilityRole="button"
-                style={styles.primaryButton}
-                activeOpacity={0.85}
-                onPress={() => router.push('/(tabs)/explore')}
-              >
-                <Text style={styles.primaryButtonText}>Explore journeys</Text>
-                <Ionicons name="arrow-forward" size={18} color={Brand.forest} />
-              </TouchableOpacity>
-            </View>
-
-            {/* Quick links */}
-            <View style={styles.gridCard}>
-              <Text style={styles.eyebrowDark}>PLAN AHEAD</Text>
-              <Text style={styles.gridTitle}>Plan your next trip</Text>
-              <View style={styles.gridRow}>
-                {quickLinks.map((link) => (
-                  <TouchableOpacity
-                    key={link.label}
-                    accessibilityRole="button"
-                    style={styles.gridItem}
-                    activeOpacity={0.85}
-                    onPress={() => router.push(link.route as never)}
-                  >
-                    <View style={styles.gridCircle}>
-                      <Ionicons name={link.icon} size={26} color={Brand.forest} />
-                    </View>
-                    <Text style={styles.gridLabel}>{link.label}</Text>
-                  </TouchableOpacity>
+                      {item}
+                    </Text>
+                  </Pressable>
                 ))}
               </View>
             </View>
-          </>
-        )}
+          </View>
 
-        <View style={styles.infoCard}>
-          <View style={styles.infoIcon}>
-            <Ionicons name="shield-checkmark" size={22} color={Brand.lemon} />
-          </View>
-          <View style={styles.infoContent}>
-            <Text style={styles.eyebrowLemon}>TRAVEL WITH CONFIDENCE</Text>
-            <Text style={styles.infoText}>Your LemonTrip travel details stay organized in one place.</Text>
-          </View>
+          <Field
+            label="MOBILE NUMBER *"
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="10-digit mobile number"
+            keyboardType="phone-pad"
+          />
+
+          <Field
+            label="EMAIL ADDRESS"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            keyboardType="email-address"
+          />
+
+          <Text style={styles.helper}>
+            Your contact details may be used for booking updates.
+          </Text>
         </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Payment preference</Text>
+          <Text style={styles.cardSub}>
+            Choose how you would like to pay.
+          </Text>
+
+          {[
+            { id: "UPI", title: "UPI", description: "Pay using a UPI app", icon: "◈" },
+            { id: "Card", title: "Credit / Debit Card", description: "Visa, Mastercard and more", icon: "▤" },
+            { id: "Net Banking", title: "Net Banking", description: "Pay through your bank", icon: "⌂" },
+          ].map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() => setPayment(item.id)}
+              style={[
+                styles.paymentOption,
+                payment === item.id && styles.paymentActive,
+              ]}
+            >
+              <View style={styles.paymentIcon}>
+                <Text style={styles.paymentIconText}>{item.icon}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.paymentTitle}>{item.title}</Text>
+                <Text style={styles.paymentSub}>{item.description}</Text>
+              </View>
+              <View style={styles.radioOuter}>
+                {payment === item.id && <View style={styles.radioInner} />}
+              </View>
+            </Pressable>
+          ))}
+        </View>
+
+        <Pressable
+          style={styles.termsRow}
+          onPress={() => setAgree(!agree)}
+        >
+          <View style={[styles.checkbox, agree && styles.checkboxActive]}>
+            {agree && <Text style={styles.checkmark}>✓</Text>}
+          </View>
+          <Text style={styles.termsText}>
+            I confirm that the passenger details are correct and agree to the
+            booking terms and cancellation policy.
+          </Text>
+        </Pressable>
+
+        <View style={styles.bottomCard}>
+          <View>
+            <Text style={styles.bottomLabel}>TOTAL PAYABLE</Text>
+            <Text style={styles.bottomPrice}>
+              ₹{price.toLocaleString("en-IN")}
+            </Text>
+            <Text style={styles.bottomSub}>For {passengerCount} passenger(s)</Text>
+          </View>
+
+          <Pressable style={styles.continueButton} onPress={handleContinue}>
+            <Text style={styles.continueText}>Continue</Text>
+            <Text style={styles.arrow}>→</Text>
+          </Pressable>
+        </View>
+
+        <Text style={styles.footer}>
+          🔒 Your details should be handled securely.
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Brand.forest },
-  container: { flex: 1, backgroundColor: Brand.cream },
-  content: { paddingBottom: 32, width: '100%', maxWidth: 900, alignSelf: 'center' },
-
-  // Header
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 56,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    backgroundColor: Brand.forest,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-  },
-  headerCopy: { flex: 1 },
-  eyebrowLemon: { color: Brand.lemon, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.6 },
-  eyebrowDark: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.4 },
-  pageTitle: { color: Colors.white, fontFamily: FONT.extra, fontSize: 30, marginTop: 4 },
-  pageSubtitle: { color: 'rgba(255,255,255,0.78)', fontFamily: FONT.medium, fontSize: 13, marginTop: 4 },
-  countPill: {
-    alignItems: 'center',
+  safe: { flex: 1, backgroundColor: BG },
+  content: {
+    width: "100%",
+    maxWidth: 520,
+    alignSelf: "center",
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: Radius.md,
-    backgroundColor: Brand.lemon,
+    paddingTop: 8,
+    paddingBottom: 35,
   },
-  countPillText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 20 },
-  countPillLabel: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 9, letterSpacing: 1 },
-
-  // Widget banner (overlaps header)
-  widgetCard: {
-    marginTop: -34,
-    marginHorizontal: 16,
-    padding: 16,
-    flexDirection: 'row',
-    gap: 14,
-    borderRadius: Radius.lg,
-    backgroundColor: Brand.forestLight,
-    ...SHADOW,
+  header: {
+    backgroundColor: GREEN,
+    borderRadius: 10,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 24,
   },
-  widgetIcon: {
-    width: 50,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.md,
-    backgroundColor: Brand.lemon,
+  back: { width: 30, justifyContent: "center" },
+  backText: { color: "#FFFFFF", fontSize: 30 },
+  brand: { flexDirection: "row", alignItems: "center", gap: 8 },
+  logo: { fontSize: 23 },
+  brandName: { color: "#FFFFFF", fontSize: 15, fontWeight: "900" },
+  brandSub: { color: "#D6E8DC", fontSize: 8, marginTop: 3 },
+  eyebrow: { color: GREEN, fontSize: 9, fontWeight: "900", letterSpacing: 1 },
+  title: { color: DARK, fontSize: 25, fontWeight: "900", marginTop: 5 },
+  subtitle: { color: "#758178", fontSize: 11, marginTop: 6, lineHeight: 17 },
+  steps: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 21,
   },
-  widgetContent: { flex: 1, minWidth: 0 },
-  widgetTitle: { color: Colors.white, fontFamily: FONT.extra, fontSize: 16 },
-  widgetDescription: { color: 'rgba(255,255,255,0.85)', fontFamily: FONT.medium, fontSize: 12, lineHeight: 18, marginTop: 3 },
-  widgetButton: {
-    alignSelf: 'flex-start',
-    minHeight: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 12,
-    paddingHorizontal: 18,
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.lemon,
+  stepDone: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: GREEN,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  widgetButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 13 },
-  widgetSpinner: { paddingHorizontal: 20 },
-  disabledButton: { opacity: 0.7 },
-
-  // Transactions entry
-  txCard: {
-    marginTop: 14,
-    marginHorizontal: 16,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: Radius.lg,
-    backgroundColor: Colors.white,
-    ...SHADOW,
+  stepDoneText: { color: "#FFFFFF", fontWeight: "900" },
+  stepCurrent: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: YELLOW,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  txIcon: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.md,
-    backgroundColor: Brand.lemon,
+  stepCurrentText: { color: DARK, fontWeight: "900" },
+  stepPending: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#E2E9E3",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  txCopy: { flex: 1 },
-  txTitle: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 15 },
-  txSub: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12, marginTop: 2 },
-
-  // Tabs
-  section: { paddingTop: 20 },
-  tabRow: { paddingHorizontal: 16, gap: 8 },
-  tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingLeft: 16,
-    paddingRight: 8,
-    paddingVertical: 9,
-    borderRadius: Radius.pill,
-    backgroundColor: Colors.white,
+  stepPendingText: { color: "#758178", fontWeight: "800" },
+  stepLine: { height: 2, width: 35, backgroundColor: "#B8D1BF" },
+  tripCard: {
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#E4E3DA',
-  },
-  tabSelected: { backgroundColor: Brand.lemon, borderColor: Brand.lemon },
-  tabText: { color: Colors.textDark, fontFamily: FONT.bold, fontSize: 13 },
-  tabTextSelected: { color: Brand.forest, fontFamily: FONT.extra },
-  tabCount: {
-    minWidth: 24,
-    height: 24,
-    paddingHorizontal: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: BORDER,
     borderRadius: 12,
-    backgroundColor: Brand.cream,
+    padding: 14,
+    marginBottom: 17,
   },
-  tabCountSelected: { backgroundColor: Brand.forest },
-  tabCountText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 11 },
-  tabCountTextSelected: { color: Brand.lemon },
-
-  // Voucher cards
-  bookingList: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
-  bookingCard: { padding: 16, borderRadius: Radius.lg, backgroundColor: Colors.white, ...SHADOW },
-  bookingTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  bookingIcon: {
-    width: 50,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.md,
-    backgroundColor: Brand.cream,
+  tripTop: { flexDirection: "row", justifyContent: "space-between" },
+  tripLabel: { color: GREEN, fontSize: 9, fontWeight: "900", letterSpacing: 1 },
+  confirmBadge: {
+    color: GREEN,
+    fontSize: 9,
+    backgroundColor: "#EAF4EC",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 5,
   },
-  bookingInfo: { flex: 1, minWidth: 0 },
-  itemName: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 16, lineHeight: 21, marginTop: 3 },
-  destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  destText: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12, flexShrink: 1 },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: Radius.pill,
+  operator: { color: DARK, fontSize: 14, fontWeight: "900", marginTop: 12 },
+  route: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 17,
   },
-  statusText: { fontFamily: FONT.extra, fontSize: 9, letterSpacing: 0.8 },
-
-  ticketDivider: { height: 20, marginVertical: 14, marginHorizontal: -16, flexDirection: 'row', alignItems: 'center' },
-  notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: Brand.cream },
-  notchLeft: { marginLeft: -10 },
-  notchRight: { marginRight: -10 },
-  dash: { flex: 1, height: 0, marginHorizontal: 8, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: '#D5D4CB' },
-
-  bookingDetails: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
-  detailCol: { flexShrink: 1 },
-  detailLabel: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 9, letterSpacing: 1.2, marginBottom: 4 },
-  detailValue: { color: Colors.textDark, fontFamily: FONT.bold, fontSize: 13 },
-  priceBox: { alignItems: 'flex-end', marginLeft: 'auto' },
-  price: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 20 },
-
-  filterEmpty: {
-    marginTop: 16,
-    marginHorizontal: 16,
-    padding: 24,
-    alignItems: 'center',
-    gap: 8,
-    borderRadius: Radius.lg,
-    backgroundColor: Colors.white,
-  },
-  filterEmptyText: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 14, textTransform: 'capitalize' },
-  linkText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 14 },
-
-  // Empty state
-  emptyCard: {
-    marginTop: 20,
-    marginHorizontal: 16,
-    paddingHorizontal: 22,
-    paddingVertical: 28,
-    alignItems: 'center',
-    borderRadius: Radius.lg,
-    backgroundColor: Colors.white,
-    ...SHADOW,
-  },
-  emptyCircle: {
-    width: 92,
-    height: 92,
-    alignItems: 'center',
-    justifyContent: 'center',
+  city: { color: DARK, fontSize: 17, fontWeight: "900" },
+  routeCaption: { color: "#89948C", fontSize: 9, marginTop: 4 },
+  routeArrow: { color: GREEN, fontSize: 21 },
+  divider: { height: 1, backgroundColor: BORDER, marginVertical: 14 },
+  tripBottom: { flexDirection: "row", justifyContent: "space-between" },
+  smallLabel: { color: "#87938A", fontSize: 8, fontWeight: "800" },
+  smallValue: { color: DARK, fontSize: 10, fontWeight: "800", marginTop: 5 },
+  price: { color: GREEN, fontSize: 14, fontWeight: "900", marginTop: 3 },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 12,
+    padding: 15,
     marginBottom: 16,
-    borderRadius: 46,
-    backgroundColor: Brand.cream,
   },
-  emptyTitle: { textAlign: 'center', color: Brand.forest, fontFamily: FONT.extra, fontSize: 22, lineHeight: 28 },
-  emptyDescription: {
-    textAlign: 'center',
-    maxWidth: 320,
-    marginTop: 8,
-    marginBottom: 20,
-    color: Colors.textLight,
-    fontFamily: FONT.medium,
-    fontSize: 14,
-    lineHeight: 21,
+  cardHeading: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 19 },
+  iconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: "#EAF4EC",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  primaryButton: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 26,
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.lemon,
-  },
-  primaryButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 15 },
-
-  // Quick link grid
-  gridCard: {
-    marginTop: 16,
-    marginHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 8,
+  iconText: { color: GREEN, fontSize: 21 },
+  cardTitle: { color: DARK, fontSize: 14, fontWeight: "900" },
+  cardSub: { color: "#89948C", fontSize: 10, marginTop: 4 },
+  field: { marginBottom: 16 },
+  label: { color: "#66746A", fontSize: 9, fontWeight: "900", marginBottom: 7 },
+  input: {
+    height: 45,
+    backgroundColor: "#F7F9F7",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 8,
     paddingHorizontal: 12,
-    borderRadius: Radius.lg,
-    backgroundColor: Colors.white,
-    ...SHADOW,
+    color: DARK,
+    fontSize: 12,
   },
-  gridTitle: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 18, marginTop: 3, marginBottom: 10 },
-  gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: {
-    width: 62,
-    height: 62,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 31,
-    backgroundColor: Brand.cream,
+  twoColumns: { flexDirection: "row", gap: 12 },
+  genderRow: { flexDirection: "row", gap: 4 },
+  genderButton: {
+    flex: 1,
+    minHeight: 45,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F7F9F7",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 7,
+    paddingHorizontal: 2,
   },
-  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: FONT.bold, fontSize: 12, lineHeight: 16 },
-
-  // Info
-  infoCard: {
-    marginTop: 20,
-    marginHorizontal: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+  genderText: { color: "#69766D", fontSize: 9, fontWeight: "700" },
+  optionActive: { backgroundColor: GREEN, borderColor: GREEN },
+  optionTextActive: { color: "#FFFFFF" },
+  helper: { color: "#849087", fontSize: 10, lineHeight: 15, marginTop: -3 },
+  paymentOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 9,
+    padding: 12,
+    marginTop: 12,
+    gap: 10,
+  },
+  paymentActive: { borderColor: GREEN, backgroundColor: "#F0F7F1" },
+  paymentIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: "#EAF4EC",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paymentIconText: { color: GREEN, fontSize: 20, fontWeight: "900" },
+  paymentTitle: { color: DARK, fontSize: 11, fontWeight: "900" },
+  paymentSub: { color: "#89948C", fontSize: 9, marginTop: 4 },
+  radioOuter: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1.5,
+    borderColor: GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: GREEN },
+  termsRow: { flexDirection: "row", alignItems: "flex-start", gap: 10, marginBottom: 18 },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#A8B8AB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxActive: { backgroundColor: GREEN, borderColor: GREEN },
+  checkmark: { color: "#FFFFFF", fontSize: 13, fontWeight: "900" },
+  termsText: { flex: 1, color: "#657268", fontSize: 10, lineHeight: 16 },
+  bottomCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 12,
+    padding: 14,
+  },
+  bottomLabel: { color: "#87938A", fontSize: 9, fontWeight: "900" },
+  bottomPrice: { color: GREEN, fontSize: 22, fontWeight: "900", marginTop: 3 },
+  bottomSub: { color: "#87938A", fontSize: 9, marginTop: 3 },
+  continueButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
-    borderRadius: Radius.lg,
-    backgroundColor: Brand.forest,
+    backgroundColor: GREEN,
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 13,
   },
-  infoIcon: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: Brand.forestLight,
-  },
-  infoContent: { flex: 1 },
-  infoText: { color: Colors.white, fontFamily: FONT.bold, fontSize: 14, lineHeight: 20, marginTop: 4 },
+  continueText: { color: "#FFFFFF", fontSize: 11, fontWeight: "900" },
+  arrow: { color: YELLOW, fontSize: 17, fontWeight: "900" },
+  footer: { textAlign: "center", color: "#87938A", fontSize: 10, marginTop: 18 },
 });
