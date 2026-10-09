@@ -103,13 +103,13 @@ function PackageCard({ item, desktop, onPress }: { item: TravelPackage; desktop:
         <View style={styles.imageArrow}><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
       </ImageBackground>
       <View style={styles.packageBody}>
-        <View style={styles.packageDestination}><Ionicons name="location-outline" size={12} color={Colors.secondary} /><Text style={styles.packageDestinationText}>{item.destination ?? 'Destination details unavailable'}</Text></View>
+        <View style={styles.packageDestination}><Ionicons name="location-outline" size={12} color={Colors.secondary} /><Text style={styles.packageDestinationText}>{item.destination ?? 'Holiday package'}</Text></View>
         <Text style={styles.packageTitle} numberOfLines={2}>{item.title}</Text>
         <View style={styles.packageMeta}><Ionicons name="time-outline" size={13} color={Colors.textLight} /><Text style={styles.packageDuration}>{item.duration}</Text></View>
         <View style={styles.highlights}>
           {item.highlights.slice(0, 2).map((highlight) => <View key={highlight} style={styles.highlight}><Text style={styles.highlightText} numberOfLines={1}>{highlight}</Text></View>)}
         </View>
-        <View style={styles.packageFooter}><View><Text style={styles.priceLabel}>STARTING FROM</Text><Text style={styles.packagePrice}>{item.price}</Text></View><Ionicons name="arrow-forward" size={16} color={Colors.primary} /></View>
+        <View style={styles.packageFooter}><View><Text style={styles.priceLabel}>FROM · PER PERSON</Text><Text style={styles.packagePrice}>{item.price}</Text></View><Ionicons name="arrow-forward" size={16} color={Colors.primary} /></View>
       </View>
     </TouchableOpacity>
   );

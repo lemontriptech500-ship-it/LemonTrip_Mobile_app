@@ -4,7 +4,8 @@ import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar'
 import { Ionicons } from '@expo/vector-icons';
 import type { TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
-import { addToCart, isInCart, useCart } from '@/utils/cartStore';
+import { selectPackage } from '@/utils/packageBookingStore';
+import { PACKAGE_ROUTES } from '@/components/packages/PackageUi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -21,8 +22,6 @@ export default function PackageDetailScreen() {
   const pkg = travelPackages.find((item) => item.id === id);
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
-  useCart();
-  const booked = pkg ? isInCart(`package-${pkg.id}`) : false;
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
@@ -31,8 +30,8 @@ export default function PackageDetailScreen() {
 
   const handleBook = () => {
     if (!pkg) return;
-    if (!booked) addToCart({ id: `package-${pkg.id}`, serviceName: 'Holiday Package', itemName: pkg.title, price: pkg.price });
-    router.push('/cart');
+    selectPackage(pkg);
+    router.push(PACKAGE_ROUTES.plan);
   };
 
   const handleEnquire = async () => {
@@ -113,16 +112,16 @@ export default function PackageDetailScreen() {
               <DetailSection title="Cancellation" icon="calendar-clear-outline" text={pkg.cancellation} />
             </View>
 
-            {desktop ? <View style={styles.bookingColumn}><BookingPanel title={pkg.title} duration={pkg.duration} price={pkg.price} booked={booked} onEnquire={handleEnquire} onBook={handleBook} /></View> : null}
+            {desktop ? <View style={styles.bookingColumn}><BookingPanel title={pkg.title} duration={pkg.duration} price={pkg.price} onEnquire={handleEnquire} onBook={handleBook} /></View> : null}
           </View>
         </View>
       </ScrollView>
 
       {!desktop ? (
         <View style={[styles.mobileBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-          <View style={styles.mobilePrice}><Text style={styles.mobilePriceLabel}>STARTING FROM</Text><Text style={styles.mobilePriceValue}>{pkg.price}</Text></View>
+          <View style={styles.mobilePrice}><Text style={styles.mobilePriceLabel}>FROM · PER PERSON</Text><Text style={styles.mobilePriceValue}>{pkg.price}</Text></View>
           <TouchableOpacity onPress={handleEnquire} style={styles.enquireButton}><Text style={styles.enquireText}>Enquire</Text></TouchableOpacity>
-          <TouchableOpacity onPress={handleBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookText}>{booked ? 'View Cart  →' : 'Book Package  →'}</Text></TouchableOpacity>
+          <TouchableOpacity onPress={handleBook} style={styles.bookButton}><Text style={styles.bookText}>Book now  →</Text></TouchableOpacity>
         </View>
       ) : null}
     </SafeAreaView>
@@ -166,11 +165,10 @@ function DetailSection({
   );
 }
 
-function BookingPanel({ title, duration, price, booked, onEnquire, onBook }: {
+function BookingPanel({ title, duration, price, onEnquire, onBook }: {
   title: string;
   duration: string;
   price: string;
-  booked: boolean;
   onEnquire: () => void;
   onBook: () => void;
 }) {
@@ -180,9 +178,9 @@ function BookingPanel({ title, duration, price, booked, onEnquire, onBook }: {
       <Text style={styles.bookingTitle}>{title}</Text>
       <View style={styles.bookingMeta}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.bookingMetaText}>{duration}</Text></View>
       <View style={styles.bookingPriceArea}><Text style={styles.bookingPriceLabel}>STARTING FROM</Text><Text style={styles.bookingPrice}>{price}</Text></View>
-      <Text style={styles.priceNote}>Final price depends on selected dates and availability.</Text>
+      <Text style={styles.priceNote}>Per person, twin sharing. Choose dates and travellers on the next step to see your total.</Text>
       <TouchableOpacity onPress={onEnquire} style={styles.enquireButtonWide}><Ionicons name="mail-outline" size={15} color={Colors.primary} /><Text style={styles.enquireWideText}>Enquire now</Text></TouchableOpacity>
-      <TouchableOpacity onPress={onBook} style={[styles.bookButtonWide, booked && styles.bookedButton]}><Text style={styles.bookWideText}>{booked ? 'View cart' : 'Book package'}</Text></TouchableOpacity>
+      <TouchableOpacity onPress={onBook} style={styles.bookButtonWide}><Text style={styles.bookWideText}>Book now</Text></TouchableOpacity>
     </View>
   );
 }
