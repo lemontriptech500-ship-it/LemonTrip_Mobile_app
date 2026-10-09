@@ -131,32 +131,43 @@ export default function ExploreScreen() {
         <View style={styles.pageWidth}>
 
           {/* Header — same structure as Home */}
-          <BrandGradientBar style={styles.header}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
-              <LemonTripBrand size={50} />
-            </TouchableOpacity>
-            {isWide ? (
-              <View style={styles.headerNav}>
-                <TouchableOpacity style={[styles.navLink, styles.navLinkActive]} onPress={() => router.push('/(tabs)/explore')}><Text style={[styles.navText, styles.navTextActive]}>Explore</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.navLink} onPress={() => router.push('/packages')}><Text style={styles.navText}>Packages</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.navLink} onPress={() => router.push('/offers')}><Text style={styles.navText}>Offers</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.navLink} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.navText}>Visa Services</Text></TouchableOpacity>
+          <BrandGradientBar style={[styles.header, isWide && styles.headerWide]}>
+            <View style={styles.headerContent}>
+              <View style={styles.headerMainRow}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
+                  <LemonTripBrand size={50} />
+                </TouchableOpacity>
+                {isWide ? (
+                  <View style={styles.headerNav}>
+                    <TouchableOpacity style={[styles.navLink, styles.navLinkActive]} onPress={() => router.push('/(tabs)/explore')}><Text style={[styles.navText, styles.navTextActive]}>Explore</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.navLink} onPress={() => router.push('/packages')}><Text style={styles.navText}>Packages</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.navLink} onPress={() => router.push('/offers')}><Text style={styles.navText}>Offers</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.navLink} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.navText}>Visa Services</Text></TouchableOpacity>
+                  </View>
+                ) : <View style={styles.headerSpacer} />}
+                <View style={styles.headerActions}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}>
+                    <Ionicons name="heart-outline" size={21} color={Colors.white} />
+                  </TouchableOpacity>
+                  {user ? (
+                    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}>
+                      <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => router.push('/login')} style={styles.loginPill}>
+                      <Ionicons name="person-outline" size={16} color={Colors.primaryDark} />
+                      <Text style={styles.loginText}>Login</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
-            ) : <View style={styles.headerSpacer} />}
-            <View style={styles.headerActions}>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}>
-                <Ionicons name="heart-outline" size={24} color={Colors.white} />
-              </TouchableOpacity>
-              {user ? (
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}>
-                  <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+              {!isWide ? (
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Change your departure city" style={styles.locationRow} onPress={() => router.push('/(tabs)/explore/flights')}>
+                  <Ionicons name="location-outline" size={14} color={Colors.onDarkMuted} />
+                  <Text style={styles.locationText}>New Delhi, IN</Text>
+                  <Text style={styles.locationChange}>· Change</Text>
                 </TouchableOpacity>
-              ) : (
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => router.push('/login')} style={styles.loginPill}>
-                  <Ionicons name="person-outline" size={18} color={Colors.primaryDark} />
-                  <Text style={styles.loginText}>Login</Text>
-                </TouchableOpacity>
-              )}
+              ) : null}
             </View>
           </BrandGradientBar>
           <View style={styles.exploreIntro}>
@@ -253,16 +264,16 @@ export default function ExploreScreen() {
                 const selected = selectedExperience === experience.filter;
                 return (
                   <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.gridItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
-                    <View style={[styles.gridCircle, selected && styles.gridCircleSelected]}>
-                      <Ionicons name={experience.icon} size={30} color={selected ? Colors.white : Colors.primary} />
-                    </View>
+                    <Ionicons name={experience.icon} size={22} color={selected ? Colors.primaryDark : Colors.textLight} />
                     <Text style={[styles.gridLabel, selected && styles.gridLabelSelected]}>{experience.name}</Text>
+                    <View style={[styles.experienceIndicator, selected && styles.experienceIndicatorSelected]} />
                   </TouchableOpacity>
                 );
               })}
               <TouchableOpacity accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push('/packages')}>
-                <View style={styles.gridCircle}><Ionicons name="grid-outline" size={28} color={Colors.primary} /></View>
+                <Ionicons name="grid-outline" size={22} color={Colors.textLight} />
                 <Text style={styles.gridLabel}>All journeys</Text>
+                <View style={styles.experienceIndicator} />
               </TouchableOpacity>
             </View>
           </View>
@@ -423,16 +434,22 @@ const styles = StyleSheet.create({
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
 
   // Header
-  header: { minHeight: 72, paddingHorizontal: 18, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  brandLockup: { minWidth: 150, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
+  header: { paddingHorizontal: 18, paddingTop: 9, paddingBottom: 11 },
+  headerWide: { minHeight: 72, paddingVertical: 8 },
+  headerContent: { width: '100%' },
+  headerMainRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  brandLockup: { minWidth: 126, height: 50, alignItems: 'flex-start', justifyContent: 'center' },
   headerSpacer: { flex: 1 },
   headerNav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 },
   navLink: { minHeight: 54, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' },
   navLinkActive: { borderBottomColor: Colors.accent },
   navText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 14, fontWeight: '700' },
   navTextActive: { color: Colors.accent, fontWeight: '800' },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  headerAction: { width: 38, height: 40, alignItems: 'center', justifyContent: 'center' },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  headerAction: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 3 },
+  locationText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
+  locationChange: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
   avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent },
   avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
   loginPill: { height: 42, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, borderRadius: 21, backgroundColor: Colors.white },
@@ -466,15 +483,15 @@ const styles = StyleSheet.create({
   applyText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
 
   // Travel style grid card
-  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 13, paddingBottom: 7, paddingHorizontal: 8, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, marginBottom: 10 },
   gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
-  gridCircleSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
-  gridLabelSelected: { color: Colors.primary },
+  gridItem: { width: '25%', minHeight: 66, alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 2, position: 'relative' },
+  gridLabel: { minHeight: 22, marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 12, fontWeight: '700' },
+  gridLabelSelected: { color: Colors.primaryDark, fontWeight: '800' },
+  experienceIndicator: { position: 'absolute', bottom: 0, width: 24, height: 3, borderRadius: 2 },
+  experienceIndicatorSelected: { backgroundColor: Colors.accent },
 
   // Sections
   section: { paddingTop: 24 },
@@ -484,7 +501,7 @@ const styles = StyleSheet.create({
 
   // Destinations
   destinationRow: { paddingHorizontal: 16, gap: 12 },
-  destinationCard: { width: 290, height: 170, borderRadius: 20, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
+  destinationCard: { width: 220, height: 172, borderRadius: 19, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, ...SHADOW },
   destinationImage: { flex: 1, justifyContent: 'space-between', padding: 14 },
   destinationImageStyle: { borderRadius: 20 },
   destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
