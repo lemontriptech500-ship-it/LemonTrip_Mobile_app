@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors';
-import { BrandMotif } from '@/components/BrandMotif';
+import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import type { Offer } from '@/data/mock/offers';
 import {
   getOfferCategory,
@@ -170,20 +170,11 @@ export default function OffersScreen() {
 
           {/* ================= HERO / TITLE ================= */}
 
-          <View style={styles.heroSection}>
-            <BrandMotif />
-            <Text style={styles.heroEyebrow}>
-              TRAVEL MORE, SPEND LESS
-            </Text>
-
-            <Text style={styles.heroTitle}>
-              Offers worth travelling for.
-            </Text>
-
-            <Text style={styles.heroSubtitle}>
-              Find a little extra value for your next journey.
-            </Text>
-          </View>
+          <ExploreSectionIntro
+            eyebrow="TRAVEL MORE, SPEND LESS"
+            title="Offers worth travelling for."
+            subtitle="Find a little extra value for your next journey."
+          />
 
           {/* ================= DEMO NOTICE ================= */}
 
@@ -615,10 +606,6 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
   page: { paddingBottom: 28 },
   pageContainer: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
-  heroSection: { position: 'relative', overflow: 'hidden', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 32, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.4 },
-  heroTitle: { maxWidth: 580, color: Colors.white, fontFamily: 'Manrope', fontSize: 28, lineHeight: 35, fontWeight: '800', marginTop: 8 },
-  heroSubtitle: { maxWidth: 520, color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, marginTop: 6 },
   sourceNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginHorizontal: 20, marginTop: 18, padding: 13, borderRadius: 16, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   sourceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
   categorySection: { marginTop: 22 },

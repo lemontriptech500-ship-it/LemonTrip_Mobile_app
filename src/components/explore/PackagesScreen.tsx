@@ -1,6 +1,7 @@
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import type { PackageCategory, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,20 +32,13 @@ export default function PackagesListScreen() {
     <View style={styles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-
-          <ImageBackground source={{ uri: travelPackages[0]?.image }} style={styles.hero} imageStyle={styles.heroImage}>
-            <View style={styles.heroShade} />
-            <View style={styles.heroContent}>
-              <Text style={styles.heroEyebrow}>CURATED ESCAPES</Text>
-              <Text style={styles.heroTitle}>Journeys worth remembering.</Text>
-              <Text style={styles.heroSubtitle}>Thoughtfully designed ways to see somewhere new.</Text>
-              <View style={styles.searchBar}>
-                <Ionicons name="search-outline" size={18} color={Colors.primary} />
-                <TextInput value={query} onChangeText={setQuery} placeholder="Where do you want to go?" placeholderTextColor={Colors.textLight} style={styles.searchInput} returnKeyType="search" />
-                {query ? <TouchableOpacity accessibilityRole="button" accessibilityLabel="Clear search" onPress={() => setQuery('')}><Ionicons name="close-circle" size={18} color={Colors.textLight} /></TouchableOpacity> : null}
-              </View>
+          <ExploreSectionIntro eyebrow="CURATED ESCAPES" title="Journeys worth remembering." subtitle="Thoughtfully designed ways to see somewhere new.">
+            <View style={styles.searchBar}>
+              <Ionicons name="search-outline" size={18} color={Colors.primary} />
+              <TextInput value={query} onChangeText={setQuery} placeholder="Where do you want to go?" placeholderTextColor={Colors.textLight} style={styles.searchInput} returnKeyType="search" />
+              {query ? <TouchableOpacity accessibilityRole="button" accessibilityLabel="Clear search" onPress={() => setQuery('')}><Ionicons name="close-circle" size={18} color={Colors.textLight} /></TouchableOpacity> : null}
             </View>
-          </ImageBackground>
+          </ExploreSectionIntro>
 
           <View style={styles.section}>
             <View style={styles.sectionHeading}><View><Text style={styles.eyebrow}>FIND YOUR KIND OF TRIP</Text><Text style={styles.sectionTitle}>Browse by feeling</Text></View></View>
@@ -114,20 +108,8 @@ function PackageCard({ item, desktop, onPress }: { item: TravelPackage; desktop:
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
-  page: { paddingTop: 16, paddingBottom: 34 },
+  page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
-  topBar: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.onDarkSurface },
-  breadcrumb: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  topSpacer: { flex: 1 },
-  iconButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accent },
-  hero: { minHeight: 350, justifyContent: 'flex-end', marginHorizontal: 14, overflow: 'hidden', borderRadius: 21, backgroundColor: Colors.primaryDark },
-  heroImage: { borderRadius: 21 },
-  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
-  heroContent: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 60, maxWidth: 650 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-  heroTitle: { maxWidth: 440, color: Colors.white, fontFamily: 'Manrope', fontSize: 30, lineHeight: 36, fontWeight: '800', marginTop: 7 },
-  heroSubtitle: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 6, marginBottom: 13 },
   searchBar: { minHeight: 47, maxWidth: 500, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 12, borderRadius: 12, backgroundColor: Colors.surface },
   searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, paddingVertical: 9 },
   section: { marginTop: 25 },
