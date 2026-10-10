@@ -4,6 +4,7 @@ import { Colors } from '@/constants/colors';
 import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from '@/constants/support';
 import { Ui } from '@/constants/theme';
 import { formatDate, normalizeStatus, serviceIcon, shortId, statusStyles } from '@/utils/bookingFormat';
+import { downloadBookingPdf } from '@/utils/bookingPdf';
 import { useBookings } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -26,15 +27,12 @@ function Barcode({ value }: { value: string }) {
   );
 }
 
-function money(value: string) {
-  return value;
-}
-
 export default function BookingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const bookings = useBookings();
   const booking = bookings.find((item) => String(item.id) === String(id));
-  const [showDownloadNote, setShowDownloadNote] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
 
   const goBack = () => {
     if (router.canGoBack()) router.back();
@@ -78,6 +76,30 @@ export default function BookingDetailScreen() {
     .join('\n');
 
   const share = () => void Share.share({ title: 'LemonTrip booking ' + bookingId, message: summary });
+
+  const download = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    setDownloadError(false);
+    try {
+      await downloadBookingPdf({
+        bookingId,
+        serviceName: booking.serviceName ?? '',
+        itemName: booking.itemName,
+        destination: booking.destination,
+        dateLabel: booking.tripDate ? 'Trip date' : 'Booked on',
+        dateValue: formatDate(booking.tripDate ?? booking.bookedAt),
+        price: booking.price,
+        statusLabel: status.label,
+      });
+    } catch (error) {
+      console.warn('PDF download failed:', error);
+      setDownloadError(true);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const call = () => {
     if (hasPhone) void Linking.openURL('tel:' + SUPPORT_PHONE);
   };
@@ -141,18 +163,22 @@ export default function BookingDetailScreen() {
 
           <Card>
             <SectionTitle eyebrow="PAYMENT" title="Receipt" />
-            <Row label="Total paid" value={money(booking.price)} bold />
+            <Row label="Total paid" value={booking.price} bold />
           </Card>
 
           <View style={s.actions}>
             <Action icon="share-social-outline" label="Share" onPress={share} />
-            <Action icon="download-outline" label="Download" onPress={() => setShowDownloadNote(true)} />
+            <Action
+              icon="download-outline"
+              label={downloading ? 'Preparing...' : 'Download'}
+              onPress={() => void download()}
+            />
             <Action icon="receipt-outline" label="Transactions" onPress={() => router.push('/transactions' as never)} />
           </View>
 
-          {showDownloadNote ? (
-            <Notice icon="download-outline" title="PDF download">
-              PDF download will be available soon. For now you can share this voucher using the Share button.
+          {downloadError ? (
+            <Notice icon="alert-circle-outline" tone="warn" title="Could not create PDF">
+              Something went wrong while creating the PDF. Please try again, or use the Share button.
             </Notice>
           ) : null}
 
