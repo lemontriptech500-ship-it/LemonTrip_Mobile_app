@@ -10,7 +10,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Switch, Text, TouchableOpacity, View } from 'react-native';
 
-const titles: Record<string, string> = { travellers: 'Saved travellers', 'saved-searches': 'Saved searches', 'recent-searches': 'Recent searches', notifications: 'Notifications', 'notification-settings': 'Notification settings', security: 'Security', language: 'Language', currency: 'Currency', 'edit-profile': 'Edit profile', 'personal-information': 'Personal information', 'support-requests': 'My support requests', about: 'About LemonTrip', search: 'Find your next journey', 'account-setup': 'Complete your profile', 'reset-password': 'Reset password', 'otp-verification': 'Verify your phone' };
+const titles: Record<string, string> = { travellers: 'Saved travellers', 'saved-searches': 'Saved searches', 'recent-searches': 'Recent searches', notifications: 'Notifications', 'notification-settings': 'Notification settings', security: 'Security', language: 'Language', currency: 'Currency', 'edit-profile': 'Edit profile', 'personal-information': 'Personal information', about: 'About LemonTrip', search: 'Find your next journey', 'account-setup': 'Complete your profile', 'reset-password': 'Reset password', 'otp-verification': 'Verify your phone' };
 export default function ManageScreen() {
   const { section } = useLocalSearchParams<{ section: string }>(); const user = useAuth(); const accountBookings = useAccountBookings(section === "notifications"); const bookings = accountBookings.bookings;
   const travellerStore = usePersonalItems('travellers', isTraveller); const searchStore = usePersonalItems('saved-searches', isSearch); const recentStore = usePersonalItems('recent-searches', isSearch);
