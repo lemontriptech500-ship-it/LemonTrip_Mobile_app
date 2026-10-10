@@ -1,17 +1,20 @@
-import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
-import { Ui } from '@/constants/theme';
-import { Colors } from '@/constants/colors';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import HotelCard from '@/components/hotels/HotelCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
+import { mockHotels } from '@/data/mockHotels';
 import type { Hotel } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
-import { setHotelSearch, selectHotel, type HotelSearchCriteria } from '@/utils/hotelSearchStore';
+import { normalizeHotelSearch, selectHotel, setHotelSearch, type HotelSearchCriteria } from '@/utils/hotelSearchStore';
+import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 
 const filterOptions = [
   { id: 'rating-5-star', label: '5 Star', matches: (hotel: Hotel) => hotel.rating === '5 Star' },
@@ -55,22 +58,29 @@ export default function HotelsScreen() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState<SortOption>('Recommended');
   const { items: hotels, loading, error } = useContentItems<Hotel>('hotel');
+  const fallbackHotels = hotels.length ? hotels : mockHotels;
 
-  const search: HotelSearchCriteria = { destination, checkIn, checkOut, guests, rooms };
+  const search: HotelSearchCriteria = normalizeHotelSearch({ destination, checkIn, checkOut, guests, rooms });
 
   const visibleHotels = useMemo(() => {
-    const filtered = hotels.filter((hotel) => {
-      const query = destination.trim().toLowerCase();
-      const matchesLocation = !hasSearched || !query || `${hotel.name} ${hotel.location}`.toLowerCase().includes(query);
+    const query = destination.trim().toLowerCase();
+    const hasSearchCriteria = Boolean(query || checkIn || checkOut || activeFilters.length);
+
+    const filtered = fallbackHotels.filter((hotel) => {
+      const matchesLocation = !query || `${hotel.name} ${hotel.location}`.toLowerCase().includes(query);
       const matchesAmenities = activeFilters.every((id) => filterOptions.find((filter) => filter.id === id)?.matches(hotel) ?? false);
       return matchesLocation && matchesAmenities;
     });
+
+    if (!hasSearchCriteria && !activeFilters.length) {
+      return [...fallbackHotels];
+    }
 
     if (sort === 'Price low to high') filtered.sort((a, b) => getPrice(a.price) - getPrice(b.price));
     if (sort === 'Rating') filtered.sort((a, b) => (b.reviewScore ?? -1) - (a.reviewScore ?? -1));
     if (sort === 'Distance') filtered.sort((a, b) => (a.distanceKm ?? Number.POSITIVE_INFINITY) - (b.distanceKm ?? Number.POSITIVE_INFINITY));
     return filtered;
-  }, [activeFilters, destination, hasSearched, hotels, sort]);
+  }, [activeFilters, checkIn, checkOut, destination, fallbackHotels, hasSearched, sort]);
 
   const handleSearch = () => {
     const start = toDate(checkIn);
@@ -87,13 +97,16 @@ export default function HotelsScreen() {
       Alert.alert('Check-out date', 'Check-out must be after check-in.');
       return;
     }
-    void recordRecentSearch('Hotels', destination || 'Your hotel search', JSON.stringify(search));
+
+    const nextSearch = normalizeHotelSearch({ destination, checkIn, checkOut, guests, rooms });
+    void recordRecentSearch('Hotels', nextSearch.destination || 'Your hotel search', JSON.stringify(nextSearch));
     setHasSearched(true);
-    setHotelSearch(search);
+    setHotelSearch(nextSearch);
   };
 
   const openHotel = (hotel: Hotel) => {
-    setHotelSearch(search);
+    const nextSearch = normalizeHotelSearch({ destination, checkIn, checkOut, guests, rooms });
+    setHotelSearch(nextSearch);
     selectHotel(hotel);
     router.push('/(tabs)/explore/hotel-details');
   };
@@ -190,47 +203,47 @@ const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
   searchPanel: { ...Ui.card, marginHorizontal: Ui.space.page, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   searchTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 13 },
-  searchTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  searchTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   searchFields: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   field: { flexGrow: 1, flexBasis: '46%', minWidth: 120, marginBottom: 4 },
   destinationField: { flexBasis: '100%' },
-  fieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 5 },
+  fieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8, marginBottom: 5 },
   inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  input: { minHeight: Ui.field.minHeight,  flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
-  dateInput: { minHeight: Ui.field.minHeight, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
+  input: { minHeight: Ui.field.minHeight,  flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
+  dateInput: { minHeight: Ui.field.minHeight, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   occupancy: { minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, paddingHorizontal: 8, borderRadius: 9, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  occupancyText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', textAlign: 'center' },
+  occupancyText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, textAlign: 'center' },
   addRoom: { paddingHorizontal: 5, paddingVertical: 5 },
-  addRoomText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  addRoomText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 7, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  searchButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  searchButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   resultsHeader: { marginTop: 23, paddingHorizontal: 16, gap: 12 },
-  resultsEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  resultsTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 3 },
+  resultsEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
+  resultsTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 3 },
   sortWrap: { gap: 6 },
-  sortLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
+  sortLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
   sortOptions: { gap: 6 },
   sortChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: Ui.radius.pill, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   sortChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  sortChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  sortChipText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   sortChipTextActive: { color: Colors.white },
   filtersBlock: { marginHorizontal: Ui.space.page, marginTop: 14, padding: 11, borderRadius: 13, backgroundColor: Colors.surfaceMuted },
   filtersTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
-  filtersTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  filtersTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   filterOptions: { gap: 6 },
   filterChip: { paddingHorizontal: 9, paddingVertical: 7, borderRadius: Ui.radius.pill, backgroundColor: Colors.surface },
   filterChipActive: { backgroundColor: Colors.primary },
-  filterChipText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  filterChipText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   filterChipTextActive: { color: Colors.white },
   unavailableFilters: { flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 8 },
-  unavailableLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
-  unavailableNote: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, textAlign: 'right' },
+  unavailableLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
+  unavailableNote: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, textAlign: 'right' },
   hotelList: { paddingHorizontal: 16, gap: 12, marginTop: 14 },
   emptyState: { minHeight: 180, alignItems: 'center', justifyContent: 'center', marginHorizontal: Ui.space.page, marginTop: 14, padding: 20, borderRadius: 15, backgroundColor: Colors.surface },
-  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 9 },
-  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 4 },
+  emptyTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 9 },
+  emptyText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 4 },
   clearButton: { minHeight: 44,  marginTop: 11, paddingHorizontal: 12, paddingVertical: 8, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  clearButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  clearButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   trustNote: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginHorizontal: Ui.space.page, marginTop: 19 },
-  trustText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  trustText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
 });

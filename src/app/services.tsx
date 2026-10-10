@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
@@ -5,7 +7,7 @@ import { travelServices } from '@/constants/navigation';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function ServicesScreen() {
   return <AppScreen><ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
@@ -15,5 +17,5 @@ export default function ServicesScreen() {
   </ScrollView></AppScreen>;
 }
 const styles = StyleSheet.create({
-  page: { paddingBottom: 24, width: '100%', maxWidth: 760, alignSelf: 'center' }, catalog: { paddingHorizontal: Ui.space.page, gap: 18 }, card: { ...Ui.card, overflow: 'hidden' }, image: { height: 160, justifyContent: 'flex-end' }, shade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.imageOverlay }, imageCopy: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 18 }, title: { fontFamily: 'Manrope', color: Colors.white, fontSize: 22, fontWeight: '800' }, body: { padding: 18, gap: 14 }, description: { fontFamily: 'Manrope', color: Colors.textLight, fontSize: 14, lineHeight: 22 }, cta: { ...Ui.button, backgroundColor: Colors.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 }, ctaText: { fontFamily: 'Manrope', color: Colors.primary, fontSize: 14, fontWeight: '800' }, support: { margin: 18, padding: 18, borderRadius: 24, backgroundColor: Colors.accentSoft, flexDirection: 'row', alignItems: 'center', gap: 12 }, supportTitle: { fontFamily: 'Manrope', color: Colors.primary, fontSize: 16, fontWeight: '800', marginBottom: 4 },
+  page: { paddingBottom: 24, width: '100%', maxWidth: 760, alignSelf: 'center' }, catalog: { paddingHorizontal: Ui.space.page, gap: 18 }, card: { ...Ui.card, overflow: 'hidden' }, image: { height: 160, justifyContent: 'flex-end' }, shade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.imageOverlay }, imageCopy: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 18 }, title: { fontFamily: FontFamily.sans, color: Colors.white, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold }, body: { padding: 18, gap: 14 }, description: { fontFamily: FontFamily.sans, color: Colors.textLight, fontSize: TextSize.body, lineHeight: 22 }, cta: { ...Ui.button, backgroundColor: Colors.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 }, ctaText: { fontFamily: FontFamily.sans, color: Colors.primary, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, support: { margin: 18, padding: 18, borderRadius: 24, backgroundColor: Colors.accentSoft, flexDirection: 'row', alignItems: 'center', gap: 12 }, supportTitle: { fontFamily: FontFamily.sans, color: Colors.primary, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginBottom: 4 },
 });

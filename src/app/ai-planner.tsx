@@ -1,26 +1,12 @@
+import { FontFamily, TextSize } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Brand, Colors, Radius } from '@/constants/colors';
 import { sendChatMessage, type ChatMessage } from '@/utils/chatApi';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const FONT = {
-  medium: 'Manrope',
-  bold: 'Manrope',
-  extra: 'Manrope',
-} as const;
 
 type Message = { id: string; role: 'user' | 'assistant'; text: string };
 
@@ -229,8 +215,8 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.lemon,
   },
   headerCopy: { flex: 1 },
-  eyebrowLemon: { color: Brand.lemon, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.6 },
-  pageTitle: { color: Colors.white, fontFamily: FONT.extra, fontSize: 26, marginTop: 2 },
+  eyebrowLemon: { color: Brand.lemon, fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1.6 },
+  pageTitle: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.display, marginTop: 2 },
   sparkle: {
     width: 42,
     height: 42,
@@ -263,12 +249,12 @@ const styles = StyleSheet.create({
   bubble: { maxWidth: '80%', paddingHorizontal: 14, paddingVertical: 11, borderRadius: Radius.lg },
   bubbleBot: { backgroundColor: Colors.white, borderBottomLeftRadius: 4 },
   bubbleMine: { backgroundColor: Brand.forest, borderBottomRightRadius: 4 },
-  bubbleText: { color: Colors.textDark, fontFamily: FONT.medium, fontSize: 14, lineHeight: 21 },
+  bubbleText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 21 },
   bubbleTextMine: { color: Colors.white },
-  boldText: { fontFamily: FONT.extra, color: Brand.forest },
+  boldText: { fontFamily: FontFamily.sans, color: Brand.forest },
 
   suggestions: { gap: 8, marginTop: 4 },
-  suggestLabel: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.4 },
+  suggestLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1.4 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -281,7 +267,7 @@ const styles = StyleSheet.create({
     borderColor: '#E4E3DA',
     backgroundColor: Colors.white,
   },
-  chipText: { flex: 1, color: Colors.textDark, fontFamily: FONT.bold, fontSize: 13 },
+  chipText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
 
   inputBar: {
     flexDirection: 'row',
@@ -301,8 +287,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     backgroundColor: Brand.cream,
     color: Colors.textDark,
-    fontFamily: FONT.medium,
-    fontSize: 14,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
   },
   sendButton: {
     width: 44,

@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
@@ -9,7 +11,7 @@ import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -375,9 +377,9 @@ const SHADOW = Ui.shadow;
 
 const styles = StyleSheet.create({
   quickSearchRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 7, marginTop: 14 },
-  quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
+  quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   quickSearchChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 11, borderRadius: 16, backgroundColor: Colors.onDarkSurface, borderWidth: 1, borderColor: Colors.onDarkBorder },
-  quickSearchText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
+  quickSearchText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
   safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
@@ -386,46 +388,46 @@ const styles = StyleSheet.create({
   // Search
   searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: -18, padding: 12, zIndex: 5 },
   searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
-  searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, paddingVertical: 10 },
+  searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, paddingVertical: 10 },
   clearSearch: { padding: 4 },
   filterCircle: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.primary },
   filterCircleActive: { backgroundColor: Colors.primaryDark },
   filterBadge: { position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
-  filterBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  filterBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   dropPanel: { ...Ui.card, marginTop: 10, padding: Ui.space.card, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
-  dropHeading: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginBottom: 4 },
+  dropHeading: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginBottom: 4 },
   suggestionRow: { minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
   suggestionRowLast: { borderBottomWidth: 0 },
-  suggestionText: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '700' },
-  noSuggestions: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, paddingVertical: 10 },
+  suggestionText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.bold },
+  noSuggestions: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, paddingVertical: 10 },
   filterGroup: { gap: 8, marginBottom: 12 },
-  filterLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', textTransform: 'capitalize' },
+  filterLabel: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, textTransform: 'capitalize' },
   filterOptions: { gap: 8 },
   filterChip: { paddingHorizontal: 14, paddingVertical: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: 20, backgroundColor: Colors.background },
   filterChipSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  filterChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  filterChipText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   filterChipTextSelected: { color: Colors.white },
   filterActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 },
-  resetText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', padding: 6 },
+  resetText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, padding: 6 },
   applyButton: { minHeight: 44,  paddingHorizontal: 18, paddingVertical: 11, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
-  applyText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  applyText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   // Travel style grid card
   gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 13, paddingBottom: 7, paddingHorizontal: 8, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, marginBottom: 10 },
-  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
+  gridTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', minHeight: 66, alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 2, position: 'relative' },
-  gridLabel: { minHeight: 22, marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 12, fontWeight: '700' },
-  gridLabelSelected: { color: Colors.primaryDark, fontWeight: '800' },
+  gridLabel: { minHeight: 22, marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, lineHeight: 12, fontWeight: FontWeight.bold },
+  gridLabelSelected: { color: Colors.primaryDark, fontWeight: FontWeight.extraBold },
   experienceIndicator: { position: 'absolute', bottom: 0, width: 24, height: 3, borderRadius: 2 },
   experienceIndicatorSelected: { backgroundColor: Colors.accent },
 
   // Sections
   section: { paddingTop: 24 },
   sectionHeading: { paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '800' },
-  linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold },
+  linkText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   // Destinations
   destinationRow: { paddingHorizontal: 16, gap: 12 },
@@ -434,14 +436,14 @@ const styles = StyleSheet.create({
   destinationImageStyle: { borderRadius: 20 },
   destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
   saveButton: { alignSelf: 'flex-end', width: 38, height: 38, borderRadius: 19, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center' },
-  destinationCountry: { color: Colors.white, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
-  destinationName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', marginTop: 1 },
-  destinationPrice: { color: Colors.white, fontFamily: 'Manrope', fontSize: 18, fontWeight: '600', marginTop: 2 },
+  destinationCountry: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  destinationName: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, marginTop: 1 },
+  destinationPrice: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.semibold, marginTop: 2 },
 
   // Active filters
   activeFilters: { paddingHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 12 },
   activeFilter: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 7, borderWidth: 1, borderColor: Colors.primary, borderRadius: 18, backgroundColor: SOFT_GREEN },
-  activeFilterText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', textTransform: 'capitalize' },
+  activeFilterText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, textTransform: 'capitalize' },
   clearAll: { paddingHorizontal: 6, paddingVertical: 6 },
 
   // Packages
@@ -449,46 +451,46 @@ const styles = StyleSheet.create({
   packageCard: { ...Ui.card, width: 264, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, overflow: 'hidden', ...SHADOW },
   packageImage: { height: 130, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start', padding: 10 },
   packageImageStyle: { borderTopLeftRadius: 19, borderTopRightRadius: 19 },
-  packageBadge: { overflow: 'hidden', color: Colors.primaryDark, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  packageBadge: { overflow: 'hidden', color: Colors.primaryDark, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.strongOverlay, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
-  packageRatingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  packageRatingText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   packageBody: { padding: 14 },
-  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 21, fontWeight: '800' },
+  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 21, fontWeight: FontWeight.extraBold },
   packageMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
-  packageDuration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  packageDuration: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   packageBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
-  priceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
-  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 1 },
+  priceLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
+  packagePrice: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 1 },
   packageArrow: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.primary },
 
   emptyState: { marginHorizontal: Ui.space.page, padding: 20, alignItems: 'flex-start', gap: 12, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  emptyStateText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 },
+  emptyStateText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20 },
   emptyButton: { minHeight: 44,  paddingHorizontal: 16, paddingVertical: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
 
   // Personal panel
   personalPanel: { marginTop: 24, marginHorizontal: Ui.space.page, padding: 18, flexDirection: 'row', gap: 14, alignItems: 'flex-start', borderRadius: 22, backgroundColor: Colors.accentSoft },
   personalLogo: { width: 52, height: 52, borderRadius: 12 },
   personalCopy: { flex: 1, minWidth: 0 },
-  personalTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 19, lineHeight: 24, fontWeight: '800' },
-  personalSubtitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 4 },
+  personalTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, lineHeight: 24, fontWeight: FontWeight.extraBold },
+  personalSubtitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 4 },
   preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 12 },
   preferenceChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: Colors.decorativeGreen, backgroundColor: Colors.surface },
   preferenceChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  preferenceText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  preferenceText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   preferenceTextActive: { color: Colors.white },
   signInLink: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 6, paddingVertical: 8 },
-  signInText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  signInText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   // Trust + footer
   trustStrip: { marginTop: 18, marginHorizontal: Ui.space.page, padding: 14, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 18 },
   trustItem: { flexGrow: 1, flexBasis: 150, flexDirection: 'row', alignItems: 'center', gap: 10 },
   trustCopy: { flexShrink: 1 },
-  trustTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  trustSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 2 },
+  trustTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  trustSubtitle: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 2 },
   footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
   footerLogoImage: { width: 118, height: 38 },
-  footerTagline: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  footerTagline: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   footerLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 18 },
-  footerLink: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
-  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  footerLink: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
 });

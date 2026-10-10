@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { recordRecentSearch } from '@/utils/personalStore';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
@@ -5,7 +7,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import FareSummary from './FareSummary';
 import FlightResults from './FlightResults';
@@ -119,29 +121,29 @@ const styles = StyleSheet.create({
   page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
   breadcrumbRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  breadcrumb: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
-  breadcrumbCurrent: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  breadcrumb: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
+  breadcrumbCurrent: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   headerSpacer: { flex: 1 },
   cartButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, borderRadius: 12 },
-  title: { paddingHorizontal: 18, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 29, fontWeight: '800' },
-  subtitle: { paddingHorizontal: 18, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 4, marginBottom: 16 },
+  title: { paddingHorizontal: 18, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.hero, fontWeight: FontWeight.extraBold },
+  subtitle: { paddingHorizontal: 18, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, marginTop: 4, marginBottom: 16 },
   hero: { height: 188, marginHorizontal: Ui.space.page, justifyContent: 'flex-end', overflow: 'hidden', borderRadius: 18 },
   heroImage: { borderRadius: 18 },
   heroShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.imageOverlay },
   heroCopy: { paddingHorizontal: 18, paddingBottom: 21, maxWidth: 430 },
-  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-  heroText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 23, fontWeight: '800', marginTop: 6 },
+  heroEyebrow: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.2 },
+  heroText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, marginTop: 6 },
   resultsSection: { gap: 13, marginTop: 24 },
-  resultsTitle: { paddingHorizontal: 16, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
+  resultsTitle: { paddingHorizontal: 16, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   errorPanel: { ...Ui.card, marginHorizontal: Ui.space.page, flexDirection: 'row', alignItems: 'center', gap: 10, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.errorBorder, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   errorIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.errorSoft },
   errorCopy: { flex: 1, minWidth: 0 },
-  errorTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  errorMessage: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 3 },
+  errorTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  errorMessage: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 3 },
   retryButton: { minHeight: 44,  flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 8, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  retryText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 24, paddingHorizontal: 20 },
-  footerText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, textAlign: 'center' },
+  footerText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, textAlign: 'center' },
   demoNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginHorizontal: 16, padding: 12, borderRadius: 12, backgroundColor: Colors.accentSoft },
-  demoNoticeText: { flex: 1, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, lineHeight: 17, fontWeight: '700' },
+  demoNoticeText: { flex: 1, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 17, fontWeight: FontWeight.bold },
 });

@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
 import { LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type ScreenHeaderProps = {
   title: string;
@@ -87,9 +89,9 @@ const styles = StyleSheet.create({
   },
   actionLabel: {
     color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
   copy: {
     paddingHorizontal: Ui.space.page,
@@ -99,9 +101,9 @@ const styles = StyleSheet.create({
   eyebrow: {
     ...Ui.eyebrow,
     color: Colors.accent,
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 6,
     textTransform: 'uppercase',
   },
@@ -111,8 +113,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: Colors.onDarkMuted,
-    fontFamily: 'Manrope',
-    fontSize: 13,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
     lineHeight: 19,
     marginTop: 5,
   },

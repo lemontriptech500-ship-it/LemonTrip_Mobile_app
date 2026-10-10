@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { StationPicker } from '@/components/trains/StationPicker';
 import { TrainCard } from '@/components/trains/TrainCards';
@@ -10,7 +12,7 @@ import { selectTrain, setTrainSearch, useTrainBooking } from '@/utils/trainBooki
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Sort = 'earliest' | 'fastest' | 'cheapest';
 type Slot = 'any' | 'morning' | 'afternoon' | 'evening' | 'night';
@@ -153,7 +155,7 @@ function StationButton({ label, code, placeholder, icon, onPress }: { label: str
       <Ionicons name={icon} size={18} color={Colors.primary} />
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={s.stationLabel}>{label}</Text>
-        <Text style={[s.stationValue, !code && { color: Colors.textLight, fontWeight: '600' }]} numberOfLines={1}>{code ? getStation(code)?.name : placeholder}</Text>
+        <Text style={[s.stationValue, !code && { color: Colors.textLight, fontWeight: FontWeight.semibold }]} numberOfLines={1}>{code ? getStation(code)?.name : placeholder}</Text>
         {code ? <Text style={s.stationCode}>{code} · {getStation(code)?.city}</Text> : null}
       </View>
       <Ionicons name="chevron-down" size={16} color={Colors.textLight} />
@@ -167,23 +169,23 @@ const s = StyleSheet.create({
   stations: { gap: 8, position: 'relative' },
   station: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 66, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   stationLabel: { ...Ui.eyebrow, color: Colors.textLight, letterSpacing: 1 },
-  stationValue: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark, marginTop: 2 },
-  stationCode: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 1 },
+  stationValue: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
+  stationCode: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
   swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginTop: 16, marginBottom: 8 },
   dates: { gap: 8 },
   date: { width: 58, alignItems: 'center', paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   dateOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  dow: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', color: Colors.textLight, letterSpacing: 0.6 },
-  dayNum: { fontFamily: 'Manrope', fontSize: 20, fontWeight: '800', color: Colors.textDark, marginVertical: 1 },
-  mon: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight },
+  dow: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.textLight, letterSpacing: 0.6 },
+  dayNum: { fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginVertical: 1 },
+  mon: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight },
   dateTextOn: { color: Colors.white },
   chips: { gap: 8, alignItems: 'center' },
-  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 10 },
+  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },
   popular: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
-  routeText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary },
+  routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   resultHead: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12, marginTop: 4 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
-  count: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginTop: 3 },
+  count: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
 });

@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
@@ -9,7 +11,7 @@ import { PACKAGE_ROUTES } from '@/components/packages/PackageUi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Alert, Image, Linking, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -186,14 +188,14 @@ function BookingPanel({ title, duration, price, onEnquire, onBook }: {
 }
 
 const styles = StyleSheet.create({
-  journeyHeading: { marginHorizontal: Ui.space.page, marginTop: 20, marginBottom: 8 }, journeyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.primary, marginTop: 5 }, dayRow: { flexDirection: 'row', marginHorizontal: Ui.space.page, gap: 10, marginBottom: 8, alignItems: 'flex-start' }, dayNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 12 }, dayNumberText: { fontFamily: 'Manrope', fontSize: 10, color: Colors.white, fontWeight: '800' }, dayCard: { ...Ui.card, flex: 1, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
+  journeyHeading: { marginHorizontal: Ui.space.page, marginTop: 20, marginBottom: 8 }, journeyTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.primary, marginTop: 5 }, dayRow: { flexDirection: 'row', marginHorizontal: Ui.space.page, gap: 10, marginBottom: 8, alignItems: 'flex-start' }, dayNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 12 }, dayNumberText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.white, fontWeight: FontWeight.extraBold }, dayCard: { ...Ui.card, flex: 1, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   safeArea: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
   page: { paddingBottom: 30 },
   content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
   navRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
   backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.onDarkSurface },
-  breadcrumb: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  breadcrumb: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   navSpacer: { flex: 1 },
   iconButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accent },
   gallery: { paddingHorizontal: 0, gap: 8 },
@@ -204,53 +206,53 @@ const styles = StyleSheet.create({
   mainColumn: { flex: 1, minWidth: 0 },
   titleArea: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 8 },
   metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  destination: { backgroundColor: Colors.accentSoft, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 7, color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  destination: { backgroundColor: Colors.accentSoft, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 7, color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   rating: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 9, backgroundColor: Colors.primaryDark },
-  ratingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  title: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '800', marginTop: 5 },
+  ratingText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
+  title: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, lineHeight: 28, fontWeight: FontWeight.extraBold, marginTop: 5 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   saveButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surfaceMuted },
   tripMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 13, marginTop: 8 },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  metaText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  metaText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   categoryList: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 9 },
   categoryTag: { paddingHorizontal: 7, paddingVertical: 5, borderRadius: Ui.radius.pill, backgroundColor: Colors.accentSoft },
-  categoryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  categoryText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   embeddedSection: { marginHorizontal: 0, marginVertical: 0, borderWidth: 0, shadowOpacity: 0, elevation: 0 },
   section: { ...Ui.card, marginHorizontal: Ui.space.page, marginVertical: 4, paddingHorizontal: 14, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
   sectionHeader: { minHeight: 45, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   sectionTitleRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { flexShrink: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  sectionTitle: { flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   sectionContent: { paddingBottom: 12 },
-  overview: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 21 },
+  overview: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 21 },
   detailBullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
-  detailText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 20 },
-  unavailable: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 20 },
+  detailText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 20 },
+  unavailable: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20 },
   bookingColumn: { width: 295, marginRight: 16, marginTop: 20, position: 'sticky' as 'relative', top: 14 },
   bookingPanel: { ...Ui.card, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  bookingEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  bookingTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 24, fontWeight: '800', marginTop: 5 },
+  bookingEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
+  bookingTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 24, fontWeight: FontWeight.extraBold, marginTop: 5 },
   bookingMeta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
-  bookingMetaText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  bookingMetaText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   bookingPriceArea: { marginTop: 13, paddingTop: 11, borderTopWidth: 1, borderTopColor: Colors.border },
-  bookingPriceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
-  bookingPrice: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 3 },
-  priceNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 5 },
+  bookingPriceLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
+  bookingPrice: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 3 },
+  priceNote: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, marginTop: 5 },
   enquireButtonWide: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 13, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.button },
-  enquireWideText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  enquireWideText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   bookButtonWide: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 7, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
   bookedButton: { backgroundColor: Colors.success },
-  bookWideText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  bookWideText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   mobileBar: { minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 11, paddingVertical: 8, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.surface },
   mobilePrice: { flex: 1, minWidth: 70 },
-  mobilePriceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  mobilePriceValue: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 2 },
+  mobilePriceLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
+  mobilePriceValue: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 2 },
   enquireButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.button },
-  enquireText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  enquireText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   bookButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 13, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  bookText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  bookText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   notFound: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 25 },
-  notFoundText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  notFoundText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   backToPackages: { marginTop: 12, paddingHorizontal: 13, paddingVertical: 9, borderRadius: 9, backgroundColor: Colors.accent },
-  backToPackagesText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  backToPackagesText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });

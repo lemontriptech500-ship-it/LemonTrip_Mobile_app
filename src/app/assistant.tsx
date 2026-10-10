@@ -6,7 +6,7 @@ import { sendChatMessage, type ChatMessage } from '@/utils/chatApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { useRef, useState, type ComponentProps } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 

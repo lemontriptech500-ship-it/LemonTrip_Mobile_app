@@ -6,7 +6,7 @@ import { getSupportRequest, listSupportRequests, type SupportRequest, type Suppo
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const statusColors = { new: Colors.textLight, open: '#997500', in_progress: '#087EA4', closed: Colors.success };
 const statusLabels = { new: 'NEW', open: 'OPEN', in_progress: 'IN PROGRESS', closed: 'CLOSED' };

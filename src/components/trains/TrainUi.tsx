@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View, type TextInputProps } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View, type TextInputProps } from 'react-native';
 import { AppScreen } from '@/components/AppScreen';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -142,43 +144,43 @@ const s = StyleSheet.create({
   dot: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderWidth: 2, borderColor: Colors.borderStrong },
   dotDone: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   dotActive: { borderColor: Colors.primary, backgroundColor: Colors.accent },
-  dotText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', color: Colors.textLight },
+  dotText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.textLight },
   dotTextActive: { color: Colors.primaryDark },
-  stepLabel: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '700', color: Colors.textLight, marginTop: 5 },
+  stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, marginTop: 5 },
   stepLabelOn: { color: Colors.primary },
   footerWrap: { backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border },
   card: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: Ui.space.card },
   sectionTitle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 12 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary, marginBottom: 3 },
-  sectionText: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark },
+  sectionText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999 },
-  pillText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  pillText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
   chipOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark },
+  chipText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark },
   chipTextOn: { color: Colors.white },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 6 },
-  rowLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight, flexShrink: 1 },
-  rowValue: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark, textAlign: 'right', flexShrink: 1 },
-  rowBold: { fontSize: 15, fontWeight: '800', color: Colors.textDark },
+  rowLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight, flexShrink: 1 },
+  rowValue: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, textAlign: 'right', flexShrink: 1 },
+  rowBold: { fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   field: { marginBottom: 12 },
   fieldLabel: { ...Ui.eyebrow, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
   inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, borderRadius: Ui.field.borderRadius, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   inputError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
-  input: { flex: 1, minWidth: 0, minHeight: Ui.field.minHeight, fontFamily: 'Manrope', fontSize: 15, color: Colors.textDark },
-  errorText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 4 },
+  input: { flex: 1, minWidth: 0, minHeight: Ui.field.minHeight, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  errorText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 4 },
   button: { ...Ui.button, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 18 },
-  buttonText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  buttonText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   footer: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: Ui.space.page, paddingVertical: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
   footerPrice: { minWidth: 96 },
-  footerCaption: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, fontWeight: '700' },
-  footerAmount: { fontFamily: 'Manrope', fontSize: 20, fontWeight: '800', color: Colors.primaryDark, marginTop: 1 },
+  footerCaption: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, fontWeight: FontWeight.bold },
+  footerAmount: { fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, color: Colors.primaryDark, marginTop: 1 },
   footerAction: { flex: 1 },
   empty: { alignItems: 'center', padding: 28, marginHorizontal: Ui.space.page, ...Ui.card },
   emptyIcon: { width: 54, height: 54, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  emptyTitle: { fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', color: Colors.textDark, marginTop: 12, textAlign: 'center' },
-  emptyText: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, color: Colors.textLight, marginTop: 5, textAlign: 'center' },
+  emptyTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 12, textAlign: 'center' },
+  emptyText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textLight, marginTop: 5, textAlign: 'center' },
   notice: { flexDirection: 'row', gap: 10, padding: 14, borderRadius: 16, marginHorizontal: Ui.space.page, marginBottom: 14 },
-  noticeTitle: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primaryDark, marginBottom: 2 },
-  noticeText: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, color: Colors.textDark },
+  noticeTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark, marginBottom: 2 },
+  noticeText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textDark },
 });

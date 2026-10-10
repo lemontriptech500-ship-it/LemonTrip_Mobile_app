@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import FlightSearchForm from '@/components/flights/FlightSearchForm';
@@ -12,7 +14,7 @@ import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type ServiceItem = {
@@ -117,7 +119,7 @@ export default function HomeScreen() {
               <LemonTripBrand size={50} />
               <View style={styles.headerSpacer} />
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerIconButton}>
-                <Ionicons name="heart-outline" size={20} color="#FFFFFF" />
+                <Ionicons name="heart-outline" size={23} color="#FFFFFF" />
               </TouchableOpacity>
               <TouchableOpacity accessibilityRole="button" onPress={handleProfilePress} style={styles.profileButton}>
                 <Text style={styles.profileText}>{user ? user.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() : 'AS'}</Text>
@@ -145,8 +147,11 @@ export default function HomeScreen() {
               accessibilityRole="button"
               accessibilityLabel={`Show ${item.label.replace('\n', ' ')} options`}
               accessibilityState={{ selected: activeService.label === item.label }}
-              onPress={() => setActiveService(item)}>
-              <Ionicons name={item.icon} size={22} color={activeService.label === item.label ? Colors.primaryDark : Colors.textLight} />
+              onPress={() => {
+                if (item.label === 'Buses') router.push(item.route);
+                else setActiveService(item);
+              }}>
+              <Ionicons name={item.icon} size={28} color={activeService.label === item.label ? Colors.primaryDark : Colors.textLight} />
               <Text numberOfLines={2} style={[styles.serviceGridLabel, activeService.label === item.label && styles.serviceGridLabelSelected]}>{item.label}</Text>
               <View style={[styles.serviceGridIndicator, activeService.label === item.label && styles.serviceGridIndicatorSelected]} />
             </TouchableOpacity>
@@ -162,7 +167,7 @@ export default function HomeScreen() {
           style={styles.aiCard}
           onPress={() => router.push('/ai-planner' as never)}>
           <View style={styles.aiIcon}>
-            <Ionicons name="sparkles" size={22} color={Colors.primaryDark} />
+            <Ionicons name="sparkles" size={26} color={Colors.primaryDark} />
           </View>
           <View style={styles.aiCopy}>
             <Text style={styles.aiEyebrow}>AI TRIP PLANNER</Text>
@@ -181,7 +186,7 @@ export default function HomeScreen() {
               return <TouchableOpacity key={destination.id} style={styles.destCard} onPress={() => router.push('/(tabs)/explore')} activeOpacity={0.92}>
                 <Image source={{ uri: destination.image }} style={styles.destImage} />
                 <TouchableOpacity accessibilityRole="button" accessibilityLabel={saved ? `Remove ${destination.name} from saved places` : `Save ${destination.name}`} style={styles.saveButton} onPress={() => toggleWishlist({ id: destination.id, name: destination.name, image: destination.image, price: destination.priceFrom })}>
-                  <Ionicons name={saved ? 'heart' : 'heart-outline'} size={16} color={saved ? Colors.error : Colors.primaryDark} />
+                  <Ionicons name={saved ? 'heart' : 'heart-outline'} size={19} color={saved ? Colors.error : Colors.primaryDark} />
                 </TouchableOpacity>
                 <View style={styles.destMeta}><Text style={styles.destName}>{destination.name}</Text><Text style={styles.destPrice}><Ionicons name="location" size={11} color="#fff" /> {destination.priceFrom}</Text></View>
                 <View style={styles.destArrow}><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
@@ -305,7 +310,7 @@ function HomeServiceWidget({ service, story, offer, travelPackage }: { service: 
   return (
     <View style={styles.serviceWidget}>
       {name !== 'Flights' ? <View style={styles.widgetHeading}>
-        <View style={styles.widgetIcon}><Ionicons name={service.icon} size={20} color={Colors.primary} /></View>
+        <View style={styles.widgetIcon}><Ionicons name={service.icon} size={25} color={Colors.primary} /></View>
         <View style={styles.widgetHeadingCopy}>
           <Text style={styles.widgetEyebrow}>{name.toUpperCase()}</Text>
           <Text style={styles.widgetTitle}>{getWidgetTitle(name, cart.length)}</Text>
@@ -426,108 +431,108 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   headerIconButton: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
-  locationText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
-  locationChange: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
+  locationText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
+  locationChange: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
   headerSpacer: { flex: 1 },
   profileButton: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: '#E8F1EC' },
-  profileText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  profileText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
 
   // Services grid
   searchCard: { zIndex: 2, marginHorizontal: 16, marginTop: -18, paddingHorizontal: 13, paddingTop: 7, paddingBottom: 14, borderRadius: 23, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
-  servicesHeading: { marginTop: 5, marginBottom: 7, color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  servicesHeading: { marginTop: 5, marginBottom: 7, color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 5 },
-  serviceGridItem: { width: '24%', minHeight: 67, alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 2, paddingVertical: 6, position: 'relative' },
-  serviceGridLabel: { minHeight: 23, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700', textAlign: 'center' },
-  serviceGridLabelSelected: { color: Colors.primaryDark, fontWeight: '800' },
+  serviceGridItem: { width: '24%', minHeight: 74, alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 2, paddingVertical: 6, position: 'relative' },
+  serviceGridLabel: { minHeight: 23, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, textAlign: 'center' },
+  serviceGridLabelSelected: { color: Colors.primaryDark, fontWeight: FontWeight.extraBold },
   serviceGridIndicator: { position: 'absolute', bottom: 0, width: 24, height: 3, borderRadius: 2 },
   serviceGridIndicatorSelected: { backgroundColor: Colors.accent },
   serviceWidget: { marginTop: 13 },
   widgetHeading: { flexDirection: 'row', alignItems: 'center', gap: 11, marginBottom: 13 },
   widgetIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: Colors.border },
   widgetHeadingCopy: { flex: 1 },
-  widgetEyebrow: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
-  widgetTitle: { marginTop: 2, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
+  widgetEyebrow: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
+  widgetTitle: { marginTop: 2, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   widgetContent: { gap: 13 },
-  widgetDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
-  widgetFeatured: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, fontWeight: '800' },
+  widgetDescription: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19 },
+  widgetFeatured: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, fontWeight: FontWeight.extraBold },
   widgetHighlights: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
-  widgetHighlight: { overflow: 'hidden', paddingHorizontal: 10, paddingVertical: 7, borderRadius: 14, backgroundColor: Colors.surfaceMuted, color: Colors.primary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  widgetHighlight: { overflow: 'hidden', paddingHorizontal: 10, paddingVertical: 7, borderRadius: 14, backgroundColor: Colors.surfaceMuted, color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
   widgetField: { flex: 1, minWidth: 0, marginBottom: 10 },
   widgetFieldRow: { flexDirection: 'row', gap: 9 },
-  widgetFieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 0.7, marginBottom: 5 },
-  widgetInput: { minHeight: 44, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12 },
+  widgetFieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.7, marginBottom: 5 },
+  widgetInput: { minHeight: 44, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 11, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   widgetButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 2, paddingHorizontal: 14, borderRadius: 14, backgroundColor: Colors.accent },
-  widgetButtonText: { flex: 1, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  widgetButtonText: { flex: 1, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   aiCard: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.primaryDark, ...cardShadow },
   aiIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.accent },
   aiCopy: { flex: 1, minWidth: 0 },
-  aiEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.2 },
-  aiTitle: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 2 },
-  aiSub: { color: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 11, marginTop: 2 },
+  aiEyebrow: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.2 },
+  aiTitle: { color: '#FFFFFF', fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 2 },
+  aiSub: { color: 'rgba(255,255,255,0.8)', fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 2 },
 
   // Sections
   section: { paddingTop: 24 },
   sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 12 },
-  sectionEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 9, lineHeight: 13, fontWeight: '800', letterSpacing: 1.05, textTransform: 'uppercase' },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 19, lineHeight: 25, fontWeight: '800', marginTop: 1 },
+  sectionEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, lineHeight: 13, fontWeight: FontWeight.extraBold, letterSpacing: 1.05, textTransform: 'uppercase' },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, lineHeight: 25, fontWeight: FontWeight.extraBold, marginTop: 1 },
   linkRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  linkText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   hRow: { paddingHorizontal: 16, paddingBottom: 8, gap: 12 },
   categoryRow: { paddingHorizontal: 16, paddingBottom: 10, gap: 7 },
   categoryChip: { paddingHorizontal: 11, paddingVertical: 7, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   categoryChipSelected: { backgroundColor: '#E5EFEA', borderColor: '#A9CBB9' },
-  categoryText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
-  categoryTextSelected: { color: Colors.primaryDark, fontWeight: '800' },
-  emptyPackages: { paddingHorizontal: 16, paddingBottom: 8, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  categoryText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
+  categoryTextSelected: { color: Colors.primaryDark, fontWeight: FontWeight.extraBold },
+  emptyPackages: { paddingHorizontal: 16, paddingBottom: 8, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
 
   // Offers
   offerCard: { width: 270, borderRadius: 20, overflow: 'hidden', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...cardShadow },
   offerImage: { width: '100%', height: 124, backgroundColor: Colors.surfaceMuted },
   offerBody: { padding: 14 },
-  offerCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  offerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 5, lineHeight: 20 },
+  offerCategory: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.6, textTransform: 'uppercase' },
+  offerTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 5, lineHeight: 20 },
   offerCodeChip: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 5, marginTop: 10, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
-  offerCode: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  offerCode: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
 
   // Destinations (image card with name over a dark band)
   destCard: { width: 178, height: 172, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, borderRadius: 19, ...cardShadow },
   destImage: { width: '100%', height: '100%' },
   saveButton: { position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' },
   destMeta: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 11, paddingVertical: 9, backgroundColor: 'rgba(0,0,0,0.54)' },
-  destName: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  destPrice: { color: 'rgba(255,255,255,0.95)', fontFamily: 'Manrope', fontSize: 10, marginTop: 2 },
+  destName: { color: '#FFFFFF', fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  destPrice: { color: 'rgba(255,255,255,0.95)', fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 2 },
   destArrow: { position: 'absolute', right: 9, bottom: 10, width: 26, height: 26, borderRadius: 13, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
 
   // Packages
   pkgCard: { width: 254, overflow: 'hidden', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 19, ...cardShadow },
   pkgImage: { width: '100%', height: 112, backgroundColor: Colors.surfaceMuted },
   pkgBadgePill: { position: 'absolute', top: 10, left: 10, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 10, backgroundColor: Colors.primary },
-  pkgBadgeText: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
+  pkgBadgeText: { color: '#FFFFFF', fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   pkgBody: { padding: 11 },
-  pkgTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  pkgTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   pkgMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
-  pkgMeta: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  pkgMeta: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   pkgRatingChip: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingVertical: 3, paddingHorizontal: 7, borderRadius: 8, backgroundColor: Colors.surfaceMuted },
-  pkgRating: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  pkgRating: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   pkgPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5, marginTop: 10 },
-  pkgFrom: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11 },
-  pkgPrice: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900' },
+  pkgFrom: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
+  pkgPrice: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   pkgArrow: { marginLeft: 'auto', width: 23, height: 23, borderRadius: 12, borderWidth: 1, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
 
   promiseCard: { minHeight: 112, marginHorizontal: 16, overflow: 'hidden', borderRadius: 18, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', padding: 16 },
   promiseCopy: { flex: 1, zIndex: 1 },
-  promiseEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 8, fontWeight: '900', letterSpacing: 1 },
-  promiseTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 15, lineHeight: 18, fontWeight: '800', marginTop: 5 },
-  promiseCaption: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 9, marginTop: 5 },
+  promiseEyebrow: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
+  promiseTitle: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 18, fontWeight: FontWeight.extraBold, marginTop: 5 },
+  promiseCaption: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 5 },
   promiseBadge: { alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 6, borderRadius: 10, backgroundColor: Colors.accent },
-  promiseBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '900' },
+  promiseBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   promiseDecoration: { position: 'absolute', right: 25, bottom: -14, transform: [{ rotate: '-20deg' }] },
   bottomCta: { minHeight: 58, marginHorizontal: 16, marginTop: 16, borderRadius: 28, backgroundColor: Colors.primaryDark, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 7 },
   ctaLogo: { width: 46, height: 42 },
-  ctaText: { color: '#fff', fontFamily: 'Caveat', fontSize: 19, flex: 1 },
+  ctaText: { color: '#fff', fontFamily: FontFamily.sans, fontSize: TextSize.heading, flex: 1 },
   ctaButton: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#FFFFFF', borderRadius: 20, paddingLeft: 14, paddingRight: 5, paddingVertical: 5 },
-  ctaButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
+  ctaButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   ctaButtonArrow: { width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
 
   // Stories
@@ -535,7 +540,7 @@ const styles = StyleSheet.create({
   storyCard: { flexDirection: 'row', backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 20, overflow: 'hidden', ...cardShadow },
   storyImage: { width: 112, backgroundColor: Colors.surfaceMuted },
   storyBody: { flex: 1, padding: 14 },
-  storyCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  storyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', marginTop: 5, lineHeight: 20 },
-  storyMeta: { marginTop: 8, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11 },
+  storyCategory: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.6, textTransform: 'uppercase' },
+  storyTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 5, lineHeight: 20 },
+  storyMeta: { marginTop: 8, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
 });

@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { visaCountryFlag } from '@/components/visa/VisaHeader';
 import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import { Colors } from '@/constants/colors';
@@ -7,7 +9,7 @@ import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function VisaScreen() {
   const [query, setQuery] = useState('');
@@ -41,15 +43,15 @@ export default function VisaScreen() {
 }
 const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 24 },
-  applications: { minHeight: 42, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 14, paddingHorizontal: 14, borderRadius: 22, backgroundColor: Colors.white }, applicationsText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.primaryDark },
+  applications: { minHeight: 42, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 14, paddingHorizontal: 14, borderRadius: 22, backgroundColor: Colors.white }, applicationsText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
   page: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: 16, gap: 10, paddingBottom: 24 },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 8, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginBottom: 4 },
-  input: { flex: 1, minWidth: 0, paddingVertical: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13 },
+  input: { flex: 1, minWidth: 0, paddingVertical: 10, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   country: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 72, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   selected: { borderColor: Colors.secondary, backgroundColor: Colors.surfaceMuted },
-  flag: { fontSize: 28 }, countryCopy: { flex: 1 }, countryName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
-  body: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 }, state: { gap: 14 },
+  flag: { fontSize: TextSize.display }, countryCopy: { flex: 1 }, countryName: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  body: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18 }, state: { gap: 14 },
   footer: { padding: 16, backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border },
   button: { width: '100%', maxWidth: 608, alignSelf: 'center', minHeight: 48, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.secondary, borderRadius: 8 },
-  buttonText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' }, disabled: { opacity: 0.45 },
+  buttonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, disabled: { opacity: 0.45 },
 });

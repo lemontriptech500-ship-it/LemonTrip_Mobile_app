@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { AuthButton, AuthDivider, AuthField, AuthLayout, AuthLink, AuthNotice, AuthSwitch, GoogleAuthButton, OtpCodeField } from '@/components/auth/AuthLayout';
 import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput } from '@/utils/authApi';
@@ -5,7 +7,7 @@ import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const { mode: initialMode } = useLocalSearchParams<{ mode?: string }>();
@@ -146,7 +148,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   otpActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
-  otpActionText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', paddingVertical: 6 },
+  otpActionText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, paddingVertical: 6 },
   otpActionDisabled: { color: Colors.textLight },
   recaptcha: { minHeight: 78, alignItems: 'flex-start', marginBottom: 12 },
 });

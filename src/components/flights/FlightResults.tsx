@@ -1,7 +1,9 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
 import { useMemo, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import FlightCard from './FlightCard';
 import FlightFilters, { periodFor } from './FlightFilters';
 import FlightSort from './FlightSort';
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
   filterColumnDesktop: { width: 255, paddingHorizontal: 0 },
   resultColumn: { flex: 1, minWidth: 0 },
   listHeading: { paddingHorizontal: 16, gap: 11, marginBottom: 12 },
-  resultCount: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  resultCount: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   listContent: { paddingHorizontal: 16, paddingBottom: 30, gap: 22 },
   skeletonList: { paddingHorizontal: 16, gap: 10 },
   skeletonCard: { minHeight: 170, padding: 15, borderWidth: 1, borderColor: Colors.border, borderRadius: 15, backgroundColor: Colors.surface, justifyContent: 'space-between' },
@@ -93,8 +95,8 @@ const styles = StyleSheet.create({
   skeletonRoute: { width: '100%', height: 48, backgroundColor: Colors.surfaceMuted, borderRadius: 9 },
   emptyState: { marginHorizontal: 16, marginTop: 10, minHeight: 200, alignItems: 'center', justifyContent: 'center', padding: 22, borderWidth: 1, borderColor: Colors.border, borderRadius: 16, backgroundColor: Colors.surface },
   emptyIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.accentSoft, marginBottom: 12 },
-  emptyTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', textAlign: 'center' },
-  emptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, textAlign: 'center', lineHeight: 17, marginTop: 6 },
+  emptyTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, textAlign: 'center' },
+  emptyText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, textAlign: 'center', lineHeight: 17, marginTop: 6 },
   clearButton: { marginTop: 12, paddingHorizontal: 13, paddingVertical: 9, borderRadius: 10, backgroundColor: Colors.accent },
-  clearButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  clearButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
 });

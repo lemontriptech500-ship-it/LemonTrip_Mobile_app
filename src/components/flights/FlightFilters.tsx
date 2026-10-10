@@ -1,7 +1,9 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import type { FlightFiltersState, FlightOffer } from './types';
 
 type FlightFiltersProps = {
@@ -108,11 +110,11 @@ const styles = StyleSheet.create({
   container: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 14, overflow: 'hidden' },
   heading: { minHeight: 48, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headingLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   content: { maxHeight: 480, paddingHorizontal: 13 },
   section: { paddingVertical: 12, borderTopWidth: 1, borderTopColor: Colors.border },
-  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginBottom: 8 },
+  sectionTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginBottom: 8 },
   option: { minHeight: 30, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  optionText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
-  facetNote: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, paddingBottom: 14 },
+  optionText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
+  facetNote: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, paddingBottom: 14 },
 });

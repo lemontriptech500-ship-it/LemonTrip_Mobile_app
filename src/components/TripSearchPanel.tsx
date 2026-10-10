@@ -1,8 +1,10 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export type SearchType = 'flights' | 'hotels' | 'buses' | 'trains' | 'packages';
 
@@ -136,9 +138,9 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
   tabLabelActive: {
     color: Colors.primaryDark,
@@ -162,9 +164,9 @@ const styles = StyleSheet.create({
   },
   modeButtonText: {
     color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.bold,
   },
   modeButtonTextActive: {
     color: Colors.white,
@@ -185,22 +187,22 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
     marginBottom: 5,
   },
   input: { minHeight: Ui.field.minHeight,
     color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.bold,
     paddingVertical: 0,
   },
   errorText: {
     color: Colors.error,
-    fontFamily: 'Manrope',
-    fontSize: 13,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
     marginTop: 10,
   },
   ctaButton: {
@@ -216,8 +218,8 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontSize: 14,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
 });

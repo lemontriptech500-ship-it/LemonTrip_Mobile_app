@@ -1,8 +1,10 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import type { FlightFareOption } from './types';
 
 type FlightFareOptionsProps = {
@@ -98,15 +100,15 @@ const styles = StyleSheet.create({
   cardSelected: { borderColor: Colors.primary, borderWidth: 1.5 },
   cardHeader: { minHeight: 65, flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 13, paddingVertical: 11 },
   nameWrap: { flex: 1 },
-  name: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  price: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 4 },
+  name: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  price: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 4 },
   details: { paddingHorizontal: 13, paddingBottom: 12, borderTopWidth: 1, borderTopColor: Colors.border },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8, paddingTop: 9 },
-  detailLabel: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
-  detailValue: { flex: 1.25, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', textAlign: 'right' },
-  missing: { color: Colors.textLight, fontWeight: '400' },
+  detailLabel: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
+  detailValue: { flex: 1.25, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, textAlign: 'right' },
+  missing: { color: Colors.textLight, fontWeight: FontWeight.regular },
   conditionsButton: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', marginTop: 12 },
-  conditionsText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  conditionsText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   noFares: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 9, padding: 13, borderRadius: 13, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  noFaresText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
+  noFaresText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18 },
 });

@@ -1,6 +1,8 @@
+import { TextSize, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Brand, Colors, Radius } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import type { FlightOffer } from './types';
 
 type FlightCardProps = {
@@ -140,23 +142,23 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     backgroundColor: Brand.lemon,
   },
-  bestTagText: { fontFamily: 'Manrope', fontSize: 10, letterSpacing: 0.5, color: Brand.forest },
+  bestTagText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 0.5, color: Brand.forest },
 
   airlineRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   logo: { width: 50, height: 50, borderRadius: 14, backgroundColor: Colors.surfaceMuted },
   logoFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
-  logoFallbackText: { fontFamily: 'Manrope', fontSize: 15, color: '#FFFFFF' },
+  logoFallbackText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: '#FFFFFF' },
   airlineCopy: { flex: 1, minWidth: 0 },
-  airlineName: { fontFamily: 'Manrope', fontSize: 16, color: Colors.textDark },
-  airlineSub: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 2 },
+  airlineName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  airlineSub: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 2 },
 
   route: { flexDirection: 'row', alignItems: 'center', paddingTop: 20, gap: 10 },
   airport: { minWidth: 64 },
   arrival: { alignItems: 'flex-end' },
-  time: { fontFamily: 'Manrope', fontSize: 26, color: Colors.textDark },
-  airportCode: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 4 },
+  time: { fontFamily: FontFamily.sans, fontSize: TextSize.display, color: Colors.textDark },
+  airportCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 4 },
   durationBlock: { flex: 1, alignItems: 'center' },
-  duration: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  duration: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
   routeLine: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
   line: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
 
@@ -164,10 +166,10 @@ const styles = StyleSheet.create({
 
   purchase: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   purchaseInfo: { flex: 1, minWidth: 0 },
-  priceLabel: { fontFamily: 'Manrope', fontSize: 9, letterSpacing: 1, color: Colors.textLight },
-  price: { fontFamily: 'Manrope', fontSize: 28, color: Colors.textDark, marginTop: 4 },
+  priceLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1, color: Colors.textLight },
+  price: { fontFamily: FontFamily.sans, fontSize: TextSize.display, color: Colors.textDark, marginTop: 4 },
   baggageRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 },
-  baggage: { flexShrink: 1, fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  baggage: { flexShrink: 1, fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
   selectButton: {
     minWidth: 124,
     height: 48,
@@ -177,5 +179,5 @@ const styles = StyleSheet.create({
     backgroundColor: Brand.forest,
     paddingHorizontal: 18,
   },
-  selectText: { fontFamily: 'Manrope', fontSize: 14, color: '#FFFFFF' },
+  selectText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: '#FFFFFF' },
 });

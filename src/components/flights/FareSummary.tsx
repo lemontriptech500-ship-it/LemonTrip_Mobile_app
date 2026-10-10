@@ -1,6 +1,8 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { FlightOffer, FlightSearchRequest } from './types';
 
 type FareSummaryProps = { request: FlightSearchRequest; offer?: FlightOffer };
@@ -39,8 +41,8 @@ export default function FareSummary({ request, offer }: FareSummaryProps) {
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 14, padding: 15, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
   routeBlock: { flexGrow: 1, minWidth: 150 },
-  route: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 4 },
+  route: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  date: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 4 },
   detail: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  detailText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
+  detailText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold },
 });

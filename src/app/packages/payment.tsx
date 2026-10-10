@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { PACKAGE_ROUTES, PackageFareSummary, PackageProgress } from '@/components/packages/PackageUi';
 import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, goBackOr, replaceTo } from '@/components/trains/TrainUi';
@@ -7,7 +9,7 @@ import { BANKS, PACKAGE_COUPONS, WALLET_BALANCE, inr, validatePackageCoupon } fr
 import { confirmPackageBooking, currentPackageFare, setCoupon, usePackageBooking, type PackagePayment } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type Method = PackagePayment['method'];
 const METHODS: { id: Method; label: string; hint: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
@@ -170,25 +172,25 @@ const s = StyleSheet.create({
   radioOn: { borderColor: Colors.primary },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
   methodIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
-  methodTitle: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  methodHint: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 1 },
+  methodTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  methodHint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
   form: { marginTop: 10 },
   pair: { flexDirection: 'row', gap: 12 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginBottom: 8 },
   banks: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 8 },
+  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 8 },
   wallet: { padding: 14, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
   walletRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   walletTotal: { borderTopWidth: 1, borderTopColor: Colors.borderStrong, marginTop: 6, paddingTop: 10 },
-  walletLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight },
-  walletValue: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
+  walletLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight },
+  walletValue: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   payError: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, borderRadius: 14, backgroundColor: Colors.errorSoft, borderWidth: 1, borderColor: Colors.errorBorder },
-  payErrorText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, color: Colors.error, fontWeight: '700' },
+  payErrorText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.error, fontWeight: FontWeight.bold },
   couponRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
   applyWrap: { width: 104, marginBottom: 12 },
-  couponMsg: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', marginBottom: 8 },
+  couponMsg: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, marginBottom: 8 },
   suggest: { gap: 8, marginTop: 4 },
   suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.primary, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  suggestLabel: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textDark },
+  suggestCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  suggestLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textDark },
 });

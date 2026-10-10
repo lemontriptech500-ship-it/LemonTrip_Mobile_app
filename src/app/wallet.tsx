@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Action, Copy, FeatureScreen, Panel, Row } from '@/components/FeatureScreen';
 import { Colors } from '@/constants/colors';
 import { supportContact } from '@/constants/navigation';
@@ -6,7 +8,7 @@ import { loadWallet, type WalletData } from '@/utils/featureApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
 
 export default function WalletScreen() {
   const user = useAuth(); const [wallet, setWallet] = useState<{ actor: string; data: WalletData } | null>(null); const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ const styles = StyleSheet.create({
   balanceRing: { position: 'absolute', width: 150, height: 150, right: -62, top: -76, borderWidth: 1, borderColor: Colors.onDarkBorder, borderRadius: 75 },
   balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   balanceIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.accent },
-  label: { fontFamily: 'Manrope', fontSize: 10, letterSpacing: 1.4, fontWeight: '800', color: Colors.accent },
-  amount: { fontFamily: 'Manrope', fontSize: 38, fontWeight: '800', color: Colors.white },
-  note: { fontFamily: 'Manrope', fontSize: 13, color: Colors.onDarkMuted },
+  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1.4, fontWeight: FontWeight.extraBold, color: Colors.accent },
+  amount: { fontFamily: FontFamily.sans, fontSize: TextSize.heroLarge, fontWeight: FontWeight.extraBold, color: Colors.white },
+  note: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.onDarkMuted },
 });

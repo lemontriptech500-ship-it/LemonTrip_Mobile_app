@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export default function AccountRecoveryScreen() {
   return (
@@ -29,6 +31,6 @@ export default function AccountRecoveryScreen() {
 const s = StyleSheet.create({
   hero: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 14, padding: 22, borderRadius: Ui.radius.card, backgroundColor: Colors.accentSoft },
   heroIcon: { width: 60, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  heroTitle: { fontFamily: 'Manrope', fontSize: 21, fontWeight: '800', color: Colors.primaryDark, marginTop: 14 },
-  heroText: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 22, color: Colors.textDark, marginTop: 6, textAlign: 'center' },
+  heroTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.primaryDark, marginTop: 14 },
+  heroText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 22, color: Colors.textDark, marginTop: 6, textAlign: 'center' },
 });

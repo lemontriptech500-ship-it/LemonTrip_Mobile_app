@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { JourneySummary } from '@/components/trains/TrainCards';
 import { Card, Chip, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
@@ -7,7 +9,7 @@ import { currentFare, selectTrain, updateSelection, useTrainBooking } from '@/ut
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -122,13 +124,13 @@ const s = StyleSheet.create({
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: Colors.primary },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
-  optionTitle: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
-  optionCode: { color: Colors.textLight, fontWeight: '700' },
-  optionFare: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.primaryDark },
-  avail: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginTop: 3 },
+  optionTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  optionCode: { color: Colors.textLight, fontWeight: FontWeight.bold },
+  optionFare: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  avail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, marginTop: 3 },
   good: { color: Colors.success }, warn: { color: '#8A6500' }, bad: { color: Colors.error },
   quota: { flexDirection: 'row', gap: 8 },
-  hint: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, color: Colors.textLight, marginTop: 10 },
+  hint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 10 },
   currentAvail: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
   stop: { flexDirection: 'row', gap: 12 },
   rail: { alignItems: 'center', width: 16 },
@@ -137,13 +139,13 @@ const s = StyleSheet.create({
   nodeEnd: { width: 16, height: 16, borderRadius: 8, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.primary, marginTop: 1 },
   link: { flex: 1, width: 2, backgroundColor: Colors.border, marginTop: 2 },
   linkOn: { backgroundColor: Colors.secondary },
-  stopName: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  stopCode: { color: Colors.textLight, fontWeight: '700' },
-  stopMeta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  stopName: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  stopCode: { color: Colors.textLight, fontWeight: FontWeight.bold },
+  stopMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   days: { flexDirection: 'row', gap: 8 },
   day: { flex: 1, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   dayOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  dayText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.textLight },
+  dayText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textLight },
   dayTextOn: { color: Colors.white },
   amenities: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
 });

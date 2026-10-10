@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
@@ -5,7 +7,7 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
 import { removeFromCart, useCart } from '@/utils/cartStore';
 import { router } from 'expo-router';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function CartScreen() {
@@ -69,24 +71,24 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   header: { paddingHorizontal: 22, paddingTop: 8, paddingBottom: 18 },
-  backArrow: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, marginBottom: 10 },
-  headerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 27, fontWeight: '800', marginBottom: 4 },
-  headerSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  backArrow: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginBottom: 10 },
+  headerTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.display, fontWeight: FontWeight.extraBold, marginBottom: 4 },
+  headerSubtitle: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
-  emptyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginBottom: 8 },
-  emptySubtitle: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, textAlign: 'center', lineHeight: 19, marginBottom: 20 },
+  emptyTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginBottom: 8 },
+  emptySubtitle: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, textAlign: 'center', lineHeight: 19, marginBottom: 20 },
   browseButton: { minHeight: Ui.button.minHeight,  backgroundColor: Colors.accent, borderRadius: Ui.radius.button, paddingVertical: 13, paddingHorizontal: 24 },
-  browseButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontWeight: '800', fontSize: 13 },
+  browseButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body },
   list: { paddingHorizontal: 22, paddingTop: 15, paddingBottom: 20, gap: 10 },
   card: { ...Ui.card, paddingHorizontal: 18,
     flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.white,
     borderBottomWidth: 1, borderBottomColor: Colors.border, paddingVertical: 15,
   },
-  serviceTag: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', color: Colors.secondary, marginBottom: 4 },
-  itemName: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark, marginBottom: 4 },
-  price: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.primary },
+  serviceTag: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.secondary, marginBottom: 4 },
+  itemName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginBottom: 4 },
+  price: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.primary },
   footer: { padding: 16, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.white },
   checkoutButton: { minHeight: Ui.button.minHeight,  backgroundColor: Colors.accent, borderRadius: Ui.radius.button, paddingVertical: 15, alignItems: 'center' },
-  checkoutButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  checkoutButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   emptyIcon: { borderRadius: 29, width: 58, height: 58, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 18 },
 });
