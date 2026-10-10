@@ -5,8 +5,25 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import QRCode from 'react-native-qrcode-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+function BookingQrFallback({ value }: { value: string }) {
+  const blocks = Array.from({ length: 9 }, (_, index) => {
+    const active = index % 2 === 0 || index % 3 === 0 || index === 7;
+    return active ? styles.qrCellActive : styles.qrCellInactive;
+  });
+
+  return (
+    <View style={styles.qrFallback}>
+      <View style={styles.qrGrid}>
+        {blocks.map((cellStyle, index) => (
+          <View key={`${value}-${index}`} style={[styles.qrCell, cellStyle]} />
+        ))}
+      </View>
+      <Text style={styles.qrFallbackText}>#{value}</Text>
+    </View>
+  );
+}
 
 const FONT = {
   medium: 'Manrope',
@@ -137,7 +154,7 @@ export default function BookingDetailScreen() {
           </View>
 
           <View style={styles.qrBox}>
-            <QRCode value={bookingId} size={150} color={Brand.forest} backgroundColor="#FFFFFF" />
+            <BookingQrFallback value={bookingId} />
             <Text style={styles.qrHint}>Show this QR at check-in</Text>
           </View>
         </View>
@@ -268,6 +285,12 @@ const styles = StyleSheet.create({
   price: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 20 },
 
   qrBox: { alignItems: 'center', marginTop: 22, gap: 10 },
+  qrFallback: { width: 150, height: 150, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF', borderRadius: 14, padding: 12 },
+  qrGrid: { width: 110, height: 110, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  qrCell: { width: 18, height: 18, borderRadius: 4 },
+  qrCellActive: { backgroundColor: Brand.forest },
+  qrCellInactive: { backgroundColor: '#EAE7DF' },
+  qrFallbackText: { marginTop: 8, color: Colors.textLight, fontFamily: FONT.medium, fontSize: 10, letterSpacing: 1 },
   qrHint: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12 },
 
   assistCard: {

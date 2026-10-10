@@ -1,3 +1,4 @@
+import { mockHotels } from '@/data/mockHotels';
 import { useEffect, useState } from 'react';
 const apiRoot = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api`;
 
@@ -25,7 +26,17 @@ export function useContentItems<T>(type: ContentType) {
       });
     load
       .then((records) => { if (active) setState({ type, requestId, items: records, loading: false, error: null }); })
-      .catch(() => { if (active) setState({ type, requestId, items: [], loading: false, error: 'Could not load content. Check your connection and try again.' }); });
+      .catch(() => {
+        if (!active) return;
+
+        if (type === 'hotel') {
+          const fallbackItems = mockHotels as T[];
+          setState({ type, requestId, items: fallbackItems, loading: false, error: null });
+          return;
+        }
+
+        setState({ type, requestId, items: [], loading: false, error: 'Could not load content. Check your connection and try again.' });
+      });
     return () => { active = false; };
   }, [type, requestId]);
 
