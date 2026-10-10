@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode, Ref } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, type TextInputProps } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View, type TextInputProps } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
