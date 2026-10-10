@@ -1,169 +1,151 @@
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
-import { Ui } from '@/constants/theme';
-import { Ionicons } from '@expo/vector-icons';
+import { formatShortDate } from '@/data/trains';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import FareSummary from './FareSummary';
-import FlightFareOptions from './FlightFareOptions';
-import FlightItineraryCard from './FlightItineraryCard';
-import FlightTripSummary from './FlightTripSummary';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlightJourney, FlightProgress } from './FlightFlowUi';
+import { airportLabel, getAirport } from './airports';
+import { formatDuration, formatPrice } from './flightFormat';
 import { getFlightSelection, selectFlightFare } from './flightSelectionStore';
 import type { FlightFareOption } from './types';
 
-function formatPrice(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount);
-  } catch {
-    return `${currency} ${amount.toLocaleString('en-IN')}`;
-  }
-}
-
-function fareConditionRows(option: FlightFareOption) {
-  return [
-    { label: 'Cancellation', value: option.cancellation },
-    { label: 'Date change', value: option.dateChange },
-    { label: 'Seat selection', value: option.seatSelection },
-    { label: 'Baggage', value: option.baggage },
-    { label: 'Refundability', value: option.refundable === undefined ? undefined : option.refundable ? 'Refundable' : 'Non-refundable' },
-  ];
-}
+const clean = (name: string) => name.replace(/\s*·\s*sample/i, '');
+const BOOKING_ROUTE = '/flight-booking/traveller';
 
 export default function FlightDetailsScreen() {
   const selection = getFlightSelection();
-  const { width } = useWindowDimensions();
-  const wide = width >= 900;
   const fares = selection?.offer.fareOptions ?? [];
   const [selectedFareId, setSelectedFareId] = useState(fares[0]?.id ?? null);
-  const [conditionsFare, setConditionsFare] = useState<FlightFareOption | null>(null);
-  const selectedFare = fares.find((fare) => fare.id === selectedFareId) ?? null;
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore/flights'));
 
-    const handleContinue = () => {
-    if (!selection || !selectedFare) return;
-    selectFlightFare(selectedFare);
-    router.push('/flight-booking/traveller' as never);
-  };
   if (!selection) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.missingSelection}>
-          <TravelArtworkIcon name="flight" size={48} />
-          <Text style={styles.missingTitle}>No flight selected</Text>
-          <Text style={styles.missingText}>Search for a flight and select an offer to view its itinerary and fares.</Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(tabs)/explore/flights')}>
-            <Text style={styles.backButtonText}>Search flights</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <FlowScreen>
+        <ScrollView>
+          <ScreenHeader title="Flight details" eyebrow="LEMONTRIP / FLIGHTS" onBack={goBack} />
+          <EmptyState icon="airplane-outline" title="No flight selected" text="Search for a flight and select an offer to view its itinerary and fares." action={<PrimaryButton label="Search flights" onPress={() => router.replace('/(tabs)/explore/flights')} />} />
+        </ScrollView>
+      </FlowScreen>
     );
   }
 
+  const { offer, request } = selection;
+  const fare: FlightFareOption | undefined = fares.find((f) => f.id === selectedFareId) ?? fares[0];
+  const currency = fare?.price.currency ?? offer.price.currency;
+  const total = fare?.price.total ?? offer.price.amount;
+  const from = getAirport(offer.departure.airportCode);
+  const to = getAirport(offer.arrival.airportCode);
+  const canContinue = fares.length === 0 || !!fare;
+
+  const handleContinue = () => {
+    if (fare) selectFlightFare(fare);
+    router.push(BOOKING_ROUTE as never);
+  };
+
+  const breakdown: { label: string; amount?: number }[] = fare ? [{ label: 'Base fare', amount: fare.price.baseFare }, { label: 'Taxes', amount: fare.price.taxes }, { label: 'Fees', amount: fare.price.fees }] : [];
+  const showBreakdown = breakdown.some((b) => b.amount !== undefined);
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <ScreenHeader title="Your flight" subtitle="Choose the fare that fits your journey." eyebrow="ONE STEP CLOSER" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}  />
+    <FlowScreen footer={<FooterBar caption={`${fare ? clean(fare.name) : 'Fare'} · per traveller`} amount={formatPrice(total, currency)} action={<PrimaryButton label="Continue" icon="arrow-forward" disabled={!canContinue} onPress={handleContinue} />} />}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+        <View style={s.content}>
+          <ScreenHeader title={`${offer.airline.name} ${offer.flightNumber}`} subtitle={`${from?.city ?? offer.departure.airportCode} → ${to?.city ?? offer.arrival.airportCode} · ${formatShortDate(request.departureDate)}`} eyebrow="LEMONTRIP / FLIGHTS" onBack={goBack} />
+          <FlightProgress current={0} />
+          <FlightJourney offer={offer} fare={fare} date={formatShortDate(request.departureDate)} />
 
-          <FareSummary request={selection.request} offer={selection.offer} />
+          <Card>
+            <SectionTitle eyebrow="STEP 1" title="Choose your fare" />
+            {fares.length ? fares.map((f) => {
+              const on = f.id === fare?.id;
+              return (
+                <TouchableOpacity key={f.id} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setSelectedFareId(f.id)} style={[s.option, on && s.optionOn]}>
+                  <View style={[s.radio, on && s.radioOn]}>{on ? <View style={s.radioDot} /> : null}</View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={s.optionTitle}>{clean(f.name)}</Text>
+                    <Text style={[s.avail, f.refundable === undefined ? s.muted : f.refundable ? s.good : s.warn]}>
+                      {f.refundable === undefined ? (f.baggage ?? 'Details not provided') : `${f.refundable ? 'Refundable' : 'Non-refundable'}${f.baggage ? ` · ${f.baggage.replace(/\s*·\s*sample allowance/i, '')}` : ''}`}
+                    </Text>
+                  </View>
+                  <Text style={s.optionFare}>{formatPrice(f.price.total, f.price.currency)}</Text>
+                </TouchableOpacity>
+              );
+            }) : <Notice icon="information-circle-outline">Fare options were not included in the flight response.</Notice>}
+          </Card>
 
-          <View style={[styles.columns, wide && styles.columnsWide]}>
-            <View style={styles.mainColumn}>
-              <View style={styles.sectionHeading}>
-                <Text style={styles.eyebrow}>YOUR FLIGHT</Text>
-                <Text style={styles.sectionTitle}>Itinerary</Text>
+          {fare ? (
+            <Card>
+              <SectionTitle eyebrow="FARE RULES" title="What’s included" right={<Pill label={fare.cabin ?? request.cabinClass} />} />
+              <Row label="Baggage" value={fare.baggage ?? 'Not provided'} />
+              <Row label="Cancellation" value={fare.cancellation ?? 'Not provided'} />
+              <Row label="Date change" value={fare.dateChange ?? 'Not provided'} />
+              <Row label="Seat selection" value={fare.seatSelection ?? 'Not provided'} />
+              <Row label="Refundability" value={fare.refundable === undefined ? 'Not provided' : fare.refundable ? 'Refundable' : 'Non-refundable'} tone={fare.refundable ? 'good' : undefined} />
+            </Card>
+          ) : null}
+
+          <Card>
+            <SectionTitle eyebrow="ROUTE" title="Journey timeline" right={<Pill icon="time-outline" label={formatDuration(offer.durationMinutes)} />} />
+            {[{ code: offer.departure.airportCode, name: offer.departure.airportName, role: 'Departs' }, { code: offer.arrival.airportCode, name: offer.arrival.airportName, role: 'Arrives' }].map((p, i) => (
+              <View key={p.role} style={s.stop}>
+                <View style={s.rail}>
+                  <View style={[s.node, s.nodeEnd]} />
+                  {i === 0 ? <View style={[s.link, s.linkOn]} /> : null}
+                </View>
+                <View style={{ flex: 1, paddingBottom: i === 0 ? 18 : 0 }}>
+                  <Text style={s.stopName}>{getAirport(p.code)?.name ?? p.name ?? p.code} <Text style={s.stopCode}>({p.code})</Text></Text>
+                  <Text style={s.stopMeta}>{p.role}{i === 0 ? ` ${formatShortDate(request.departureDate)}` : ''}{getAirport(p.code) ? `  ·  ${airportLabel(p.code)}` : ''}</Text>
+                </View>
               </View>
-              <FlightItineraryCard offer={selection.offer} />
-
-              <View style={styles.sectionHeading}>
-                <Text style={styles.eyebrow}>COMPARE WHAT’S INCLUDED</Text>
-                <Text style={styles.sectionTitle}>Choose a fare</Text>
-              </View>
-              <FlightFareOptions
-                options={fares}
-                selectedId={selectedFareId}
-                onSelect={(fare) => setSelectedFareId(fare.id)}
-                onFareConditions={setConditionsFare}
-              />
+            ))}
+            <View style={s.amenities}>
+              <Pill icon="airplane-outline" label={offer.stops === 0 ? 'Nonstop' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`} tone={offer.stops === 0 ? 'good' : 'neutral'} />
+              {offer.aircraft?.name || offer.aircraft?.code ? <Pill icon="information-circle-outline" label={[offer.aircraft.name, offer.aircraft.code].filter(Boolean).join(' · ')} /> : null}
+              {offer.baggage ? <Pill icon="briefcase-outline" label={offer.baggage.replace(/\s*·\s*sample allowance/i, '')} /> : null}
             </View>
+          </Card>
 
-            <View style={[styles.summaryColumn, wide && styles.summaryColumnWide]}>
-              <FlightTripSummary fareOption={selectedFare} onContinue={handleContinue} />
-              <View style={styles.secureNote}>
-                <Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} />
-                <Text style={styles.secureText}>{selection.offer.isDemo ? 'Sample fare details only. This journey cannot be booked until the flight service is connected.' : 'Fare details are shown as supplied by the airline.'}</Text>
-              </View>
-            </View>
-          </View>
+          {showBreakdown && fare ? (
+            <Card>
+              <SectionTitle eyebrow="FARE" title="Price breakdown" />
+              {breakdown.map((b) => (b.amount !== undefined ? <Row key={b.label} label={b.label} value={formatPrice(b.amount, currency)} /> : null))}
+              <View style={s.divider} />
+              <Row label="Total per traveller" value={formatPrice(fare.price.total, currency)} bold />
+            </Card>
+          ) : null}
+
+          <Notice icon="shield-checkmark-outline" title={offer.isDemo ? 'Demo inventory' : 'Fare details'} tone={offer.isDemo ? 'warn' : 'info'}>
+            {offer.isDemo ? 'Sample fare details only. This journey cannot be booked until the flight service is connected.' : 'Fare details are shown as supplied by the airline.'}
+          </Notice>
         </View>
       </ScrollView>
-
-      <Modal visible={conditionsFare !== null} transparent animationType="fade" onRequestClose={() => setConditionsFare(null)}>
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalTitleWrap}>
-                <Text style={styles.modalEyebrow}>FARE DETAILS</Text>
-                <Text style={styles.modalTitle}>Fare conditions</Text>
-                {conditionsFare ? <Text style={styles.modalFareName}>{conditionsFare.name}</Text> : null}
-              </View>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Close fare conditions" onPress={() => setConditionsFare(null)} style={styles.modalClose}>
-                <Ionicons name="close" size={18} color={Colors.textDark} />
-              </TouchableOpacity>
-            </View>
-            {conditionsFare ? fareConditionRows(conditionsFare).map((row) => (
-              <View key={row.label} style={styles.conditionRow}>
-                <Text style={styles.conditionLabel}>{row.label}</Text>
-                <Text style={styles.conditionValue}>{row.value ?? 'Not provided by the flight service'}</Text>
-              </View>
-            )) : null}
-            <TouchableOpacity onPress={() => setConditionsFare(null)} style={styles.doneButton}><Text style={styles.doneText}>Done</Text></TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
+    </FlowScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  scroll: { flex: 1 },
-  page: { paddingHorizontal: Ui.space.page, paddingBottom: 34 },
-  content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
-  breadcrumbRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  backIcon: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.onDarkSurface },
-  breadcrumb: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
-  breadcrumbCurrent: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  columns: { gap: 15, marginTop: 20 },
-  columnsWide: { flexDirection: 'row', alignItems: 'flex-start' },
-  mainColumn: { flex: 1, minWidth: 0 },
-  summaryColumn: { gap: 10, marginTop: 18 },
-  summaryColumnWide: { width: 300, marginTop: 36 },
-  sectionHeading: { marginTop: 21, marginBottom: 11 },
-  eyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
-  sectionTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, marginTop: 3 },
-  secureNote: { flexDirection: 'row', alignItems: 'flex-start', gap: 7, paddingHorizontal: 4 },
-  secureText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19 },
-  missingSelection: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 26 },
-  missingTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 12 },
-  missingText: { maxWidth: 310, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, textAlign: 'center', marginTop: 6 },
-  backButton: { minHeight: 44,  marginTop: 15, paddingHorizontal: 16, paddingVertical: 11, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  backButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  modalBackdrop: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 18, backgroundColor: Colors.heroOverlay },
-  modalCard: { ...Ui.card, width: '100%', maxWidth: 480, padding: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  modalHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  modalTitleWrap: { flex: 1 },
-  modalEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
-  modalTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 4 },
-  modalFareName: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 3 },
-  modalClose: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.background },
-  conditionRow: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  conditionLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
-  conditionValue: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 4 },
-  doneButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  doneText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+const s = StyleSheet.create({
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
+  optionOn: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
+  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
+  radioOn: { borderColor: Colors.primary },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
+  optionTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  optionFare: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  avail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, marginTop: 3 },
+  good: { color: Colors.success }, warn: { color: '#8A6500' }, muted: { color: Colors.textLight },
+  stop: { flexDirection: 'row', gap: 12 },
+  rail: { alignItems: 'center', width: 16 },
+  node: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.borderStrong, marginTop: 3 },
+  nodeEnd: { width: 16, height: 16, borderRadius: 8, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.primary, marginTop: 1 },
+  link: { flex: 1, width: 2, backgroundColor: Colors.border, marginTop: 2 },
+  linkOn: { backgroundColor: Colors.secondary },
+  stopName: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  stopCode: { color: Colors.textLight, fontWeight: FontWeight.bold },
+  stopMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  amenities: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 },
+  divider: { height: 1, backgroundColor: Colors.border, marginVertical: 8 },
 });

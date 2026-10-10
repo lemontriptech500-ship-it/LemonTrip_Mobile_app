@@ -11,6 +11,7 @@ import {
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
 import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
+import { formatShortDate } from '@/data/trains';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
@@ -91,7 +92,7 @@ export default function TravellerDetailsScreen() {
           <View style={s.content}>
             <ScreenHeader title="Traveller details" subtitle="Names must match a valid government ID." eyebrow="LEMONTRIP / FLIGHTS" onBack={goBack} />
             <FlightProgress current={1} />
-            <FlightJourney offer={offer} fare={fare} />
+            <FlightJourney offer={offer} fare={fare} date={formatShortDate(selection.request.departureDate)} />
 
             {travellers.map((t, i) => (
               <Card key={i}>
