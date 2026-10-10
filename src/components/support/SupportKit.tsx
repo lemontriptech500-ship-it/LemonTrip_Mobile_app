@@ -1,5 +1,4 @@
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
-import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';

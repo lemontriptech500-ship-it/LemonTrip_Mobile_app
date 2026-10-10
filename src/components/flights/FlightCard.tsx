@@ -1,183 +1,77 @@
-import { TextSize, FontFamily } from '@/constants/typography';
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { Brand, Colors, Radius } from '@/constants/colors';
-import { Ionicons } from '@expo/vector-icons';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pill } from '@/components/trains/TrainUi';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { formatPrice, formatTime } from './flightFormat';
+import { AirlineBadge, FlightRouteLine, TimeBlock } from './FlightParts';
 import type { FlightOffer } from './types';
 
 type FlightCardProps = {
   offer: FlightOffer;
   onSelect: (offer: FlightOffer) => void;
-  /** Highlights the card as the best deal (yellow border + tag). */
+  /** Marks the cheapest visible flight. */
   best?: boolean;
+  dateLabel?: string;
 };
 
-function formatTime(value: string) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-
-function formatDuration(minutes: number) {
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return `${hours}h${remainingMinutes ? ` ${remainingMinutes}m` : ''}`;
-}
-
-function formatPrice(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
-  } catch {
-    return `${currency} ${amount.toLocaleString('en-IN')}`;
-  }
-}
-
-export default function FlightCard({ offer, onSelect, best = false }: FlightCardProps) {
-  const stopLabel = offer.stops === 0 ? 'Direct' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
-  const fareNote =
-    offer.fareInfo ??
-    (offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null);
-  const subtitle = [offer.flightNumber, fareNote].filter(Boolean).join(' · ');
-
+/** Result card — mirrors TrainCard: header, timeline, fare tiles, footer. */
+export default function FlightCard({ offer, onSelect, best = false, dateLabel }: FlightCardProps) {
+  const fares = offer.fareOptions?.length ? offer.fareOptions : null;
+  const refundNote = offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null;
+  const open = () => onSelect(offer);
   return (
-    <View style={[styles.card, best && styles.cardBest]}>
-      {best || offer.isDemo ? (
-        <View style={styles.bestTag}>
-          <Ionicons name={offer.isDemo ? 'information-circle' : 'sparkles'} size={12} color={Brand.forest} />
-          <Text style={styles.bestTagText}>{offer.isDemo ? (best ? 'SAMPLE · BEST PRICE' : 'SAMPLE RESULT') : 'LEMONTRIP BEST DEAL'}</Text>
-        </View>
-      ) : null}
-
-      {/* Airline */}
-      <Pressable accessibilityRole="button" onPress={() => onSelect(offer)} style={styles.airlineRow}>
-        {offer.airline.logoUrl ? (
-          <Image
-            source={{ uri: offer.airline.logoUrl }}
-            style={styles.logo}
-            resizeMode="contain"
-            accessibilityLabel={`${offer.airline.name} logo`}
-          />
-        ) : (
-          <View style={[styles.logo, styles.logoFallback]}>
-            <Text style={styles.logoFallbackText}>{offer.airline.code}</Text>
+    <View style={[s.card, best && s.cardBest]}>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={`${offer.airline.name} ${offer.flightNumber}, open details`} onPress={open} activeOpacity={0.85}>
+        <View style={s.top}>
+          <AirlineBadge offer={offer} />
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={s.name} numberOfLines={1}>{offer.airline.name}</Text>
+            <Text style={s.number} numberOfLines={1}>{[offer.flightNumber, offer.aircraft?.name ?? offer.aircraft?.code].filter(Boolean).join('  ·  ')}</Text>
           </View>
-        )}
-        <View style={styles.airlineCopy}>
-          <Text style={styles.airlineName} numberOfLines={1}>{offer.airline.name}</Text>
-          <Text style={styles.airlineSub} numberOfLines={1}>{subtitle}</Text>
+          {offer.isDemo ? <Pill label="Sample" tone="warn" icon="information-circle-outline" /> : best ? <Pill label="Best price" tone="brand" icon="sparkles" /> : null}
         </View>
-        <Ionicons name="chevron-forward" size={20} color={Colors.textDark} />
-      </Pressable>
+        <View style={s.times}>
+          <TimeBlock time={formatTime(offer.departure.time)} code={offer.departure.airportCode} sub={dateLabel} />
+          <FlightRouteLine offer={offer} />
+          <TimeBlock time={formatTime(offer.arrival.time)} code={offer.arrival.airportCode} align="right" />
+        </View>
+      </TouchableOpacity>
 
-      {/* Route */}
-      <View style={styles.route}>
-        <View style={styles.airport}>
-          <Text style={styles.time}>{formatTime(offer.departure.time)}</Text>
-          <Text style={styles.airportCode}>{offer.departure.airportCode}</Text>
-        </View>
-
-        <View style={styles.durationBlock}>
-          <Text style={styles.duration}>{formatDuration(offer.durationMinutes)} · {stopLabel}</Text>
-          <View style={styles.routeLine}>
-            <View style={styles.line} />
-            <Ionicons name="airplane" size={14} color={Brand.forest} />
-            <View style={styles.line} />
-          </View>
-        </View>
-
-        <View style={[styles.airport, styles.arrival]}>
-          <Text style={styles.time}>{formatTime(offer.arrival.time)}</Text>
-          <Text style={styles.airportCode}>{offer.arrival.airportCode}</Text>
-        </View>
+      <View style={s.classes}>
+        {(fares ?? [{ id: 'base', name: refundNote ?? 'Fare', price: { total: offer.price.amount, currency: offer.price.currency } }]).map((f) => (
+          <TouchableOpacity key={f.id} accessibilityRole="button" accessibilityLabel={`${f.name}, ${formatPrice(f.price.total, f.price.currency)}`} onPress={open} style={s.classTile} activeOpacity={0.8}>
+            <Text style={s.classCode} numberOfLines={1}>{f.name.replace(/\s*·\s*sample/i, '')}</Text>
+            <Text style={s.classFare}>{formatPrice(f.price.total, f.price.currency)}</Text>
+            {'refundable' in f && f.refundable !== undefined ? <Text style={[s.avail, f.refundable ? s.good : s.warn]}>{f.refundable ? 'Refundable' : 'Non-refundable'}</Text> : null}
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <View style={styles.divider} />
-
-      {/* Price + select */}
-      <View style={styles.purchase}>
-        <View style={styles.purchaseInfo}>
-          <Text style={styles.priceLabel}>PER TRAVELER · INCL. TAXES</Text>
-          <Text style={styles.price}>{formatPrice(offer.price.amount, offer.price.currency)}</Text>
-          <View style={styles.baggageRow}>
-            <Ionicons name="briefcase-outline" size={12} color={Colors.textLight} />
-            <Text style={styles.baggage} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}</Text>
-          </View>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => onSelect(offer)}
-          style={({ pressed }) => [styles.selectButton, pressed && { opacity: 0.9 }]}
-        >
-          <Text style={styles.selectText}>Select</Text>
-        </Pressable>
+      <View style={s.foot}>
+        <Text style={s.footText} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}  ·  from <Text style={s.footBold}>{formatPrice(offer.price.amount, offer.price.currency)}</Text></Text>
+        <TouchableOpacity accessibilityRole="button" onPress={open}><Text style={s.link}>View details</Text></TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    padding: 18,
-    backgroundColor: '#FFFFFF',
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: 'transparent',
-    shadowColor: '#0F3D2E',
-    shadowOpacity: 0.06,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
-  cardBest: { borderColor: Brand.lemon, borderWidth: 1.5 },
-
-  bestTag: {
-    position: 'absolute',
-    top: -13,
-    right: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.lemon,
-  },
-  bestTagText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 0.5, color: Brand.forest },
-
-  airlineRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  logo: { width: 50, height: 50, borderRadius: 14, backgroundColor: Colors.surfaceMuted },
-  logoFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
-  logoFallbackText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: '#FFFFFF' },
-  airlineCopy: { flex: 1, minWidth: 0 },
-  airlineName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: Colors.textDark },
-  airlineSub: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 2 },
-
-  route: { flexDirection: 'row', alignItems: 'center', paddingTop: 20, gap: 10 },
-  airport: { minWidth: 64 },
-  arrival: { alignItems: 'flex-end' },
-  time: { fontFamily: FontFamily.sans, fontSize: TextSize.display, color: Colors.textDark },
-  airportCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 4 },
-  durationBlock: { flex: 1, alignItems: 'center' },
-  duration: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
-  routeLine: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 8 },
-  line: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
-
-  divider: { height: 1, backgroundColor: Colors.border, marginVertical: 16 },
-
-  purchase: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  purchaseInfo: { flex: 1, minWidth: 0 },
-  priceLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1, color: Colors.textLight },
-  price: { fontFamily: FontFamily.sans, fontSize: TextSize.display, color: Colors.textDark, marginTop: 4 },
-  baggageRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 },
-  baggage: { flexShrink: 1, fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
-  selectButton: {
-    minWidth: 124,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.md,
-    backgroundColor: Brand.forest,
-    paddingHorizontal: 18,
-  },
-  selectText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: '#FFFFFF' },
+const s = StyleSheet.create({
+  card: { ...Ui.card, padding: 14, marginBottom: 12 },
+  cardBest: { borderColor: Colors.accent, borderWidth: 1.5 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  name: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  number: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 16 },
+  classes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: Colors.border },
+  classTile: { flexGrow: 1, flexBasis: '30%', minWidth: 120, padding: 10, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
+  classCode: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  classFare: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
+  avail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, marginTop: 5 },
+  good: { color: Colors.success }, warn: { color: '#8A6500' },
+  foot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 12 },
+  footText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight },
+  footBold: { fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  link: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
 });

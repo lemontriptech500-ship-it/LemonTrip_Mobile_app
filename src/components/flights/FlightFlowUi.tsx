@@ -1,25 +1,15 @@
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { Card, Row, SectionTitle } from '@/components/trains/TrainUi';
+import { Pill } from '@/components/trains/TrainUi';
+import { formatTime } from './flightFormat';
+import { AirlineBadge, FlightRouteLine, TimeBlock } from './FlightParts';
 import type { FlightFareOption, FlightOffer } from '@/components/flights/types';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 
-export function formatPrice(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
-  } catch {
-    return `${currency} ${amount.toLocaleString('en-IN')}`;
-  }
-}
-
-// Shows 06:15 for "2026-12-01T06:15:00"; leaves other formats untouched.
-export function formatTime(value: string) {
-  const match = /T(\d{2}:\d{2})/.exec(value);
-  return match ? match[1] : value;
-}
+export { formatDuration, formatPrice, formatTime } from './flightFormat';
 
 const STEPS = ['Select', 'Travellers', 'Seats', 'Payment', 'Done'];
 
@@ -43,18 +33,24 @@ export function FlightProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
   );
 }
 
-export function FlightJourney({ offer, fare }: { offer: FlightOffer; fare?: FlightFareOption }) {
-  const hours = Math.floor(offer.durationMinutes / 60);
-  const minutes = offer.durationMinutes % 60;
+/** Compact flight recap used on travellers / seats / payment screens (mirrors the train JourneySummary). */
+export function FlightJourney({ offer, fare, date }: { offer: FlightOffer; fare?: FlightFareOption; date?: string }) {
   return (
-    <Card>
-      <SectionTitle eyebrow="YOUR FLIGHT" title={`${offer.airline.name} ${offer.flightNumber}`} />
-      <Row label="Route" value={`${offer.departure.airportCode} to ${offer.arrival.airportCode}`} />
-      <Row label="Departs" value={formatTime(offer.departure.time)} />
-      <Row label="Arrives" value={formatTime(offer.arrival.time)} />
-      <Row label="Duration" value={`${hours}h ${minutes}m${offer.stops === 0 ? ' · Nonstop' : ` · ${offer.stops} stop`}`} />
-      <Row label="Fare" value={fare?.name ?? 'Standard'} />
-    </Card>
+    <View style={s.summary}>
+      <View style={s.summaryTop}>
+        <AirlineBadge offer={offer} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={s.summaryName} numberOfLines={1}>{offer.airline.name}</Text>
+          <Text style={s.summaryMeta} numberOfLines={1}>{offer.flightNumber}  ·  {fare?.name?.replace(/\s*·\s*sample/i, '') ?? 'Standard'}</Text>
+        </View>
+        <Pill label={offer.stops === 0 ? 'Nonstop' : `${offer.stops} stop${offer.stops > 1 ? 's' : ''}`} tone="neutral" />
+      </View>
+      <View style={s.times}>
+        <TimeBlock time={formatTime(offer.departure.time)} code={offer.departure.airportCode} sub={date} />
+        <FlightRouteLine offer={offer} />
+        <TimeBlock time={formatTime(offer.arrival.time)} code={offer.arrival.airportCode} align="right" />
+      </View>
+    </View>
   );
 }
 
@@ -70,4 +66,9 @@ const s = StyleSheet.create({
   dotTextActive: { color: Colors.primaryDark },
   stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, marginTop: 5 },
   stepLabelOn: { color: Colors.primary },
+  summary: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: 16 },
+  summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  summaryName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  summaryMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 16 },
 });

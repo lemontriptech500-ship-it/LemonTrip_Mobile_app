@@ -10,6 +10,7 @@ import {
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
 import { Card, EmptyState, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
+import { formatShortDate } from '@/data/trains';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -114,7 +115,7 @@ export default function SeatsAddOnsScreen() {
         <View style={s.content}>
           <ScreenHeader title="Seats and add-ons" subtitle="Seat selection is optional." eyebrow="LEMONTRIP / FLIGHTS" onBack={goBack} />
           <FlightProgress current={2} />
-          <FlightJourney offer={offer} fare={fare} />
+          <FlightJourney offer={offer} fare={fare} date={formatShortDate(selection.request.departureDate)} />
 
           <Card>
             <SectionTitle
