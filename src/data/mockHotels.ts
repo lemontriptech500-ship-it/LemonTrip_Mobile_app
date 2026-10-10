@@ -1,0 +1,153 @@
+import type { Hotel } from '@/types/content';
+
+export const mockHotels: Hotel[] = [
+  {
+    id: 'hotel-manali-himalayan-view',
+    name: 'The Himalayan View',
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+    location: 'Manali, Himachal Pradesh',
+    rating: '4.6',
+    price: '₹4,500 / night',
+    description:
+      'A premium mountain stay with warm hospitality, valley views, and spa-inspired rooms in the heart of Manali.',
+    amenities: ['Free WiFi', 'Mountain View', 'Breakfast', 'Pool', 'Parking', 'Room Service'],
+    propertyType: 'Resort',
+    reviewScore: 4.6,
+    reviewCount: 1200,
+    gallery: [
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80',
+    ],
+    cancellation: 'Free cancellation before 48 hours',
+    breakfast: true,
+    distanceKm: 2.4,
+    address: 'Himalayan Road, Manali, Himachal Pradesh',
+    roomOptions: [
+      {
+        id: 'room-standard-1',
+        name: 'Standard Room',
+        pricePerNight: '₹4,500 / night',
+        amenities: ['1 King Bed', '2 Guests', 'Mountain View'],
+        breakfast: true,
+        cancellation: 'Free cancellation up to 48 hours',
+      },
+      {
+        id: 'room-deluxe-1',
+        name: 'Deluxe Room',
+        pricePerNight: '₹5,200 / night',
+        amenities: ['1 King Bed', '2 Guests', 'Balcony'],
+        breakfast: true,
+        cancellation: 'Free cancellation up to 48 hours',
+      },
+      {
+        id: 'room-family-1',
+        name: 'Family Room',
+        pricePerNight: '₹6,500 / night',
+        amenities: ['2 Beds', '4 Guests', 'Separate Lounge'],
+        breakfast: true,
+        cancellation: 'Free cancellation up to 48 hours',
+      },
+    ],
+    reviews: [
+      { id: 'r1', author: 'Ananya', score: 4.8, comment: 'Perfect location and the room was comfortable with a beautiful view.' },
+      { id: 'r2', author: 'Rahul', score: 4.5, comment: 'Great breakfast and easy check-in. Loved the mountain ambience.' },
+    ],
+  },
+  {
+    id: 'hotel-manali-valley-retreat',
+    name: 'Valley Retreat',
+    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+    location: 'Manali, Himachal Pradesh',
+    rating: '4.5',
+    price: '₹4,200 / night',
+    description:
+      'A cozy mountain retreat surrounded by cedar trees and calm valley views, ideal for a relaxing getaway.',
+    amenities: ['Free WiFi', 'Café', 'Garden', 'Parking', 'Terrace', 'Daily Housekeeping'],
+    propertyType: 'Boutique',
+    reviewScore: 4.5,
+    reviewCount: 980,
+    gallery: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+    ],
+    cancellation: 'Flexible cancellation',
+    breakfast: false,
+    distanceKm: 3.2,
+    address: 'Valley Road, Manali, Himachal Pradesh',
+    roomOptions: [
+      {
+        id: 'room-valley-standard',
+        name: 'Standard Room',
+        pricePerNight: '₹4,200 / night',
+        amenities: ['1 Queen Bed', '2 Guests'],
+        breakfast: false,
+        cancellation: 'Flexible cancellation',
+      },
+      {
+        id: 'room-valley-suite',
+        name: 'Suite',
+        pricePerNight: '₹5,800 / night',
+        amenities: ['1 King Bed', '2 Guests', 'Private Balcony'],
+        breakfast: true,
+        cancellation: 'Flexible cancellation',
+      },
+    ],
+    reviews: [
+      { id: 'r3', author: 'Priya', score: 4.6, comment: 'Very peaceful stay and the staff were courteous.' },
+    ],
+  },
+  {
+    id: 'hotel-manali-snow-peak',
+    name: 'Snow Peak Resort',
+    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80',
+    location: 'Manali, Himachal Pradesh',
+    rating: '4.4',
+    price: '₹3,800 / night',
+    description:
+      'A snow-laced resort with modern rooms and a calm alpine atmosphere for family vacations and quick escapes.',
+    amenities: ['Free WiFi', 'Spa', 'Heater', 'Breakfast', 'Family Lounge'],
+    propertyType: 'Resort',
+    reviewScore: 4.4,
+    reviewCount: 760,
+    gallery: [
+      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80',
+    ],
+    cancellation: 'Free cancellation before 24 hours',
+    breakfast: true,
+    distanceKm: 4.1,
+    address: 'Snow Valley Avenue, Manali, Himachal Pradesh',
+    roomOptions: [
+      {
+        id: 'room-snow-standard',
+        name: 'Standard Room',
+        pricePerNight: '₹3,800 / night',
+        amenities: ['1 Double Bed', '2 Guests'],
+        breakfast: true,
+        cancellation: 'Free cancellation before 24 hours',
+      },
+      {
+        id: 'room-snow-deluxe',
+        name: 'Deluxe Room',
+        pricePerNight: '₹4,900 / night',
+        amenities: ['1 King Bed', '2 Guests', 'City View'],
+        breakfast: true,
+        cancellation: 'Free cancellation before 24 hours',
+      },
+    ],
+    reviews: [
+      { id: 'r4', author: 'Karan', score: 4.4, comment: 'The resort felt premium, and the family room was perfect for our trip.' },
+    ],
+  },
+];
+
+export const defaultHotelSearch = {
+  destination: 'Manali',
+  checkIn: '2026-10-15',
+  checkOut: '2026-10-17',
+  guests: 2,
+  rooms: 1,
+};

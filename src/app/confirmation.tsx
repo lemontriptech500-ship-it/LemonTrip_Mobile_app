@@ -2,6 +2,7 @@ import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useAccountBookings } from '@/utils/accountBookings';
+import { useBookings } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -23,9 +24,12 @@ function formatDate(value?: string) {
 }
 
 export default function ConfirmationScreen() {
-  const { bookings } = useAccountBookings();
+  const localBookings = useBookings();
+  const { bookings: accountBookings } = useAccountBookings();
   const { bookingId } = useLocalSearchParams<{ bookingId?: string }>();
-  const booking = bookings.find((item) => item.id === bookingId);
+
+  const booking = localBookings.find((item) => String(item.id) === String(bookingId))
+    ?? accountBookings.find((item) => String(item.id) === String(bookingId));
 
   if (!booking) {
     return <SafeAreaView style={styles.safeArea}><View style={styles.emptyState}><View style={styles.emptyIcon}><Ionicons name="checkmark-circle-outline" size={28} color={Colors.primary} /></View><Text style={styles.emptyTitle}>No confirmed trip yet</Text><Text style={styles.emptyText}>Complete a booking to see its confirmation here.</Text><TouchableOpacity onPress={() => router.replace('/(tabs)/explore')} style={styles.primaryButton}><Text style={styles.primaryButtonText}>Continue exploring</Text></TouchableOpacity></View></SafeAreaView>;
