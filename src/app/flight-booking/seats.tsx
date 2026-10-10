@@ -201,4 +201,3 @@ const s = StyleSheet.create({
   addOnRight: { alignItems: 'flex-end', gap: 4 },
   addOnPrice: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primaryDark },
 });
-

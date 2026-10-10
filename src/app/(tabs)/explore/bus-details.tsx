@@ -1,247 +1,531 @@
-import { Ui } from '@/constants/theme';
-import { Colors } from '@/constants/colors';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { addToCart } from '@/utils/cartStore';
-import { getBusSearch, getSelectedBus } from '@/utils/busSearchStore';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
-function parsePrice(value: string) {
-  const match = value.match(/[\d,]+(?:\.\d+)?/);
-  return match ? Number(match[0].replace(/,/g, '')) : 0;
-}
+import React, { useState } from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
-function formatPrice(value: number) {
-  return `₹${value.toLocaleString('en-IN')}`;
-}
-
-const seatRows = ['A', 'B', 'C', 'D', 'E'];
-const seatColumns = ['1', '2', '3', '4'];
+const GREEN = "#075638";
+const DARK = "#153C2D";
+const BG = "#F4F8F4";
+const BORDER = "#DCE8DF";
+const YELLOW = "#FFD83D";
 
 export default function BusDetailsScreen() {
-  const bus = getSelectedBus();
-  const search = getBusSearch();
-  const { width } = useWindowDimensions();
-  const desktop = width >= 920;
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [continued, setContinued] = useState(false);
+  const router = useRouter();
+  const params = useLocalSearchParams();
 
-  const seats = useMemo(() => seatRows.flatMap((row) => seatColumns.map((column) => `${row}${column}`)), []);
-  const total = bus ? parsePrice(bus.price) * selectedSeats.length : 0;
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [deck, setDeck] = useState<"Lower" | "Upper">("Lower");
+
+  const operator = String(params.operator || "GreenLine Travels");
+  const from = String(params.from || "Delhi");
+  const to = String(params.to || "Jaipur");
+  const departure = String(params.departure || "21:30");
+  const arrival = String(params.arrival || "06:00");
+  const duration = String(params.duration || "8h 30m");
+  const price = Number(params.price || 899);
+  const date = String(params.date || "09 Oct 2026");
+  const busType = String(params.type || "AC Sleeper (2+1)");
+
+  const unavailableSeats = ["L2", "L5", "L9", "L12", "U3", "U8"];
 
   const toggleSeat = (seat: string) => {
-    setSelectedSeats((current) => current.includes(seat) ? current.filter((item) => item !== seat) : [...current, seat]);
-    setContinued(false);
-  };
+    if (unavailableSeats.includes(seat)) return;
 
-  const handleContinue = () => {
-    if (!bus || !selectedSeats.length) return;
-    addToCart({
-      id: `bus-${bus.id}-${Date.now()}`,
-      serviceName: 'Bus',
-      itemName: `${bus.origin} to ${bus.destination} · ${bus.busType} · Seats ${selectedSeats.join(', ')}`,
-      price: formatPrice(total),
-      ...(search.travelDate ? { tripDate: search.travelDate } : {}),
-    });
-    setContinued(true);
-    Alert.alert('Seats selected', 'Your bus seats have been added to the trip cart.', [
-      { text: 'Continue to cart', onPress: () => router.push('/cart') },
-    ]);
-  };
-
-  const handleBack = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace('/(tabs)/explore/buses');
-  };
-
-  if (!bus) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.notFound}>
-          <TravelArtworkIcon name="bus" size={44} />
-          <Text style={styles.notFoundTitle}>Choose a bus service</Text>
-          <Text style={styles.notFoundText}>Return to bus search and choose a route to select seats.</Text>
-          <TouchableOpacity onPress={() => router.replace('/(tabs)/explore/buses')} style={styles.backButton}><Text style={styles.backButtonText}>Search buses</Text></TouchableOpacity>
-        </View>
-      </SafeAreaView>
+    setSelectedSeats((current) =>
+      current.includes(seat)
+        ? current.filter((item) => item !== seat)
+        : current.length >= 6
+        ? current
+        : [...current, seat]
     );
-  }
+  };
+
+  const seatPrice = selectedSeats.length * price;
+
+  const continueBooking = () => {
+    if (selectedSeats.length === 0) {
+      Alert.alert("Select a seat", "Please select at least one available seat.");
+      return;
+    }
+
+    router.push({
+      pathname: "/(tabs)/explore/bus-passengers" as any,
+      params: {
+        operator,
+        from,
+        to,
+        departure,
+        arrival,
+        date,
+        seats: selectedSeats.join(","),
+        passengers: String(selectedSeats.length),
+        price: String(seatPrice),
+        busPrice: String(price),
+      },
+    });
+  };
+
+  const renderSeat = (seat: string) => {
+    const unavailable = unavailableSeats.includes(seat);
+    const selected = selectedSeats.includes(seat);
+
+    return (
+      <Pressable
+        key={seat}
+        onPress={() => toggleSeat(seat)}
+        style={[
+          styles.seat,
+          unavailable && styles.seatUnavailable,
+          selected && styles.seatSelected,
+        ]}
+      >
+        <Text
+          style={[
+            styles.seatText,
+            unavailable && styles.unavailableText,
+            selected && styles.selectedText,
+          ]}
+        >
+          {seat}
+        </Text>
+      </Pressable>
+    );
+  };
+
+  const lowerSeats = [
+    ["L1", "L2", "L3"],
+    ["L4", "L5", "L6"],
+    ["L7", "L8", "L9"],
+    ["L10", "L11", "L12"],
+  ];
+
+  const upperSeats = [
+    ["U1", "U2", "U3"],
+    ["U4", "U5", "U6"],
+    ["U7", "U8", "U9"],
+    ["U10", "U11", "U12"],
+  ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <ScreenHeader title={`${bus.origin} to ${bus.destination}`} subtitle={search.travelDate || 'Travel date not selected'} eyebrow="LEMONTRIP / BUS SEATS" onBack={handleBack} />
+    <SafeAreaView style={styles.safe}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <Text style={styles.backText}>‹</Text>
+          </Pressable>
 
-          <View style={styles.routeCard}>
-            <View style={styles.operatorIcon}><TravelArtworkIcon name="bus" size={32} /></View>
-            <View style={styles.routeInfo}>
-              <Text style={styles.operator}>{bus.operator ?? 'Operator not provided'}</Text>
-              <Text style={styles.busType}>{bus.busType}</Text>
+          <View style={styles.brand}>
+            <Text style={styles.logo}>🍋</Text>
+            <View>
+              <Text style={styles.brandName}>LemonTrip</Text>
+              <Text style={styles.brandSubtitle}>BUS BOOKING</Text>
             </View>
-            {bus.rating !== undefined ? <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.ratingText}>{bus.rating.toFixed(1)}</Text></View> : null}
+          </View>
+          <View style={{ width: 35 }} />
+        </View>
+
+        <Text style={styles.eyebrow}>YOUR JOURNEY</Text>
+        <Text style={styles.title}>Bus details</Text>
+        <Text style={styles.subtitle}>
+          Choose your preferred seats for a comfortable journey.
+        </Text>
+
+        <View style={styles.tripCard}>
+          <View style={styles.operatorRow}>
+            <View style={styles.busIcon}>
+              <Text style={{ fontSize: 25 }}>🚌</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.operator}>{operator}</Text>
+              <Text style={styles.busType}>{busType}</Text>
+              <Text style={styles.rating}>★ 4.7 · Guest rated</Text>
+            </View>
+            <View style={styles.acBadge}>
+              <Text style={styles.acText}>AC</Text>
+            </View>
           </View>
 
-          <View style={[styles.detailsLayout, desktop && styles.detailsLayoutDesktop]}>
-            <View style={styles.mainColumn}>
-              <View style={styles.scheduleCard}>
-                <View style={styles.schedulePoint}><Text style={styles.scheduleTime}>{bus.departure ?? '—'}</Text><Text style={styles.scheduleCity}>{bus.origin}</Text><Text style={styles.scheduleCaption}>Departure time unavailable</Text></View>
-                <View style={styles.durationBlock}><View style={styles.line} /><Text style={styles.durationText}>{bus.duration ?? 'Duration unavailable'}</Text><View style={styles.line} /></View>
-                <View style={[styles.schedulePoint, styles.alignRight]}><Text style={styles.scheduleTime}>{bus.arrival ?? '—'}</Text><Text style={styles.scheduleCity}>{bus.destination}</Text><Text style={styles.scheduleCaption}>Arrival time unavailable</Text></View>
-              </View>
-
-              <View style={styles.seatSectionHeader}>
-                <View><Text style={styles.eyebrow}>PICK YOUR PLACE</Text><Text style={styles.sectionTitle}>Seat layout</Text></View>
-                <Text style={styles.selectedCount}>{selectedSeats.length} selected</Text>
-              </View>
-
-              <View style={styles.seatLegend}>
-                <Legend color={Colors.surface} border={Colors.borderStrong} label="Select" />
-                <Legend color={Colors.primary} border={Colors.primary} label="Selected" />
-              </View>
-
-              <View style={styles.seatMapCard}>
-                <View style={styles.driverRow}><TravelArtworkIcon name="bus" size={32} /><Text style={styles.driverText}>FRONT OF BUS</Text></View>
-                <View style={styles.seatGrid}>
-                  {seatRows.map((row) => (
-                    <View key={row} style={styles.seatRow}>
-                      {seatColumns.slice(0, 2).map((column) => <Seat key={`${row}${column}`} id={`${row}${column}`} selected={selectedSeats.includes(`${row}${column}`)} onPress={() => toggleSeat(`${row}${column}`)} />)}
-                      <View style={styles.aisle} />
-                      {seatColumns.slice(2).map((column) => <Seat key={`${row}${column}`} id={`${row}${column}`} selected={selectedSeats.includes(`${row}${column}`)} onPress={() => toggleSeat(`${row}${column}`)} />)}
-                    </View>
-                  ))}
-                </View>
-                <View style={styles.seatNotice}><Ionicons name="information-circle-outline" size={14} color={Colors.textLight} /><Text style={styles.seatNoticeText}>Seat selection is a local preview; live seat availability was not supplied.</Text></View>
-              </View>
-
-              <View style={styles.pointsSection}>
-                <InfoBlock icon="navigate-outline" title="Boarding points" values={bus.boardingPoints} />
-                <InfoBlock icon="flag-outline" title="Dropping points" values={bus.droppingPoints} />
-              </View>
+          <View style={styles.routeRow}>
+            <View>
+              <Text style={styles.time}>{departure}</Text>
+              <Text style={styles.city}>{from}</Text>
             </View>
+            <View style={styles.routeMiddle}>
+              <Text style={styles.duration}>{duration}</Text>
+              <View style={styles.routeLine}>
+                <View style={styles.dot} />
+                <View style={styles.line} />
+                <Text>🚌</Text>
+                <View style={styles.line} />
+                <View style={styles.dot} />
+              </View>
+              <Text style={styles.direct}>Direct journey</Text>
+            </View>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text style={styles.time}>{arrival}</Text>
+              <Text style={styles.city}>{to}</Text>
+            </View>
+          </View>
 
-            {desktop ? <BookingSummary busName={`${bus.origin} to ${bus.destination}`} price={bus.price} selectedSeats={selectedSeats} total={total} onContinue={handleContinue} continued={continued} /> : null}
+          <View style={styles.separator} />
+          <Text style={styles.dateText}>▣  {date}</Text>
+        </View>
+
+        <View style={styles.sectionHeading}>
+          <Text style={styles.sectionTitle}>Select your seats</Text>
+          <Text style={styles.selectedCount}>
+            {selectedSeats.length} selected
+          </Text>
+        </View>
+
+        <View style={styles.legend}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "#FFFFFF" }]} />
+            <Text style={styles.legendText}>Available</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: GREEN }]} />
+            <Text style={styles.legendText}>Selected</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendBox, { backgroundColor: "#D7DEDA" }]} />
+            <Text style={styles.legendText}>Booked</Text>
           </View>
         </View>
+
+        <View style={styles.busLayout}>
+          <View style={styles.driverRow}>
+            <Text style={styles.driverLabel}>FRONT OF BUS</Text>
+            <Text style={styles.steering}>◉</Text>
+          </View>
+
+          <View style={styles.deckSelector}>
+            {(["Lower", "Upper"] as const).map((item) => (
+              <Pressable
+                key={item}
+                onPress={() => setDeck(item)}
+                style={[
+                  styles.deckButton,
+                  deck === item && styles.deckActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.deckText,
+                    deck === item && styles.deckTextActive,
+                  ]}
+                >
+                  {item} deck
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <Text style={styles.deckHint}>
+            {deck === "Lower" ? "Lower deck · Sleeper berths" : "Upper deck · Sleeper berths"}
+          </Text>
+
+          {(deck === "Lower" ? lowerSeats : upperSeats).map(
+            (row, index) => (
+              <View key={index} style={styles.seatRow}>
+                {row.map((seat, seatIndex) => (
+                  <React.Fragment key={seat}>
+                    {renderSeat(seat)}
+                    {seatIndex === 0 && <View style={styles.aisle} />}
+                  </React.Fragment>
+                ))}
+              </View>
+            )
+          )}
+
+          <Text style={styles.layoutNote}>
+            Seat layout is illustrative. Confirm availability before payment.
+          </Text>
+        </View>
+
+        <View style={styles.summaryCard}>
+          <Text style={styles.sectionTitle}>Booking summary</Text>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Selected seats</Text>
+            <Text style={styles.summaryValue}>
+              {selectedSeats.length ? selectedSeats.join(", ") : "None"}
+            </Text>
+          </View>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Price per seat</Text>
+            <Text style={styles.summaryValue}>₹{price}</Text>
+          </View>
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Passengers</Text>
+            <Text style={styles.summaryValue}>{selectedSeats.length}</Text>
+          </View>
+
+          <View style={styles.separator} />
+
+          <View style={styles.summaryRow}>
+            <Text style={styles.totalLabel}>Total amount</Text>
+            <Text style={styles.totalPrice}>₹{seatPrice.toLocaleString("en-IN")}</Text>
+          </View>
+
+          <Pressable style={styles.continueButton} onPress={continueBooking}>
+            <Text style={styles.continueText}>Continue to passenger details</Text>
+            <Text style={styles.arrow}>→</Text>
+          </Pressable>
+        </View>
+
+        <Text style={styles.footer}>
+          🍋 LemonTrip · Travel smarter, travel better.
+        </Text>
       </ScrollView>
-
-      {!desktop ? (
-        <View style={styles.mobileBar}>
-          <View style={styles.mobileSummary}><Text style={styles.mobileSeats}>{selectedSeats.length ? selectedSeats.join(', ') : 'No seats selected'}</Text><Text style={styles.mobileTotal}>{selectedSeats.length ? formatPrice(total) : bus.price}</Text></View>
-          <TouchableOpacity disabled={!selectedSeats.length} onPress={handleContinue} style={[styles.continueButton, !selectedSeats.length && styles.continueDisabled]}><Text style={styles.continueText}>Continue</Text><Ionicons name="arrow-forward" size={14} color={Colors.primaryDark} /></TouchableOpacity>
-        </View>
-      ) : null}
     </SafeAreaView>
   );
 }
 
-function Seat({ id, selected, onPress }: { id: string; selected: boolean; onPress: () => void }) {
-  return (
-    <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Seat ${id}${selected ? ', selected' : ''}`} accessibilityState={{ selected }} onPress={onPress} style={[styles.seat, selected && styles.seatSelected]}>
-      <Text style={[styles.seatText, selected && styles.seatTextSelected]}>{id}</Text>
-    </TouchableOpacity>
-  );
-}
-
-function Legend({ color, border, label }: { color: string; border: string; label: string }) {
-  return <View style={styles.legendItem}><View style={[styles.legendSwatch, { backgroundColor: color, borderColor: border }]} /><Text style={styles.legendText}>{label}</Text></View>;
-}
-
-function InfoBlock({ icon, title, values }: { icon: keyof typeof Ionicons.glyphMap; title: string; values?: string[] }) {
-  return <View style={styles.infoBlock}><View style={styles.infoTitleRow}><Ionicons name={icon} size={15} color={Colors.primary} /><Text style={styles.infoTitle}>{title}</Text></View><Text style={styles.infoValue}>{values?.length ? values.join(' · ') : 'Not provided by this listing'}</Text></View>;
-}
-
-function BookingSummary({ busName, price, selectedSeats, total, onContinue, continued }: {
-  busName: string;
-  price: string;
-  selectedSeats: string[];
-  total: number;
-  onContinue: () => void;
-  continued: boolean;
-}) {
-  return (
-    <View style={styles.summaryCard}>
-      <Text style={styles.eyebrow}>TRIP SUMMARY</Text>
-      <Text style={styles.summaryTitle}>{busName}</Text>
-      <View style={styles.summaryRow}><Text style={styles.summaryLabel}>Selected seats</Text><Text style={styles.summaryValue}>{selectedSeats.length ? selectedSeats.join(', ') : 'None'}</Text></View>
-      <View style={styles.summaryRow}><Text style={styles.summaryLabel}>Price per seat</Text><Text style={styles.summaryValue}>{price}</Text></View>
-      <View style={[styles.summaryRow, styles.summaryTotalRow]}><Text style={styles.summaryTotalLabel}>Total</Text><Text style={styles.summaryTotal}>{selectedSeats.length ? formatPrice(total) : '—'}</Text></View>
-      <TouchableOpacity disabled={!selectedSeats.length} onPress={onContinue} style={[styles.continueButton, !selectedSeats.length && styles.continueDisabled]}><Text style={styles.continueText}>{continued ? 'Added to cart' : 'Continue'}</Text><Ionicons name="arrow-forward" size={14} color={Colors.primaryDark} /></TouchableOpacity>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  scroll: { flex: 1 },
-  page: { paddingBottom: 28 },
-  content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
-  routeCard: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 9, marginHorizontal: Ui.space.page, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  operatorIcon: { width: 37, height: 37, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.accentSoft },
-  routeInfo: { flex: 1 },
-  operator: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  busType: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
-  rating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  ratingText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  detailsLayout: { gap: 14, marginTop: 18, paddingHorizontal: 16 },
-  detailsLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
-  mainColumn: { flex: 1, minWidth: 0 },
-  scheduleCard: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 8, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  schedulePoint: { minWidth: 80 },
-  alignRight: { alignItems: 'flex-end' },
-  scheduleTime: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
-  scheduleCity: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', marginTop: 3 },
-  scheduleCaption: { maxWidth: 90, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 3 },
-  durationBlock: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 5 },
-  line: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
-  durationText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
-  seatSectionHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 22, marginBottom: 9 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 3 },
-  selectedCount: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  seatLegend: { flexDirection: 'row', gap: 14, marginBottom: 8 },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  legendSwatch: { width: 12, height: 12, borderWidth: 1, borderRadius: 4 },
-  legendText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
-  seatMapCard: { ...Ui.card, alignSelf: 'center', width: '100%', maxWidth: 380, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  driverRow: { minHeight: 38, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 8, marginBottom: 13, paddingRight: 4, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  driverText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', letterSpacing: 0.8 },
-  seatGrid: { gap: 8, paddingHorizontal: 8 },
-  seatRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', gap: 9 },
-  aisle: { width: 32 },
-  seat: { width: 42, height: 40, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.borderStrong, borderRadius: 9, backgroundColor: Colors.background },
-  seatSelected: { borderColor: Colors.primaryDark, backgroundColor: Colors.primary },
-  seatText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  seatTextSelected: { color: Colors.white },
-  seatNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border },
-  seatNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
-  pointsSection: { gap: 8, marginTop: 12 },
-  infoBlock: { padding: 12, borderRadius: 12, backgroundColor: Colors.surface },
-  infoTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  infoTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  infoValue: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 5 },
-  summaryCard: { ...Ui.card, width: 285, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface, position: 'sticky' as 'relative', top: 14 },
-  summaryTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 5, marginBottom: 12 },
-  summaryRow: { minHeight: 31, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  summaryLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10 },
-  summaryValue: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', textAlign: 'right' },
-  summaryTotalRow: { marginTop: 5, paddingTop: 8, borderTopWidth: 1, borderTopColor: Colors.border },
-  summaryTotalLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
-  summaryTotal: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
-  continueButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 12, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  continueDisabled: { opacity: 0.5 },
-  continueText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  mobileBar: { minHeight: 68, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingHorizontal: 15, paddingVertical: 9, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.surface },
-  mobileSummary: { flex: 1 },
-  mobileSeats: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  mobileTotal: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginTop: 3 },
-  notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  notFoundTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', marginTop: 10 },
-  notFoundText: { maxWidth: 280, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, textAlign: 'center', marginTop: 5 },
-  backButton: { minHeight: 44,  marginTop: 13, paddingHorizontal: 13, paddingVertical: 9, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  backButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  safe: { flex: 1, backgroundColor: BG },
+  content: {
+    width: "100%",
+    maxWidth: 520,
+    alignSelf: "center",
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 35,
+  },
+  header: {
+    backgroundColor: GREEN,
+    borderRadius: 10,
+    padding: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 23,
+  },
+  backButton: {
+    width: 35,
+    height: 35,
+    justifyContent: "center",
+  },
+  backText: { color: "#FFFFFF", fontSize: 31 },
+  brand: { flexDirection: "row", alignItems: "center", gap: 8 },
+  logo: { fontSize: 22 },
+  brandName: { color: "#FFFFFF", fontSize: 15, fontWeight: "900" },
+  brandSubtitle: { color: "#D6E8DC", fontSize: 8, marginTop: 2 },
+  eyebrow: {
+    color: GREEN,
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
+  title: {
+    color: DARK,
+    fontSize: 25,
+    fontWeight: "900",
+    marginTop: 5,
+  },
+  subtitle: {
+    color: "#758178",
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 5,
+    marginBottom: 17,
+  },
+  tripCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 14,
+    marginBottom: 23,
+  },
+  operatorRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  busIcon: {
+    width: 43,
+    height: 43,
+    backgroundColor: "#EAF4EC",
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  operator: { color: DARK, fontSize: 13, fontWeight: "900" },
+  busType: { color: "#78867D", fontSize: 10, marginTop: 4 },
+  rating: { color: GREEN, fontSize: 9, marginTop: 4 },
+  acBadge: {
+    backgroundColor: "#EAF4EC",
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+    borderRadius: 5,
+  },
+  acText: { color: GREEN, fontSize: 10, fontWeight: "900" },
+  routeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  time: { color: DARK, fontSize: 18, fontWeight: "900" },
+  city: { color: "#7B887E", fontSize: 10, marginTop: 4 },
+  routeMiddle: { flex: 1, alignItems: "center", paddingHorizontal: 8 },
+  duration: { color: "#758178", fontSize: 9 },
+  routeLine: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 6,
+  },
+  dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: GREEN },
+  line: { flex: 1, height: 1, backgroundColor: "#A6CBB1" },
+  direct: { color: "#849087", fontSize: 8 },
+  separator: { height: 1, backgroundColor: "#E6EDE7", marginVertical: 13 },
+  dateText: { color: DARK, fontSize: 11, fontWeight: "800" },
+  sectionHeading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  sectionTitle: { color: DARK, fontSize: 16, fontWeight: "900" },
+  selectedCount: { color: GREEN, fontSize: 11, fontWeight: "800" },
+  legend: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 13,
+  },
+  legendItem: { flexDirection: "row", alignItems: "center", gap: 6 },
+  legendBox: {
+    width: 15,
+    height: 15,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  legendText: { color: "#66746A", fontSize: 10 },
+  busLayout: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 18,
+  },
+  driverRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  driverLabel: {
+    color: "#849087",
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
+  steering: { color: GREEN, fontSize: 22 },
+  deckSelector: {
+    flexDirection: "row",
+    backgroundColor: "#F0F5F0",
+    padding: 4,
+    borderRadius: 8,
+    marginTop: 15,
+  },
+  deckButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 6,
+  },
+  deckActive: { backgroundColor: GREEN },
+  deckText: { color: "#617067", fontSize: 11, fontWeight: "800" },
+  deckTextActive: { color: "#FFFFFF" },
+  deckHint: {
+    textAlign: "center",
+    color: "#839087",
+    fontSize: 10,
+    marginVertical: 15,
+  },
+  seatRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  seat: {
+    width: 65,
+    height: 42,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#B8D2BF",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  seatUnavailable: { backgroundColor: "#D7DEDA", borderColor: "#D7DEDA" },
+  seatSelected: { backgroundColor: GREEN, borderColor: GREEN },
+  seatText: { color: GREEN, fontSize: 11, fontWeight: "900" },
+  unavailableText: { color: "#7F8B83" },
+  selectedText: { color: "#FFFFFF" },
+  aisle: { width: 24 },
+  layoutNote: {
+    color: "#89948C",
+    fontSize: 9,
+    textAlign: "center",
+    marginTop: 5,
+    lineHeight: 14,
+  },
+  summaryCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: 12,
+    padding: 15,
+  },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 13,
+    gap: 8,
+  },
+  summaryLabel: { color: "#758178", fontSize: 11 },
+  summaryValue: {
+    color: DARK,
+    fontSize: 11,
+    fontWeight: "800",
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  totalLabel: { color: DARK, fontSize: 13, fontWeight: "900" },
+  totalPrice: { color: GREEN, fontSize: 22, fontWeight: "900" },
+  continueButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: GREEN,
+    borderRadius: 8,
+    padding: 14,
+    marginTop: 18,
+  },
+  continueText: { color: "#FFFFFF", fontSize: 11, fontWeight: "900" },
+  arrow: { color: YELLOW, fontSize: 19, fontWeight: "900" },
+  footer: {
+    textAlign: "center",
+    color: "#849087",
+    fontSize: 10,
+    marginTop: 22,
+  },
 });

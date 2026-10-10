@@ -45,7 +45,7 @@ export default function FlightDetailsScreen() {
     if (!selection || !selectedFare) return;
     selectFlightFare(selectedFare);
     router.push('/flight-booking/traveller' as never);
-  }; 
+  };
   if (!selection) {
     return (
       <SafeAreaView style={styles.safeArea}>

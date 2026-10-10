@@ -145,7 +145,10 @@ export default function HomeScreen() {
               accessibilityRole="button"
               accessibilityLabel={`Show ${item.label.replace('\n', ' ')} options`}
               accessibilityState={{ selected: activeService.label === item.label }}
-              onPress={() => setActiveService(item)}>
+              onPress={() => {
+                if (item.label === 'Buses') router.push(item.route);
+                else setActiveService(item);
+              }}>
               <Ionicons name={item.icon} size={22} color={activeService.label === item.label ? Colors.primaryDark : Colors.textLight} />
               <Text numberOfLines={2} style={[styles.serviceGridLabel, activeService.label === item.label && styles.serviceGridLabelSelected]}>{item.label}</Text>
               <View style={[styles.serviceGridIndicator, activeService.label === item.label && styles.serviceGridIndicatorSelected]} />

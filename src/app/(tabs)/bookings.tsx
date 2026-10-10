@@ -223,4 +223,3 @@ const styles = StyleSheet.create({
   price: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.primaryDark },
   noticeGap: { marginTop: 4 },
 });
-
