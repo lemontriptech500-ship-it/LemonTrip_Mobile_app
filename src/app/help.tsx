@@ -29,7 +29,7 @@ export default function HelpScreen() {
 
       <SupportCard>
         <SupportHeading eyebrow="GET ANSWERS" title="Help & support" />
-        <SupportItem icon="headset-outline" title="Help center" detail="Find answers to common questions" onPress={() => goTo('/faq')} />
+        <SupportItem icon="headset-outline" title="FAQ" detail="Find answers to common questions" onPress={() => goTo('/faq')} />
         <SupportItem icon="person-outline" title="Contact us" detail="Send a message and track the reply" onPress={() => goTo('/contact')} />
         <SupportItem icon="pulse-outline" title="Status dashboard" detail="Follow the progress of your requests" onPress={() => goTo('/manage/support-requests')} last />
       </SupportCard>

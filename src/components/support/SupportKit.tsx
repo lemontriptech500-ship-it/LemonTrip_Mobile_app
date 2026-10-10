@@ -4,7 +4,8 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, type TextInputProps } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -13,15 +14,16 @@ export const goTo = (path: string) => router.push(path as Href);
 export const goBackOr = (fallback: string) => (router.canGoBack() ? router.back() : router.replace(fallback as Href));
 
 /** Page shell for help-style screens: brand header, scrollable body, optional sticky footer. */
-export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, children }: { title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; children: ReactNode }) {
+export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, scrollRef, onContentSizeChange, children }: { title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; scrollRef?: Ref<ScrollView>; onContentSizeChange?: (width: number, height: number) => void; children: ReactNode }) {
+  const insets = useSafeAreaInsets();
   return (
     <AppScreen>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={s.page}>
+        <ScrollView ref={scrollRef} onContentSizeChange={onContentSizeChange} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={s.page}>
           <ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={onBack ?? (() => goBackOr('/settings'))} />
           {children}
         </ScrollView>
-        {footer ? <View style={s.footer}><View style={s.footerInner}>{footer}</View></View> : null}
+        {footer ? <View style={s.footer}><View style={[s.footerInner, { paddingBottom: Math.max(insets.bottom, 12) + 4 }]}>{footer}</View></View> : null}
       </KeyboardAvoidingView>
     </AppScreen>
   );
