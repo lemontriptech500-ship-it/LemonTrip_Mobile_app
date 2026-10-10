@@ -57,7 +57,7 @@ export default function BusDetailsScreen() {
     }
 
     router.push({
-      pathname: "/(tabs)/bookings" as any,
+      pathname: "/(tabs)/explore/bus-passengers" as any,
       params: {
         operator,
         from,

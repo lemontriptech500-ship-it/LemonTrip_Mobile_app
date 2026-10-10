@@ -1,0 +1,115 @@
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { FareSummary, JourneySummary } from '@/components/trains/TrainCards';
+import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
+import { Colors } from '@/constants/colors';
+import { CLASS_INFO, formatLongDate, getAvailability, inr } from '@/data/trains';
+import { currentFare, useTrainBooking } from '@/utils/trainBookingStore';
+import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+export default function TrainReviewScreen() {
+  const { selection, passengers, contact, options } = useTrainBooking();
+  const [agreed, setAgreed] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const derived = currentFare();
+  if (!selection || !derived || passengers.some((p) => !p.name.trim())) {
+    return <FlowScreen><ScrollView><ScreenHeader title="Review booking" eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr(TRAIN_ROUTES.passengers)} /><EmptyState icon="document-text-outline" title="Nothing to review yet" text="Select a train and add passenger details first." action={<PrimaryButton label="Search trains" onPress={() => replaceTo(TRAIN_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+  }
+  const { fare, result } = derived;
+  const availability = getAvailability(selection.trainId, selection.classCode, selection.date, selection.quota);
+  const proceed = () => { if (!agreed) { setShowError(true); return; } goTo(TRAIN_ROUTES.payment); };
+
+  return (
+    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+        <View style={s.content}>
+          <ScreenHeader title="Review your booking" subtitle="Check every detail before you pay." eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr(TRAIN_ROUTES.passengers)} />
+          <TrainProgress current={2} />
+          <JourneySummary result={result} date={selection.date} className={CLASS_INFO[selection.classCode].name} quota={selection.quota} />
+
+          <Card>
+            <SectionTitle eyebrow="JOURNEY" title="Trip details" right={<TouchableOpacity accessibilityRole="button" onPress={() => goTo(TRAIN_ROUTES.details)}><Text style={s.edit}>Change</Text></TouchableOpacity>} />
+            <Line icon="calendar-outline" label="Date" value={formatLongDate(selection.date)} />
+            <Line icon="log-in-outline" label="Boarding" value={`${result.from.code} · ${result.departure}`} />
+            <Line icon="log-out-outline" label="Destination" value={`${result.to.code} · ${result.arrival}${result.arrivalDayOffset ? ` (+${result.arrivalDayOffset}d)` : ''}`} />
+            <View style={s.status}><Text style={s.statusLabel}>Current availability</Text><Pill label={availability.label} tone={availability.tone === 'good' ? 'good' : availability.tone === 'warn' ? 'warn' : 'bad'} /></View>
+          </Card>
+
+          {availability.status !== 'AVL' ? <Notice tone="warn" icon="alert-circle-outline" title={availability.status === 'WL' ? 'Waitlisted ticket' : 'RAC ticket'}>{options.confirmedOnly ? 'You asked to book only if confirmed. Because confirmed berths are not available, this booking may be skipped.' : availability.status === 'WL' ? 'Your seat will be confirmed only if earlier passengers cancel. Full refund is issued if it stays waitlisted after chart preparation.' : 'RAC passengers share a berth until the chart confirms a full berth.'}</Notice> : null}
+
+          <Card>
+            <SectionTitle eyebrow="TRAVELLERS" title={`${passengers.length} passenger${passengers.length > 1 ? 's' : ''}`} right={<TouchableOpacity accessibilityRole="button" onPress={() => goBackOr(TRAIN_ROUTES.passengers)}><Text style={s.edit}>Edit</Text></TouchableOpacity>} />
+            {passengers.map((p, i) => (
+              <View key={i} style={[s.pax, i > 0 && s.paxBorder]}>
+                <View style={s.avatar}><Text style={s.avatarText}>{p.name.trim().charAt(0).toUpperCase()}</Text></View>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={s.paxName} numberOfLines={1}>{p.name.trim()}</Text>
+                  <Text style={s.paxMeta}>{p.age} yrs · {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} · {p.berth}</Text>
+                </View>
+              </View>
+            ))}
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="CONTACT" title="E-ticket delivery" right={<TouchableOpacity accessibilityRole="button" onPress={() => goBackOr(TRAIN_ROUTES.passengers)}><Text style={s.edit}>Edit</Text></TouchableOpacity>} />
+            <Line icon="mail-outline" label="Email" value={contact.email} />
+            <Line icon="call-outline" label="Mobile" value={`+91 ${contact.phone}`} />
+            <View style={s.opts}>
+              {options.autoUpgrade ? <Pill icon="trending-up-outline" label="Auto-upgrade on" /> : null}
+              {options.confirmedOnly ? <Pill icon="checkmark-done-outline" label="Confirmed only" /> : null}
+            </View>
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="FARE" title="Price breakdown" />
+            <FareSummary fare={fare} />
+          </Card>
+
+          <View style={s.info}>
+            <View style={s.infoHead}><Ionicons name="alert-circle-outline" size={18} color={Colors.primaryDark} /><Text style={s.infoTitle}>Important information</Text></View>
+            {['Carry a valid photo ID in original. Passenger names must match it exactly.', 'Cancellation charges depend on the class and how close to departure you cancel.', 'Charts are prepared about 4 hours before departure; final berths are shown on your ticket.', 'Booking is confirmed only after successful payment.'].map((line) => (
+              <View key={line} style={s.bullet}><Text style={s.dot}>•</Text><Text style={s.infoText}>{line}</Text></View>
+            ))}
+          </View>
+
+          <TouchableOpacity accessibilityRole="checkbox" accessibilityState={{ checked: agreed }} onPress={() => { setAgreed((v) => !v); setShowError(false); }} style={s.agree}>
+            <Ionicons name={agreed ? 'checkbox' : 'square-outline'} size={22} color={showError ? Colors.error : Colors.primary} />
+            <Text style={s.agreeText}>I have verified the passenger details and agree to the booking and cancellation terms.</Text>
+          </TouchableOpacity>
+          {showError ? <Text style={s.error}>Please accept the terms to continue.</Text> : null}
+        </View>
+      </ScrollView>
+    </FlowScreen>
+  );
+}
+
+function Line({ icon, label, value }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; value: string }) {
+  return <View style={s.line}><Ionicons name={icon} size={16} color={Colors.primary} /><Text style={s.lineLabel}>{label}</Text><Text style={s.lineValue} numberOfLines={2}>{value}</Text></View>;
+}
+
+const s = StyleSheet.create({
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  edit: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary },
+  line: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7 },
+  lineLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight, width: 84 },
+  lineValue: { flex: 1, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark, textAlign: 'right' },
+  status: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
+  statusLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight },
+  pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
+  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
+  avatarText: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.primaryDark },
+  paxName: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
+  paxMeta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  opts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
+  info: { marginHorizontal: 20, marginBottom: 14, padding: 16, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
+  infoHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  infoTitle: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primaryDark },
+  bullet: { flexDirection: 'row', gap: 8, marginTop: 5 },
+  dot: { color: Colors.primary, fontSize: 14, lineHeight: 19 },
+  infoText: { flex: 1, fontFamily: 'Manrope', fontSize: 12, lineHeight: 19, color: Colors.textDark },
+  agree: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginHorizontal: 20, marginTop: 2 },
+  agreeText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, color: Colors.textDark },
+  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginHorizontal: 20, marginTop: 8 },
+});

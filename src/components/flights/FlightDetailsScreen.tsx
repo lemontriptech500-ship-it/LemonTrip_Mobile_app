@@ -1,13 +1,12 @@
-import { Ui } from '@/constants/theme';
-import { Colors } from '@/constants/colors';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
-import { addToCart } from '@/utils/cartStore';
 import FareSummary from './FareSummary';
 import FlightFareOptions from './FlightFareOptions';
 import FlightItineraryCard from './FlightItineraryCard';
@@ -42,19 +41,11 @@ export default function FlightDetailsScreen() {
   const [conditionsFare, setConditionsFare] = useState<FlightFareOption | null>(null);
   const selectedFare = fares.find((fare) => fare.id === selectedFareId) ?? null;
 
-  const handleContinue = () => {
+    const handleContinue = () => {
     if (!selection || !selectedFare) return;
     selectFlightFare(selectedFare);
-    addToCart({
-      id: `flight-${selection.offer.id}-${selectedFare.id}`,
-      serviceName: 'Flight',
-      itemName: `${selection.offer.airline.name} ${selection.offer.flightNumber} · ${selection.offer.departure.airportCode} to ${selection.offer.arrival.airportCode} · ${selectedFare.name}`,
-      price: formatPrice(selectedFare.price.total, selectedFare.price.currency),
-      tripDate: selection.request.departureDate,
-    });
-    router.push('/cart');
+    router.push('/flight-booking/traveller' as never);
   };
-
   if (!selection) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -102,7 +93,7 @@ export default function FlightDetailsScreen() {
               <FlightTripSummary fareOption={selectedFare} onContinue={handleContinue} />
               <View style={styles.secureNote}>
                 <Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} />
-                <Text style={styles.secureText}>Fare details are shown as supplied by the airline.</Text>
+                <Text style={styles.secureText}>{selection.offer.isDemo ? 'Sample fare details only. This journey cannot be booked until the flight service is connected.' : 'Fare details are shown as supplied by the airline.'}</Text>
               </View>
             </View>
           </View>

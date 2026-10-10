@@ -107,7 +107,7 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   label: {
-    fontFamily: 'PlusJakartaSans_800ExtraBold',
+    fontFamily: 'Manrope',
     fontSize: 11,
     marginTop: 4,
   },
