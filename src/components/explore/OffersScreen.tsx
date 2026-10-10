@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors';
+import { BrandMotif } from '@/components/BrandMotif';
 import type { Offer } from '@/data/mock/offers';
 import {
   getOfferCategory,
@@ -170,17 +171,17 @@ export default function OffersScreen() {
           {/* ================= HERO / TITLE ================= */}
 
           <View style={styles.heroSection}>
+            <BrandMotif />
             <Text style={styles.heroEyebrow}>
-              LIMITED-TIME COLLECTION
+              TRAVEL MORE, SPEND LESS
             </Text>
 
             <Text style={styles.heroTitle}>
-              Offers worth packing for.
+              Offers worth travelling for.
             </Text>
 
             <Text style={styles.heroSubtitle}>
-              Member-only fares and curated package savings,
-              with every condition shown upfront.
+              Find a little extra value for your next journey.
             </Text>
           </View>
 
@@ -356,78 +357,15 @@ export default function OffersScreen() {
           {/* ================= FOOTER ================= */}
 
           <View style={styles.footer}>
-
-            <View style={styles.footerBrandSection}>
-              <View style={styles.footerLogoRow}>
-                <View style={styles.footerLogo}>
-                  <Text style={styles.footerLogoText}>L</Text>
-                </View>
-
-                <Text style={styles.footerBrand}>
-                  LemonTrip
-                </Text>
-              </View>
-
-              <Text style={styles.footerDescription}>
-                India's premier luxury and curated travel
-                platform.
-              </Text>
+            <Image source={require('../../../assets/images/App Logo.png')} style={styles.footerLogoImage} resizeMode="cover" />
+            <Text style={styles.footerTagline}>Travel, thoughtfully planned.</Text>
+            <View style={styles.footerLinks}>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore')}><Text style={styles.footerLink}>Explore</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/packages')}><Text style={styles.footerLink}>Packages</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/offers')}><Text style={styles.footerLink}>Offers</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/contact')}><Text style={styles.footerLink}>Support</Text></TouchableOpacity>
             </View>
-
-            <View style={styles.footerColumn}>
-              <Text style={styles.footerHeading}>
-                Explore
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => router.navigate('/(tabs)/explore/packages')}
-              >
-                <Text style={styles.footerLink}>
-                  Packages
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => router.navigate('/(tabs)/explore/offers')}
-              >
-                <Text style={styles.footerLink}>
-                  Offers
-                </Text>
-              </TouchableOpacity>
-
-              <Text style={styles.footerLink}>
-                Travel stories
-              </Text>
-            </View>
-
-            <View style={styles.footerColumn}>
-              <Text style={styles.footerHeading}>
-                Support
-              </Text>
-
-              <Text style={styles.footerLink}>
-                Contact
-              </Text>
-
-              <Text style={styles.footerLink}>
-                Services
-              </Text>
-
-              <Text style={styles.footerLink}>
-                Privacy
-              </Text>
-            </View>
-
-            <View style={styles.assistCard}>
-              <Text style={styles.assistSmall}>
-                24/7 TRAVELER ASSIST
-              </Text>
-
-              <Text style={styles.assistNumber}>
-                +91 11 4123 8888
-              </Text>
-            </View>
-
+            <Text style={styles.footerCopyright}>© LemonTrip. Made for the journey.</Text>
           </View>
 
         </View>
@@ -674,589 +612,75 @@ function OfferCard({
 ========================================================= */
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F5F8F5',
-  },
-
-  page: {
-    paddingBottom: 40,
-  },
-
-  pageContainer: {
-    width: '100%',
-    maxWidth: 1380,
-    alignSelf: 'center',
-  },
-
-  /* ================= HERO ================= */
-
-  heroSection: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 48,
-    paddingBottom: 25,
-  },
-
-  heroEyebrow: {
-    color: Colors.secondary,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    fontWeight: '900',
-    letterSpacing: 1.2,
-    textAlign: 'center',
-  },
-
-  heroTitle: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 29,
-    lineHeight: 36,
-    fontWeight: '900',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-
-  heroSubtitle: {
-    maxWidth: 650,
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 9,
-    lineHeight: 15,
-    textAlign: 'center',
-    marginTop: 7,
-  },
-
-  /* ================= NOTICE ================= */
-
-  sourceNotice: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 7,
-    marginHorizontal: 22,
-    marginBottom: 10,
-    padding: 10,
-    borderRadius: 11,
-    backgroundColor: Colors.surfaceMuted,
-  },
-
-  sourceNoticeText: {
-    flex: 1,
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    lineHeight: 13,
-  },
-
-  /* ================= CATEGORY ================= */
-
-  categorySection: {
-    marginTop: 8,
-  },
-
-  filterLabel: {
-    paddingHorizontal: 22,
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '900',
-    letterSpacing: 0.9,
-  },
-
-  categoryRow: {
-    gap: 7,
-    paddingHorizontal: 22,
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-
-  categoryChip: {
-    paddingHorizontal: 13,
-    paddingVertical: 8,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.white,
-  },
-
-  categoryChipActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-  },
-
-  categoryText: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    fontWeight: '700',
-  },
-
-  categoryTextActive: {
-    color: Colors.white,
-  },
-
-  /* ================= RESULTS ================= */
-
-  resultsHeading: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    paddingHorizontal: 22,
-    marginTop: 28,
-    marginBottom: 13,
-  },
-
-  resultsEyebrow: {
-    color: Colors.secondary,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '900',
-    letterSpacing: 0.9,
-  },
-
-  resultsTitle: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 18,
-    fontWeight: '900',
-    marginTop: 4,
-  },
-
-  resultsCount: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-  },
-
-  /* ================= GRID ================= */
-
-  offerGrid: {
-    gap: 14,
-    paddingHorizontal: 22,
-  },
-
-  offerGridDesktop: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-
-  /* ================= OFFER CARD ================= */
-
-  offerCard: {
-    overflow: 'hidden',
-    borderRadius: 17,
-    backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: '#E4EBE6',
-  },
-
-  offerCardDesktop: {
-    width: '31.8%',
-    marginBottom: 14,
-  },
-
-  imageWrap: {
-    height: 190,
-    position: 'relative',
-    backgroundColor: Colors.surfaceMuted,
-  },
-
-  offerImage: {
-    width: '100%',
-    height: '100%',
-  },
-
-  discountBadge: {
-    position: 'absolute',
-    top: 11,
-    left: 11,
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-    borderRadius: 8,
-    backgroundColor: Colors.accent,
-  },
-
-  discountText: {
-    color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '900',
-  },
-
-  offerBody: {
-    padding: 13,
-  },
-
-  offerMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 7,
-  },
-
-  offerCategory: {
-    color: Colors.secondary,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '900',
-    letterSpacing: 0.7,
-  },
-
-  validityBadge: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 6,
-    fontWeight: '900',
-    letterSpacing: 0.6,
-  },
-
-  validityActive: {
-    color: Colors.secondary,
-  },
-
-  validityExpired: {
-    color: Colors.error,
-  },
-
-  offerTitle: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '900',
-    marginTop: 6,
-  },
-
-  offerDescription: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    lineHeight: 13,
-    marginTop: 5,
-  },
-
-  validityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginTop: 9,
-  },
-
-  validityText: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-  },
-
-  /* ================= COUPON ================= */
-
-  couponRow: {
-    minHeight: 47,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 7,
-    marginTop: 10,
-    paddingHorizontal: 9,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    backgroundColor: '#FAFCFA',
-  },
-
-  couponInfo: {
-    flex: 1,
-  },
-
-  couponLabel: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 6,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-  },
-
-  couponCode: {
-    color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '900',
-    marginTop: 2,
-  },
-
-  noCoupon: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-  },
-
-  copyButton: {
-    minHeight: 31,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 8,
-    backgroundColor: Colors.white,
-  },
-
-  copyButtonDone: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-  },
-
-  copyText: {
-    color: Colors.primary,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '800',
-  },
-
-  copyTextDone: {
-    color: Colors.white,
-  },
-
-  copyConfirmation: {
-    color: Colors.secondary,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '800',
-    marginTop: 4,
-  },
-
-  /* ================= TERMS ================= */
-
-  termsArea: {
-    marginTop: 9,
-  },
-
-  termsLabel: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 6,
-    fontWeight: '800',
-    letterSpacing: 0.7,
-  },
-
-  termsText: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    lineHeight: 11,
-    marginTop: 3,
-  },
-
-  /* ================= BOOK ================= */
-
-  bookButton: {
-    minHeight: 39,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginTop: 11,
-    borderRadius: 9,
-    backgroundColor: Colors.accent,
-  },
-
-  bookButtonDisabled: {
-    backgroundColor: Colors.surfaceMuted,
-  },
-
-  bookButtonText: {
-    color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    fontWeight: '800',
-  },
-
-  bookButtonTextDisabled: {
-    color: Colors.textLight,
-  },
-
-  /* ================= STATES ================= */
-
-  skeletonCard: {
-    overflow: 'hidden',
-    borderRadius: 17,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.white,
-  },
-
-  skeletonCardDesktop: {
-    width: '31.8%',
-  },
-
-  skeletonImage: {
-    height: 190,
-    backgroundColor: Colors.surfaceMuted,
-  },
-
-  skeletonLine: {
-    width: '60%',
-    height: 11,
-    marginTop: 13,
-    marginHorizontal: 13,
-    borderRadius: 6,
-    backgroundColor: Colors.surfaceMuted,
-  },
-
-  skeletonLineShort: {
-    width: '38%',
-    height: 8,
-    marginTop: 8,
-    marginBottom: 15,
-    marginHorizontal: 13,
-    borderRadius: 6,
-    backgroundColor: Colors.surfaceMuted,
-  },
-
-  stateCard: {
-    minHeight: 180,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginHorizontal: 22,
-    padding: 20,
-    borderRadius: 17,
-    backgroundColor: Colors.white,
-  },
-
-  stateTitle: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    fontWeight: '900',
-    textAlign: 'center',
-  },
-
-  stateText: {
-    maxWidth: 300,
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    lineHeight: 13,
-    textAlign: 'center',
-  },
-
-  validityNote: {
-    flexDirection: 'row',
-    gap: 6,
-    alignItems: 'center',
-    marginHorizontal: 22,
-    marginTop: 10,
-  },
-
-  validityNoteText: {
-    flex: 1,
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    lineHeight: 12,
-  },
-
-  /* ================= FOOTER ================= */
-
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 35,
-    marginTop: 80,
-    marginHorizontal: 22,
-    paddingTop: 30,
-    paddingBottom: 15,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-
-  footerBrandSection: {
-    width: 230,
-  },
-
-  footerLogoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-
-  footerLogo: {
-    width: 25,
-    height: 25,
-    borderRadius: 13,
-    backgroundColor: Colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  footerLogoText: {
-    color: Colors.primaryDark,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-
-  footerBrand: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '900',
-  },
-
-  footerDescription: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    lineHeight: 12,
-    marginTop: 9,
-    maxWidth: 180,
-  },
-
-  footerColumn: {
-    minWidth: 100,
-    gap: 7,
-  },
-
-  footerHeading: {
-    color: Colors.textDark,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    fontWeight: '900',
-    marginBottom: 3,
-  },
-
-  footerLink: {
-    color: Colors.textLight,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-  },
-
-  assistCard: {
-    width: 190,
-    minHeight: 70,
-    borderRadius: 14,
-    backgroundColor: Colors.primaryDark,
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-  },
-
-  assistSmall: {
-    color: Colors.accent,
-    fontFamily: 'Manrope',
-    fontSize: 6,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-
-  assistNumber: {
-    color: Colors.white,
-    fontFamily: 'Manrope',
-    fontSize: 9,
-    fontWeight: '900',
-    marginTop: 5,
-  },
+  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
+  page: { paddingBottom: 28 },
+  pageContainer: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
+  heroSection: { position: 'relative', overflow: 'hidden', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 32, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
+  heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.4 },
+  heroTitle: { maxWidth: 580, color: Colors.white, fontFamily: 'Manrope', fontSize: 28, lineHeight: 35, fontWeight: '800', marginTop: 8 },
+  heroSubtitle: { maxWidth: 520, color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, marginTop: 6 },
+  sourceNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginHorizontal: 20, marginTop: 18, padding: 13, borderRadius: 16, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  sourceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
+  categorySection: { marginTop: 22 },
+  filterLabel: { paddingHorizontal: 20, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.1 },
+  categoryRow: { gap: 8, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 4 },
+  categoryChip: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 15, borderRadius: 20, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  categoryChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary },
+  categoryText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  categoryTextActive: { color: Colors.white },
+  resultsHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, paddingHorizontal: 20, marginTop: 22, marginBottom: 12 },
+  resultsEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  resultsTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '800', marginTop: 4 },
+  resultsCount: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  offerGrid: { gap: 14, paddingHorizontal: 20 },
+  offerGridDesktop: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  offerCard: { overflow: 'hidden', borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  offerCardDesktop: { width: '31.8%', marginBottom: 14 },
+  imageWrap: { height: 190, position: 'relative', backgroundColor: Colors.surfaceMuted },
+  offerImage: { width: '100%', height: '100%' },
+  discountBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: Colors.accent },
+  discountText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  offerBody: { padding: 15 },
+  offerMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  offerCategory: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  validityBadge: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
+  validityActive: { color: Colors.secondary },
+  validityExpired: { color: Colors.error },
+  offerTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 17, lineHeight: 23, fontWeight: '800', marginTop: 7 },
+  offerDescription: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 6 },
+  validityRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 11 },
+  validityText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  couponRow: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 12, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderStyle: 'dashed', borderRadius: 12, backgroundColor: Colors.background },
+  couponInfo: { flex: 1 },
+  couponLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.7 },
+  couponCode: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', marginTop: 2 },
+  noCoupon: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  copyButton: { minHeight: 36, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 10, backgroundColor: Colors.surface },
+  copyButtonDone: { borderColor: Colors.primary, backgroundColor: Colors.primary },
+  copyText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  copyTextDone: { color: Colors.white },
+  copyConfirmation: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginTop: 5 },
+  termsArea: { marginTop: 12 },
+  termsLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.7 },
+  termsText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, lineHeight: 16, marginTop: 3 },
+  bookButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 13, borderRadius: 15, backgroundColor: Colors.accent },
+  bookButtonDisabled: { backgroundColor: Colors.surfaceMuted },
+  bookButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  bookButtonTextDisabled: { color: Colors.textLight },
+  skeletonCard: { overflow: 'hidden', borderRadius: 20, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface, paddingBottom: 16 },
+  skeletonCardDesktop: { width: '31.8%' },
+  skeletonImage: { height: 190, backgroundColor: Colors.surfaceMuted },
+  skeletonLine: { width: '60%', height: 12, marginTop: 14, marginHorizontal: 15, borderRadius: 6, backgroundColor: Colors.surfaceMuted },
+  skeletonLineShort: { width: '38%', height: 9, marginTop: 9, marginHorizontal: 15, borderRadius: 6, backgroundColor: Colors.surfaceMuted },
+  stateCard: { minHeight: 190, alignItems: 'center', justifyContent: 'center', gap: 9, marginHorizontal: 20, padding: 22, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  stateTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', textAlign: 'center' },
+  stateText: { maxWidth: 320, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, textAlign: 'center' },
+  validityNote: { flexDirection: 'row', gap: 7, alignItems: 'center', marginHorizontal: 20, marginTop: 12 },
+  validityNoteText: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
+  footer: { marginTop: 24, paddingTop: 16, paddingHorizontal: 20, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
+  footerLogoImage: { width: 118, height: 38 },
+  footerTagline: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  footerLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 18 },
+  footerLink: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
 });
