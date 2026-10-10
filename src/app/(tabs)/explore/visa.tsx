@@ -1,4 +1,5 @@
 import { visaCountryFlag } from '@/components/visa/VisaHeader';
+import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import { Colors } from '@/constants/colors';
 import type { VisaCountry } from '@/types/content';
 import { getVisaServices } from '@/utils/visaService';
@@ -24,18 +25,23 @@ export default function VisaScreen() {
   const visible = countries.filter(country => `${country.name} ${country.visaType}`.toLowerCase().includes(query.trim().toLowerCase()));
   const destination = countries.find(country => country.id === selected);
   return <View style={{ flex: 1, backgroundColor: Colors.background }}>
-    <ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-      <View style={styles.directoryHeading}><Text style={styles.directoryTitle}>Visa Services</Text><TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={styles.applications}><Ionicons name="document-text-outline" size={18} color={Colors.secondary} /><Text style={styles.applicationsText}>My applications</Text></TouchableOpacity></View>
+    <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ExploreSectionIntro eyebrow="TRAVEL WITH CONFIDENCE" title="Visa Services" subtitle="Explore visa guidance for your next destination.">
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={styles.applications}><Ionicons name="document-text-outline" size={18} color={Colors.primaryDark} /><Text style={styles.applicationsText}>My applications</Text></TouchableOpacity>
+      </ExploreSectionIntro>
+      <View style={styles.page}>
       <View style={styles.search}><Ionicons name="search-outline" size={17} color={Colors.textLight} /><TextInput accessibilityLabel="Search countries" value={query} onChangeText={setQuery} placeholder="Search country or visa" placeholderTextColor={Colors.textLight} style={styles.input} /></View>
       {loading ? <ActivityIndicator accessibilityLabel="Loading visa services" color={Colors.secondary} /> : result?.error ? <View style={styles.state}><Text style={styles.body}>{result.error}</Text><TouchableOpacity accessibilityRole="button" style={styles.button} onPress={() => setAttempt(value => value + 1)}><Text style={styles.buttonText}>Try again</Text></TouchableOpacity></View> : visible.length === 0 ? <Text style={styles.body}>No visa services found. Try another country.</Text> : visible.map(country => <TouchableOpacity key={country.id} accessibilityRole="radio" accessibilityLabel={`${country.name}, ${country.visaType}`} accessibilityState={{ selected: selected === country.id, checked: selected === country.id }} onPress={() => setSelected(country.id)} style={[styles.country, selected === country.id && styles.selected]}>
         <Text style={styles.flag}>{visaCountryFlag(country.name)}</Text><View style={styles.countryCopy}><Text style={styles.countryName}>{country.name}</Text><Text style={styles.body}>{country.visaType}</Text></View><Ionicons name={selected === country.id ? 'radio-button-on' : 'radio-button-off'} size={22} color={selected === country.id ? Colors.secondary : Colors.textLight} />
       </TouchableOpacity>)}
+      </View>
     </ScrollView>
     {!loading && !result?.error && countries.length > 0 ? <View style={styles.footer}><TouchableOpacity accessibilityRole="button" disabled={!destination} style={[styles.button, !destination && styles.disabled]} onPress={() => { if (destination) { blurWebNavigationFocus(); router.push({ pathname: '/(tabs)/explore/visa/[id]', params: { id: destination.id } }); } }}><Text style={styles.buttonText}>Continue</Text></TouchableOpacity></View> : null}
   </View>;
 }
 const styles = StyleSheet.create({
-  directoryHeading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }, directoryTitle: { fontFamily: 'Manrope', fontSize: 20, fontWeight: '800', color: Colors.primary }, applications: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 6 }, applicationsText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.secondary },
+  scrollContent: { paddingBottom: 24 },
+  applications: { minHeight: 42, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 14, paddingHorizontal: 14, borderRadius: 22, backgroundColor: Colors.white }, applicationsText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.primaryDark },
   page: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: 16, gap: 10, paddingBottom: 24 },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 8, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginBottom: 4 },
   input: { flex: 1, minWidth: 0, paddingVertical: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13 },

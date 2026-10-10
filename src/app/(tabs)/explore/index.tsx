@@ -1,4 +1,4 @@
-import { BrandMotif } from '@/components/BrandMotif';
+import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -128,11 +128,7 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <View style={styles.exploreIntro}>
-            <BrandMotif />
-            <Text style={styles.exploreEyebrow}>DESTINATION DISCOVERY</Text>
-            <Text style={styles.exploreTitle}>Discover somewhere new.</Text>
-            <Text style={styles.exploreSubtitle}>Search by place, then narrow your journey by travel style.</Text>
+          <ExploreSectionIntro eyebrow="DESTINATION DISCOVERY" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style.">
             <View style={styles.quickSearchRow}>
               <Text style={styles.quickSearchLabel}>POPULAR</Text>
               {popularSearches.slice(0, 3).map((destination) => (
@@ -141,7 +137,7 @@ export default function ExploreScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </ExploreSectionIntro>
 
           {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
@@ -378,10 +374,6 @@ const SOFT_GREEN = Colors.surfaceMuted;
 const SHADOW = Ui.shadow;
 
 const styles = StyleSheet.create({
-  exploreIntro: { paddingHorizontal: Ui.space.page, paddingTop: 14, paddingBottom: 34, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
-  exploreEyebrow: { ...Ui.eyebrow, color: Colors.accent },
-  exploreTitle: { fontFamily: 'Manrope', fontSize: 28, lineHeight: 35, fontWeight: '800', color: Colors.white, marginTop: 8 },
-  exploreSubtitle: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 6 },
   quickSearchRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 7, marginTop: 14 },
   quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
   quickSearchChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 11, borderRadius: 16, backgroundColor: Colors.onDarkSurface, borderWidth: 1, borderColor: Colors.onDarkBorder },
