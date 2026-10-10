@@ -1,50 +1,46 @@
-import { AppScreen } from '@/components/AppScreen';
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { SupportScreen, supportStyles as s } from '@/components/support/SupportScreen';
 import { Colors } from '@/constants/colors';
 import { supportContact } from '@/constants/navigation';
-import { Ui } from '@/constants/theme';
+import { getAccessToken, useAuth } from '@/utils/authStore';
+import { submitSupportRequest, supportTopics, type SupportTopic } from '@/utils/supportApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const initial = { name: '', email: '', phone: '', subject: '', message: '' };
 export default function ContactScreen() {
-  const { reference } = useLocalSearchParams<{ reference?: string }>();
-  const [form, setForm] = useState({ ...initial, subject: reference ? `Help with reference ${reference}` : '' });
-  const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState('');
-  const [sent, setSent] = useState(false);
-  const submit = async () => {
-    setSent(false);
-    if (!form.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) || !form.subject.trim() || !form.message.trim()) { setFeedback('Please add your name, a valid email, subject, and message.'); return; }
-    setBusy(true); setFeedback('');
-    try {
-      const endpoint = process.env.EXPO_PUBLIC_CONTACT_URL;
-      if (endpoint) {
-        const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 15000);
-        try {
-          const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), signal: controller.signal });
-          const payload: unknown = await response.json().catch(() => null);
-          if (!response.ok) throw new Error('Unable to send your message. Please try email or WhatsApp.');
-          setSent(true); setForm(initial); setFeedback(typeof payload === 'object' && payload !== null && 'message' in payload && typeof payload.message === 'string' ? payload.message : 'Your message has been received.');
-        } finally { clearTimeout(timeout); }
-      } else {
-        const body = `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\n\n${form.message}`;
-        await Linking.openURL(`mailto:${supportContact.email}?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(body)}`);
-        setSent(true); setFeedback('Your email draft is ready. Send it from your email app to contact our team.');
-      }
-    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Your email app could not open. You can email us directly.'); }
-    finally { setBusy(false); }
+  const { reference, topic: initialTopic } = useLocalSearchParams<{ reference?: string; topic?: string }>();
+  const user = useAuth();
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', subject: reference ? `Help with ${reference}` : '', message: '' });
+  const [topic, setTopic] = useState<SupportTopic | ''>(supportTopics.includes(initialTopic as SupportTopic) ? initialTopic as SupportTopic : '');
+  const [expanded, setExpanded] = useState(false); const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [received, setReceived] = useState('');
+  const submitting = useRef(false); const submissionKey = useRef('');
+  const edit = (key: keyof typeof form, value: string) => { setForm(current => ({ ...current, [key]: value })); submissionKey.current = ''; setError(''); };
+  const send = async () => {
+    if (submitting.current) return;
+    if (!form.firstName.trim() || !form.lastName.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) || !topic || form.subject.trim().length < 3 || form.message.trim().length < 10) { setError('Add both names, a valid email, topic, subject, and a message of at least 10 characters.'); return; }
+    const token = getAccessToken(); if (!user || !token) { setError('Sign in to submit and track your support request.'); return; }
+    submitting.current = true; setBusy(true); setError('');
+    if (!submissionKey.current) submissionKey.current = uuid();
+    try { const result = await submitSupportRequest({ ...form, firstName: form.firstName.trim(), lastName: form.lastName.trim(), email: form.email.trim(), topic, reference, submissionKey: submissionKey.current }, token); if (!result.request?.id) throw new Error('Support did not return a request reference. Please retry.'); setReceived(result.request.id); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not send your message.'); }
+    finally { submitting.current = false; setBusy(false); }
   };
-  const open = async (url: string) => { try { await Linking.openURL(url); } catch { Alert.alert('Contact LemonTrip', `Email ${supportContact.email} for help.`); } };
-  return <AppScreen><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-    <ScreenHeader title="Let’s plan the next step." subtitle="Questions about a booking, destination, or travel service? We’re here to help." eyebrow="CONTACT LEMONTRIP" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} />
-    <View style={styles.channels}><TouchableOpacity accessibilityRole="button" onPress={() => void open(`mailto:${supportContact.email}`)} style={styles.channel}><Ionicons name="mail-outline" size={24} color={Colors.accent} /><View style={{ flex: 1 }}><Text style={styles.channelTitle}>Email LemonTrip</Text><Text style={styles.channelCopy}>{supportContact.email}</Text></View></TouchableOpacity><TouchableOpacity accessibilityRole="button" onPress={() => void open(supportContact.whatsapp)} style={styles.channel}><Ionicons name="logo-whatsapp" size={24} color={Colors.accent} /><View style={{ flex: 1 }}><Text style={styles.channelTitle}>WhatsApp us</Text><Text style={styles.channelCopy}>Talk to the LemonTrip team</Text></View><Ionicons name="arrow-forward" size={18} color={Colors.white} /></TouchableOpacity></View>
-    <View style={styles.form}><Text style={styles.title}>Send us a message</Text><Text style={styles.copy}>Share the details and we’ll help you find the next step.</Text>{(Object.keys(initial) as (keyof typeof initial)[]).map(key => <View key={key} style={styles.field}><Text style={styles.label}>{key === 'phone' ? 'Phone (optional)' : key.charAt(0).toUpperCase() + key.slice(1)}</Text><TextInput accessibilityLabel={key} value={form[key]} onChangeText={value => { setForm(current => ({ ...current, [key]: value })); setFeedback(''); }} editable={!busy} autoCapitalize={key === 'email' ? 'none' : 'sentences'} keyboardType={key === 'email' ? 'email-address' : key === 'phone' ? 'phone-pad' : 'default'} multiline={key === 'message'} maxLength={key === 'message' ? 5000 : 200} placeholder={key === 'message' ? 'Tell us a little more about your question…' : key === 'email' ? 'you@example.com' : `Your ${key}`} placeholderTextColor={Colors.textLight} style={[styles.input, key === 'message' && styles.message]} /></View>)}{feedback ? <Text accessibilityRole="alert" style={[styles.feedback, { color: sent ? Colors.primary : Colors.error }]}>{feedback}</Text> : null}<TouchableOpacity accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[styles.button, busy && { opacity: 0.5 }]}><Text style={styles.buttonText}>{busy ? 'Please wait…' : process.env.EXPO_PUBLIC_CONTACT_URL ? 'Send message' : 'Compose email'}</Text><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></TouchableOpacity></View>
-    <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/help')} style={styles.help}><Text style={styles.buttonText}>Looking for a quick answer? Visit Help</Text></TouchableOpacity>
-  </ScrollView></KeyboardAvoidingView></AppScreen>;
+  const open = async (url: string) => { try { await Linking.openURL(url); } catch { setError(`Contact us at ${supportContact.email}.`); } };
+  return <SupportScreen title="Contact Support" footer={!received ? <TouchableOpacity accessibilityRole="button" disabled={busy} onPress={() => void send()} style={[s.button, busy && styles.disabled]}>{busy ? <ActivityIndicator color={Colors.primaryDark} /> : <Text style={s.buttonText}>Send Message</Text>}</TouchableOpacity> : undefined}>
+    {received ? <View style={s.card}><Ionicons name="checkmark-circle" size={36} color={Colors.success} /><Text style={s.title}>Request received</Text><Text style={s.body}>You can follow this request and its updates in My Support Requests.</Text><Text selectable style={s.body}>{received}</Text><TouchableOpacity accessibilityRole="button" style={s.button} onPress={() => router.replace('/manage/support-requests')}><Text style={s.buttonText}>View my support requests</Text></TouchableOpacity></View> : <View style={s.card}>
+      <Text style={s.title}>Send us a message</Text><View style={styles.names}>{(['firstName', 'lastName'] as const).map(key => <TextInput key={key} accessibilityLabel={key === 'firstName' ? 'First name' : 'Last name'} placeholder={key === 'firstName' ? 'First name' : 'Last name'} placeholderTextColor={Colors.textLight} value={form[key]} onChangeText={value => edit(key, value)} editable={!busy} maxLength={80} autoCapitalize="words" style={[s.input, styles.name]} />)}</View>
+      <TextInput accessibilityLabel="Email address" placeholder="Email address" placeholderTextColor={Colors.textLight} value={form.email} onChangeText={value => edit('email', value)} keyboardType="email-address" autoCapitalize="none" editable={!busy} maxLength={255} style={s.input} />
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Select topic" accessibilityState={{ expanded }} disabled={busy} onPress={() => setExpanded(value => !value)} style={styles.select}><Text style={s.body}>{topic || 'Select topic'}</Text><Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.primary} /></TouchableOpacity>
+      {expanded ? <View style={styles.options}>{supportTopics.map(option => <TouchableOpacity key={option} accessibilityRole="button" accessibilityState={{ selected: topic === option }} style={styles.option} onPress={() => { setTopic(option); setExpanded(false); submissionKey.current = ''; setError(''); }}><Text style={styles.optionText}>{option}</Text>{topic === option ? <Ionicons name="checkmark" size={16} color={Colors.secondary} /> : null}</TouchableOpacity>)}</View> : null}
+      <TextInput accessibilityLabel="Subject" placeholder="Subject" placeholderTextColor={Colors.textLight} value={form.subject} onChangeText={value => edit('subject', value)} maxLength={200} editable={!busy} style={s.input} />
+      <TextInput accessibilityLabel="Message" placeholder="Tell us how we can help…" placeholderTextColor={Colors.textLight} value={form.message} onChangeText={value => edit('message', value)} maxLength={5000} multiline editable={!busy} style={[s.input, styles.message]} />
+      {reference ? <Text style={s.body}>Booking / application reference: {reference}</Text> : null}
+      {!user ? <TouchableOpacity accessibilityRole="button" style={styles.signin} onPress={() => router.push('/login')}><Text style={styles.optionText}>Sign in to submit and track your request</Text></TouchableOpacity> : null}
+      {error ? <Text accessibilityRole="alert" style={s.error}>{error}</Text> : null}
+    </View>}
+    <View style={styles.channels}><TouchableOpacity accessibilityRole="button" onPress={() => void open(`mailto:${supportContact.email}`)} style={styles.channel}><Ionicons name="mail-outline" size={18} color={Colors.secondary} /><Text style={styles.optionText}>Email support</Text></TouchableOpacity><TouchableOpacity accessibilityRole="button" onPress={() => void open(supportContact.whatsapp)} style={styles.channel}><Ionicons name="logo-whatsapp" size={18} color={Colors.secondary} /><Text style={styles.optionText}>WhatsApp</Text></TouchableOpacity></View>
+  </SupportScreen>;
 }
-const styles = StyleSheet.create({
-  page: { paddingBottom: 24, maxWidth: 760, width: '100%', alignSelf: 'center' }, channels: { marginHorizontal: Ui.space.page, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, gap: 20 }, channel: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 }, channelTitle: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.white }, channelCopy: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 4 }, form: { ...Ui.card, padding: 20, margin: 18 }, title: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.primary }, copy: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 22, color: Colors.textLight, marginTop: 8, marginBottom: 18 }, field: { marginBottom: 14 }, label: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.primary, marginBottom: 6 }, input: { ...Ui.field, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: 'Manrope', fontSize: 14, color: Colors.textDark, padding: 14 }, message: { minHeight: 140, textAlignVertical: 'top' }, feedback: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 21, marginBottom: 12 }, button: { ...Ui.button, backgroundColor: Colors.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 }, buttonText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary }, help: { marginHorizontal: Ui.space.page, padding: 14, alignItems: 'center' },
-});
+function uuid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, character => { const value = Math.floor(Math.random() * 16); return (character === 'x' ? value : (value & 3) | 8).toString(16); }); }
+const styles = StyleSheet.create({ names: { flexDirection: 'row', gap: 8 }, name: { flex: 1, minWidth: 0 }, select: { ...s.input, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, options: { borderRadius: 8, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background }, option: { minHeight: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12 }, optionText: { fontFamily: 'Manrope', fontSize: 13, color: Colors.secondary, fontWeight: '700' }, message: { minHeight: 120, textAlignVertical: 'top' }, signin: { minHeight: 44, justifyContent: 'center' }, channels: { flexDirection: 'row', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }, channel: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8 }, disabled: { opacity: 0.5 } });

@@ -1,6 +1,4 @@
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
-import { BrandMotif } from '@/components/BrandMotif';
+import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -126,55 +124,11 @@ export default function ExploreScreen() {
   const clearAll = () => { setFilters(defaultFilters); setSelectedExperience(null); setQuery(''); };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          {/* Header — same structure as Home */}
-          <BrandGradientBar style={[styles.header, isWide && styles.headerWide]}>
-            <View style={styles.headerContent}>
-              <View style={styles.headerMainRow}>
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
-                  <LemonTripBrand size={50} />
-                </TouchableOpacity>
-                {isWide ? (
-                  <View style={styles.headerNav}>
-                    <TouchableOpacity style={[styles.navLink, styles.navLinkActive]} onPress={() => router.push('/(tabs)/explore')}><Text style={[styles.navText, styles.navTextActive]}>Explore</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.navLink} onPress={() => router.push('/packages')}><Text style={styles.navText}>Packages</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.navLink} onPress={() => router.push('/offers')}><Text style={styles.navText}>Offers</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.navLink} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.navText}>Visa Services</Text></TouchableOpacity>
-                  </View>
-                ) : <View style={styles.headerSpacer} />}
-                <View style={styles.headerActions}>
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}>
-                    <Ionicons name="heart-outline" size={21} color={Colors.white} />
-                  </TouchableOpacity>
-                  {user ? (
-                    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}>
-                      <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => router.push('/login')} style={styles.loginPill}>
-                      <Ionicons name="person-outline" size={16} color={Colors.primaryDark} />
-                      <Text style={styles.loginText}>Login</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-              {!isWide ? (
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Change your departure city" style={styles.locationRow} onPress={() => router.push('/(tabs)/explore/flights')}>
-                  <Ionicons name="location-outline" size={14} color={Colors.onDarkMuted} />
-                  <Text style={styles.locationText}>New Delhi, IN</Text>
-                  <Text style={styles.locationChange}>· Change</Text>
-                </TouchableOpacity>
-              ) : null}
-            </View>
-          </BrandGradientBar>
-          <View style={styles.exploreIntro}>
-            <BrandMotif />
-            <Text style={styles.exploreEyebrow}>DESTINATION DISCOVERY</Text>
-            <Text style={styles.exploreTitle}>Discover somewhere new.</Text>
-            <Text style={styles.exploreSubtitle}>Search by place, then narrow your journey by travel style.</Text>
+          <ExploreSectionIntro eyebrow="DESTINATION DISCOVERY" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style.">
             <View style={styles.quickSearchRow}>
               <Text style={styles.quickSearchLabel}>POPULAR</Text>
               {popularSearches.slice(0, 3).map((destination) => (
@@ -183,7 +137,7 @@ export default function ExploreScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </ExploreSectionIntro>
 
           {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
@@ -270,7 +224,7 @@ export default function ExploreScreen() {
                   </TouchableOpacity>
                 );
               })}
-              <TouchableOpacity accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push('/packages')}>
+              <TouchableOpacity accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
                 <Ionicons name="grid-outline" size={22} color={Colors.textLight} />
                 <Text style={styles.gridLabel}>All journeys</Text>
                 <View style={styles.experienceIndicator} />
@@ -318,7 +272,7 @@ export default function ExploreScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
               <Text style={styles.sectionTitle}>Handpicked journeys</Text>
-              <TouchableOpacity onPress={() => router.push('/packages')}><Text style={styles.linkText}>All journeys</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/packages')}><Text style={styles.linkText}>All journeys</Text></TouchableOpacity>
             </View>
 
             {activeFilterCount > 0 ? (
@@ -377,7 +331,7 @@ export default function ExploreScreen() {
                   <TouchableOpacity key={preference} style={[styles.preferenceChip, tripPreference === preference && styles.preferenceChipActive]} onPress={() => {
                     setTripPreference(preference);
                     if (preference === 'Save a place') router.push('/(tabs)/wishlist');
-                    if (preference === 'Surprise me') router.push('/packages');
+                    if (preference === 'Surprise me') router.navigate('/(tabs)/explore/packages');
                   }}>
                     <Text style={[styles.preferenceText, tripPreference === preference && styles.preferenceTextActive]}>{preference}</Text>
                   </TouchableOpacity>
@@ -404,15 +358,15 @@ export default function ExploreScreen() {
             <Text style={styles.footerTagline}>Travel, thoughtfully planned.</Text>
             <View style={styles.footerLinks}>
               <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}><Text style={styles.footerLink}>Explore</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/packages')}><Text style={styles.footerLink}>Packages</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/offers')}><Text style={styles.footerLink}>Offers</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/packages')}><Text style={styles.footerLink}>Packages</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/offers')}><Text style={styles.footerLink}>Offers</Text></TouchableOpacity>
               <TouchableOpacity onPress={() => router.push('/contact')}><Text style={styles.footerLink}>Support</Text></TouchableOpacity>
             </View>
             <Text style={styles.footerCopyright}>© LemonTrip. Made for the journey.</Text>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -420,10 +374,6 @@ const SOFT_GREEN = Colors.surfaceMuted;
 const SHADOW = Ui.shadow;
 
 const styles = StyleSheet.create({
-  exploreIntro: { paddingHorizontal: Ui.space.page, paddingTop: 14, paddingBottom: 34, backgroundColor: Colors.primaryDark, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
-  exploreEyebrow: { ...Ui.eyebrow, color: Colors.accent },
-  exploreTitle: { fontFamily: 'Manrope', fontSize: 28, lineHeight: 35, fontWeight: '800', color: Colors.white, marginTop: 8 },
-  exploreSubtitle: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 6 },
   quickSearchRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 7, marginTop: 14 },
   quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1 },
   quickSearchChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 11, borderRadius: 16, backgroundColor: Colors.onDarkSurface, borderWidth: 1, borderColor: Colors.onDarkBorder },
@@ -432,28 +382,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
-
-  // Header
-  header: { paddingHorizontal: 18, paddingTop: 9, paddingBottom: 11 },
-  headerWide: { minHeight: 72, paddingVertical: 8 },
-  headerContent: { width: '100%' },
-  headerMainRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  brandLockup: { minWidth: 126, height: 50, alignItems: 'flex-start', justifyContent: 'center' },
-  headerSpacer: { flex: 1 },
-  headerNav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 },
-  navLink: { minHeight: 54, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  navLinkActive: { borderBottomColor: Colors.accent },
-  navText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 14, fontWeight: '700' },
-  navTextActive: { color: Colors.accent, fontWeight: '800' },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  headerAction: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 3 },
-  locationText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
-  locationChange: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 },
-  avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent },
-  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  loginPill: { height: 42, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, borderRadius: 21, backgroundColor: Colors.white },
-  loginText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
 
   // Search
   searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: -18, padding: 12, zIndex: 5 },

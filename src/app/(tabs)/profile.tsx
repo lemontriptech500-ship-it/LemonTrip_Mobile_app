@@ -24,7 +24,7 @@ const travelLinks = [
 const accountLinks = [
   { label: 'Personal information', detail: 'Manage your contact details', artwork: 'profile' as const, route: '/manage/personal-information' },
   { label: 'Wallet', detail: 'Balance and transactions on LemonTrip', artwork: 'payment' as const, route: '/wallet' },
-  { label: 'Contact LemonTrip', detail: 'Help with bookings and travel plans', artwork: 'help' as const, route: '/contact' },
+  { label: 'Help & Support', detail: 'FAQs, contact support, and request updates', artwork: 'help' as const, route: '/help' },
   { label: 'Travel services', detail: 'Flights, hotels, trains, buses, holidays and visas', artwork: 'booking' as const, route: '/services' },
   { label: 'Payment methods', detail: 'Choose how to pay', artwork: 'payment' as const, route: '/wallet/payment-methods' },
   { label: 'Saved travellers', detail: 'Names for your next journey', artwork: 'profile' as const, route: '/manage/travellers' },
