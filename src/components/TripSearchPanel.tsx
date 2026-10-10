@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
   },
   ctaButton: {
     marginTop: 14,
-    minHeight: 48,
-    borderRadius: 12,
+    minHeight: Ui.button.minHeight,
+    borderRadius: Ui.radius.button,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.accent,

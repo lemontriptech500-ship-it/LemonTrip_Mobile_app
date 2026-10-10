@@ -20,12 +20,24 @@ import {
 // SafeAreaView from 'react-native' is deprecated — use the safe-area-context version.
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { requestPinWidget } from 'react-native-android-widget';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
 
-const SOFT_GREEN = '#f1f7ee';
-const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 } as const;
+const FONT = {
+  medium: 'Manrope',
+  bold: 'Manrope',
+  extra: 'Manrope',
+} as const;
+
+const SHADOW = {
+  shadowColor: '#0F3D2E',
+  shadowOpacity: 0.1,
+  shadowRadius: 14,
+  shadowOffset: { width: 0, height: 6 },
+  elevation: 4,
+} as const;
 
 const statusTabs: { key: StatusFilter; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -84,7 +96,9 @@ export default function BookingsScreen() {
 
   const counts = useMemo(() => {
     const base = { all: bookings.length, upcoming: 0, completed: 0, cancelled: 0 };
-    bookings.forEach((booking) => { base[normalizeStatus(booking.status)] += 1; });
+    bookings.forEach((booking) => {
+      base[normalizeStatus(booking.status)] += 1;
+    });
     return base;
   }, [bookings]);
 
@@ -133,7 +147,7 @@ export default function BookingsScreen() {
         {/* Widget banner — same style as Home banner */}
         <View style={styles.widgetCard}>
           <View style={styles.widgetIcon}>
-            <Ionicons name="grid-outline" size={26} color={Colors.primaryDark} />
+            <Ionicons name="grid-outline" size={24} color={Brand.forest} />
           </View>
           <View style={styles.widgetContent}>
             <Text style={styles.widgetTitle}>Upcoming Trip widget</Text>
@@ -146,16 +160,35 @@ export default function BookingsScreen() {
               disabled={addingWidget}
             >
               {addingWidget ? (
-                <ActivityIndicator size="small" color={Colors.primaryDark} style={styles.widgetSpinner} />
+                <ActivityIndicator size="small" color={Brand.forest} style={styles.widgetSpinner} />
               ) : (
                 <>
                   <Text style={styles.widgetButtonText}>Add widget</Text>
-                  <View style={styles.widgetArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
+                  <Ionicons name="arrow-forward" size={16} color={Brand.forest} />
                 </>
               )}
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Transactions entry */}
+        {bookings.length > 0 ? (
+          <TouchableOpacity
+            accessibilityRole="button"
+            activeOpacity={0.9}
+            style={styles.txCard}
+            onPress={() => router.push('/transactions' as never)}
+          >
+            <View style={styles.txIcon}>
+              <Ionicons name="receipt-outline" size={22} color={Brand.forest} />
+            </View>
+            <View style={styles.txCopy}>
+              <Text style={styles.txTitle}>Transactions</Text>
+              <Text style={styles.txSub}>Payments and refunds</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Brand.forest} />
+          </TouchableOpacity>
+        ) : null}
 
         {bookings.length > 0 ? (
           <View style={styles.section}>
@@ -187,14 +220,22 @@ export default function BookingsScreen() {
                     <TouchableOpacity key={booking.id} accessibilityRole="button" accessibilityLabel={`View booking ${booking.itemName}`} onPress={() => router.push({ pathname: "/booking/[id]", params: { id: booking.id } })} style={styles.bookingCard}>
                       <View style={styles.bookingTop}>
                         <View style={styles.bookingIcon}>
-                          <Ionicons name={serviceIcon(booking.serviceName)} size={26} color={Colors.primary} />
+                          <Ionicons name={serviceIcon(booking.serviceName)} size={24} color={Brand.forest} />
                         </View>
                         <View style={styles.bookingInfo}>
-                          <Text style={styles.serviceName} numberOfLines={1}>{booking.serviceName}</Text>
+                          <Text style={styles.eyebrowDark} numberOfLines={1}>
+                            {(booking.serviceName ?? '').toUpperCase()}
+                          </Text>
                           <Text style={styles.itemName} numberOfLines={2}>{booking.itemName}</Text>
+                          {booking.destination ? (
+                            <View style={styles.destRow}>
+                              <Ionicons name="location-outline" size={13} color={Colors.textLight} />
+                              <Text style={styles.destText} numberOfLines={1}>{booking.destination}</Text>
+                            </View>
+                          ) : null}
                         </View>
                         <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
-                          <Ionicons name={status.icon} size={13} color={status.fg} />
+                          <Ionicons name={status.icon} size={12} color={status.fg} />
                           <Text style={[styles.statusText, { color: status.fg }]}>{status.label}</Text>
                         </View>
                       </View>
@@ -207,17 +248,15 @@ export default function BookingsScreen() {
 
                       <View style={styles.bookingDetails}>
                         <View style={styles.detailCol}>
-                          <Text style={styles.detailLabel}>Booked on</Text>
-                          <Text style={styles.detailValue}>{formatDate(booking.bookedAt)}</Text>
+                          <Text style={styles.detailLabel}>BOOKING ID</Text>
+                          <Text style={styles.detailValue}>{shortId(booking.id)}</Text>
                         </View>
-                        {booking.tripDate ? (
-                          <View style={styles.detailCol}>
-                            <Text style={styles.detailLabel}>Trip date</Text>
-                            <Text style={styles.detailValue}>{formatDate(booking.tripDate)}</Text>
-                          </View>
-                        ) : null}
+                        <View style={styles.detailCol}>
+                          <Text style={styles.detailLabel}>{booking.tripDate ? 'TRIP DATE' : 'BOOKED ON'}</Text>
+                          <Text style={styles.detailValue}>{formatDate(booking.tripDate ?? booking.bookedAt)}</Text>
+                        </View>
                         <View style={styles.priceBox}>
-                          <Text style={styles.detailLabel}>Total</Text>
+                          <Text style={styles.detailLabel}>TOTAL</Text>
                           <Text style={styles.price}>{booking.price}</Text>
                         </View>
                       </View>
@@ -227,9 +266,11 @@ export default function BookingsScreen() {
               </View>
             ) : (
               <View style={styles.filterEmpty}>
-                <Ionicons name="filter-outline" size={26} color={Colors.primary} />
+                <Ionicons name="filter-outline" size={26} color={Brand.forest} />
                 <Text style={styles.filterEmptyText}>No {activeTab} bookings.</Text>
-                <TouchableOpacity onPress={() => setActiveTab('all')}><Text style={styles.linkText}>Show all</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => setActiveTab('all')}>
+                  <Text style={styles.linkText}>Show all</Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -238,25 +279,37 @@ export default function BookingsScreen() {
             {/* Empty state */}
             <View style={styles.emptyCard}>
               <View style={styles.emptyCircle}>
-                <Ionicons name="airplane-outline" size={38} color={Colors.primary} />
+                <Ionicons name="airplane-outline" size={38} color={Brand.forest} />
               </View>
               <Text style={styles.emptyTitle}>Your next journey could start here</Text>
               <Text style={styles.emptyDescription}>
                 You don’t have any bookings yet. Explore flights, hotels and experiences to plan your next adventure.
               </Text>
-              <TouchableOpacity accessibilityRole="button" style={styles.primaryButton} activeOpacity={0.85} onPress={() => router.push('/(tabs)/explore')}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.primaryButton}
+                activeOpacity={0.85}
+                onPress={() => router.push('/(tabs)/explore')}
+              >
                 <Text style={styles.primaryButtonText}>Explore journeys</Text>
-                <View style={styles.primaryArrow}><Ionicons name="arrow-forward" size={18} color={Colors.primaryDark} /></View>
+                <Ionicons name="arrow-forward" size={18} color={Brand.forest} />
               </TouchableOpacity>
             </View>
 
-            {/* Quick links — same circle grid as Home */}
+            {/* Quick links */}
             <View style={styles.gridCard}>
+              <Text style={styles.eyebrowDark}>PLAN AHEAD</Text>
               <Text style={styles.gridTitle}>Plan your next trip</Text>
               <View style={styles.gridRow}>
                 {quickLinks.map((link) => (
-                  <TouchableOpacity key={link.label} accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push(link.route as never)}>
-                    <View style={styles.gridCircle}><Ionicons name={link.icon} size={28} color={Colors.primary} /></View>
+                  <TouchableOpacity
+                    key={link.label}
+                    accessibilityRole="button"
+                    style={styles.gridItem}
+                    activeOpacity={0.85}
+                    onPress={() => router.push(link.route as never)}
+                  >
+                    <Ionicons name={link.icon} size={23} color={Colors.primary} />
                     <Text style={styles.gridLabel}>{link.label}</Text>
                   </TouchableOpacity>
                 ))}
@@ -267,10 +320,10 @@ export default function BookingsScreen() {
 
         <View style={styles.infoCard}>
           <View style={styles.infoIcon}>
-            <Ionicons name="shield-checkmark" size={24} color={Colors.primary} />
+            <Ionicons name="shield-checkmark" size={22} color={Brand.lemon} />
           </View>
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>Travel with confidence</Text>
+            <Text style={styles.eyebrowLemon}>TRAVEL WITH CONFIDENCE</Text>
             <Text style={styles.infoText}>Your LemonTrip travel details stay organized in one place.</Text>
           </View>
         </View>
@@ -280,8 +333,8 @@ export default function BookingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  container: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
+  container: { flex: 1, backgroundColor: Colors.surfaceMuted },
   content: { paddingBottom: 32, width: '100%', maxWidth: 900, alignSelf: 'center' },
 
   // Header
@@ -304,8 +357,26 @@ const styles = StyleSheet.create({
   countPillLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
 
   // Widget banner
-  widgetCard: { marginTop: 16, marginHorizontal: 16, padding: 18, flexDirection: 'row', gap: 14, borderRadius: 24, backgroundColor: Colors.primaryDark },
-  widgetIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.accent },
+  widgetCard: {
+    marginTop: 0,
+    marginHorizontal: 16,
+    padding: 16,
+    flexDirection: 'row',
+    gap: 14,
+    borderRadius: 22,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    ...SHADOW,
+  },
+  widgetIcon: {
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    backgroundColor: Colors.accentSoft,
+  },
   widgetContent: { flex: 1, minWidth: 0 },
   widgetTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
   widgetDescription: { color: 'rgba(255,255,255,0.88)', fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 4 },
@@ -314,6 +385,30 @@ const styles = StyleSheet.create({
   widgetArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
   widgetSpinner: { paddingHorizontal: 20 },
   disabledButton: { opacity: 0.7 },
+
+  // Transactions entry
+  txCard: {
+    marginTop: 14,
+    marginHorizontal: 16,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.white,
+    ...SHADOW,
+  },
+  txIcon: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.md,
+    backgroundColor: Colors.accentSoft,
+  },
+  txCopy: { flex: 1 },
+  txTitle: { color: Colors.primaryDark, fontFamily: FONT.extra, fontSize: 15 },
+  txSub: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12, marginTop: 2 },
 
   // Tabs
   section: { paddingTop: 20 },
@@ -338,22 +433,30 @@ const styles = StyleSheet.create({
   statusBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 12 },
   statusText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 
-  ticketDivider: { height: 20, marginVertical: 12, marginHorizontal: -16, flexDirection: 'row', alignItems: 'center' },
-  notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
-  notchLeft: { marginLeft: -11 },
-  notchRight: { marginRight: -11 },
-  dash: { flex: 1, height: 0, marginHorizontal: 8, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border },
+  ticketDivider: { height: 20, marginVertical: 14, marginHorizontal: -16, flexDirection: 'row', alignItems: 'center' },
+  notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: Brand.cream },
+  notchLeft: { marginLeft: -10 },
+  notchRight: { marginRight: -10 },
+  dash: { flex: 1, height: 0, marginHorizontal: 8, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: '#D5D4CB' },
 
   bookingDetails: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
   detailCol: { flexShrink: 1 },
-  detailLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', marginBottom: 3 },
-  detailValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  detailLabel: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 9, letterSpacing: 1.2, marginBottom: 4 },
+  detailValue: { color: Colors.textDark, fontFamily: FONT.bold, fontSize: 13 },
   priceBox: { alignItems: 'flex-end', marginLeft: 'auto' },
-  price: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
+  price: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 20 },
 
-  filterEmpty: { marginTop: 14, marginHorizontal: 16, padding: 24, alignItems: 'center', gap: 8, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  filterEmptyText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, textTransform: 'capitalize' },
-  linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  filterEmpty: {
+    marginTop: 16,
+    marginHorizontal: 16,
+    padding: 24,
+    alignItems: 'center',
+    gap: 8,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.white,
+  },
+  filterEmptyText: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 14, textTransform: 'capitalize' },
+  linkText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 14 },
 
   // Empty state
   emptyCard: { ...Ui.card, marginTop: 16, marginHorizontal: 16, paddingHorizontal: 22, paddingVertical: 28, alignItems: 'center', borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
@@ -369,12 +472,28 @@ const styles = StyleSheet.create({
   gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', paddingHorizontal: 10, marginBottom: 10 },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
-  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
+  gridLabel: { marginTop: 6, textAlign: 'center', color: Colors.textLight, fontFamily: FONT.bold, fontSize: 10, lineHeight: 14 },
 
   // Info
-  infoCard: { marginTop: 18, marginHorizontal: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, backgroundColor: '#edf5eb' },
-  infoIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surface },
+  eyebrowLemon: { color: Brand.lemon, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.2 },
+  infoCard: {
+    marginTop: 20,
+    marginHorizontal: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: Radius.lg,
+    backgroundColor: Brand.forest,
+  },
+  infoIcon: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: Brand.forestLight,
+  },
   infoContent: { flex: 1 },
   infoTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },
   infoText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 2 },

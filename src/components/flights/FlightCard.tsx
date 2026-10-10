@@ -1,10 +1,15 @@
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { FlightOffer } from './types';
 
-type FlightCardProps = { offer: FlightOffer; onSelect: (offer: FlightOffer) => void };
+type FlightCardProps = {
+  offer: FlightOffer;
+  onSelect: (offer: FlightOffer) => void;
+  /** Highlights the card as the best deal (yellow border + tag). */
+  best?: boolean;
+};
 
 function formatTime(value: string) {
   const parsed = new Date(value);
@@ -20,57 +25,87 @@ function formatDuration(minutes: number) {
 
 function formatPrice(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount);
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
   } catch {
     return `${currency} ${amount.toLocaleString('en-IN')}`;
   }
 }
 
-export default function FlightCard({ offer, onSelect }: FlightCardProps) {
-  const stopLabel = offer.stops === 0 ? 'Nonstop' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
-  const fareNote = offer.fareInfo ?? (offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null);
+export default function FlightCard({ offer, onSelect, best = false }: FlightCardProps) {
+  const stopLabel = offer.stops === 0 ? 'Direct' : `${offer.stops} ${offer.stops === 1 ? 'stop' : 'stops'}`;
+  const fareNote =
+    offer.fareInfo ??
+    (offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null);
+  const subtitle = [offer.flightNumber, fareNote].filter(Boolean).join(' · ');
 
   return (
-    <View style={styles.card}>
-      <View style={styles.airline}>
+    <View style={[styles.card, best && styles.cardBest]}>
+      {best || offer.isDemo ? (
+        <View style={styles.bestTag}>
+          <Ionicons name={offer.isDemo ? 'information-circle' : 'sparkles'} size={12} color={Brand.forest} />
+          <Text style={styles.bestTagText}>{offer.isDemo ? (best ? 'SAMPLE · BEST PRICE' : 'SAMPLE RESULT') : 'LEMONTRIP BEST DEAL'}</Text>
+        </View>
+      ) : null}
+
+      {/* Airline */}
+      <Pressable accessibilityRole="button" onPress={() => onSelect(offer)} style={styles.airlineRow}>
         {offer.airline.logoUrl ? (
-          <Image source={{ uri: offer.airline.logoUrl }} style={styles.logo} resizeMode="contain" accessibilityLabel={`${offer.airline.name} logo`} />
+          <Image
+            source={{ uri: offer.airline.logoUrl }}
+            style={styles.logo}
+            resizeMode="contain"
+            accessibilityLabel={`${offer.airline.name} logo`}
+          />
         ) : (
-          <View style={styles.logoFallback}><Ionicons name="airplane" size={18} color={Colors.primary} /></View>
+          <View style={[styles.logo, styles.logoFallback]}>
+            <Text style={styles.logoFallbackText}>{offer.airline.code}</Text>
+          </View>
         )}
         <View style={styles.airlineCopy}>
           <Text style={styles.airlineName} numberOfLines={1}>{offer.airline.name}</Text>
-          <Text style={styles.flightNumber}>{offer.flightNumber}</Text>
+          <Text style={styles.airlineSub} numberOfLines={1}>{subtitle}</Text>
         </View>
-      </View>
+        <Ionicons name="chevron-forward" size={20} color={Colors.textDark} />
+      </Pressable>
 
+      {/* Route */}
       <View style={styles.route}>
         <View style={styles.airport}>
           <Text style={styles.time}>{formatTime(offer.departure.time)}</Text>
           <Text style={styles.airportCode}>{offer.departure.airportCode}</Text>
-          {offer.departure.airportName ? <Text style={styles.airportName} numberOfLines={1}>{offer.departure.airportName}</Text> : null}
         </View>
+
         <View style={styles.durationBlock}>
-          <Text style={styles.duration}>{formatDuration(offer.durationMinutes)}</Text>
-          <View style={styles.routeLine}><View style={styles.routeDot} /><View style={styles.line} /><Ionicons name="airplane" size={13} color={Colors.primary} /><View style={styles.line} /><View style={styles.routeDot} /></View>
-          <Text style={styles.stops}>{stopLabel}</Text>
+          <Text style={styles.duration}>{formatDuration(offer.durationMinutes)} · {stopLabel}</Text>
+          <View style={styles.routeLine}>
+            <View style={styles.line} />
+            <Ionicons name="airplane" size={14} color={Brand.forest} />
+            <View style={styles.line} />
+          </View>
         </View>
+
         <View style={[styles.airport, styles.arrival]}>
           <Text style={styles.time}>{formatTime(offer.arrival.time)}</Text>
           <Text style={styles.airportCode}>{offer.arrival.airportCode}</Text>
-          {offer.arrival.airportName ? <Text style={styles.airportName} numberOfLines={1}>{offer.arrival.airportName}</Text> : null}
         </View>
       </View>
 
+      <View style={styles.divider} />
+
+      {/* Price + select */}
       <View style={styles.purchase}>
         <View style={styles.purchaseInfo}>
           <Text style={{ color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, marginBottom: 3 }}>FARE</Text><Text style={styles.price}>{formatPrice(offer.price.amount, offer.price.currency)}</Text>
           <Text style={styles.baggage} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}</Text>
           {fareNote ? <Text style={styles.fareNote}>{fareNote}</Text> : null}
         </View>
-        <TouchableOpacity accessibilityRole="button" onPress={() => onSelect(offer)} style={styles.selectButton}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => onSelect(offer)}
+          style={({ pressed }) => [styles.selectButton, pressed && { opacity: 0.9 }]}
+        >
           <Text style={styles.selectText}>Select</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

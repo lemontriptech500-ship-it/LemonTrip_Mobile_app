@@ -1,6 +1,5 @@
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -28,35 +27,35 @@ type AuthFieldProps = {
   keyboardType?: 'default' | 'email-address' | 'phone-pad';
   secure?: boolean;
   onToggleSecure?: () => void;
+  icon?: ComponentProps<typeof Ionicons>['name'];
 };
 
 export function AuthLayout({ eyebrow, title, subtitle, onBack, children }: AuthLayoutProps) {
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView style={styles.keyboardAvoiding} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={[styles.layout, desktop && styles.layoutDesktop]}>
-          {desktop ? <TravelVisual style={styles.desktopVisual} /> : null}
+        <View style={styles.layout}>
+          <View style={styles.authHeader}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={18} color={Colors.white} />
+            </TouchableOpacity>
+            <View accessibilityLabel="LemonTrip" style={styles.lemonMark}>
+              <View style={styles.lemonFruit} />
+              <View style={styles.lemonLeaf} />
+            </View>
+            <View style={styles.headerSpacer} />
+          </View>
           <View style={styles.formPane}>
-            {!desktop ? <TravelVisual style={styles.mobileVisual} compact /> : null}
             <ScrollView
               style={styles.formScroll}
-              contentContainerStyle={[styles.formScrollContent, desktop && styles.formScrollContentDesktop]}
+              contentContainerStyle={styles.formScrollContent}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>
               <View style={styles.formWrap}>
-                <BrandGradientBar style={styles.authNav}>
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={18} color={Colors.white} />
-                  </TouchableOpacity>
-                  <LemonTripBrand size={42} />
-                </BrandGradientBar>
-                <Text style={styles.eyebrow}>{eyebrow}</Text>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.subtitle}>{subtitle}</Text>
-                {children}
+                <View style={styles.formContent}>{children}</View>
+                <Text style={styles.eyebrow}>{eyebrow}</Text>
               </View>
             </ScrollView>
           </View>
@@ -98,11 +97,13 @@ export function AuthField({
   keyboardType = 'default',
   secure = false,
   onToggleSecure,
+  icon,
 }: AuthFieldProps) {
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.fieldLabel}>{label}</Text>
       <View style={[styles.inputWrap, error && styles.inputWrapError]}>
+        {icon ? <Ionicons name={icon} size={18} color={Colors.secondary} style={styles.fieldIcon} /> : null}
         <TextInput
           accessibilityLabel={label}
           value={value}
@@ -126,28 +127,85 @@ export function AuthField({
   );
 }
 
+export function OtpCodeField({ value, onChangeText, error }: { value: string; onChangeText: (value: string) => void; error?: string }) {
+  return (
+    <View style={styles.otpFieldWrap}>
+      <View style={styles.otpBoxes}>
+        {Array.from({ length: 6 }, (_, index) => (
+          <View key={index} style={[styles.otpBox, error && styles.inputWrapError, index === value.length && styles.otpBoxActive]}>
+            <Text style={styles.otpDigit}>{value[index] ?? ''}</Text>
+          </View>
+        ))}
+      </View>
+      <TextInput
+        accessibilityLabel="Six-digit verification code"
+        value={value}
+        onChangeText={(text) => onChangeText(text.replace(/\D/g, '').slice(0, 6))}
+        keyboardType="number-pad"
+        maxLength={6}
+        autoComplete="sms-otp"
+        textContentType="oneTimeCode"
+        style={styles.otpInputOverlay}
+      />
+      {error ? <Text accessibilityRole="alert" style={styles.errorText}>{error}</Text> : null}
+    </View>
+  );
+}
+
 export function GoogleAuthButton({ label, onSuccess }: { label: string; onSuccess: (idToken: string) => Promise<void> }) {
   const clientIds = {
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim(),
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim(),
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID?.trim(),
   };
-  const platformClientId = Platform.OS === 'web'
-    ? clientIds.webClientId
-    : Platform.OS === 'ios'
-      ? clientIds.iosClientId
-      : clientIds.androidClientId;
+  const isPlaceholder = (value?: string) => !value || value.startsWith('your-google-');
+  // Native Google Sign-In needs the WEB client ID (it is the token audience); iOS also needs its own client ID.
+  const configured = Platform.OS === 'ios'
+    ? !isPlaceholder(clientIds.webClientId) && !isPlaceholder(clientIds.iosClientId)
+    : !isPlaceholder(clientIds.webClientId);
 
-  if (!platformClientId || platformClientId.startsWith('your-google-')) {
+  if (!configured) {
     return (
       <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: true }} disabled style={[styles.googleButton, styles.googleButtonDisabled]}>
         <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
-        <Text style={styles.googleButtonText}>Google sign-in not configured</Text>
+        <Text style={styles.googleButtonText}>{label}</Text>
       </TouchableOpacity>
     );
   }
 
-  return <ConfiguredGoogleAuthButton label={label} onSuccess={onSuccess} {...clientIds} />;
+  if (Platform.OS === 'web') return <ConfiguredGoogleAuthButton label={label} onSuccess={onSuccess} {...clientIds} />;
+  return <NativeGoogleAuthButton label={label} onSuccess={onSuccess} />;
+}
+
+function NativeGoogleAuthButton({ label, onSuccess }: { label: string; onSuccess: (idToken: string) => Promise<void> }) {
+  const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  const startGoogleAuth = async () => {
+    if (loading) return;
+    setAuthError('');
+    setLoading(true);
+    try {
+      const idToken = await getGoogleIdToken();
+      if (!idToken) return; // cancelled by the user
+      await onSuccess(idToken); // backend exchange + navigation happen in the screen
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'Google sign-in failed. Please try again.');
+      void signOutGoogleUser(); // so the next attempt shows the account picker (e.g. to pick a different account)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View>
+      <TouchableOpacity accessibilityRole="button" disabled={loading} onPress={() => void startGoogleAuth()} style={[styles.googleButton, loading && styles.googleButtonDisabled]}>
+        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <Text style={styles.googleButtonText}>{loading ? 'Connecting to Google…' : label}</Text>
+      </TouchableOpacity>
+      {authError ? <Text accessibilityRole="alert" style={styles.googleError}>{authError}</Text> : null}
+    </View>
+  );
 }
 
 function ConfiguredGoogleAuthButton({
@@ -228,7 +286,7 @@ export function AuthLegalLinks({ onTerms, onPrivacy }: { onTerms: () => void; on
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
+  safeArea: { flex: 1, backgroundColor: Colors.primaryDark },
   keyboardAvoiding: { flex: 1 },
   layout: { flex: 1 },
   layoutDesktop: { flexDirection: 'row' },

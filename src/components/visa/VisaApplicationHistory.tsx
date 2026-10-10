@@ -98,7 +98,7 @@ export function VisaApplicationHistory({ accessToken }: Props) {
 }
 
 const styles = StyleSheet.create({
-  section: { marginHorizontal: 16, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.border },
+  section: { marginHorizontal: Ui.space.page, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.border },
   headingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   headingCopy: { gap: 3 },
   eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },

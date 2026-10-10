@@ -1,3 +1,4 @@
+/** LemonTrip palette: forest green, lemon yellow, warm neutral surfaces. */
 export const Colors = {
   primary: '#103D30',
   primaryDark: '#0C3026',
@@ -18,3 +19,12 @@ export const Colors = {
   error: '#EF4444',
   overlay: 'rgba(6, 59, 36, 0.58)',
 } as const;
+
+export const Brand = {
+  forest: '#0F3D2E',      // dark green for headers/hero/cards
+  forestLight: '#1B5340',
+  lemon: '#FFD000',       // yellow CTA
+  cream: '#F6F5EF',       // screen background
+} as const;
+
+export const Radius = { sm: 10, md: 16, lg: 24, xl: 32, pill: 999 } as const;

@@ -76,7 +76,128 @@ export default function HomeScreen() {
         <TouchableOpacity accessibilityRole="button" style={styles.planner} onPress={() => router.push('/assistant')}><Ionicons name="sparkles-outline" size={22} color={Colors.primary} /><View style={{ flex: 1 }}><Text style={styles.plannerTitle}>Dream it. Let’s plan it.</Text><Text style={styles.plannerMeta}>Create a journey around you</Text></View><Ionicons name="arrow-forward" size={20} color={Colors.primary} /></TouchableOpacity>
         <TouchableOpacity style={styles.allServices} onPress={() => router.push('/services')}><Text style={styles.link}>Explore all travel services</Text><Ionicons name="arrow-forward" size={16} color={Colors.primary} /></TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </AppScreen>
+  );
+}
+
+function HomeServiceWidget({ service, story, offer, travelPackage }: { service: ServiceItem; story?: BlogPost; offer?: Offer; travelPackage?: TravelPackage }) {
+  const cart = useCart();
+  const [destination, setDestination] = useState('');
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [travelDate, setTravelDate] = useState('');
+  const name = service.label === 'Packages' ? 'Holiday Packages' : service.label === 'Trip Cart' ? 'Cart' : service.label.replace('\n', ' ');
+
+  const searchHotels = () => router.push({ pathname: '/(tabs)/explore/hotels', params: { query: JSON.stringify({ destination, checkIn, checkOut }) } });
+  const searchGroundTravel = () => {
+    const pathname = name === 'Trains' ? '/(tabs)/explore/trains' : '/(tabs)/explore/buses';
+    router.push({ pathname, params: { query: JSON.stringify({ from, to, travelDate }) } });
+  };
+
+  return (
+    <View style={styles.serviceWidget}>
+      {name !== 'Flights' ? <View style={styles.widgetHeading}>
+        <View style={styles.widgetIcon}><Ionicons name={service.icon} size={20} color={Colors.primary} /></View>
+        <View style={styles.widgetHeadingCopy}>
+          <Text style={styles.widgetEyebrow}>{name.toUpperCase()}</Text>
+          <Text style={styles.widgetTitle}>{getWidgetTitle(name, cart.length)}</Text>
+        </View>
+      </View> : null}
+      {name === 'Flights' ? (
+        <FlightSearchForm compact hideTripTypeSelector initialOrigin="New Delhi" initialTravellers={2} searchButtonLabel="Search Trips" loading={false} onSearch={(request) => router.push({ pathname: '/(tabs)/explore/flights', params: { search: JSON.stringify(request) } })} />
+      ) : name === 'Hotels' ? (
+        <View>
+          <WidgetField label="DESTINATION" value={destination} onChangeText={setDestination} placeholder="City, region or property" />
+          <View style={styles.widgetFieldRow}>
+            <WidgetField label="CHECK IN" value={checkIn} onChangeText={setCheckIn} placeholder="YYYY-MM-DD" />
+            <WidgetField label="CHECK OUT" value={checkOut} onChangeText={setCheckOut} placeholder="YYYY-MM-DD" />
+          </View>
+          <WidgetButton label="Search hotels" onPress={searchHotels} />
+        </View>
+      ) : name === 'Trains' || name === 'Buses' ? (
+        <View>
+          <View style={styles.widgetFieldRow}>
+            <WidgetField label="FROM" value={from} onChangeText={setFrom} placeholder={name === 'Trains' ? 'Departure station' : 'Departure city'} />
+            <WidgetField label="TO" value={to} onChangeText={setTo} placeholder={name === 'Trains' ? 'Arrival station' : 'Destination city'} />
+          </View>
+          <WidgetField label="TRAVEL DATE" value={travelDate} onChangeText={setTravelDate} placeholder="YYYY-MM-DD" />
+          <WidgetButton label={`Search ${name.toLowerCase()}`} onPress={searchGroundTravel} />
+        </View>
+      ) : (
+        <View style={styles.widgetContent}>
+          <Text style={styles.widgetDescription}>{getWidgetDescription(name, cart.length, story)}</Text>
+          {name === 'Holiday Packages' ? (
+            <View style={styles.widgetHighlights}>
+              {travelPackage ? <Text style={styles.widgetHighlight}>{travelPackage.title} · From {travelPackage.price}</Text> : <Text style={styles.widgetHighlight}>Handpicked stays and experiences</Text>}
+              <Text style={styles.widgetHighlight}>Clear trip pricing</Text>
+            </View>
+          ) : null}
+          {name === 'Offers' && offer ? <Text style={styles.widgetFeatured}>{offer.title}{offer.code ? ` · Code ${offer.code}` : ''}</Text> : null}
+          <WidgetButton label={getWidgetAction(name)} onPress={() => router.push(service.route)} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function getWidgetTitle(service: string, cartCount: number) {
+  if (service === 'Flights') return 'Plan a flight';
+  if (service === 'Hotels') return 'Find your stay';
+  if (service === 'Trains') return 'Plan a rail journey';
+  if (service === 'Buses') return 'Plan your bus trip';
+  if (service === 'Holiday Packages') return 'Find a holiday';
+  if (service === 'AI Plan') return 'Plan a trip with AI';
+  if (service === 'Visa') return 'Visa help for your trip';
+  if (service === 'Offers') return 'Travel deals for you';
+  if (service === 'Saved Places') return 'Your saved places';
+  if (service === 'Travel Stories') return 'Ideas for your next trip';
+  if (service === 'Cart') return `Your trip cart · ${cartCount} ${cartCount === 1 ? 'item' : 'items'}`;
+  if (service === 'Help') return 'Travel support';
+  return 'Explore LemonTrip services';
+}
+
+function getWidgetDescription(service: string, cartCount: number, story?: BlogPost) {
+  if (service === 'Holiday Packages') return 'Choose a thoughtfully planned escape, with the details of your journey together.';
+  if (service === 'AI Plan') return 'Build an itinerary around your destination, dates, interests and budget.';
+  if (service === 'Visa') return 'Check destination guidance and prepare for the entry requirements on your itinerary.';
+  if (service === 'Offers') return 'Browse current savings across flights, stays and handpicked holidays.';
+  if (service === 'Saved Places') return "Keep the stays and destinations you like together for when you're ready.";
+  if (service === 'Travel Stories') return story?.title ?? 'Read destination guides and ideas from the LemonTrip journal.';
+  if (service === 'Cart') return cartCount ? 'Review the travel items you have collected before checkout.' : 'Your trip cart is empty. Browse travel options and add a journey to keep planning.';
+  if (service === 'Help') return 'Get practical help from a LemonTrip travel expert before or during your journey.';
+  return 'Open the full service directory to find the right way to plan your trip.';
+}
+
+function getWidgetAction(service: string) {
+  if (service === 'Holiday Packages') return 'Browse holidays';
+  if (service === 'AI Plan') return 'Plan a trip';
+  if (service === 'Visa') return 'Explore visa support';
+  if (service === 'Offers') return 'View offers';
+  if (service === 'Saved Places') return 'View saved places';
+  if (service === 'Travel Stories') return 'Read travel stories';
+  if (service === 'Cart') return 'Open trip cart';
+  if (service === 'Help') return 'Get travel help';
+  return 'Browse all services';
+}
+
+function WidgetField({ label, value, onChangeText, placeholder }: { label: string; value: string; onChangeText: (value: string) => void; placeholder: string }) {
+  return (
+    <View style={styles.widgetField}>
+      <Text style={styles.widgetFieldLabel}>{label}</Text>
+      <TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={Colors.textLight} style={styles.widgetInput} />
+    </View>
+  );
+}
+
+function WidgetButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity accessibilityRole="button" onPress={onPress} style={styles.widgetButton}>
+      <Ionicons name="search-outline" size={17} color={Colors.primaryDark} />
+      <Text style={styles.widgetButtonText}>{label}</Text>
+      <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
+    </TouchableOpacity>
   );
 }
 const styles = StyleSheet.create({

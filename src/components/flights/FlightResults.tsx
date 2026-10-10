@@ -1,6 +1,7 @@
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import FlightCard from './FlightCard';
@@ -35,6 +36,11 @@ export default function FlightResults({ offers, loading, onSelect }: FlightResul
     return filtered;
   }, [offers, filters, sort]);
 
+  // Cheapest visible flight gets the "LemonTrip best deal" highlight
+  const bestId = visibleOffers.length > 1
+    ? visibleOffers.reduce((a, b) => (b.price.amount < a.price.amount ? b : a)).id
+    : null;
+
   return (
     <View style={[styles.resultsLayout, desktop && styles.resultsLayoutDesktop]}>
       <View style={[styles.filterColumn, desktop && styles.filterColumnDesktop]}>
@@ -64,7 +70,7 @@ export default function FlightResults({ offers, loading, onSelect }: FlightResul
               <FlightSort selected={sort} onChange={setSort} />
             </View>
             <View style={styles.listContent}>
-              {visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={onSelect} />)}
+              {visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={onSelect} best={offer.id === bestId} />)}
             </View>
           </>
         )}

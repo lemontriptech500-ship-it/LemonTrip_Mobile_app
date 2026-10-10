@@ -166,11 +166,10 @@ function DetailSection({
   );
 }
 
-function BookingPanel({ title, duration, price, booked, onEnquire, onBook }: {
+function BookingPanel({ title, duration, price, onEnquire, onBook }: {
   title: string;
   duration: string;
   price: string;
-  booked: boolean;
   onEnquire: () => void;
   onBook: () => void;
 }) {
@@ -180,7 +179,7 @@ function BookingPanel({ title, duration, price, booked, onEnquire, onBook }: {
       <Text style={styles.bookingTitle}>{title}</Text>
       <View style={styles.bookingMeta}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.bookingMetaText}>{duration}</Text></View>
       <View style={styles.bookingPriceArea}><Text style={styles.bookingPriceLabel}>STARTING FROM</Text><Text style={styles.bookingPrice}>{price}</Text></View>
-      <Text style={styles.priceNote}>Final price depends on selected dates and availability.</Text>
+      <Text style={styles.priceNote}>Per person, twin sharing. Choose dates and travellers on the next step to see your total.</Text>
       <TouchableOpacity onPress={onEnquire} style={styles.enquireButtonWide}><Ionicons name="mail-outline" size={15} color={Colors.primary} /><Text style={styles.enquireWideText}>Enquire now</Text></TouchableOpacity>
       <TouchableOpacity onPress={onBook} style={[styles.bookButtonWide, booked && styles.bookedButton]}><Text style={styles.bookWideText}>{booked ? 'View cart' : 'Book package'}</Text></TouchableOpacity>
     </View>

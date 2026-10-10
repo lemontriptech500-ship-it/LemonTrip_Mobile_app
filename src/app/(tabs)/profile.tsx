@@ -15,10 +15,10 @@ const SHADOW = { shadowColor: '#15372e', shadowOpacity: 0.08, shadowRadius: 12, 
 
 // Same circle-icon grid pattern as the Home screen.
 const travelLinks = [
-  { label: 'My trips', artwork: 'flight' as const, route: '/(tabs)/bookings' },
-  { label: 'Saved places', artwork: 'saved' as const, route: '/(tabs)/wishlist' },
-  { label: 'Visa updates', artwork: 'visa' as const, route: '/(tabs)/explore/visa/applications' },
-  { label: 'Offers', artwork: 'offer' as const, route: '/offers' },
+  { label: 'My trips', icon: 'briefcase-outline' as const, route: '/(tabs)/bookings' },
+  { label: 'Saved places', icon: 'heart-outline' as const, route: '/(tabs)/wishlist' },
+  { label: 'Visa updates', icon: 'document-text-outline' as const, route: '/(tabs)/explore/visa/applications' },
+  { label: 'Offers', icon: 'pricetag-outline' as const, route: '/offers' },
 ];
 
 const accountLinks = [
@@ -106,11 +106,9 @@ export default function ProfileScreen() {
             <View style={styles.gridRow}>
               {travelLinks.map((item) => (
                 <TouchableOpacity key={item.label} accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push(item.route as never)}>
-                  <View style={styles.gridCircle}>
-                    <TravelArtworkIcon name={item.artwork} size={36} />
-                    {item.label === 'My trips' && bookings.length > 0 ? (
-                      <View style={styles.gridBadge}><Text style={styles.gridBadgeText}>{bookings.length}</Text></View>
-                    ) : null}
+                  <View style={styles.gridIconWrap}>
+                    <Ionicons name={item.icon} size={23} color={Colors.primary} />
+                    {item.label === 'My trips' && bookings.length > 0 ? <View style={styles.gridBadge}><Text style={styles.gridBadgeText}>{bookings.length}</Text></View> : null}
                   </View>
                   <Text style={styles.gridLabel}>{item.label}</Text>
                 </TouchableOpacity>
@@ -166,7 +164,7 @@ export default function ProfileScreen() {
           {/* Log out */}
           {user ? (
             <TouchableOpacity accessibilityRole="button" onPress={confirmLogout} style={styles.logoutButton} activeOpacity={0.8}>
-              <Ionicons name="log-out-outline" size={20} color="#C62828" />
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
               <Text style={styles.logoutText}>Log out</Text>
             </TouchableOpacity>
           ) : null}
@@ -192,15 +190,15 @@ const styles = StyleSheet.create({
 
   // Title
   titleStrip: { paddingHorizontal: 18, paddingVertical: 16, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 26, fontWeight: '900' },
+  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 26, fontWeight: '800' },
   pageSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, marginTop: 3 },
 
   // Identity card
-  heroCard: { marginTop: 16, marginHorizontal: 16, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
-  heroRing: { position: 'absolute', width: 190, height: 190, right: -80, top: -90, borderRadius: 95, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)' },
+  heroCard: { marginTop: 16, marginHorizontal: Ui.space.page, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
+  heroRing: { position: 'absolute', width: 190, height: 190, right: -80, top: -90, borderRadius: 95, borderWidth: 1, borderColor: Colors.onDarkBorder },
   identityRow: { flexDirection: 'row', alignItems: 'center', gap: 15 },
-  avatar: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accent, borderWidth: 3, borderColor: 'rgba(255,255,255,0.25)' },
-  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, fontWeight: '900' },
+  avatar: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.onDarkHighlight },
+  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, fontWeight: '800' },
   identityCopy: { flex: 1, minWidth: 0 },
   memberPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 6, borderRadius: Ui.radius.pill, backgroundColor: Colors.accent },
   memberPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '900' },
@@ -244,10 +242,10 @@ const styles = StyleSheet.create({
   discoverCard: { flexGrow: 1, minWidth: 0, overflow: 'hidden', padding: 20, borderRadius: 24, backgroundColor: Colors.accentSoft },
   discoverRing: { position: 'absolute', width: 150, height: 150, right: -70, bottom: -80, borderRadius: 75, borderWidth: 1, borderColor: 'rgba(6,59,36,0.15)' },
   discoverIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 27, backgroundColor: Colors.surface },
-  discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '900', marginTop: 14 },
+  discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '800', marginTop: 14 },
   discoverText: { maxWidth: 300, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6 },
   discoverCta: { alignSelf: 'flex-start', minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingLeft: 18, paddingRight: 5, borderRadius: 24, backgroundColor: Colors.white },
-  discoverCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '900' },
+  discoverCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
   discoverCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
 
   // Log out + footer

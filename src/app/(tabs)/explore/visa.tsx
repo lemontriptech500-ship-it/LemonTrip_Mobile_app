@@ -1,11 +1,8 @@
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { VisaApplicationHistory } from '@/components/visa/VisaApplicationHistory';
 import type { VisaCountry } from '@/types/content';
-import { useContentItems } from '@/utils/contentApi';
-import { getAccessToken, useAuth } from '@/utils/authStore';
-import { visaApiConfigured } from '@/utils/visaService';
+import { getVisaServices } from '@/utils/visaService';
+import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
@@ -14,79 +11,35 @@ import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, TouchableOpac
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function VisaScreen() {
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
   const [query, setQuery] = useState('');
-  const user = useAuth();
-  const { items: supportedCountries, loading, error, retry } = useContentItems<VisaCountry>('visa');
-
-  const visibleCountries = useMemo(() => supportedCountries.filter((country) => {
-    const search = query.trim().toLowerCase();
-    return !search || `${country.name} ${country.id} ${country.visaType}`.toLowerCase().includes(search);
-  }), [query, supportedCountries]);
-
-  const handleBack = () => {
-    blurWebNavigationFocus();
-    if (router.canGoBack()) router.back();
-    else router.replace('/(tabs)/explore');
-  };
-
-  return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
-        <View style={styles.content}>
-          <ScreenHeader title="Visa assistance" subtitle="Clear guidance for the next step in your journey." eyebrow="LEMONTRIP / VISA" onBack={handleBack} />
-
-          <ImageBackground source={{ uri: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1500&q=90' }} style={styles.hero} imageStyle={styles.heroImage}>
-            <View style={styles.heroShade} />
-            <View style={styles.heroContent}>
-              <Text style={styles.heroEyebrow}>DESTINATION SUPPORT</Text>
-              <Text style={styles.heroTitle}>Global travel, simplified.</Text>
-              <Text style={styles.heroSubtitle}>Explore visa assistance for countries currently listed by LemonTrip.</Text>
-              <View style={styles.searchBar}>
-                <Ionicons name="search-outline" size={17} color={Colors.primary} />
-                <TextInput value={query} onChangeText={setQuery} placeholder="Search or select a country" placeholderTextColor={Colors.textLight} style={styles.searchInput} />
-                {query ? <TouchableOpacity accessibilityRole="button" accessibilityLabel="Clear country search" onPress={() => setQuery('')}><Ionicons name="close-circle" size={18} color={Colors.textLight} /></TouchableOpacity> : null}
-              </View>
-            </View>
-          </ImageBackground>
-
-          <View style={styles.catalogHeader}>
-            <View><Text style={styles.eyebrow}>CURRENT SERVICE LIST</Text><Text style={styles.sectionTitle}>Choose a destination</Text></View>
-            <Text style={styles.countryCount}>{loading ? 'Loading…' : error ? 'Unavailable' : `${supportedCountries.length} countries`}</Text>
-          </View>
-
-          <View style={[styles.countryGrid, desktop && styles.countryGridDesktop]}>
-          {loading ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Loading visa services…</Text></View> : error ? <View style={styles.emptyState}><Text style={styles.emptyTitle}>Visa services couldn’t load</Text><Text style={styles.emptyText}>{error}</Text><TouchableOpacity accessibilityRole="button" onPress={retry} style={styles.retryButton}><Text style={styles.retryText}>Try again</Text></TouchableOpacity></View> : visibleCountries.map((country) => (
-              <TouchableOpacity key={country.id} accessibilityRole="button" onPress={() => { blurWebNavigationFocus(); router.push({ pathname: '/(tabs)/explore/visa/[id]', params: { id: country.id } }); }} style={[styles.countryCard, desktop && styles.countryCardDesktop]}>
-                <ImageBackground source={{ uri: country.image }} style={styles.countryImage} imageStyle={styles.countryImageStyle}>
-                  <View style={styles.countryShade} />
-                  <View style={styles.countryImageTop}><Text style={styles.countryCode}>VISA SUPPORT</Text><Ionicons name="arrow-forward" size={13} color={Colors.primaryDark} style={styles.countryArrow} /></View>
-                  <Text style={styles.countryName}>{country.name}</Text>
-                </ImageBackground>
-                <View style={styles.countryBody}>
-                  <Text style={styles.countryVisaType}>{country.visaType}</Text>
-                  <View style={styles.countryMeta}><Ionicons name="time-outline" size={12} color={Colors.textLight} /><Text style={styles.countryMetaText}>{country.processing ?? 'Processing time not listed'}</Text></View>
-                  <View style={styles.countryFooter}><Text style={styles.countryFee}>{country.fee ? `From ${country.fee}` : 'Price not listed'}</Text><Text style={styles.checkText}>Check requirements →</Text></View>
-                  <Text numberOfLines={2} style={styles.countryDocuments}>Documents: {country.documents?.join(', ') || 'Requirements not listed'}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {!loading && !error && visibleCountries.length === 0 ? <View style={styles.emptyState}><Ionicons name="search-outline" size={22} color={Colors.primary} /><Text style={styles.emptyTitle}>No supported country found</Text><Text style={styles.emptyText}>Search the current service list or clear your search.</Text></View> : null}
-
-          <View style={styles.serviceNotice}><Ionicons name="information-circle-outline" size={15} color={Colors.secondary} /><Text style={styles.serviceNoticeText}>{visaApiConfigured ? 'Visa requirements, processing estimates, and guidance prices are indicative and should be confirmed with an advisor.' : 'These visa listings are mock service content for browsing. Requirements, processing estimates, and fees are indicative and require advisor confirmation.'}</Text></View>
-
-          {visaApiConfigured ? <VisaApplicationHistory accessToken={user ? getAccessToken() : null} /> : null}
-
-        </View>
-      </ScrollView>
-
-    </SafeAreaView>
-  );
+  const [selected, setSelected] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const [result, setResult] = useState<{ attempt: number; items: VisaCountry[]; error: string } | null>(null);
+  useEffect(() => {
+    let active = true;
+    getVisaServices().then(items => { if (active) setResult({ attempt, items, error: '' }); })
+      .catch(error => { if (active) setResult({ attempt, items: [], error: error instanceof Error ? error.message : 'Visa services could not load.' }); });
+    return () => { active = false; };
+  }, [attempt]);
+  const loading = result?.attempt !== attempt;
+  const countries = useMemo(() => result?.attempt === attempt ? result.items : [], [result, attempt]);
+  const visible = countries.filter(country => `${country.name} ${country.visaType}`.toLowerCase().includes(query.trim().toLowerCase()));
+  const destination = countries.find(country => country.id === selected);
+  return <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+      <ExploreSectionIntro eyebrow="TRAVEL WITH CONFIDENCE" title="Visa Services" subtitle="Explore visa guidance for your next destination.">
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={styles.applications}><Ionicons name="document-text-outline" size={18} color={Colors.primaryDark} /><Text style={styles.applicationsText}>My applications</Text></TouchableOpacity>
+      </ExploreSectionIntro>
+      <View style={styles.page}>
+      <View style={styles.search}><Ionicons name="search-outline" size={17} color={Colors.textLight} /><TextInput accessibilityLabel="Search countries" value={query} onChangeText={setQuery} placeholder="Search country or visa" placeholderTextColor={Colors.textLight} style={styles.input} /></View>
+      {loading ? <ActivityIndicator accessibilityLabel="Loading visa services" color={Colors.secondary} /> : result?.error ? <View style={styles.state}><Text style={styles.body}>{result.error}</Text><TouchableOpacity accessibilityRole="button" style={styles.button} onPress={() => setAttempt(value => value + 1)}><Text style={styles.buttonText}>Try again</Text></TouchableOpacity></View> : visible.length === 0 ? <Text style={styles.body}>No visa services found. Try another country.</Text> : visible.map(country => <TouchableOpacity key={country.id} accessibilityRole="radio" accessibilityLabel={`${country.name}, ${country.visaType}`} accessibilityState={{ selected: selected === country.id, checked: selected === country.id }} onPress={() => setSelected(country.id)} style={[styles.country, selected === country.id && styles.selected]}>
+        <Text style={styles.flag}>{visaCountryFlag(country.name)}</Text><View style={styles.countryCopy}><Text style={styles.countryName}>{country.name}</Text><Text style={styles.body}>{country.visaType}</Text></View><Ionicons name={selected === country.id ? 'radio-button-on' : 'radio-button-off'} size={22} color={selected === country.id ? Colors.secondary : Colors.textLight} />
+      </TouchableOpacity>)}
+      </View>
+    </ScrollView>
+    {!loading && !result?.error && countries.length > 0 ? <View style={styles.footer}><TouchableOpacity accessibilityRole="button" disabled={!destination} style={[styles.button, !destination && styles.disabled]} onPress={() => { if (destination) { blurWebNavigationFocus(); router.push({ pathname: '/(tabs)/explore/visa/[id]', params: { id: destination.id } }); } }}><Text style={styles.buttonText}>Continue</Text></TouchableOpacity></View> : null}
+  </View>;
 }
-
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 28 },

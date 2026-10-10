@@ -20,6 +20,7 @@ export default function FlightSearchScreen() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resultSource, setResultSource] = useState<'live' | 'mock' | null>(null);
   const [request, setRequest] = useState<FlightSearchRequest | null>(null);
   const [offers, setOffers] = useState<FlightOffer[]>([]);
 
@@ -28,11 +29,13 @@ export default function FlightSearchScreen() {
     setLoading(true);
     setHasSearched(true);
     setError(null);
+    setResultSource(null);
     setRequest(searchRequest);
     setOffers([]);
     try {
       const response = await searchFlights(searchRequest);
       setOffers(response.offers);
+      setResultSource(response.source ?? 'live');
     } catch (searchError) {
       setError(searchError instanceof Error ? searchError.message : 'Flight search failed. Please try again.');
     } finally {
@@ -73,6 +76,12 @@ export default function FlightSearchScreen() {
           {request && hasSearched ? (
             <View style={styles.resultsSection}>
               <FareSummary request={request} offer={offers[0]} />
+              {resultSource === 'mock' ? (
+                <View style={styles.demoNotice}>
+                  <Ionicons name="information-circle-outline" size={18} color={Colors.primaryDark} />
+                  <Text style={styles.demoNoticeText}>Sample flight data for preview only. Prices and availability are not real; payment is disabled.</Text>
+                </View>
+              ) : null}
               {error ? (
                 <View style={styles.errorPanel}>
                   <View style={styles.errorIcon}><Ionicons name="cloud-offline-outline" size={21} color={Colors.error} /></View>
@@ -96,7 +105,7 @@ export default function FlightSearchScreen() {
 
           <View style={styles.footer}>
             <Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} />
-            <Text style={styles.footerText}>Secure search. Prices and availability come directly from the flight service.</Text>
+            <Text style={styles.footerText}>Live prices appear when the flight service is connected. Sample results are clearly marked.</Text>
           </View>
         </View>
       </ScrollView>
@@ -110,15 +119,15 @@ const styles = StyleSheet.create({
   page: { paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
   breadcrumbRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  breadcrumb: { color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  breadcrumb: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
   breadcrumbCurrent: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   headerSpacer: { flex: 1 },
   cartButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, borderRadius: 12 },
-  title: { paddingHorizontal: 18, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 29, fontWeight: '900' },
+  title: { paddingHorizontal: 18, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 29, fontWeight: '800' },
   subtitle: { paddingHorizontal: 18, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 4, marginBottom: 16 },
-  hero: { height: 188, marginHorizontal: 16, justifyContent: 'flex-end', overflow: 'hidden', borderRadius: 18 },
+  hero: { height: 188, marginHorizontal: Ui.space.page, justifyContent: 'flex-end', overflow: 'hidden', borderRadius: 18 },
   heroImage: { borderRadius: 18 },
-  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(6, 38, 27, 0.3)' },
+  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.imageOverlay },
   heroCopy: { paddingHorizontal: 18, paddingBottom: 21, maxWidth: 430 },
   heroEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   heroText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 23, fontWeight: '800', marginTop: 6 },

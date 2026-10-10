@@ -2,6 +2,8 @@ import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -45,16 +47,8 @@ export default function FlightDetailsScreen() {
   const handleContinue = () => {
     if (!selection || !selectedFare) return;
     selectFlightFare(selectedFare);
-    addToCart({
-      id: `flight-${selection.offer.id}-${selectedFare.id}`,
-      serviceName: 'Flight',
-      itemName: `${selection.offer.airline.name} ${selection.offer.flightNumber} · ${selection.offer.departure.airportCode} to ${selection.offer.arrival.airportCode} · ${selectedFare.name}`,
-      price: formatPrice(selectedFare.price.total, selectedFare.price.currency),
-      tripDate: selection.request.departureDate,
-    });
-    router.push('/cart');
+    router.push('/flight-booking/traveller' as never);
   };
-
   if (!selection) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -102,7 +96,7 @@ export default function FlightDetailsScreen() {
               <FlightTripSummary fareOption={selectedFare} onContinue={handleContinue} />
               <View style={styles.secureNote}>
                 <Ionicons name="shield-checkmark-outline" size={15} color={Colors.secondary} />
-                <Text style={styles.secureText}>Fare details are shown as supplied by the airline.</Text>
+                <Text style={styles.secureText}>{selection.offer.isDemo ? 'Sample fare details only. This journey cannot be booked until the flight service is connected.' : 'Fare details are shown as supplied by the airline.'}</Text>
               </View>
             </View>
           </View>
@@ -139,11 +133,11 @@ export default function FlightDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
-  page: { paddingHorizontal: 16, paddingBottom: 34 },
+  page: { paddingHorizontal: Ui.space.page, paddingBottom: 34 },
   content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
   breadcrumbRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  backIcon: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.14)' },
-  breadcrumb: { color: 'rgba(255,255,255,0.82)', fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
+  backIcon: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.onDarkSurface },
+  breadcrumb: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
   breadcrumbCurrent: { color: Colors.white, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   columns: { gap: 15, marginTop: 20 },
   columnsWide: { flexDirection: 'row', alignItems: 'flex-start' },

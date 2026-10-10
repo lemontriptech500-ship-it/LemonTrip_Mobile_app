@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/colors';
+import { Brand, Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { View, type ColorValue } from 'react-native';
@@ -85,3 +85,21 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  label: {
+    fontFamily: 'Manrope',
+    fontSize: 11,
+    marginTop: 4,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapActive: {
+    backgroundColor: "#E5F1EC",
+  },
+});

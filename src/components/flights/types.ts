@@ -36,6 +36,8 @@ export interface FlightFareOption {
 
 export interface FlightOffer {
   id: string;
+  /** True only for local sample inventory; never shown for provider-backed results. */
+  isDemo?: boolean;
   airline: { name: string; code: string; logoUrl?: string };
   flightNumber: string;
   departure: { time: string; airportCode: string; airportName?: string };
@@ -58,6 +60,7 @@ export interface FlightSelection {
 
 export interface FlightSearchResponse {
   offers: FlightOffer[];
+  source?: 'live' | 'mock';
 }
 
 export interface FlightFiltersState {

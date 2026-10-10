@@ -75,8 +75,8 @@ export function exchangeFirebasePhoneIdentity(input: {
   return request<AuthSession>('/firebase/phone', input);
 }
 
-export function loginWithGoogle(idToken: string) {
-  return request<AuthSession>('/google', { idToken });
+export function loginWithGoogle(idToken: string, mode: 'login' | 'signup') {
+  return request<AuthSession>('/google', { idToken, mode });
 }
 
 export function refreshAuthSession(refreshToken: string) {

@@ -3,6 +3,8 @@ import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
 import type { Destination, TravelPackage } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
 import { useContentItems } from '@/utils/contentApi';
@@ -138,42 +140,23 @@ export default function ExploreScreen() {
   const clearAll = () => { setFilters(defaultFilters); setSelectedExperience(null); setQuery(''); };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          {/* Header — same structure as Home */}
-          <BrandGradientBar style={styles.header}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => router.push('/(tabs)')} style={styles.brandLockup}>
-              <LemonTripBrand size={50} />
-            </TouchableOpacity>
-            {isWide ? (
-              <View style={styles.headerNav}>
-                <TouchableOpacity style={[styles.navLink, styles.navLinkActive]} onPress={() => router.push('/(tabs)/explore')}><Text style={[styles.navText, styles.navTextActive]}>Explore</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.navLink} onPress={() => router.push('/packages')}><Text style={styles.navText}>Packages</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.navLink} onPress={() => router.push('/offers')}><Text style={styles.navText}>Offers</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.navLink} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.navText}>Visa Services</Text></TouchableOpacity>
-              </View>
-            ) : <View style={styles.headerSpacer} />}
-            <View style={styles.headerActions}>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => router.push('/(tabs)/wishlist')} style={styles.headerAction}>
-                <Ionicons name="heart-outline" size={24} color={Colors.white} />
-              </TouchableOpacity>
-              {user ? (
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => router.push('/(tabs)/profile')} style={styles.avatar}>
-                  <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+          <ExploreSectionIntro eyebrow="DESTINATION DISCOVERY" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style.">
+            <View style={styles.quickSearchRow}>
+              <Text style={styles.quickSearchLabel}>POPULAR</Text>
+              {popularSearches.slice(0, 3).map((destination) => (
+                <TouchableOpacity key={destination} accessibilityRole="button" onPress={() => selectSearch(destination)} style={styles.quickSearchChip}>
+                  <Text style={styles.quickSearchText}>{destination}</Text>
                 </TouchableOpacity>
-              ) : (
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => router.push('/login')} style={styles.loginPill}>
-                  <Ionicons name="person-outline" size={18} color={Colors.primaryDark} />
-                  <Text style={styles.loginText}>Login</Text>
-                </TouchableOpacity>
-              )}
+              ))}
             </View>
           </BrandGradientBar>
           <View style={styles.exploreIntro}><BrandMotif /><Text style={styles.exploreEyebrow}>THE WORLD IS CALLING</Text><Text style={styles.exploreTitle}>Find your next escape.</Text><Text style={styles.exploreSubtitle}>Somewhere new. Something unforgettable.</Text></View>
 
-          {/* Search strip — same pill as Home, filter button replaces the arrow */}
+          {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
             <View style={styles.searchPill}>
               <Ionicons name="search-outline" size={22} color={Colors.textLight} />
@@ -257,34 +240,18 @@ export default function ExploreScreen() {
                 const selected = selectedExperience === experience.filter;
                 return (
                   <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.gridItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
-                    <View style={[styles.gridCircle, selected && styles.gridCircleSelected]}>
-                      <Ionicons name={experience.icon} size={30} color={selected ? Colors.white : Colors.primary} />
-                    </View>
+                    <Ionicons name={experience.icon} size={22} color={selected ? Colors.primaryDark : Colors.textLight} />
                     <Text style={[styles.gridLabel, selected && styles.gridLabelSelected]}>{experience.name}</Text>
+                    <View style={[styles.experienceIndicator, selected && styles.experienceIndicatorSelected]} />
                   </TouchableOpacity>
                 );
               })}
-              <TouchableOpacity accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push('/packages')}>
-                <View style={styles.gridCircle}><Ionicons name="grid-outline" size={28} color={Colors.primary} /></View>
+              <TouchableOpacity accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
+                <Ionicons name="grid-outline" size={22} color={Colors.textLight} />
                 <Text style={styles.gridLabel}>All journeys</Text>
+                <View style={styles.experienceIndicator} />
               </TouchableOpacity>
             </View>
-          </View>
-
-          {/* Promo banner — same treatment as Home carousel */}
-          <View style={styles.bannerWrap}>
-            <ImageBackground source={{ uri: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1800&q=92' }} style={[styles.banner, isWide && styles.bannerWide]} imageStyle={styles.bannerImage}>
-              <View style={styles.bannerShade} />
-              <View style={styles.bannerContent}>
-                <Text style={styles.bannerKicker}>Find your kind of</Text>
-                <Text style={styles.bannerTitle}>Escape</Text>
-                <Text style={styles.bannerSubtitle}>Discover destinations, handpicked stays and unforgettable experiences.</Text>
-                <TouchableOpacity accessibilityRole="button" style={styles.bannerCta} onPress={() => router.push('/packages')}>
-                  <Text style={styles.bannerCtaText}>View Packages</Text>
-                  <View style={styles.bannerCtaArrow}><Ionicons name="arrow-forward" size={18} color={Colors.white} /></View>
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
           </View>
 
           {/* Trending destinations */}
@@ -327,7 +294,7 @@ export default function ExploreScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
               <Text style={styles.sectionTitle}>Handpicked journeys</Text>
-              <TouchableOpacity onPress={() => router.push('/packages')}><Text style={styles.linkText}>All journeys</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/packages')}><Text style={styles.linkText}>All journeys</Text></TouchableOpacity>
             </View>
 
             {activeFilterCount > 0 ? (
@@ -386,7 +353,7 @@ export default function ExploreScreen() {
                   <TouchableOpacity key={preference} style={[styles.preferenceChip, tripPreference === preference && styles.preferenceChipActive]} onPress={() => {
                     setTripPreference(preference);
                     if (preference === 'Save a place') router.push('/(tabs)/wishlist');
-                    if (preference === 'Surprise me') router.push('/packages');
+                    if (preference === 'Surprise me') router.navigate('/(tabs)/explore/packages');
                   }}>
                     <Text style={[styles.preferenceText, tripPreference === preference && styles.preferenceTextActive]}>{preference}</Text>
                   </TouchableOpacity>
@@ -421,7 +388,7 @@ export default function ExploreScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -441,22 +408,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
-
-  // Header
-  header: { minHeight: 72, paddingHorizontal: 18, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  brandLockup: { minWidth: 150, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
-  headerSpacer: { flex: 1 },
-  headerNav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 },
-  navLink: { minHeight: 54, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  navLinkActive: { borderBottomColor: Colors.accent },
-  navText: { color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 14, fontWeight: '700' },
-  navTextActive: { color: Colors.accent, fontWeight: '900' },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  headerAction: { width: 38, height: 40, alignItems: 'center', justifyContent: 'center' },
-  avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent },
-  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  loginPill: { height: 42, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, borderRadius: 21, backgroundColor: Colors.white },
-  loginText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
 
   // Search
   searchStrip: { ...Ui.card, marginHorizontal: 18, marginTop: -18, padding: 12, zIndex: 5 },
@@ -488,37 +439,23 @@ const styles = StyleSheet.create({
   // Travel style grid card
   gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: 16, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, marginBottom: 10 },
-  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
+  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridCircle: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center', borderRadius: 33, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
-  gridCircleSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  gridLabel: { marginTop: 7, textAlign: 'center', color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, lineHeight: 17, fontWeight: '800' },
-  gridLabelSelected: { color: Colors.primary },
-
-  // Banner
-  bannerWrap: { marginTop: 16, marginHorizontal: 16 },
-  banner: { minHeight: 230, justifyContent: 'flex-end', borderRadius: 24, overflow: 'hidden', backgroundColor: Colors.primaryDark },
-  bannerWide: { minHeight: 260 },
-  bannerImage: { borderRadius: 24 },
-  bannerShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(3, 39, 30, 0.36)' },
-  bannerContent: { padding: 20, maxWidth: 560 },
-  bannerKicker: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '500' },
-  bannerTitle: { color: Colors.white, fontFamily: 'Manrope', fontSize: 36, lineHeight: 42, fontWeight: '900' },
-  bannerSubtitle: { color: 'rgba(255,255,255,0.94)', fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6, maxWidth: 380 },
-  bannerCta: { alignSelf: 'flex-start', minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 14, paddingLeft: 20, paddingRight: 6, borderRadius: 25, backgroundColor: Colors.white },
-  bannerCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
-  bannerCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
+  gridItem: { width: '25%', minHeight: 66, alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 2, position: 'relative' },
+  gridLabel: { minHeight: 22, marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, lineHeight: 12, fontWeight: '700' },
+  gridLabelSelected: { color: Colors.primaryDark, fontWeight: '800' },
+  experienceIndicator: { position: 'absolute', bottom: 0, width: 24, height: 3, borderRadius: 2 },
+  experienceIndicatorSelected: { backgroundColor: Colors.accent },
 
   // Sections
   section: { paddingTop: 24 },
   sectionHeading: { paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '900' },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '800' },
   linkText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
 
   // Destinations
   destinationRow: { paddingHorizontal: 16, gap: 12 },
-  destinationCard: { width: 290, height: 170, borderRadius: 20, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
+  destinationCard: { width: 220, height: 172, borderRadius: 19, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, ...SHADOW },
   destinationImage: { flex: 1, justifyContent: 'space-between', padding: 14 },
   destinationImageStyle: { borderRadius: 20 },
   destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(4, 30, 25, 0.42)' },
@@ -538,19 +475,19 @@ const styles = StyleSheet.create({
   packageCard: { ...Ui.card, width: 264, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, overflow: 'hidden', ...SHADOW },
   packageImage: { height: 130, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start', padding: 10 },
   packageImageStyle: { borderTopLeftRadius: 19, borderTopRightRadius: 19 },
-  packageBadge: { overflow: 'hidden', color: Colors.primaryDark, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9, fontFamily: 'Manrope', fontSize: 11, fontWeight: '900' },
-  packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(20, 31, 25, 0.72)', paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
+  packageBadge: { overflow: 'hidden', color: Colors.primaryDark, backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 9, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.strongOverlay, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
   packageRatingText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
   packageBody: { padding: 14 },
-  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 21, fontWeight: '900' },
+  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 21, fontWeight: '800' },
   packageMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   packageDuration: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
   packageBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
   priceLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
-  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900', marginTop: 1 },
+  packagePrice: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', marginTop: 1 },
   packageArrow: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.primary },
 
-  emptyState: { marginHorizontal: 16, padding: 20, alignItems: 'flex-start', gap: 12, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  emptyState: { marginHorizontal: Ui.space.page, padding: 20, alignItems: 'flex-start', gap: 12, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   emptyStateText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 },
   emptyButton: { minHeight: 44,  paddingHorizontal: 16, paddingVertical: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
 
@@ -558,10 +495,10 @@ const styles = StyleSheet.create({
   personalPanel: { marginTop: 24, marginHorizontal: 16, padding: 18, flexDirection: 'row', gap: 14, alignItems: 'flex-start', borderRadius: 22, backgroundColor: Colors.accentSoft },
   personalLogo: { width: 52, height: 52, borderRadius: 12 },
   personalCopy: { flex: 1, minWidth: 0 },
-  personalTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 19, lineHeight: 24, fontWeight: '900' },
+  personalTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 19, lineHeight: 24, fontWeight: '800' },
   personalSubtitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 4 },
   preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 12 },
-  preferenceChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(6,59,36,0.14)', backgroundColor: 'rgba(255,255,255,0.8)' },
+  preferenceChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: Colors.decorativeGreen, backgroundColor: Colors.surface },
   preferenceChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   preferenceText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
   preferenceTextActive: { color: Colors.white },
@@ -569,7 +506,7 @@ const styles = StyleSheet.create({
   signInText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
 
   // Trust + footer
-  trustStrip: { marginTop: 18, marginHorizontal: 16, padding: 14, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: '#edf5eb', borderRadius: 18 },
+  trustStrip: { marginTop: 18, marginHorizontal: Ui.space.page, padding: 14, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 18 },
   trustItem: { flexGrow: 1, flexBasis: 150, flexDirection: 'row', alignItems: 'center', gap: 10 },
   trustCopy: { flexShrink: 1 },
   trustTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '900' },

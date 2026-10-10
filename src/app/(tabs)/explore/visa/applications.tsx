@@ -49,8 +49,8 @@ export default function VisaApplicationsScreen() {
     finally { setOpening(''); }
   };
 
-  return <SafeAreaView style={styles.safe} edges={['top']}><ScrollView contentContainerStyle={styles.page}>
-    <View style={styles.content}><ScreenHeader title="Visa applications" subtitle="Your submitted visa requests and uploaded documents." eyebrow="LEMONTRIP / VISA" onBack={() => router.back()} />
+  return <SafeAreaView headerTone="light" style={styles.safe} edges={['top']}><VisaHeader title="Visa Applications" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/explore/visa')} /><ScrollView contentContainerStyle={styles.page}>
+    <View style={styles.content}><Text style={styles.heading}>Your visa applications</Text><Text style={styles.copy}>View your requests, documents, and latest updates.</Text>
       {loading ? <ActivityIndicator accessibilityLabel="Loading visa applications" color={Colors.primary} style={styles.loader} /> : null}
       {!loading && !user ? <View style={styles.empty}><Ionicons name="lock-closed-outline" size={28} color={Colors.primary}/><Text style={styles.heading}>Sign in required</Text><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => router.push('/login')}><Text style={styles.buttonText}>Sign in</Text></TouchableOpacity></View> : null}
       {!loading && user && error ? <View style={styles.errorPanel}><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => void load()}><Text style={styles.buttonText}>Try again</Text></TouchableOpacity></View> : null}

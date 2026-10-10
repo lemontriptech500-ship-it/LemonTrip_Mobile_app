@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   sortChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   sortChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
   sortChipTextActive: { color: Colors.white },
-  filtersBlock: { marginHorizontal: 16, marginTop: 14, padding: 11, borderRadius: 13, backgroundColor: Colors.surfaceMuted },
+  filtersBlock: { marginHorizontal: Ui.space.page, marginTop: 14, padding: 11, borderRadius: 13, backgroundColor: Colors.surfaceMuted },
   filtersTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
   filtersTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
   filterOptions: { gap: 6 },

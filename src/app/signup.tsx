@@ -1,6 +1,6 @@
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { AuthField, AuthLayout, AuthLegalLinks, GoogleAuthButton } from '@/components/auth/AuthLayout';
+import { AuthField, AuthLayout, GoogleAuthButton, OtpCodeField } from '@/components/auth/AuthLayout';
 import { exchangeFirebasePhoneIdentity, loginWithGoogle, normalizePhoneInput, signupWithEmail } from '@/utils/authApi';
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
@@ -71,9 +71,12 @@ export default function SignupScreen() {
   return (
     <AuthLayout
       eyebrow="LEMONTRIP / CREATE ACCOUNT"
-      title="Create your LemonTrip account"
-      subtitle="Save your plans and keep every journey close."
+      title={mode === 'phone' && phoneOtp.challenge ? 'Verify Your Number' : 'Create Account'}
+      subtitle={mode === 'phone' && phoneOtp.challenge
+        ? `Enter the six-digit code sent to ${normalizePhoneInput(phone) ?? phone}.`
+        : 'Join LemonTrip today.'}
       onBack={handleBack}>
+      {!phoneOtp.challenge ? <>
       <AuthField
         label="Name"
         value={name}
@@ -81,31 +84,32 @@ export default function SignupScreen() {
         onChangeText={(value) => { setName(value); if (errors.name) setErrors((current) => ({ ...current, name: '' })); }}
         error={errors.name}
         autoCapitalize="words"
+        icon="person-outline"
       />
-      <View style={styles.modeSwitch}>
-        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('email'); void phoneOtp.reset(); }} style={[styles.modeButton, mode === 'email' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email + password</Text></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" onPress={() => { setMode('phone'); void phoneOtp.reset(); }} style={[styles.modeButton, mode === 'phone' && styles.modeButtonActive]}><Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone OTP</Text></TouchableOpacity>
-      </View>
-      {mode === 'email' ? <AuthField
-        label="Email"
-        value={email}
-        placeholder="you@example.com"
-        onChangeText={(value) => { setEmail(value); if (errors.email) setErrors((current) => ({ ...current, email: '' })); }}
-        error={errors.email}
+      </> : null}
+      {!phoneOtp.challenge ? <AuthField
+        label="Email or Mobile Number"
+        value={mode === 'email' ? email : phone}
+        placeholder="Email or mobile number"
+        onChangeText={(value) => {
+          const phoneMode = Boolean(value.trim()) && /^[+\d\s()-]+$/.test(value.trim());
+          setMode(phoneMode ? 'phone' : 'email');
+          if (phoneMode) {
+            setPhone(value);
+            if (errors.phone) setErrors((current) => ({ ...current, phone: '' }));
+          } else {
+            setEmail(value);
+            if (errors.email) setErrors((current) => ({ ...current, email: '' }));
+          }
+          if (phoneOtp.challenge) void phoneOtp.reset();
+        }}
+        error={mode === 'phone' ? errors.phone : errors.email}
         autoCapitalize="none"
         keyboardType="email-address"
-      /> : null}
-      {mode === 'phone' ? <AuthField
-        label="Mobile"
-        value={phone}
-        placeholder="Phone number (+91 default)"
-        onChangeText={(value) => { setPhone(value); if (phoneOtp.challenge) void phoneOtp.reset(); if (errors.phone) setErrors((current) => ({ ...current, phone: '' })); }}
-        error={errors.phone}
-        autoCapitalize="none"
-        keyboardType="phone-pad"
+        icon={mode === 'phone' ? 'call-outline' : 'mail-outline'}
       /> : null}
       {mode === 'phone' && phoneOtp.challenge ? <>
-        <AuthField label="Verification code" value={phoneOtp.code} placeholder="Six-digit code" onChangeText={phoneOtp.setCode} error={phoneOtp.error} keyboardType="phone-pad" autoCapitalize="none" />
+        <OtpCodeField value={phoneOtp.code} onChangeText={phoneOtp.setCode} error={phoneOtp.error} />
         <View style={styles.otpActions}>
           <TouchableOpacity accessibilityRole="button" onPress={() => void phoneOtp.reset()}><Text style={styles.otpActionText}>Edit phone</Text></TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" disabled={phoneOtp.busy || phoneOtp.resendSeconds > 0} onPress={() => { const number = normalizePhoneInput(phone); if (number) void phoneOtp.sendCode(number); }}>
@@ -113,8 +117,8 @@ export default function SignupScreen() {
           </TouchableOpacity>
         </View>
       </> : null}
-      {mode === 'phone' && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
-      {mode === 'phone' ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
+      {mode === 'phone' && !phoneOtp.challenge && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
+      {mode === 'phone' && !phoneOtp.challenge ? <Text style={styles.smsNotice}>We’ll send an SMS to verify your number. Standard messaging rates may apply.</Text> : null}
       {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <Text accessibilityRole="alert" style={styles.phoneError}>{phoneOtp.error}</Text> : null}
       {mode === 'phone' && phoneOtp.errorCode === 'PHONE_ACCOUNT_EXISTS' ? <TouchableOpacity accessibilityRole="button" onPress={() => router.replace('/login')} style={styles.accountLink}><Text style={styles.accountLinkText}>Sign in to your existing account</Text></TouchableOpacity> : null}
       {mode === 'email' ? <AuthField
@@ -126,17 +130,19 @@ export default function SignupScreen() {
         secure={!showPassword}
         onToggleSecure={() => setShowPassword((visible) => !visible)}
         autoCapitalize="none"
+        icon="lock-closed-outline"
       /> : null}
 
       <TouchableOpacity accessibilityRole="button" disabled={loading || phoneOtp.busy} style={[styles.primaryButton, (loading || phoneOtp.busy) && styles.disabledButton]} onPress={() => void validateAndSignup()}>
-        <Text style={styles.primaryButtonText}>{loading || phoneOtp.busy ? 'Please wait…' : mode === 'phone' && !phoneOtp.challenge ? 'Send verification code' : mode === 'phone' ? 'Verify & create account' : 'Create account'}</Text>
+        <Text style={styles.primaryButtonText}>{loading || phoneOtp.busy ? 'Please wait…' : mode === 'phone' && !phoneOtp.challenge ? 'Send OTP' : mode === 'phone' ? 'Verify' : 'Sign Up'}</Text>
       </TouchableOpacity>
 
+      {!phoneOtp.challenge ? <>
       <View style={styles.dividerRow}><View style={styles.divider} /><Text style={styles.dividerText}>OR</Text><View style={styles.divider} /></View>
-      <GoogleAuthButton label="Sign up with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken)); router.replace('/(tabs)/profile'); }} />
+      <GoogleAuthButton label="Sign up with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'signup')); router.replace('/(tabs)/profile'); }} />
 
       <TouchableOpacity onPress={() => router.push('/login')} style={styles.switchLink}>
-        <Text style={styles.switchText}>Already have an account? <Text style={styles.switchTextStrong}>Login</Text></Text>
+        <Text style={styles.switchText}>Already have an account? <Text style={styles.switchTextStrong}>Log In</Text></Text>
       </TouchableOpacity>
       <AuthLegalLinks onTerms={() => router.push('/terms')} onPrivacy={() => router.push('/privacy')} />
     </AuthLayout>

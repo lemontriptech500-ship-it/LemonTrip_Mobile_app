@@ -3,40 +3,26 @@ import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import type { Listing } from '@/types/content';
-import { useContentItems } from '@/utils/contentApi';
+import { StationPicker } from '@/components/trains/StationPicker';
+import { TrainCard } from '@/components/trains/TrainCards';
+import { Card, Chip, EmptyState, FlowScreen, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, goBackOr, goTo } from '@/components/trains/TrainUi';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
+import { CLASS_INFO, POPULAR_ROUTES, fromISO, getClassOptions, getStation, isRealDate, lowestFare, resolveStation, searchTrains, stationLabel, timeOfDay, upcomingDates, type ClassCode } from '@/data/trains';
+import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
+import { selectTrain, setTrainSearch, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
-function getRoute(detail: string) {
-  const route = detail.split('·')[0] ?? '';
-  const [from = '', to = ''] = route.split('→').map((station) => station.trim());
-  return { from, to };
-}
-
-function getClasses(detail: string) {
-  const classes: string[] = [];
-  if (/AC\s*2\s*Tier/i.test(detail)) classes.push('2A');
-  if (/AC\s*3\s*Tier/i.test(detail)) classes.push('3A');
-  if (/AC\s*Chair/i.test(detail)) classes.push('CC');
-  if (/Sleeper/i.test(detail)) classes.push('SL');
-  if (/First\s*AC/i.test(detail)) classes.push('1A');
-  if (/General/i.test(detail)) classes.push('General');
-  return classes;
-}
-
-function parsePrice(price: string) {
-  const match = price.match(/[\d,]+(?:\.\d+)?/);
-  return match ? Number(match[0].replace(/,/g, '')) : Number.POSITIVE_INFINITY;
-}
-
-function validDate(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  return !Number.isNaN(new Date(`${value}T00:00:00`).getTime());
-}
+type Sort = 'earliest' | 'fastest' | 'cheapest';
+type Slot = 'any' | 'morning' | 'afternoon' | 'evening' | 'night';
+const SLOTS: { id: Slot; label: string }[] = [
+  { id: 'any', label: 'Any time' }, { id: 'morning', label: 'Morning' }, { id: 'afternoon', label: 'Afternoon' }, { id: 'evening', label: 'Evening' }, { id: 'night', label: 'Night' },
+];
+const ALL_CLASSES = Object.keys(CLASS_INFO) as ClassCode[];
 
 export default function TrainsScreen() {
   const { query } = useLocalSearchParams<{ query?: string }>();
@@ -51,19 +37,20 @@ export default function TrainsScreen() {
   const [travelDate, setTravelDate] = useState(typeof initial.travelDate === 'string' ? initial.travelDate : '');
   const [selectedClass, setSelectedClass] = useState('Any class');
   const [searched, setSearched] = useState(false);
-  const [activeClassFilter, setActiveClassFilter] = useState<string | null>(null);
-  const [expressOnly, setExpressOnly] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [sort, setSort] = useState<Sort>('earliest');
+  const [slot, setSlot] = useState<Slot>('any');
+  const dates = useMemo(() => { const base = upcomingDates(14); return base.includes(search.date) ? base : [search.date, ...base]; }, [search.date]);
 
-  const results = useMemo(() => trainListings.filter((train) => {
-    const route = getRoute(train.detail);
-    const matchesFrom = !searched || !from.trim() || route.from.toLowerCase().includes(from.trim().toLowerCase());
-    const matchesTo = !searched || !to.trim() || route.to.toLowerCase().includes(to.trim().toLowerCase());
-    const classes = getClasses(train.detail);
-    const matchesClass = (!searched || selectedClass === 'Any class' || classes.includes(selectedClass))
-      && (!activeClassFilter || classes.includes(activeClassFilter));
-    const matchesType = !expressOnly || /express/i.test(train.name);
-    return matchesFrom && matchesTo && matchesClass && matchesType;
-  }).sort((first, second) => parsePrice(first.price) - parsePrice(second.price)), [activeClassFilter, expressOnly, from, searched, selectedClass, to, trainListings]);
+  // Restore a saved/recent search (e.g. from Home → Recent searches).
+  useEffect(() => {
+    const saved = parseSavedQuery(query);
+    const from = typeof saved.from === 'string' ? resolveStation(saved.from)?.code : undefined;
+    const to = typeof saved.to === 'string' ? resolveStation(saved.to)?.code : undefined;
+    const rawDate = typeof saved.travelDate === 'string' ? saved.travelDate.replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3') : '';
+    const date = isRealDate(rawDate) && rawDate >= upcomingDates(1)[0] ? rawDate : undefined;
+    if (from || to || date) { setTrainSearch({ ...(from ? { from } : {}), ...(to ? { to } : {}), ...(date ? { date } : {}) }); if (from && to) setSearched(true); }
+  }, [query]);
 
   const handleSearch = () => {
     if (travelDate && !validDate(travelDate)) {
@@ -72,69 +59,102 @@ export default function TrainsScreen() {
     }
     void recordRecentSearch('Trains', `${from || 'Origin'} → ${to || 'Destination'}`, JSON.stringify({ from, to, travelDate }));
     setSearched(true);
+    void recordRecentSearch('Trains', `${getStation(search.from)?.city} → ${getStation(search.to)?.city}`, JSON.stringify({ from: search.from, to: search.to, travelDate: search.date }));
   };
-
-  const handleBack = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace('/(tabs)/explore');
+  const open = (resultIndex: number, classCode?: string) => {
+    const r = results[resultIndex];
+    const preferred = (classCode as ClassCode | undefined) ?? (search.classCode !== 'ANY' && r.train.classes.includes(search.classCode) ? search.classCode : r.train.classes[0]);
+    selectTrain({ trainId: r.train.id, fromCode: r.from.code, toCode: r.to.code, date: search.date, classCode: preferred, quota: 'GN' });
+    goTo(TRAIN_ROUTES.details, { id: r.train.id });
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <View style={styles.content}>
-          <ScreenHeader title="Book train travel" subtitle="Compare routes and fares supplied by LemonTrip." eyebrow="LEMONTRIP / RAIL" onBack={handleBack} />
+    <FlowScreen>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 32 }}>
+        <View style={s.content}>
+          <ScreenHeader title="Book train tickets" subtitle="Search routes, compare classes and check seat availability." eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr('/(tabs)/explore')} />
 
-          <View style={styles.searchPanel}>
-            <View style={styles.searchHeading}><View style={styles.railIcon}><TravelArtworkIcon name="train" size={38} /></View><View><Text style={styles.searchTitle}>Plan your rail journey</Text><Text style={styles.searchSubtitle}>Search stations, travel date, and class.</Text></View></View>
-            <View style={styles.fields}>
-              <SearchField label="FROM STATION" value={from} onChangeText={setFrom} placeholder="Departure station" icon="radio-button-on-outline" />
-              <View style={styles.swapIcon}><Ionicons name="arrow-forward" size={14} color={Colors.textLight} /></View>
-              <SearchField label="TO STATION" value={to} onChangeText={setTo} placeholder="Arrival station" icon="location-outline" />
-              <SearchField label="DATE" value={travelDate} onChangeText={setTravelDate} placeholder="YYYY-MM-DD" icon="calendar-outline" />
+          <Card>
+            <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />
+            <View style={s.stations}>
+              <StationButton label="FROM" code={search.from} placeholder="Select departure" icon="radio-button-on-outline" onPress={() => setPicker('from')} />
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap stations" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.primaryDark} /></TouchableOpacity>
+              <StationButton label="TO" code={search.to} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to')} />
             </View>
-            <Text style={styles.classLabel}>CLASS</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.classOptions}>
-              {['Any class', ...availableClasses].map((trainClass) => (
-                <TouchableOpacity key={trainClass} onPress={() => setSelectedClass(trainClass)} style={[styles.classChip, selectedClass === trainClass && styles.classChipSelected]}>
-                  <Text style={[styles.classChipText, selectedClass === trainClass && styles.classChipTextSelected]}>{trainClass}</Text>
-                </TouchableOpacity>
-              ))}
+
+            <Text style={s.label}>DEPARTURE DATE</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.dates}>
+              {dates.map((iso) => {
+                const d = fromISO(iso); const on = iso === search.date;
+                return (
+                  <TouchableOpacity key={iso} accessibilityRole="button" accessibilityState={{ selected: on }} accessibilityLabel={d.toDateString()} onPress={() => setTrainSearch({ date: iso })} style={[s.date, on && s.dateOn]}>
+                    <Text style={[s.dow, on && s.dateTextOn]}>{d.toLocaleDateString('en-IN', { weekday: 'short' }).toUpperCase()}</Text>
+                    <Text style={[s.dayNum, on && s.dateTextOn]}>{d.getDate()}</Text>
+                    <Text style={[s.mon, on && s.dateTextOn]}>{d.toLocaleDateString('en-IN', { month: 'short' })}</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
-            <TouchableOpacity accessibilityRole="button" onPress={handleSearch} style={styles.searchButton}><Ionicons name="search-outline" size={16} color={Colors.primaryDark} /><Text style={styles.searchButtonText}>Search trains</Text></TouchableOpacity>
-          </View>
 
-          <View style={[styles.resultsLayout, desktop && styles.resultsLayoutDesktop]}>
-            <View style={[styles.filterPanel, desktop && styles.filterPanelDesktop]}>
-              <View style={styles.filterHeading}><Ionicons name="options-outline" size={15} color={Colors.primary} /><Text style={styles.filterTitle}>Filter trains</Text></View>
-              <Text style={styles.filterGroup}>Departure time</Text><Text style={styles.unavailable}>Times are not provided by the demo data.</Text>
-              <Text style={styles.filterGroup}>Arrival time</Text><Text style={styles.unavailable}>Times are not provided by the demo data.</Text>
-              <Text style={styles.filterGroup}>Train type</Text>
-              <TouchableOpacity accessibilityRole="button" accessibilityState={{ selected: expressOnly }} onPress={() => setExpressOnly((current) => !current)} style={styles.filterOption}><Ionicons name={expressOnly ? 'checkbox' : 'square-outline'} size={15} color={expressOnly ? Colors.primary : Colors.textLight} /><Text style={styles.filterOptionText}>Express</Text></TouchableOpacity>
-              <Text style={styles.filterGroup}>Class</Text>
-              {availableClasses.map((trainClass) => <TouchableOpacity key={trainClass} accessibilityRole="button" accessibilityState={{ selected: activeClassFilter === trainClass }} onPress={() => setActiveClassFilter((current) => current === trainClass ? null : trainClass)} style={styles.filterOption}><Ionicons name={activeClassFilter === trainClass ? 'checkbox' : 'square-outline'} size={15} color={activeClassFilter === trainClass ? Colors.primary : Colors.textLight} /><Text style={styles.filterOptionText}>{trainClass}</Text></TouchableOpacity>)}
-            </View>
+            <Text style={s.label}>CLASS</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
+              <Chip label="Any class" selected={search.classCode === 'ANY'} onPress={() => setTrainSearch({ classCode: 'ANY' })} />
+              {ALL_CLASSES.map((c) => <Chip key={c} label={c} selected={search.classCode === c} onPress={() => setTrainSearch({ classCode: c })} />)}
+            </ScrollView>
 
-            <View style={styles.resultColumn}>
-              <View style={styles.resultHeading}><View><Text style={styles.eyebrow}>{searched ? 'MATCHING ROUTES' : 'AVAILABLE ROUTES'}</Text><Text style={styles.resultTitle}>{results.length} {results.length === 1 ? 'train' : 'trains'}</Text></View>
-                {(activeClassFilter || expressOnly) ? <TouchableOpacity onPress={() => { setActiveClassFilter(null); setExpressOnly(false); }}><Text style={styles.clearText}>Clear filters</Text></TouchableOpacity> : null}
+            {errorMsg ? <Text style={s.error}>{errorMsg}</Text> : null}
+            <View style={{ marginTop: 14 }}><PrimaryButton label="Search trains" icon="search" onPress={runSearch} /></View>
+          </Card>
+
+          {!searched ? (
+            <Card>
+              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
+              <View style={s.popular}>
+                {POPULAR_ROUTES.map((r) => (
+                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setTrainSearch({ from: r.from, to: r.to }); setSearched(true); setErrorMsg(''); }} style={s.route}>
+                    <Text style={s.routeText}>{getStation(r.from)?.city}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getStation(r.to)?.city}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-              {loading ? <View style={styles.empty}><Text style={styles.emptyTitle}>Loading train listings…</Text></View> : error ? <View style={styles.empty}><Text style={styles.emptyTitle}>{error}</Text></View> : results.length ? <View style={styles.trainList}>{results.map((train) => <TrainResult key={train.id} train={train} />)}</View> : <View style={styles.empty}><TravelArtworkIcon name="train" size={40} /><Text style={styles.emptyTitle}>No train listings are available</Text><Text style={styles.unavailable}>Try again after train inventory is added.</Text></View>}
+            </Card>
+          ) : null}
+
+          <View style={s.pad}>
+            <View style={s.resultHead}>
+              <View>
+                <Text style={s.eyebrow}>{searched ? `${getStation(search.from)?.code} → ${getStation(search.to)?.code}` : 'ALL ROUTES'}</Text>
+                <Text style={s.count}>{results.length} {results.length === 1 ? 'train' : 'trains'} {searched ? 'found' : 'available'}</Text>
+              </View>
             </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
+              <Chip icon="time-outline" label="Earliest" selected={sort === 'earliest'} onPress={() => setSort('earliest')} />
+              <Chip icon="flash-outline" label="Fastest" selected={sort === 'fastest'} onPress={() => setSort('fastest')} />
+              <Chip icon="wallet-outline" label="Cheapest" selected={sort === 'cheapest'} onPress={() => setSort('cheapest')} />
+            </ScrollView>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginTop: 8, marginBottom: 14 }]}>
+              {SLOTS.map((o) => <Chip key={o.id} label={o.label} selected={slot === o.id} onPress={() => setSlot(o.id)} />)}
+            </ScrollView>
+
+            {results.length ? results.map((r, i) => (
+              <TrainCard key={r.train.id} result={r} date={search.date} onOpen={() => open(i)} onSelectClass={(code) => open(i, code)} />
+            )) : (
+              <EmptyState icon="train-outline" title="No trains match" text={searched ? 'No trains run on this route for the selected date, class or time. Try another date or clear the filters.' : 'No trains available.'} action={<PrimaryButton variant="soft" label="Clear filters" onPress={() => { setSlot('any'); setTrainSearch({ classCode: 'ANY' }); }} />} />
+            )}
           </View>
+
+          <Notice icon="shield-checkmark-outline" title="Demo inventory">Schedules, fares and seat availability shown here are sample data for demonstration. No real railway ticket or PNR is issued.</Notice>
         </View>
       </ScrollView>
-    </SafeAreaView>
+
+      <StationPicker visible={picker !== null} title={picker === 'from' ? 'Departure station' : 'Arrival station'} exclude={picker === 'from' ? search.to : search.from}
+        onClose={() => setPicker(null)} onSelect={(code) => { setTrainSearch(picker === 'from' ? { from: code } : { to: code }); setPicker(null); setErrorMsg(''); }} />
+    </FlowScreen>
   );
 }
 
-function SearchField({ label, value, onChangeText, placeholder, icon }: { label: string; value: string; onChangeText: (value: string) => void; placeholder: string; icon: keyof typeof Ionicons.glyphMap }) {
-  return <View style={styles.field}><Text style={styles.fieldLabel}>{label}</Text><View style={styles.inputWrap}><Ionicons name={icon} size={14} color={Colors.primary} /><TextInput value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={Colors.textLight} style={styles.input} /></View></View>;
-}
+function lowest(r: ReturnType<typeof searchTrains>[number], date: string) { return lowestFare(getClassOptions(r, date)); }
 
-function TrainResult({ train }: { train: Listing }) {
-  const route = getRoute(train.detail);
-  const classes = getClasses(train.detail);
+function StationButton({ label, code, placeholder, icon, onPress }: { label: string; code: string; placeholder: string; icon: React.ComponentProps<typeof Ionicons>['name']; onPress: () => void }) {
   return (
     <View style={styles.trainCard}>
       <View style={styles.trainAccent} />
@@ -159,7 +179,8 @@ function TrainResult({ train }: { train: Listing }) {
         </View>
         <View style={styles.availability}><Ionicons name="information-circle-outline" size={14} color={Colors.textLight} /><Text style={styles.availabilityText}>Availability not connected · fare is sample data</Text></View>
       </View>
-    </View>
+      <Ionicons name="chevron-down" size={16} color={Colors.textLight} />
+    </TouchableOpacity>
   );
 }
 

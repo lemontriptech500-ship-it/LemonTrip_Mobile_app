@@ -37,7 +37,7 @@ function Field({ label, value, placeholder, onChangeText, keyboardType, grid = f
         placeholder={placeholder}
         placeholderTextColor={Colors.textLight}
         autoCapitalize="characters"
-        style={styles.input}
+        style={[styles.input, compact && styles.compactInput]}
         keyboardType={keyboardType}
       />
     </View>
@@ -47,14 +47,14 @@ function Field({ label, value, placeholder, onChangeText, keyboardType, grid = f
 export default function FlightSearchForm({ compact = false, loading, onSearch }: FlightSearchFormProps) {
   const [showOptions, setShowOptions] = useState(!compact);
   const [tripType, setTripType] = useState<TripType>('roundTrip');
-  const [origin, setOrigin] = useState('');
+  const [origin, setOrigin] = useState(initialOrigin);
   const [destination, setDestination] = useState('');
   const [departureDate, setDepartureDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
   const [secondOrigin, setSecondOrigin] = useState('');
   const [secondDestination, setSecondDestination] = useState('');
   const [secondDate, setSecondDate] = useState('');
-  const [travellers, setTravellers] = useState(1);
+  const [travellers, setTravellers] = useState(Math.max(1, Math.min(9, initialTravellers)));
   const [cabinClass, setCabinClass] = useState('Economy');
   const [specialFare, setSpecialFare] = useState<SpecialFare>('regular');
   const [validationError, setValidationError] = useState('');
@@ -100,7 +100,7 @@ export default function FlightSearchForm({ compact = false, loading, onSearch }:
             <Text style={[styles.tripTabText, tripType === item.id && styles.tripTabTextSelected]}>{item.label}</Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </ScrollView> : null}
 
       <View style={styles.locationRow}>
         <Field label="FROM" value={origin} placeholder="City / airport" onChangeText={setOrigin} />
@@ -165,7 +165,7 @@ export default function FlightSearchForm({ compact = false, loading, onSearch }:
       {validationError ? <Text accessibilityRole="alert" style={styles.validationError}>{validationError}</Text> : null}
       <TouchableOpacity accessibilityRole="button" disabled={loading} onPress={submit} style={[styles.searchButton, loading && styles.searchButtonDisabled]}>
         <Ionicons name={loading ? 'hourglass-outline' : 'search-outline'} size={17} color={Colors.primaryDark} />
-        <Text style={styles.searchButtonText}>{loading ? 'Searching flights…' : 'Search Flights'}</Text>
+        <Text style={styles.searchButtonText}>{loading ? 'Searching flights…' : searchButtonLabel}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -185,6 +185,11 @@ const styles = StyleSheet.create({
   swapButton: { width: 36, height: 36, marginBottom: 17, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.accentSoft },
   gridField: { flexBasis: '46%', flexGrow: 1, flexShrink: 0 },
   fieldGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 5 },
+  compactField: { marginBottom: 7 },
+  compactGridField: { flexBasis: 0, flexGrow: 1, flexShrink: 1 },
+  compactFieldLabel: { fontSize: 8, marginBottom: 3 },
+  compactInput: { minHeight: 30, paddingHorizontal: 0, paddingVertical: 3, borderWidth: 0, borderBottomWidth: 1, borderColor: Colors.border, borderRadius: 0, backgroundColor: 'transparent', fontSize: 12 },
+  compactCounter: { minHeight: 32, paddingHorizontal: 0, borderWidth: 0, borderBottomWidth: 1, borderRadius: 0, backgroundColor: 'transparent' },
   counter: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: Colors.border, borderRadius: 10, backgroundColor: Colors.background, paddingHorizontal: 5 },
   counterButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   counterText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },

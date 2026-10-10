@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   mainColumn: { flex: 1, minWidth: 0 },
   titleBlock: { paddingHorizontal: 16, paddingTop: 18 },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
-  hotelName: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 20, lineHeight: 26, fontWeight: '900' },
+  hotelName: { flex: 1, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 20, lineHeight: 26, fontWeight: '800' },
   propertyBadge: { paddingHorizontal: 9, paddingVertical: 6, borderRadius: 9, backgroundColor: Colors.accentSoft },
   propertyBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 7 },

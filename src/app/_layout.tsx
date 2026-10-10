@@ -2,6 +2,7 @@ import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from "expo-router";
 import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

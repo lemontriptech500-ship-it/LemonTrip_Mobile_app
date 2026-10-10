@@ -1,4 +1,5 @@
 import type { FlightFareOption, FlightOffer, FlightSearchRequest, FlightSearchResponse } from './types';
+import { getMockFlights } from '@/data/mock/flights';
 
 const endpoint = process.env.EXPO_PUBLIC_FLIGHT_SEARCH_URL;
 
@@ -37,6 +38,7 @@ function isFlightOffer(value: unknown): value is FlightOffer {
   return validFareOptions
     && validAircraft
     && typeof value.id === 'string'
+    && (value.isDemo === undefined || typeof value.isDemo === 'boolean')
     && typeof value.airline.name === 'string'
     && typeof value.airline.code === 'string'
     && typeof value.flightNumber === 'string'
@@ -55,7 +57,7 @@ function isFlightOffer(value: unknown): value is FlightOffer {
 
 export async function searchFlights(request: FlightSearchRequest): Promise<FlightSearchResponse> {
   if (!endpoint) {
-    throw new Error('Flight search is not connected. Configure EXPO_PUBLIC_FLIGHT_SEARCH_URL to use live results.');
+    return { offers: getMockFlights(request), source: 'mock' };
   }
 
   let response: Response;
@@ -85,5 +87,5 @@ export async function searchFlights(request: FlightSearchRequest): Promise<Fligh
     throw new Error('The flight service response did not match the supported flight offer format.');
   }
 
-  return { offers: offers as FlightOffer[] };
+  return { offers: offers as FlightOffer[], source: 'live' };
 }

@@ -1,4 +1,4 @@
-import { offers as demoOffers, type Offer } from '@/data/offers';
+import { offers as demoOffers, type Offer } from '@/data/mock/offers';
 
 const endpoint = process.env.EXPO_PUBLIC_OFFERS_URL;
 
