@@ -1,31 +1,38 @@
-import { Brand, Colors, Radius } from '@/constants/colors';
+﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
+import { Colors } from '@/constants/colors';
 import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from '@/constants/support';
+import { Ui } from '@/constants/theme';
 import { formatDate, normalizeStatus, serviceIcon, shortId, statusStyles } from '@/utils/bookingFormat';
+import { downloadBookingPdf } from '@/utils/bookingPdf';
 import { useBookings } from '@/utils/bookingStore';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-const FONT = {
-  medium: 'Manrope',
-  bold: 'Manrope',
-  extra: 'Manrope',
-} as const;
-
-const SHADOW = {
-  shadowColor: '#0F3D2E',
-  shadowOpacity: 0.1,
-  shadowRadius: 14,
-  shadowOffset: { width: 0, height: 6 },
-  elevation: 4,
-} as const;
+/** Decorative barcode derived from the booking id (demo only). */
+function Barcode({ value }: { value: string }) {
+  const bars = (value + value + value).split('').map((ch, i) => ({
+    w: 1 + ((ch.charCodeAt(0) + i) % 3),
+    gap: 1 + ((ch.charCodeAt(0) * 7 + i) % 2),
+  }));
+  return (
+    <View style={s.barcode} accessible={false}>
+      {bars.map((b, i) => (
+        <View key={i} style={{ width: b.w, height: 40, marginRight: b.gap, backgroundColor: Colors.primaryDark }} />
+      ))}
+    </View>
+  );
+}
 
 export default function BookingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const bookings = useBookings();
   const booking = bookings.find((item) => String(item.id) === String(id));
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
 
   const goBack = () => {
     if (router.canGoBack()) router.back();
@@ -34,299 +41,215 @@ export default function BookingDetailScreen() {
 
   if (!booking) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Ionicons name="alert-circle-outline" size={40} color={Brand.lemon} />
-          <Text style={styles.notFoundText}>Booking not found</Text>
-          <TouchableOpacity style={styles.lemonButton} onPress={goBack}>
-            <Text style={styles.lemonButtonText}>Go back</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <FlowScreen>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <ScreenHeader title="Booking voucher" eyebrow="MY TRIPS" onBack={goBack} />
+          <EmptyState
+            icon="alert-circle-outline"
+            title="Booking not found"
+            text="We could not find this booking."
+            action={<PrimaryButton label="Go back" onPress={goBack} />}
+          />
+        </ScrollView>
+      </FlowScreen>
     );
   }
 
-  const status = statusStyles[normalizeStatus(booking.status)];
+  const normalized = normalizeStatus(booking.status);
+  const status = statusStyles[normalized];
+  const tone = normalized === 'cancelled' ? 'bad' : normalized === 'completed' ? 'neutral' : 'good';
   const bookingId = shortId(booking.id);
   const hasPhone = SUPPORT_PHONE.trim().length > 0;
   const hasWhatsapp = SUPPORT_WHATSAPP.trim().length > 0;
-  const canCancel = booking.status !== 'cancelled' && booking.status !== 'completed';
+  const canCancel = normalized === 'upcoming';
 
-  const handleShare = async () => {
+  const summary = [
+    'LemonTrip booking voucher',
+    'Booking ID ' + bookingId,
+    booking.itemName,
+    booking.destination ? 'Destination: ' + booking.destination : '',
+    (booking.tripDate ? 'Trip date: ' : 'Booked on: ') + formatDate(booking.tripDate ?? booking.bookedAt),
+    'Total: ' + booking.price,
+    'Status: ' + status.label,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const share = () => void Share.share({ title: 'LemonTrip booking ' + bookingId, message: summary });
+
+  const download = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    setDownloadError(false);
     try {
-      await Share.share({
-        message: `LemonTrip booking ${bookingId}\n${booking.itemName}\nTotal: ${booking.price}`,
+      await downloadBookingPdf({
+        bookingId,
+        serviceName: booking.serviceName ?? '',
+        itemName: booking.itemName,
+        destination: booking.destination,
+        dateLabel: booking.tripDate ? 'Trip date' : 'Booked on',
+        dateValue: formatDate(booking.tripDate ?? booking.bookedAt),
+        price: booking.price,
+        statusLabel: status.label,
       });
     } catch (error) {
-      console.error('Share failed:', error);
+      console.warn('PDF download failed:', error);
+      setDownloadError(true);
+    } finally {
+      setDownloading(false);
     }
   };
 
-  const handleCall = () => {
-    if (hasPhone) Linking.openURL(`tel:${SUPPORT_PHONE}`);
+  const call = () => {
+    if (hasPhone) void Linking.openURL('tel:' + SUPPORT_PHONE);
   };
-
-  const handleWhatsapp = () => {
-    if (hasWhatsapp) Linking.openURL(`https://wa.me/${SUPPORT_WHATSAPP.replace(/\D/g, '')}`);
+  const whatsapp = () => {
+    if (hasWhatsapp) void Linking.openURL('https://wa.me/' + SUPPORT_WHATSAPP.replace(/\D/g, ''));
   };
-
-  const handleCancel = () => {
-    router.push({ pathname: '/booking/cancel', params: { id: String(booking.id) } } as never);
-  };
+  const cancel = () => router.push({ pathname: '/booking/cancel', params: { id: String(booking.id) } } as never);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Green header */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <TouchableOpacity accessibilityRole="button" style={styles.iconButton} onPress={goBack}>
-              <Ionicons name="arrow-back" size={22} color={Brand.forest} />
-            </TouchableOpacity>
-            <TouchableOpacity accessibilityRole="button" style={styles.iconButton} onPress={handleShare}>
-              <Ionicons name="share-social-outline" size={22} color={Brand.forest} />
-            </TouchableOpacity>
+    <FlowScreen>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
+        <View style={s.content}>
+          <ScreenHeader
+            eyebrow="BOOKING VOUCHER"
+            title={bookingId}
+            subtitle="Show this voucher at check-in."
+            onBack={goBack}
+          />
+
+          <View style={s.ticket}>
+            <View style={s.ticketTop}>
+              <View style={s.ticketIcon}>
+                <Ionicons name={serviceIcon(booking.serviceName)} size={24} color={Colors.primary} />
+              </View>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={s.service} numberOfLines={1}>{(booking.serviceName ?? '').toUpperCase()}</Text>
+                <Text style={s.itemName}>{booking.itemName}</Text>
+                {booking.destination ? (
+                  <View style={s.destRow}>
+                    <Ionicons name="location-outline" size={13} color={Colors.textLight} />
+                    <Text style={s.destText} numberOfLines={1}>{booking.destination}</Text>
+                  </View>
+                ) : null}
+              </View>
+              <Pill label={status.label} tone={tone} icon={status.icon} />
+            </View>
+
+            <View style={s.perforation}>
+              <View style={[s.notch, { left: -10 }]} />
+              <View style={s.dash} />
+              <View style={[s.notch, { right: -10 }]} />
+            </View>
+
+            <View style={s.ticketBottom}>
+              <View style={s.qrWrap}>
+                <QRCode value={bookingId} size={150} color={Colors.primaryDark} backgroundColor="#FFFFFF" />
+              </View>
+              <Barcode value={bookingId} />
+              <Text style={s.bookingIdText}>Booking ID {bookingId}</Text>
+            </View>
           </View>
-          <Text style={styles.eyebrowLemon}>BOOKING VOUCHER</Text>
-          <Text style={styles.pageTitle}>{bookingId}</Text>
-          <View style={[styles.statusBadge, { backgroundColor: status.bg }]}>
-            <Ionicons name={status.icon} size={13} color={status.fg} />
-            <Text style={[styles.statusText, { color: status.fg }]}>{status.label}</Text>
+
+          <Card>
+            <SectionTitle eyebrow="DETAILS" title="Booking summary" />
+            <Row label="Service" value={booking.serviceName} />
+            <Row label="Booking ID" value={bookingId} />
+            <Row label={booking.tripDate ? 'Trip date' : 'Booked on'} value={formatDate(booking.tripDate ?? booking.bookedAt)} />
+            {booking.tripDate ? <Row label="Booked on" value={formatDate(booking.bookedAt)} /> : null}
+            <Row label="Status" value={status.label} />
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="PAYMENT" title="Receipt" />
+            <Row label="Total paid" value={booking.price} bold />
+          </Card>
+
+          <View style={s.actions}>
+            <Action icon="share-social-outline" label="Share" onPress={share} />
+            <Action
+              icon="download-outline"
+              label={downloading ? 'Preparing...' : 'Download'}
+              onPress={() => void download()}
+            />
+            <Action icon="receipt-outline" label="Transactions" onPress={() => router.push('/transactions' as never)} />
           </View>
+
+          {downloadError ? (
+            <Notice icon="alert-circle-outline" tone="warn" title="Could not create PDF">
+              Something went wrong while creating the PDF. Please try again, or use the Share button.
+            </Notice>
+          ) : null}
+
+          <Card>
+            <SectionTitle eyebrow="24/7 ASSIST" title="Need help with this trip?" />
+            <View style={s.assistRow}>
+              <View style={[s.assistBtn, !hasPhone && { opacity: 0.4 }]}>
+                <PrimaryButton label="Call" icon="call-outline" onPress={call} disabled={!hasPhone} />
+              </View>
+              <View style={[s.assistBtn, !hasWhatsapp && { opacity: 0.4 }]}>
+                <PrimaryButton label="WhatsApp" icon="logo-whatsapp" onPress={whatsapp} disabled={!hasWhatsapp} variant="soft" />
+              </View>
+            </View>
+          </Card>
+
+          {canCancel ? (
+            <TouchableOpacity accessibilityRole="button" style={s.cancelButton} onPress={cancel}>
+              <Ionicons name="close-circle-outline" size={18} color={Colors.error} />
+              <Text style={s.cancelText}>Cancel booking</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
-
-        {/* Voucher */}
-        <View style={styles.voucher}>
-          <View style={styles.voucherTop}>
-            <View style={styles.voucherIcon}>
-              <Ionicons name={serviceIcon(booking.serviceName)} size={26} color={Brand.forest} />
-            </View>
-            <View style={styles.voucherInfo}>
-              <Text style={styles.eyebrowDark} numberOfLines={1}>
-                {(booking.serviceName ?? '').toUpperCase()}
-              </Text>
-              <Text style={styles.itemName}>{booking.itemName}</Text>
-              {booking.destination ? (
-                <View style={styles.destRow}>
-                  <Ionicons name="location-outline" size={14} color={Colors.textLight} />
-                  <Text style={styles.destText}>{booking.destination}</Text>
-                </View>
-              ) : null}
-            </View>
-          </View>
-
-          <View style={styles.ticketDivider}>
-            <View style={[styles.notch, styles.notchLeft]} />
-            <View style={styles.dash} />
-            <View style={[styles.notch, styles.notchRight]} />
-          </View>
-
-          <View style={styles.detailsRow}>
-            <View>
-              <Text style={styles.detailLabel}>BOOKING ID</Text>
-              <Text style={styles.detailValue}>{bookingId}</Text>
-            </View>
-            <View>
-              <Text style={styles.detailLabel}>{booking.tripDate ? 'TRIP DATE' : 'BOOKED ON'}</Text>
-              <Text style={styles.detailValue}>{formatDate(booking.tripDate ?? booking.bookedAt)}</Text>
-            </View>
-            <View style={styles.priceBox}>
-              <Text style={styles.detailLabel}>TOTAL</Text>
-              <Text style={styles.price}>{booking.price}</Text>
-            </View>
-          </View>
-
-          <View style={styles.qrBox}>
-            <QRCode value={bookingId} size={150} color={Brand.forest} backgroundColor="#FFFFFF" />
-            <Text style={styles.qrHint}>Show this QR at check-in</Text>
-          </View>
-        </View>
-
-        {/* 24/7 assist */}
-        <View style={styles.assistCard}>
-          <View style={styles.assistHead}>
-            <View style={styles.assistIcon}>
-              <Ionicons name="headset-outline" size={22} color={Brand.forest} />
-            </View>
-            <View style={styles.assistCopy}>
-              <Text style={styles.eyebrowLemon}>24/7 ASSIST</Text>
-              <Text style={styles.assistTitle}>Need help with this trip?</Text>
-            </View>
-          </View>
-          <View style={styles.assistButtons}>
-            <TouchableOpacity
-              accessibilityRole="button"
-              style={[styles.assistButton, !hasPhone && styles.disabledButton]}
-              onPress={handleCall}
-              disabled={!hasPhone}
-            >
-              <Ionicons name="call-outline" size={18} color={Brand.forest} />
-              <Text style={styles.assistButtonText}>Call</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              accessibilityRole="button"
-              style={[styles.assistButton, !hasWhatsapp && styles.disabledButton]}
-              onPress={handleWhatsapp}
-              disabled={!hasWhatsapp}
-            >
-              <Ionicons name="logo-whatsapp" size={18} color={Brand.forest} />
-              <Text style={styles.assistButtonText}>WhatsApp</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <TouchableOpacity accessibilityRole="button" style={styles.shareButton} onPress={handleShare}>
-          <Ionicons name="share-social-outline" size={18} color={Brand.forest} />
-          <Text style={styles.shareButtonText}>Share booking</Text>
-        </TouchableOpacity>
-
-        {canCancel ? (
-          <TouchableOpacity accessibilityRole="button" style={styles.cancelButton} onPress={handleCancel}>
-            <Ionicons name="close-circle-outline" size={18} color="#C0392B" />
-            <Text style={styles.cancelButtonText}>Cancel booking</Text>
-          </TouchableOpacity>
-        ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </FlowScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Brand.forest },
-  container: { flex: 1, backgroundColor: Brand.cream },
-  content: { paddingBottom: 32, width: '100%', maxWidth: 900, alignSelf: 'center' },
+function Action({ icon, label, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={s.action}>
+      <View style={s.actionIcon}>
+        <Ionicons name={icon} size={19} color={Colors.primary} />
+      </View>
+      <Text style={s.actionLabel}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
 
-  notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  notFoundText: { color: Colors.white, fontFamily: FONT.extra, fontSize: 18 },
-  lemonButton: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: Radius.pill, backgroundColor:Brand.lemon },
-  lemonButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 14 },
-
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 64,
-    backgroundColor: Brand.forest,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-  },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
-  iconButton: {
-    width: 42,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 21,
-    backgroundColor: Brand.lemon,
-  },
-  eyebrowLemon: { color: Brand.lemon, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.6 },
-  eyebrowDark: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 10, letterSpacing: 1.4 },
-  pageTitle: { color: Colors.white, fontFamily: FONT.extra, fontSize: 28, marginTop: 4 },
-  statusBadge: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginTop: 10,
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: Radius.pill,
-  },
-  statusText: { fontFamily: FONT.extra, fontSize: 10, letterSpacing: 0.8 },
-
-  voucher: {
-    marginTop: -40,
-    marginHorizontal: 16,
-    padding: 18,
-    borderRadius: Radius.lg,
-    backgroundColor: Colors.white,
-    ...SHADOW,
-  },
-  voucherTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  voucherIcon: {
-    width: 52,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: Radius.md,
-    backgroundColor: Brand.cream,
-  },
-  voucherInfo: { flex: 1, minWidth: 0 },
-  itemName: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 18, lineHeight: 24, marginTop: 3 },
-  destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 5 },
-  destText: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 13, flexShrink: 1 },
-
-  ticketDivider: { height: 20, marginVertical: 16, marginHorizontal: -18, flexDirection: 'row', alignItems: 'center' },
-  notch: { width: 20, height: 20, borderRadius: 10, backgroundColor: Brand.cream },
-  notchLeft: { marginLeft: -10 },
-  notchRight: { marginRight: -10 },
-  dash: { flex: 1, height: 0, marginHorizontal: 8, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: '#D5D4CB' },
-
-  detailsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
-  detailLabel: { color: Colors.textLight, fontFamily: FONT.extra, fontSize: 9, letterSpacing: 1.2, marginBottom: 4 },
-  detailValue: { color: Colors.textDark, fontFamily: FONT.bold, fontSize: 13 },
-  priceBox: { alignItems: 'flex-end' },
-  price: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 20 },
-
-  qrBox: { alignItems: 'center', marginTop: 22, gap: 10 },
-  qrHint: { color: Colors.textLight, fontFamily: FONT.medium, fontSize: 12 },
-
-  assistCard: {
-    marginTop: 16,
-    marginHorizontal: 16,
-    padding: 16,
-    borderRadius: Radius.lg,
-    backgroundColor: Brand.forest,
-  },
-  assistHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  assistIcon: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: Brand.lemon,
-  },
-  assistCopy: { flex: 1 },
-  assistTitle: { color: Colors.white, fontFamily: FONT.bold, fontSize: 15, marginTop: 3 },
-  assistButtons: { flexDirection: 'row', gap: 10, marginTop: 14 },
-  assistButton: {
-    flex: 1,
-    minHeight: 46,
+const s = StyleSheet.create({
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  ticket: { ...Ui.card, marginHorizontal: 20, marginBottom: 14, padding: 18, overflow: 'visible' },
+  ticketTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  ticketIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  service: { ...Ui.eyebrow, color: Colors.secondary },
+  itemName: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark, marginTop: 3 },
+  destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
+  destText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, flexShrink: 1 },
+  perforation: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, height: 20 },
+  dash: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
+  notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
+  ticketBottom: { alignItems: 'center', gap: 12 },
+  qrWrap: { padding: 10, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: Colors.border },
+  barcode: { flexDirection: 'row', alignItems: 'center', height: 40, overflow: 'hidden', maxWidth: '100%' },
+  bookingIdText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight, letterSpacing: 0.5 },
+  actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 14 },
+  action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  actionLabel: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.textDark },
+  assistRow: { flexDirection: 'row', gap: 10 },
+  assistBtn: { flex: 1 },
+  cancelButton: {
+    minHeight: 52,
+    marginHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.lemon,
-  },
-  assistButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 14 },
-  disabledButton: { opacity: 0.4 },
-
-  shareButton: {
-    minHeight: 52,
-    marginTop: 16,
-    marginHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    borderRadius: Radius.pill,
-    backgroundColor: Brand.lemon,
-  },
-  shareButtonText: { color: Brand.forest, fontFamily: FONT.extra, fontSize: 15 },
-
-  cancelButton: {
-    minHeight: 52,
-    marginTop: 10,
-    marginHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    borderRadius: Radius.pill,
+    borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: '#C0392B',
-    backgroundColor: Colors.white,
+    borderColor: Colors.error,
+    backgroundColor: Colors.surface,
   },
-  cancelButtonText: { color: '#C0392B', fontFamily: FONT.extra, fontSize: 15 },
+  cancelText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.error },
 });
