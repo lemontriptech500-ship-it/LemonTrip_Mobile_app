@@ -75,7 +75,7 @@ export default function SeatsAddOnsScreen() {
   };
 
   const handleContinue = () => {
-    updateFlightBookingDraft({ seats, addOns });
+    updateFlightBookingDraft({ seats, addOns, seatTotal, addOnTotal });
     router.push('/flight-booking/payment' as never);
   };
 
@@ -201,3 +201,4 @@ const s = StyleSheet.create({
   addOnRight: { alignItems: 'flex-end', gap: 4 },
   addOnPrice: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primaryDark },
 });
+
