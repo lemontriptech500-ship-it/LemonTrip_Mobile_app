@@ -1,39 +1,73 @@
-import { Ui } from '@/constants/theme';
-import { Colors } from '@/constants/colors';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { addToCart, isInCart, useCart } from '@/utils/cartStore';
-import { getHotelSearch, getSelectedHotel } from '@/utils/hotelSearchStore';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
+import { defaultHotelSearch, mockHotels } from '@/data/mockHotels';
+import { getHotelSearch, getSelectedHotel, selectHotel } from '@/utils/hotelSearchStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { formatINR, getNightCount, parseNightlyPrice } from './HotelCard';
 
 export default function HotelDetailsScreen() {
   useWishlist();
-  const hotel = getSelectedHotel();
+  const hotel = getSelectedHotel() ?? mockHotels[0] ?? null;
   const search = getHotelSearch();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [selectedRoomId, setSelectedRoomId] = useState(hotel?.roomOptions?.[0]?.id ?? null);
-  useCart();
-  const cartId = hotel ? `hotel-${hotel.id}-${selectedRoomId ?? 'standard'}-${search.checkIn}` : '';
-  const booked = isInCart(cartId);
+  const booked = false;
   const nights = getNightCount(search.checkIn, search.checkOut);
   const selectedRoom = hotel?.roomOptions?.find((room) => room.id === selectedRoomId);
   const selectedNightlyPrice = hotel ? selectedRoom?.pricePerNight ?? hotel.price : '';
   const nightlyPrice = hotel ? parseNightlyPrice(selectedNightlyPrice) : null;
   const total = nightlyPrice !== null && nights ? nightlyPrice * nights : null;
 
-  const handleBook = () => {
-    if (!hotel) return;
-    const roomName = selectedRoom?.name ? ` · ${selectedRoom.name}` : '';
-    if (!booked) addToCart({ id: cartId, serviceName: 'Hotels', itemName: `${hotel.name}${roomName}`, price: total !== null ? formatINR(total) : selectedNightlyPrice, ...(search.checkIn ? { tripDate: search.checkIn } : {}) });
-    router.push('/cart');
+const handleBook = () => {
+  const activeHotel = getSelectedHotel();
+  const activeSearch = getHotelSearch();
+
+  if (!activeHotel) {
+    Alert.alert('Select a stay', 'Please choose a hotel before continuing.');
+    return;
+  }
+
+  const fallbackRoom = activeHotel.roomOptions?.[0];
+  const roomToUse = selectedRoom ?? fallbackRoom;
+
+  if (!roomToUse) {
+    Alert.alert('Select a room', 'Please choose a room type to continue.');
+    return;
+  }
+
+  const resolvedCheckIn = activeSearch.checkIn || defaultHotelSearch.checkIn;
+  const resolvedCheckOut = activeSearch.checkOut || defaultHotelSearch.checkOut;
+  const resolvedGuests = activeSearch.guests || defaultHotelSearch.guests;
+  const resolvedRooms = activeSearch.rooms || defaultHotelSearch.rooms;
+
+  const updatedSearch = {
+    ...activeSearch,
+    checkIn: resolvedCheckIn,
+    checkOut: resolvedCheckOut,
+    guests: resolvedGuests,
+    rooms: resolvedRooms,
   };
+
+  const finalHotel = { ...activeHotel, roomOptions: activeHotel.roomOptions ?? [roomToUse] };
+  selectHotel(finalHotel);
+
+  const finalNights = getNightCount(updatedSearch.checkIn, updatedSearch.checkOut);
+  if (!updatedSearch.checkIn || !updatedSearch.checkOut || !finalNights) {
+    Alert.alert('Select dates', 'Please choose valid check-in and check-out dates to book this stay.');
+    return;
+  }
+
+  setSelectedRoomId(roomToUse.id);
+  router.push('/hotel-room-selection');
+};
+
 
   if (!hotel) {
     return (
@@ -54,17 +88,27 @@ export default function HotelDetailsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <ScreenHeader
-            title={hotel.name}
-            subtitle={hotel.location}
-            eyebrow="LEMONTRIP / STAY DETAILS"
-            onBack={() => router.back()}
-            rightAction={{
-              label: isInWishlist(hotel.id) ? 'Saved' : 'Save stay',
-              icon: isInWishlist(hotel.id) ? 'heart' : 'heart-outline',
-              onPress: () => toggleWishlist({ id: hotel.id, name: hotel.name, image: hotel.image, price: hotel.price, category: 'Hotels', location: hotel.location }),
-            }}
-          />
+          <View style={styles.brandBar}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backCapsule}>
+              <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
+            </TouchableOpacity>
+            <View style={styles.brandBlock}>
+              <View style={styles.brandMark} />
+              <Text style={styles.brandText}>LemonTrip</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => toggleWishlist({ id: hotel.id, name: hotel.name, image: hotel.image, price: hotel.price, category: 'Hotels', location: hotel.location })}
+              style={styles.saveCapsule}
+            >
+              <Ionicons name={isInWishlist(hotel.id) ? 'heart' : 'heart-outline'} size={16} color={Colors.primaryDark} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.searchChipBar}>
+            <View style={styles.searchChip}><Ionicons name="location-outline" size={13} color={Colors.primary} /><Text style={styles.searchChipText}>Manali</Text></View>
+            <View style={styles.searchChip}><Ionicons name="calendar-outline" size={13} color={Colors.primary} /><Text style={styles.searchChipText}>{search.checkIn ?? '15-17 Oct'}</Text></View>
+            <View style={styles.searchChip}><Ionicons name="people-outline" size={13} color={Colors.primary} /><Text style={styles.searchChipText}>{search.guests || 2} guests</Text></View>
+          </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>
             {gallery.map((image, index) => (
@@ -215,10 +259,19 @@ function BookingSummary({
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
+  safeArea: { flex: 1, backgroundColor: '#f5f6f3' },
   scroll: { flex: 1 },
   page: { paddingBottom: 28 },
   content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
+  brandBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 10, paddingHorizontal: 8, paddingVertical: 10, borderRadius: 18, backgroundColor: '#0d382b', shadowColor: '#0d382b', shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 5 },
+  backCapsule: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.white },
+  brandBlock: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  brandMark: { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.accent },
+  brandText: { color: Colors.white, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
+  saveCapsule: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.white },
+  searchChipBar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, marginTop: 12, marginBottom: 8 },
+  searchChip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
+  searchChipText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '700' },
   gallery: { paddingHorizontal: 16, gap: 8 },
   galleryImage: { width: 265, height: 205, borderRadius: 15, backgroundColor: Colors.surfaceMuted },
   singleImage: { width: '100%', height: 250 },

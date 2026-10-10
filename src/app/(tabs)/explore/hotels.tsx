@@ -1,17 +1,18 @@
-import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
-import { Ui } from '@/constants/theme';
-import { Colors } from '@/constants/colors';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import HotelCard from '@/components/hotels/HotelCard';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
+import { mockHotels } from '@/data/mockHotels';
 import type { Hotel } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
-import { setHotelSearch, selectHotel, type HotelSearchCriteria } from '@/utils/hotelSearchStore';
+import { normalizeHotelSearch, selectHotel, setHotelSearch, type HotelSearchCriteria } from '@/utils/hotelSearchStore';
+import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 const filterOptions = [
   { id: 'rating-5-star', label: '5 Star', matches: (hotel: Hotel) => hotel.rating === '5 Star' },
@@ -55,22 +56,29 @@ export default function HotelsScreen() {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [sort, setSort] = useState<SortOption>('Recommended');
   const { items: hotels, loading, error } = useContentItems<Hotel>('hotel');
+  const fallbackHotels = hotels.length ? hotels : mockHotels;
 
-  const search: HotelSearchCriteria = { destination, checkIn, checkOut, guests, rooms };
+  const search: HotelSearchCriteria = normalizeHotelSearch({ destination, checkIn, checkOut, guests, rooms });
 
   const visibleHotels = useMemo(() => {
-    const filtered = hotels.filter((hotel) => {
-      const query = destination.trim().toLowerCase();
-      const matchesLocation = !hasSearched || !query || `${hotel.name} ${hotel.location}`.toLowerCase().includes(query);
+    const query = destination.trim().toLowerCase();
+    const hasSearchCriteria = Boolean(query || checkIn || checkOut || activeFilters.length);
+
+    const filtered = fallbackHotels.filter((hotel) => {
+      const matchesLocation = !query || `${hotel.name} ${hotel.location}`.toLowerCase().includes(query);
       const matchesAmenities = activeFilters.every((id) => filterOptions.find((filter) => filter.id === id)?.matches(hotel) ?? false);
       return matchesLocation && matchesAmenities;
     });
+
+    if (!hasSearchCriteria && !activeFilters.length) {
+      return [...fallbackHotels];
+    }
 
     if (sort === 'Price low to high') filtered.sort((a, b) => getPrice(a.price) - getPrice(b.price));
     if (sort === 'Rating') filtered.sort((a, b) => (b.reviewScore ?? -1) - (a.reviewScore ?? -1));
     if (sort === 'Distance') filtered.sort((a, b) => (a.distanceKm ?? Number.POSITIVE_INFINITY) - (b.distanceKm ?? Number.POSITIVE_INFINITY));
     return filtered;
-  }, [activeFilters, destination, hasSearched, hotels, sort]);
+  }, [activeFilters, checkIn, checkOut, destination, fallbackHotels, hasSearched, sort]);
 
   const handleSearch = () => {
     const start = toDate(checkIn);
@@ -87,13 +95,16 @@ export default function HotelsScreen() {
       Alert.alert('Check-out date', 'Check-out must be after check-in.');
       return;
     }
-    void recordRecentSearch('Hotels', destination || 'Your hotel search', JSON.stringify(search));
+
+    const nextSearch = normalizeHotelSearch({ destination, checkIn, checkOut, guests, rooms });
+    void recordRecentSearch('Hotels', nextSearch.destination || 'Your hotel search', JSON.stringify(nextSearch));
     setHasSearched(true);
-    setHotelSearch(search);
+    setHotelSearch(nextSearch);
   };
 
   const openHotel = (hotel: Hotel) => {
-    setHotelSearch(search);
+    const nextSearch = normalizeHotelSearch({ destination, checkIn, checkOut, guests, rooms });
+    setHotelSearch(nextSearch);
     selectHotel(hotel);
     router.push('/(tabs)/explore/hotel-details');
   };

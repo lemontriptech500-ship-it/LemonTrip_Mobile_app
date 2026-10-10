@@ -82,6 +82,11 @@ export default function TabsLayout() {
           href: null,
         }}
       />
+
+      <Tabs.Screen
+        name="booking-confirmation"
+        options={{ href: null, title: 'Booking Confirmation' }}
+      />
     </Tabs>
   );
 }
