@@ -1,8 +1,10 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import type { FlightSearchRequest, SpecialFare, TripType } from './types';
 
 const tripTypes: { id: TripType; label: string }[] = [
@@ -185,40 +187,40 @@ const styles = StyleSheet.create({
   tripTabs: { gap: 5, paddingBottom: 16 },
   tripTab: { paddingHorizontal: 13, paddingVertical: 9, borderRadius: 16, backgroundColor: Colors.background },
   tripTabSelected: { backgroundColor: Colors.primary },
-  tripTabText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  tripTabText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   tripTabTextSelected: { color: Colors.white },
   locationRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   field: { flex: 1, minWidth: 0, marginBottom: 12 },
-  fieldLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8, marginBottom: 6 },
-  input: { minHeight: Ui.field.minHeight, paddingHorizontal: 10, paddingVertical: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surfaceMuted, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
+  fieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8, marginBottom: 6 },
+  input: { minHeight: Ui.field.minHeight, paddingHorizontal: 10, paddingVertical: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surfaceMuted, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   swapButton: { width: 36, height: 36, marginBottom: 17, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.accentSoft },
   compactSwapButton: { backgroundColor: '#E7F1EC' },
   gridField: { flexBasis: '46%', flexGrow: 1, flexShrink: 0 },
   fieldGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 5 },
   compactField: { marginBottom: 7 },
   compactGridField: { flexBasis: 0, flexGrow: 1, flexShrink: 1 },
-  compactFieldLabel: { fontSize: 8, marginBottom: 3 },
-  compactInput: { minHeight: 30, paddingHorizontal: 0, paddingVertical: 3, borderWidth: 0, borderBottomWidth: 1, borderColor: Colors.border, borderRadius: 0, backgroundColor: 'transparent', fontSize: 12 },
+  compactFieldLabel: { fontSize: TextSize.micro, marginBottom: 3 },
+  compactInput: { minHeight: 30, paddingHorizontal: 0, paddingVertical: 3, borderWidth: 0, borderBottomWidth: 1, borderColor: Colors.border, borderRadius: 0, backgroundColor: 'transparent', fontSize: TextSize.caption },
   compactCounter: { minHeight: 32, paddingHorizontal: 0, borderWidth: 0, borderBottomWidth: 1, borderRadius: 0, backgroundColor: 'transparent' },
   counter: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: Colors.border, borderRadius: 10, backgroundColor: Colors.background, paddingHorizontal: 5 },
   counterButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
-  counterText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  counterText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   classOptions: { minHeight: 46, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 4 },
   classButton: { paddingHorizontal: 7, paddingVertical: 7, borderRadius: 8, backgroundColor: Colors.background },
   classButtonSelected: { backgroundColor: Colors.accentSoft },
-  classText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  classText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   classTextSelected: { color: Colors.primaryDark },
   multiCityBlock: { padding: 12, marginVertical: 4, borderRadius: 12, backgroundColor: Colors.background },
   secondDate: { width: '50%' },
   fareHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
-  fareHint: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12 },
+  fareHint: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   fareOptions: { gap: 7, paddingTop: 8, paddingBottom: 14 },
   fareOption: { paddingHorizontal: 10, paddingVertical: 8, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
   fareOptionSelected: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
-  fareOptionText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, fontWeight: '700' },
+  fareOptionText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold },
   fareOptionTextSelected: { color: Colors.primaryDark },
-  validationError: { color: Colors.error, fontFamily: 'Manrope', fontSize: 13, marginBottom: 10 },
+  validationError: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginBottom: 10 },
   searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
   searchButtonDisabled: { opacity: 0.65 },
-  searchButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  searchButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });

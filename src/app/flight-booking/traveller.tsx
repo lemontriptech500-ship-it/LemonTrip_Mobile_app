@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightJourney, FlightProgress, formatPrice } from '@/components/flights/FlightFlowUi';
 import {
@@ -11,7 +13,7 @@ import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryBu
 import { Colors } from '@/constants/colors';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 const GENDERS: Exclude<Gender, ''>[] = ['Male', 'Female', 'Other'];
 const emptyTraveller = (): TravellerInfo => ({ firstName: '', lastName: '', gender: '', dob: '' });
@@ -167,7 +169,7 @@ export default function TravellerDetailsScreen() {
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  label: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
-  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 4 },
-  hint: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, lineHeight: 18 },
+  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
+  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 4 },
+  hint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, lineHeight: 18 },
 });

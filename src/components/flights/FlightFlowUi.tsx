@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { Card, Row, SectionTitle } from '@/components/trains/TrainUi';
 import type { FlightFareOption, FlightOffer } from '@/components/flights/types';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export function formatPrice(amount: number, currency: string) {
   try {
@@ -64,8 +66,8 @@ const s = StyleSheet.create({
   dot: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderWidth: 2, borderColor: Colors.borderStrong },
   dotDone: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   dotActive: { borderColor: Colors.primary, backgroundColor: Colors.accent },
-  dotText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', color: Colors.textLight },
+  dotText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.textLight },
   dotTextActive: { color: Colors.primaryDark },
-  stepLabel: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '700', color: Colors.textLight, marginTop: 5 },
+  stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, marginTop: 5 },
   stepLabelOn: { color: Colors.primary },
 });

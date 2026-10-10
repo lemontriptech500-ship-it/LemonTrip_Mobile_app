@@ -1,3 +1,4 @@
+import { FontFamily, TextSize, FontWeight } from '@/constants/typography';
 import { Colors } from '@/constants/colors';
 import { FlexWidget, TextWidget } from 'react-native-android-widget';
 
@@ -37,8 +38,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="LEMONTRIP"
           style={{
-            fontSize: 11,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.micro,
+            fontWeight: FontWeight.bold,
             color: Colors.primary,
             marginBottom: 7,
           }}
@@ -47,8 +49,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="No upcoming trips"
           style={{
-            fontSize: 18,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.title,
+            fontWeight: FontWeight.bold,
             color: Colors.textDark,
           }}
         />
@@ -56,7 +59,8 @@ export function UpcomingTripWidget({
         <TextWidget
           text="Plan your next journey with LemonTrip"
           style={{
-            fontSize: 12,
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.caption,
             color: Colors.textLight,
             marginTop: 5,
           }}
@@ -94,8 +98,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="UPCOMING TRIP"
           style={{
-            fontSize: 11,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.micro,
+            fontWeight: FontWeight.bold,
             color: Colors.textLight,
           }}
         />
@@ -103,8 +108,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="LEMONTRIP"
           style={{
-            fontSize: 9,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.micro,
+            fontWeight: FontWeight.bold,
             color: Colors.primary,
           }}
         />
@@ -122,8 +128,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text={trip.destination}
           style={{
-            fontSize: 24,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.displaySmall,
+            fontWeight: FontWeight.bold,
             color: Colors.textDark,
           }}
         />
@@ -131,8 +138,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text={`${trip.from}  ->  ${trip.to}`}
           style={{
-            fontSize: 13,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.body,
+            fontWeight: FontWeight.bold,
             color: Colors.textLight,
             marginTop: 4,
           }}
@@ -158,8 +166,9 @@ export function UpcomingTripWidget({
           <TextWidget
             text="TRAVEL DATE"
             style={{
-              fontSize: 9,
-              fontWeight: 'bold',
+              fontFamily: FontFamily.sans,
+              fontSize: TextSize.micro,
+              fontWeight: FontWeight.bold,
               color: Colors.textLight,
             }}
           />
@@ -167,8 +176,9 @@ export function UpcomingTripWidget({
           <TextWidget
             text={trip.date}
             style={{
-              fontSize: 14,
-              fontWeight: 'bold',
+              fontFamily: FontFamily.sans,
+              fontSize: TextSize.body,
+              fontWeight: FontWeight.bold,
               color: Colors.textDark,
               marginTop: 2,
             }}
@@ -190,8 +200,9 @@ export function UpcomingTripWidget({
                 : `${trip.daysLeft} days left`
             }
             style={{
-              fontSize: 11,
-              fontWeight: 'bold',
+              fontFamily: FontFamily.sans,
+              fontSize: TextSize.micro,
+              fontWeight: FontWeight.bold,
               color: Colors.primary,
             }}
           />
@@ -211,8 +222,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="STATUS"
           style={{
-            fontSize: 9,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.micro,
+            fontWeight: FontWeight.bold,
             color: Colors.textLight,
           }}
         />
@@ -220,8 +232,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text={`  ${trip.status}`}
           style={{
-            fontSize: 12,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.caption,
+            fontWeight: FontWeight.bold,
             color: Colors.success,
             marginLeft: 3,
           }}
@@ -245,8 +258,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="LemonTrip"
           style={{
-            fontSize: 12,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.caption,
+            fontWeight: FontWeight.bold,
             color: Colors.textDark,
           }}
         />
@@ -254,8 +268,9 @@ export function UpcomingTripWidget({
         <TextWidget
           text="View Trip  >"
           style={{
-            fontSize: 12,
-            fontWeight: 'bold',
+            fontFamily: FontFamily.sans,
+            fontSize: TextSize.caption,
+            fontWeight: FontWeight.bold,
             color: Colors.primary,
           }}
         />

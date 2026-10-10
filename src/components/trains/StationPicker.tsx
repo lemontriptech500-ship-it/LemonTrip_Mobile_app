@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { STATIONS, getStation } from '@/data/trains';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface Props { visible: boolean; title: string; exclude?: string; onSelect: (code: string) => void; onClose: () => void }
@@ -49,14 +51,14 @@ const s = StyleSheet.create({
   sheet: { maxHeight: '78%', minHeight: '55%', backgroundColor: Colors.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: Ui.space.page, paddingTop: 10 },
   grab: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: Colors.borderStrong, marginBottom: 10 },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  title: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark },
+  title: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   closeBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48, paddingHorizontal: 12, borderRadius: 16, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border, marginBottom: 6 },
-  searchInput: { flex: 1, minHeight: 48, fontFamily: 'Manrope', fontSize: 15, color: Colors.textDark },
+  searchInput: { flex: 1, minHeight: 48, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: Colors.textDark },
   item: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: Colors.border },
   code: { minWidth: 54, alignItems: 'center', paddingVertical: 6, paddingHorizontal: 8, borderRadius: 10, backgroundColor: Colors.surfaceMuted },
-  codeText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.primary },
-  name: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '700', color: Colors.textDark },
-  city: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 1 },
-  none: { fontFamily: 'Manrope', fontSize: 14, color: Colors.textLight, textAlign: 'center', marginTop: 30 },
+  codeText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary },
+  name: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.bold, color: Colors.textDark },
+  city: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
+  none: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight, textAlign: 'center', marginTop: 30 },
 });

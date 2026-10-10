@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { SupportScreen, supportStyles as s } from '@/components/support/SupportScreen';
 import { Colors } from '@/constants/colors';
 import { getAccessToken, useAuth } from '@/utils/authStore';
@@ -5,7 +7,7 @@ import { sendChatMessage, type ChatMessage } from '@/utils/chatApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { useRef, useState, type ComponentProps } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const shortcuts: { title: string; icon: ComponentProps<typeof Ionicons>['name']; route?: Href; prompt?: string }[] = [
   { title: 'Book a flight', icon: 'airplane', route: '/(tabs)/explore/flights' },
@@ -33,4 +35,4 @@ function AssistantChat() {
     </ScrollView>
   </SupportScreen>;
 }
-const styles = StyleSheet.create({ page: { width: '100%', maxWidth: 640, alignSelf: 'center', flexGrow: 1, padding: 18, gap: 14 }, menu: { alignSelf: 'flex-end', width: '88%', maxWidth: 340, backgroundColor: '#56635F', padding: 14, borderRadius: 14, borderBottomLeftRadius: 3, marginTop: 14 }, shortcut: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 12 }, shortcutText: { flex: 1, color: Colors.white, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 }, message: { maxWidth: '92%', alignSelf: 'flex-start', padding: 14, borderRadius: 14, backgroundColor: Colors.surface }, userMessage: { alignSelf: 'flex-end', backgroundColor: Colors.surfaceMuted }, sender: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', marginBottom: 6 }, messageText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 22 }, composer: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 24, backgroundColor: Colors.surfaceMuted, paddingHorizontal: 8 }, input: { flex: 1, minWidth: 0, minHeight: 48, maxHeight: 110, padding: 12, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13 }, send: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.secondary }, disabled: { opacity: 0.45 }, support: { minHeight: 44, justifyContent: 'center' }, supportText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' } });
+const styles = StyleSheet.create({ page: { width: '100%', maxWidth: 640, alignSelf: 'center', flexGrow: 1, padding: 18, gap: 14 }, menu: { alignSelf: 'flex-end', width: '88%', maxWidth: 340, backgroundColor: '#56635F', padding: 14, borderRadius: 14, borderBottomLeftRadius: 3, marginTop: 14 }, shortcut: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 12 }, shortcutText: { flex: 1, color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20 }, message: { maxWidth: '92%', alignSelf: 'flex-start', padding: 14, borderRadius: 14, backgroundColor: Colors.surface }, userMessage: { alignSelf: 'flex-end', backgroundColor: Colors.surfaceMuted }, sender: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, marginBottom: 6 }, messageText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 22 }, composer: { flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 24, backgroundColor: Colors.surfaceMuted, paddingHorizontal: 8 }, input: { flex: 1, minWidth: 0, minHeight: 48, maxHeight: 110, padding: 12, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body }, send: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.secondary }, disabled: { opacity: 0.45 }, support: { minHeight: 44, justifyContent: 'center' }, supportText: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold } });

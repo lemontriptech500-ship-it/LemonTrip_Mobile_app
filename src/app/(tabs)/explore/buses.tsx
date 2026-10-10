@@ -1,16 +1,8 @@
+import { TextSize, FontWeight } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 
 import React, { useMemo, useState } from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-  ImageBackground,
-  Alert,
-} from "react-native";
+import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, ImageBackground, Alert } from 'react-native';
 import { useRouter } from "expo-router";
 
 const GREEN = "#075638";
@@ -637,16 +629,16 @@ const styles = StyleSheet.create({
     gap: 9,
   },
   logo: {
-    fontSize: 23,
+    fontSize: TextSize.displaySmall,
   },
   brandName: {
     color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "900",
+    fontSize: TextSize.bodyLarge,
+    fontWeight: FontWeight.extraBold,
   },
   tagline: {
     color: "#D4E9DC",
-    fontSize: 8,
+    fontSize: TextSize.micro,
     marginTop: 2,
     letterSpacing: 0.5,
   },
@@ -659,7 +651,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     color: "#FFFFFF",
-    fontSize: 22,
+    fontSize: TextSize.displaySmall,
   },
   hero: {
     height: 174,
@@ -687,19 +679,19 @@ const styles = StyleSheet.create({
   },
   heroBadgeText: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 0.7,
   },
   heroTitle: {
     color: "#FFFFFF",
-    fontSize: 25,
-    fontWeight: "900",
+    fontSize: TextSize.display,
+    fontWeight: FontWeight.extraBold,
     lineHeight: 29,
   },
   heroSubtitle: {
     color: "#F2F7F3",
-    fontSize: 12,
+    fontSize: TextSize.caption,
     marginTop: 6,
   },
   heroDecoration: {
@@ -708,7 +700,7 @@ const styles = StyleSheet.create({
     bottom: 14,
   },
   heroBus: {
-    fontSize: 34,
+    fontSize: TextSize.hero,
   },
   heading: {
     flexDirection: "row",
@@ -726,19 +718,19 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1.1,
   },
   pageTitle: {
     color: DARK,
-    fontSize: 25,
-    fontWeight: "900",
+    fontSize: TextSize.display,
+    fontWeight: FontWeight.extraBold,
     marginTop: 3,
   },
   subtitle: {
     color: MUTED,
-    fontSize: 11,
+    fontSize: TextSize.micro,
     marginTop: 4,
     lineHeight: 16,
   },
@@ -758,12 +750,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: DARK,
-    fontSize: 16,
-    fontWeight: "900",
+    fontSize: TextSize.bodyLarge,
+    fontWeight: FontWeight.extraBold,
   },
   cardSubtitle: {
     color: MUTED,
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginTop: 3,
   },
   cardIcon: {
@@ -776,8 +768,8 @@ const styles = StyleSheet.create({
   },
   cardIconText: {
     color: GREEN,
-    fontSize: 21,
-    fontWeight: "900",
+    fontSize: TextSize.displaySmall,
+    fontWeight: FontWeight.extraBold,
   },
   cityRow: {
     flexDirection: "row",
@@ -796,21 +788,21 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     color: "#7C8980",
-    fontSize: 8,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 0.8,
     marginBottom: 6,
   },
   cityInput: {
     color: DARK,
-    fontSize: 13,
-    fontWeight: "800",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
     padding: 0,
     minWidth: 0,
   },
   fieldHint: {
     color: "#96A198",
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 5,
   },
   swapButton: {
@@ -823,8 +815,8 @@ const styles = StyleSheet.create({
   },
   swapText: {
     color: GREEN,
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: TextSize.heading,
+    fontWeight: FontWeight.extraBold,
   },
   divider: {
     height: 1,
@@ -841,8 +833,8 @@ const styles = StyleSheet.create({
   },
   dateValue: {
     color: DARK,
-    fontSize: 12,
-    fontWeight: "800",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
   },
   dateActions: {
     flexDirection: "row",
@@ -851,8 +843,8 @@ const styles = StyleSheet.create({
   },
   dateAction: {
     color: GREEN,
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   passengerField: {
     alignItems: "flex-start",
@@ -874,13 +866,13 @@ const styles = StyleSheet.create({
   },
   counterText: {
     color: GREEN,
-    fontSize: 17,
-    fontWeight: "800",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   passengerCount: {
     color: DARK,
-    fontSize: 13,
-    fontWeight: "800",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
   searchButton: {
     backgroundColor: GREEN,
@@ -894,8 +886,8 @@ const styles = StyleSheet.create({
   },
   searchButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "900",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
   searchArrowCircle: {
     width: 25,
@@ -907,8 +899,8 @@ const styles = StyleSheet.create({
   },
   searchArrow: {
     color: GREEN,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   secureRow: {
     flexDirection: "row",
@@ -918,8 +910,8 @@ const styles = StyleSheet.create({
   },
   secureText: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "700",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
   sectionHeader: {
     flexDirection: "row",
@@ -929,12 +921,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: DARK,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   sectionSubtitle: {
     color: MUTED,
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginTop: 3,
   },
   yellowBadge: {
@@ -945,8 +937,8 @@ const styles = StyleSheet.create({
   },
   yellowBadgeText: {
     color: "#745900",
-    fontSize: 8,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   popularRow: {
     gap: 10,
@@ -961,23 +953,23 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   popularIcon: {
-    fontSize: 24,
+    fontSize: TextSize.displaySmall,
     marginBottom: 9,
   },
   popularRoute: {
     color: DARK,
-    fontSize: 11,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   popularPrice: {
     color: GREEN,
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginTop: 6,
   },
   popularAction: {
     color: "#8A968E",
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 8,
   },
   resultCount: {
@@ -988,8 +980,8 @@ const styles = StyleSheet.create({
   },
   resultCountText: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   filterRow: {
     gap: 7,
@@ -1009,8 +1001,8 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: "#506256",
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   filterTextActive: {
     color: "#FFFFFF",
@@ -1041,12 +1033,12 @@ const styles = StyleSheet.create({
   },
   sortText: {
     color: "#526257",
-    fontSize: 9,
-    fontWeight: "700",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
   sortTextActive: {
     color: GREEN,
-    fontWeight: "900",
+    fontWeight: FontWeight.extraBold,
   },
   priceRow: {
     flexDirection: "row",
@@ -1061,8 +1053,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     color: DARK,
-    fontSize: 11,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     textAlign: "right",
   },
   busCard: {
@@ -1087,7 +1079,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   busIcon: {
-    fontSize: 23,
+    fontSize: TextSize.displaySmall,
   },
   operatorBlock: {
     flex: 1,
@@ -1095,23 +1087,23 @@ const styles = StyleSheet.create({
   },
   operatorName: {
     color: DARK,
-    fontSize: 12,
-    fontWeight: "900",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
   },
   busType: {
     color: MUTED,
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 3,
   },
   rating: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginTop: 4,
   },
   ratingMuted: {
     color: MUTED,
-    fontWeight: "400",
+    fontWeight: FontWeight.regular,
   },
   popularBadge: {
     backgroundColor: "#FFF3BC",
@@ -1121,8 +1113,8 @@ const styles = StyleSheet.create({
   },
   popularBadgeText: {
     color: "#745900",
-    fontSize: 8,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   routeLine: {
     flexDirection: "row",
@@ -1132,12 +1124,12 @@ const styles = StyleSheet.create({
   },
   timeText: {
     color: DARK,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   cityLabel: {
     color: MUTED,
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 3,
     maxWidth: 80,
   },
@@ -1148,8 +1140,8 @@ const styles = StyleSheet.create({
   },
   durationText: {
     color: MUTED,
-    fontSize: 9,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   routeTrack: {
     width: "100%",
@@ -1169,12 +1161,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#9BC5A6",
   },
   routeBus: {
-    fontSize: 12,
+    fontSize: TextSize.caption,
     marginHorizontal: 3,
   },
   durationCaption: {
     color: "#89948C",
-    fontSize: 8,
+    fontSize: TextSize.micro,
   },
   arrivalBlock: {
     alignItems: "flex-end",
@@ -1187,12 +1179,12 @@ const styles = StyleSheet.create({
   },
   seatsAvailable: {
     color: GREEN,
-    fontSize: 10,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   amenities: {
     color: MUTED,
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 5,
   },
   priceBlock: {
@@ -1200,12 +1192,12 @@ const styles = StyleSheet.create({
   },
   price: {
     color: DARK,
-    fontSize: 19,
-    fontWeight: "900",
+    fontSize: TextSize.heading,
+    fontWeight: FontWeight.extraBold,
   },
   perPerson: {
     color: MUTED,
-    fontSize: 8,
+    fontSize: TextSize.micro,
     marginTop: 2,
   },
   viewButton: {
@@ -1220,13 +1212,13 @@ const styles = StyleSheet.create({
   },
   viewButtonText: {
     color: "#FFFFFF",
-    fontSize: 10,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   viewButtonArrow: {
     color: YELLOW,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   emptyCard: {
     backgroundColor: "#FFFFFF",
@@ -1237,17 +1229,17 @@ const styles = StyleSheet.create({
     borderColor: BORDER,
   },
   emptyIcon: {
-    fontSize: 34,
+    fontSize: TextSize.hero,
     marginBottom: 8,
   },
   emptyTitle: {
     color: DARK,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   emptySubtitle: {
     color: MUTED,
-    fontSize: 11,
+    fontSize: TextSize.micro,
     textAlign: "center",
     marginTop: 7,
   },
@@ -1260,8 +1252,8 @@ const styles = StyleSheet.create({
   },
   resetText: {
     color: "#FFFFFF",
-    fontSize: 11,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   footer: {
     alignItems: "center",
@@ -1270,25 +1262,25 @@ const styles = StyleSheet.create({
   },
   footerLogo: {
     color: GREEN,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   footerTitle: {
     color: DARK,
-    fontSize: 12,
-    fontWeight: "900",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
     marginTop: 10,
   },
   footerText: {
     color: MUTED,
-    fontSize: 10,
+    fontSize: TextSize.micro,
     textAlign: "center",
     marginTop: 5,
     lineHeight: 16,
   },
   footerNote: {
     color: "#9AA49C",
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 9,
   },
 });

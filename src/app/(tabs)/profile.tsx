@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { AccountArtworkIcon } from '@/components/AccountArtworkIcon';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -7,7 +9,7 @@ import { logout, useAuth } from '@/utils/authStore';
 import { useAccountBookings } from '@/utils/accountBookings';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 const SOFT_GREEN = Colors.surfaceMuted;
@@ -190,66 +192,66 @@ const styles = StyleSheet.create({
 
   // Title
   titleStrip: { paddingHorizontal: 18, paddingVertical: 16, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  pageTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 26, fontWeight: '800' },
-  pageSubtitle: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 14, marginTop: 3 },
+  pageTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.display, fontWeight: FontWeight.extraBold },
+  pageSubtitle: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 3 },
 
   // Identity card
   heroCard: { marginTop: 16, marginHorizontal: Ui.space.page, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
   heroRing: { position: 'absolute', width: 190, height: 190, right: -80, top: -90, borderRadius: 95, borderWidth: 1, borderColor: Colors.onDarkBorder },
   identityRow: { flexDirection: 'row', alignItems: 'center', gap: 15 },
   avatar: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.onDarkHighlight },
-  avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 30, fontWeight: '800' },
+  avatarText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.hero, fontWeight: FontWeight.extraBold },
   identityCopy: { flex: 1, minWidth: 0 },
   memberPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 6, borderRadius: Ui.radius.pill, backgroundColor: Colors.accent },
-  memberPillText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  name: { color: Colors.white, fontFamily: 'Manrope', fontSize: 22, fontWeight: '800' },
-  emailText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
+  memberPillText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  name: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
+  emailText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 3 },
   statRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.onDarkBorder },
   stat: { minWidth: 0 },
-  statValue: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 28, lineHeight: 32, fontWeight: '800' },
-  statLabel: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
+  statValue: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.display, lineHeight: 32, fontWeight: FontWeight.extraBold },
+  statLabel: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   guestBlock: { gap: 14, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.onDarkBorder },
-  guestText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20 },
+  guestText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20 },
   heroButton: { alignSelf: 'flex-start', minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 18, paddingRight: 5, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  heroButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  heroButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   heroButtonArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
 
   // Circle grid card
   gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
-  gridTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', paddingHorizontal: 10, marginBottom: 10 },
+  gridTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, paddingHorizontal: 10, marginBottom: 10 },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
   gridIconWrap: { width: 44, height: 40, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   gridBadge: { position: 'absolute', top: -2, right: -2, minWidth: 20, height: 20, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
-  gridBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
-  gridLabel: { marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, lineHeight: 13, fontWeight: '700' },
+  gridBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
+  gridLabel: { marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, lineHeight: 13, fontWeight: FontWeight.bold },
 
   // Lower layout
   lowerLayout: { gap: 16, marginTop: 24, paddingHorizontal: 16 },
   lowerLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
   menuSection: { flex: 1, minWidth: 0 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 20, fontWeight: '800', marginHorizontal: 2, marginBottom: 12 },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, marginHorizontal: 2, marginBottom: 12 },
   menuCard: { ...Ui.card, overflow: 'hidden', paddingHorizontal: 14, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
   menuRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 10 },
   menuDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   menuIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
   menuCopy: { flex: 1, minWidth: 0 },
-  menuTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  menuDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 18, marginTop: 2 },
-  soonTag: { overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 4, borderRadius: Ui.radius.pill, backgroundColor: SOFT_GREEN, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
+  menuTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  menuDetail: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 18, marginTop: 2 },
+  soonTag: { overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 4, borderRadius: Ui.radius.pill, backgroundColor: SOFT_GREEN, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
 
   // Discover banner
   discoverCard: { flexGrow: 1, minWidth: 0, overflow: 'hidden', padding: 20, borderRadius: 24, backgroundColor: Colors.accentSoft },
   discoverRing: { position: 'absolute', width: 150, height: 150, right: -70, bottom: -80, borderRadius: 75, borderWidth: 1, borderColor: Colors.decorativeGreen },
   discoverIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 27, backgroundColor: Colors.surface },
-  discoverTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, lineHeight: 28, fontWeight: '800', marginTop: 14 },
-  discoverText: { maxWidth: 300, color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, marginTop: 6 },
+  discoverTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, lineHeight: 28, fontWeight: FontWeight.extraBold, marginTop: 14 },
+  discoverText: { maxWidth: 300, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 6 },
   discoverCta: { alignSelf: 'flex-start', minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingLeft: 18, paddingRight: 5, borderRadius: 24, backgroundColor: Colors.white },
-  discoverCtaText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
+  discoverCtaText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   discoverCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
 
   // Log out + footer
   logoutButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, marginHorizontal: Ui.space.page, borderRadius: 26, borderWidth: 1, borderColor: Colors.errorBorder, backgroundColor: Colors.errorSoft },
-  logoutText: { color: Colors.error, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  footer: { marginTop: 22, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, textAlign: 'center' },
+  logoutText: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  footer: { marginTop: 22, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, textAlign: 'center' },
 });

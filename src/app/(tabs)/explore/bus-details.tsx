@@ -1,14 +1,8 @@
+import { TextSize, FontWeight } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 
 import React, { useState } from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const GREEN = "#075638";
@@ -144,7 +138,7 @@ export default function BusDetailsScreen() {
         <View style={styles.tripCard}>
           <View style={styles.operatorRow}>
             <View style={styles.busIcon}>
-              <Text style={{ fontSize: 25 }}>🚌</Text>
+              <Text style={{ fontSize: TextSize.display }}>🚌</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.operator}>{operator}</Text>
@@ -319,26 +313,26 @@ const styles = StyleSheet.create({
     height: 35,
     justifyContent: "center",
   },
-  backText: { color: "#FFFFFF", fontSize: 31 },
+  backText: { color: "#FFFFFF", fontSize: TextSize.hero },
   brand: { flexDirection: "row", alignItems: "center", gap: 8 },
-  logo: { fontSize: 22 },
-  brandName: { color: "#FFFFFF", fontSize: 15, fontWeight: "900" },
-  brandSubtitle: { color: "#D6E8DC", fontSize: 8, marginTop: 2 },
+  logo: { fontSize: TextSize.displaySmall },
+  brandName: { color: "#FFFFFF", fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  brandSubtitle: { color: "#D6E8DC", fontSize: TextSize.micro, marginTop: 2 },
   eyebrow: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1,
   },
   title: {
     color: DARK,
-    fontSize: 25,
-    fontWeight: "900",
+    fontSize: TextSize.display,
+    fontWeight: FontWeight.extraBold,
     marginTop: 5,
   },
   subtitle: {
     color: "#758178",
-    fontSize: 11,
+    fontSize: TextSize.micro,
     lineHeight: 17,
     marginTop: 5,
     marginBottom: 17,
@@ -360,26 +354,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  operator: { color: DARK, fontSize: 13, fontWeight: "900" },
-  busType: { color: "#78867D", fontSize: 10, marginTop: 4 },
-  rating: { color: GREEN, fontSize: 9, marginTop: 4 },
+  operator: { color: DARK, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  busType: { color: "#78867D", fontSize: TextSize.micro, marginTop: 4 },
+  rating: { color: GREEN, fontSize: TextSize.micro, marginTop: 4 },
   acBadge: {
     backgroundColor: "#EAF4EC",
     paddingHorizontal: 9,
     paddingVertical: 6,
     borderRadius: 5,
   },
-  acText: { color: GREEN, fontSize: 10, fontWeight: "900" },
+  acText: { color: GREEN, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   routeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 22,
   },
-  time: { color: DARK, fontSize: 18, fontWeight: "900" },
-  city: { color: "#7B887E", fontSize: 10, marginTop: 4 },
+  time: { color: DARK, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
+  city: { color: "#7B887E", fontSize: TextSize.micro, marginTop: 4 },
   routeMiddle: { flex: 1, alignItems: "center", paddingHorizontal: 8 },
-  duration: { color: "#758178", fontSize: 9 },
+  duration: { color: "#758178", fontSize: TextSize.micro },
   routeLine: {
     flexDirection: "row",
     alignItems: "center",
@@ -388,17 +382,17 @@ const styles = StyleSheet.create({
   },
   dot: { width: 5, height: 5, borderRadius: 3, backgroundColor: GREEN },
   line: { flex: 1, height: 1, backgroundColor: "#A6CBB1" },
-  direct: { color: "#849087", fontSize: 8 },
+  direct: { color: "#849087", fontSize: TextSize.micro },
   separator: { height: 1, backgroundColor: "#E6EDE7", marginVertical: 13 },
-  dateText: { color: DARK, fontSize: 11, fontWeight: "800" },
+  dateText: { color: DARK, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   sectionHeading: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 12,
   },
-  sectionTitle: { color: DARK, fontSize: 16, fontWeight: "900" },
-  selectedCount: { color: GREEN, fontSize: 11, fontWeight: "800" },
+  sectionTitle: { color: DARK, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  selectedCount: { color: GREEN, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   legend: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -412,7 +406,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BORDER,
   },
-  legendText: { color: "#66746A", fontSize: 10 },
+  legendText: { color: "#66746A", fontSize: TextSize.micro },
   busLayout: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -431,11 +425,11 @@ const styles = StyleSheet.create({
   },
   driverLabel: {
     color: "#849087",
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1,
   },
-  steering: { color: GREEN, fontSize: 22 },
+  steering: { color: GREEN, fontSize: TextSize.displaySmall },
   deckSelector: {
     flexDirection: "row",
     backgroundColor: "#F0F5F0",
@@ -450,12 +444,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   deckActive: { backgroundColor: GREEN },
-  deckText: { color: "#617067", fontSize: 11, fontWeight: "800" },
+  deckText: { color: "#617067", fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   deckTextActive: { color: "#FFFFFF" },
   deckHint: {
     textAlign: "center",
     color: "#839087",
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginVertical: 15,
   },
   seatRow: {
@@ -476,13 +470,13 @@ const styles = StyleSheet.create({
   },
   seatUnavailable: { backgroundColor: "#D7DEDA", borderColor: "#D7DEDA" },
   seatSelected: { backgroundColor: GREEN, borderColor: GREEN },
-  seatText: { color: GREEN, fontSize: 11, fontWeight: "900" },
+  seatText: { color: GREEN, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   unavailableText: { color: "#7F8B83" },
   selectedText: { color: "#FFFFFF" },
   aisle: { width: 24 },
   layoutNote: {
     color: "#89948C",
-    fontSize: 9,
+    fontSize: TextSize.micro,
     textAlign: "center",
     marginTop: 5,
     lineHeight: 14,
@@ -501,16 +495,16 @@ const styles = StyleSheet.create({
     marginTop: 13,
     gap: 8,
   },
-  summaryLabel: { color: "#758178", fontSize: 11 },
+  summaryLabel: { color: "#758178", fontSize: TextSize.micro },
   summaryValue: {
     color: DARK,
-    fontSize: 11,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     flexShrink: 1,
     textAlign: "right",
   },
-  totalLabel: { color: DARK, fontSize: 13, fontWeight: "900" },
-  totalPrice: { color: GREEN, fontSize: 22, fontWeight: "900" },
+  totalLabel: { color: DARK, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  totalPrice: { color: GREEN, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
   continueButton: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -520,12 +514,12 @@ const styles = StyleSheet.create({
     padding: 14,
     marginTop: 18,
   },
-  continueText: { color: "#FFFFFF", fontSize: 11, fontWeight: "900" },
-  arrow: { color: YELLOW, fontSize: 19, fontWeight: "900" },
+  continueText: { color: "#FFFFFF", fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
+  arrow: { color: YELLOW, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold },
   footer: {
     textAlign: "center",
     color: "#849087",
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginTop: 22,
   },
 });

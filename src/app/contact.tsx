@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { SupportButton, SupportCard, SupportChip, SupportField, SupportHeading, SupportNotice, SupportPage } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -7,7 +9,7 @@ import { submitSupportRequest, supportTopics, type SupportTopic } from '@/utils/
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const MESSAGE_MIN = 10;
 const MESSAGE_MAX = 5000;
@@ -120,23 +122,23 @@ function uuid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
 const s = StyleSheet.create({
   names: { flexDirection: 'row', gap: 10 },
   name: { flex: 1, minWidth: 0 },
-  label: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9, color: Colors.textLight, marginBottom: 8 },
+  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 8 },
   topics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  inlineLink: { fontWeight: '800', color: Colors.primary, textDecorationLine: 'underline' },
+  inlineLink: { fontWeight: FontWeight.extraBold, color: Colors.primary, textDecorationLine: 'underline' },
   ref2: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 10, borderRadius: 12, backgroundColor: Colors.surfaceMuted },
-  ref2Text: { flex: 1, fontFamily: 'Manrope', fontSize: 12, color: Colors.textDark },
+  ref2Text: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textDark },
   channels: { alignItems: 'center', marginHorizontal: Ui.space.page, marginTop: 4 },
-  channelsLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight },
+  channelsLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight },
   channelRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 4 },
   channel: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 7 },
-  channelText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primary },
+  channelText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.borderStrong },
   done: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 14, padding: 24, borderRadius: Ui.radius.card, backgroundColor: Colors.primaryDark },
   doneIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  doneTitle: { fontFamily: 'Manrope', fontSize: 21, fontWeight: '800', color: Colors.white, marginTop: 14 },
-  doneText: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 5, textAlign: 'center' },
+  doneTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, marginTop: 14 },
+  doneText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 5, textAlign: 'center' },
   refBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
   refLabel: { ...Ui.eyebrow, color: Colors.onDarkMuted },
-  ref: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.white, marginTop: 4 },
+  ref: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.white, marginTop: 4 },
   cta: { marginHorizontal: Ui.space.page },
 });

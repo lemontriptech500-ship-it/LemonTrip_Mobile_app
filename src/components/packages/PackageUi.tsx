@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Pill, Row } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -5,7 +7,7 @@ import { countsLabel, formatShortDate, inr, type PackageFare } from '@/data/pack
 import type { PackageSnapshot } from '@/utils/packageBookingStore';
 import type { Counts } from '@/data/packages';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export const PACKAGE_ROUTES = {
   list: '/packages',
@@ -99,23 +101,23 @@ const s = StyleSheet.create({
   dot: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderWidth: 2, borderColor: Colors.borderStrong },
   dotDone: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   dotActive: { borderColor: Colors.primary, backgroundColor: Colors.accent },
-  dotText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '800', color: Colors.textLight },
+  dotText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.textLight },
   dotTextActive: { color: Colors.primaryDark },
-  stepLabel: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '700', color: Colors.textLight, marginTop: 5 },
+  stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, marginTop: 5 },
   stepLabelOn: { color: Colors.primary },
   summary: { ...Ui.card, flexDirection: 'row', gap: 12, marginHorizontal: Ui.space.page, marginBottom: 14, padding: 12 },
   thumb: { width: 84, height: 96, borderRadius: 14, backgroundColor: Colors.surfaceMuted },
   thumbEmpty: { alignItems: 'center', justifyContent: 'center' },
   place: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  placeText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.secondary, flexShrink: 1 },
-  title: { fontFamily: 'Manrope', fontSize: 15, lineHeight: 20, fontWeight: '800', color: Colors.textDark, marginTop: 3 },
-  meta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 3 },
+  placeText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.secondary, flexShrink: 1 },
+  title: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 20, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
+  meta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 3 },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 8 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
-  stepperLabel: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
-  stepperHint: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  stepperLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  stepperHint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   stepperControls: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   stepBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
   stepBtnOff: { opacity: 0.35 },
-  stepValue: { minWidth: 30, textAlign: 'center', fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', color: Colors.textDark },
+  stepValue: { minWidth: 30, textAlign: 'center', fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark },
 });

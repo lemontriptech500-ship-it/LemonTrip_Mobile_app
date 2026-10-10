@@ -1,8 +1,10 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Colors } from '@/constants/colors';
 import { getVisaApplications, getVisaDocumentUrl, type VisaApplication, type VisaDocumentKey } from '@/utils/visaService';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
@@ -101,25 +103,25 @@ const styles = StyleSheet.create({
   section: { marginHorizontal: Ui.space.page, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.border },
   headingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   headingCopy: { gap: 3 },
-  eyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
-  title: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800' },
+  eyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
+  title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   refreshButton: { minHeight: 44,  width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surface },
-  body: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19 },
+  body: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19 },
   loader: { marginVertical: 18 },
   state: { alignItems: 'flex-start', gap: 8 },
   retryButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 12, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  retryText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
-  error: { color: Colors.error, fontFamily: 'Manrope', fontSize: 13, marginBottom: 8 },
+  retryText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  error: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginBottom: 8 },
   application: { marginTop: 8, padding: 13, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, backgroundColor: Colors.surface },
   applicationTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 },
   applicationTitle: { flex: 1, minWidth: 0 },
-  country: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
-  visaType: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 2 },
-  status: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', textTransform: 'capitalize' },
-  reference: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, marginTop: 8 },
-  date: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 3 },
+  country: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  visaType: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 2 },
+  status: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, textTransform: 'capitalize' },
+  reference: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 8 },
+  date: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 3 },
   documents: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginTop: 11 },
   documentButton: { minHeight: 34, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: 8, backgroundColor: Colors.background },
-  documentText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  documentText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   dimmed: { opacity: 0.6 },
 });

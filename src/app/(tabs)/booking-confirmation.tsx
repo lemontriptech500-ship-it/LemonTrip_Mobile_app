@@ -1,14 +1,8 @@
+import { TextSize, FontWeight } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 
 import React from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  StatusBar,
-} from "react-native";
+import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const GREEN = "#075638";
@@ -189,12 +183,12 @@ const styles = StyleSheet.create({
   },
   logo: {
     color: "#FFFFFF",
-    fontSize: 20,
-    fontWeight: "900",
+    fontSize: TextSize.heading,
+    fontWeight: FontWeight.extraBold,
   },
   tagline: {
     color: "#D7EADF",
-    fontSize: 9,
+    fontSize: TextSize.micro,
     marginTop: 3,
     letterSpacing: 1,
   },
@@ -220,25 +214,25 @@ const styles = StyleSheet.create({
   },
   check: {
     color: GREEN,
-    fontSize: 42,
-    fontWeight: "800",
+    fontSize: TextSize.heroLarge,
+    fontWeight: FontWeight.extraBold,
   },
   eyebrow: {
     color: GREEN,
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1.3,
   },
   successTitle: {
     color: DARK,
-    fontSize: 25,
-    fontWeight: "900",
+    fontSize: TextSize.display,
+    fontWeight: FontWeight.extraBold,
     marginTop: 8,
     textAlign: "center",
   },
   successMessage: {
     color: MUTED,
-    fontSize: 13,
+    fontSize: TextSize.body,
     lineHeight: 20,
     textAlign: "center",
     marginTop: 8,
@@ -261,8 +255,8 @@ const styles = StyleSheet.create({
   },
   statusText: {
     color: "#765800",
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   card: {
     backgroundColor: "#FFFFFF",
@@ -274,14 +268,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: DARK,
-    fontSize: 17,
-    fontWeight: "800",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 12,
   },
   operator: {
     color: GREEN,
-    fontSize: 13,
-    fontWeight: "700",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.bold,
     marginBottom: 18,
   },
   routeRow: {
@@ -297,12 +291,12 @@ const styles = StyleSheet.create({
   },
   cityName: {
     color: DARK,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   smallText: {
     color: MUTED,
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginTop: 4,
   },
   routeMiddle: {
@@ -318,7 +312,7 @@ const styles = StyleSheet.create({
     top: 8,
   },
   busIcon: {
-    fontSize: 17,
+    fontSize: TextSize.title,
     backgroundColor: "#FFFFFF",
   },
   divider: {
@@ -335,14 +329,14 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     color: MUTED,
-    fontSize: 10,
-    fontWeight: "700",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
     flex: 1,
   },
   detailValue: {
     color: DARK,
-    fontSize: 12,
-    fontWeight: "800",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
     flex: 1,
     textAlign: "right",
   },
@@ -353,13 +347,13 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     color: MUTED,
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   totalAmount: {
     color: GREEN,
-    fontSize: 24,
-    fontWeight: "900",
+    fontSize: TextSize.displaySmall,
+    fontWeight: FontWeight.extraBold,
   },
   referenceCard: {
     backgroundColor: "#E8F4EC",
@@ -372,20 +366,20 @@ const styles = StyleSheet.create({
   },
   referenceLabel: {
     color: GREEN,
-    fontSize: 10,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1,
   },
   referenceId: {
     color: DARK,
-    fontSize: 24,
-    fontWeight: "900",
+    fontSize: TextSize.displaySmall,
+    fontWeight: FontWeight.extraBold,
     marginTop: 8,
     letterSpacing: 1,
   },
   referenceNote: {
     color: MUTED,
-    fontSize: 10,
+    fontSize: TextSize.micro,
     textAlign: "center",
     marginTop: 8,
   },
@@ -399,13 +393,13 @@ const styles = StyleSheet.create({
   },
   noticeTitle: {
     color: DARK,
-    fontWeight: "800",
-    fontSize: 13,
+    fontWeight: FontWeight.extraBold,
+    fontSize: TextSize.body,
     marginBottom: 6,
   },
   noticeText: {
     color: MUTED,
-    fontSize: 11,
+    fontSize: TextSize.micro,
     lineHeight: 17,
   },
   primaryButton: {
@@ -419,13 +413,13 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "800",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
   arrow: {
     color: YELLOW,
-    fontSize: 21,
-    fontWeight: "800",
+    fontSize: TextSize.displaySmall,
+    fontWeight: FontWeight.extraBold,
   },
   secondaryButton: {
     marginTop: 10,
@@ -439,13 +433,13 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: GREEN,
-    fontSize: 13,
-    fontWeight: "800",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
   footer: {
     textAlign: "center",
     color: MUTED,
-    fontSize: 11,
+    fontSize: TextSize.micro,
     marginTop: 24,
   },
 });

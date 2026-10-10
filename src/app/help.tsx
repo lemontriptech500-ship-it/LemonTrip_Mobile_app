@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { SupportCard, SupportHeading, SupportItem, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { supportContact } from '@/constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -61,9 +63,9 @@ const s = StyleSheet.create({
   quick: { flexDirection: 'row', gap: 10, marginHorizontal: Ui.space.page, marginBottom: 14 },
   quickItem: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 14, paddingHorizontal: 6, borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   quickIcon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  quickLabel: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.textDark, textAlign: 'center' },
+  quickLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark, textAlign: 'center' },
   channels: { flexDirection: 'row', gap: 10 },
   channel: { flex: 1, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 14, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.background },
-  channelText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primary },
-  email: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, textAlign: 'center', marginTop: 10 },
+  channelText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
+  email: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, textAlign: 'center', marginTop: 10 },
 });

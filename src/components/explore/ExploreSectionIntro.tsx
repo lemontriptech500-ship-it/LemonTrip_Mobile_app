@@ -1,6 +1,8 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
-import { StyleSheet, Text, View, type ReactNode } from 'react-native';
+import { StyleSheet, View, type ReactNode } from 'react-native';
 
 export function ExploreSectionIntro({
   eyebrow,
@@ -37,23 +39,23 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     color: Colors.accent,
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1.4,
   },
   title: {
     color: Colors.white,
-    fontFamily: 'Manrope',
-    fontSize: 28,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.display,
     lineHeight: 35,
-    fontWeight: '800',
+    fontWeight: FontWeight.extraBold,
     marginTop: 8,
   },
   subtitle: {
     color: Colors.onDarkMuted,
-    fontFamily: 'Manrope',
-    fontSize: 13,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
     lineHeight: 20,
     marginTop: 6,
   },

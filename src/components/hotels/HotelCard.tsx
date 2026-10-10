@@ -1,7 +1,9 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import type { Hotel } from '@/types/content';
 import type { HotelSearchCriteria } from '@/utils/hotelSearchStore';
 
@@ -90,26 +92,26 @@ const styles = StyleSheet.create({
   image: { width: '100%', height: 205, backgroundColor: Colors.surfaceMuted },
   imageDesktop: { width: 270, height: '100%', minHeight: 214 },
   imageBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 9, backgroundColor: Colors.white },
-  imageBadgeText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800' },
+  imageBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   content: { flex: 1, minWidth: 0, padding: 13 },
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   titleBlock: { flex: 1, minWidth: 0 },
-  name: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, lineHeight: 24, fontWeight: '800' },
+  name: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 24, fontWeight: FontWeight.extraBold },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 5 },
-  location: { flex: 1, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
+  location: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   reviewScore: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 8, backgroundColor: Colors.primaryDark },
-  score: { color: Colors.white, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  score: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   amenities: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 5, marginTop: 10 },
   amenity: { maxWidth: 108, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 8, backgroundColor: Colors.background },
-  amenityText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13 },
-  moreAmenities: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  amenityText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
+  moreAmenities: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   roomInfo: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 5, marginTop: 11 },
-  roomText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700' },
-  cancelText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  roomText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  cancelText: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   bottomRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border },
   priceBlock: { flex: 1, minWidth: 0 },
-  price: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '800' },
-  total: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 3 },
+  price: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
+  total: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 3 },
   viewButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  viewButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  viewButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });

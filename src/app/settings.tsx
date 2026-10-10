@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { usePreferences } from '@/utils/preferencesStore';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
@@ -8,7 +10,7 @@ import { logout, useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { type ReactNode } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -165,19 +167,19 @@ const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
   accountBanner: { minHeight: 102, flexDirection: 'row', alignItems: 'center', gap: 13, marginHorizontal: Ui.space.page, paddingHorizontal: 16, paddingVertical: 14, borderRadius: Ui.radius.card, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
   accountAvatar: { width: 51, height: 51, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: Colors.accent },
-  avatarInitial: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 21, fontWeight: '800' },
+  avatarInitial: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
   accountCopy: { flex: 1, minWidth: 0 },
-  accountEyebrow: { color: Colors.accent, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.25, marginBottom: 3 },
-  accountName: { color: Colors.white, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  accountEmail: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 13, marginTop: 3 },
+  accountEyebrow: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.25, marginBottom: 3 },
+  accountName: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  accountEmail: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 3 },
   accountAction: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accent },
   signInButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 12, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  signInText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  signInText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   bannerAccent: { position: 'absolute', width: 120, height: 120, right: -57, top: -78, borderRadius: 60, borderWidth: 1, borderColor: Colors.onDarkSurface },
   quick: { flexDirection: 'row', gap: 10, marginHorizontal: Ui.space.page, marginTop: 13 },
   quickItem: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   quickIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  quickLabel: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.textDark },
+  quickLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   columns: { gap: 13, marginTop: 17, paddingHorizontal: 16 },
   columnsDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
   column: { flex: 1, minWidth: 0, gap: 13 },
@@ -186,23 +188,23 @@ const styles = StyleSheet.create({
   sectionIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accentSoft },
   sectionHeadingCopy: { flex: 1 },
   sectionEyebrow: { ...Ui.eyebrow, color: Colors.secondary, marginBottom: 2 },
-  sectionTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
+  sectionTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   rows: { paddingHorizontal: 14, paddingVertical: 2 },
   row: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 11, paddingVertical: 8 },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   rowIcon: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.background },
   rowCopy: { flex: 1, minWidth: 0 },
-  rowTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
-  rowDetail: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 2 },
+  rowTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  rowDetail: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 2 },
   valuePill: { maxWidth: 130, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
-  valueText: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
+  valueText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   helpCard: { minHeight: 86, flexDirection: 'row', alignItems: 'center', gap: 11, paddingHorizontal: 13, paddingVertical: 12, borderRadius: 16, backgroundColor: Colors.accentSoft },
   helpIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.surfaceMuted },
   helpCopy: { flex: 1, minWidth: 0 },
-  helpTitle: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 16, fontWeight: '800' },
-  helpText: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, marginTop: 4 },
+  helpTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  helpText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 4 },
   helpArrow: { width: 31, height: 31, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.surface },
   logout: { minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 16, borderWidth: 1, borderColor: Colors.errorBorder, backgroundColor: Colors.errorSoft },
-  logoutText: { color: Colors.error, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
-  version: { marginTop: 22, color: Colors.textLight, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', letterSpacing: 1.1, textAlign: 'center' },
+  logoutText: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  version: { marginTop: 22, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, letterSpacing: 1.1, textAlign: 'center' },
 });

@@ -1,16 +1,10 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Brand, Radius } from '@/constants/colors';
 import { useAuth } from '@/utils/authStore';
 import { toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router } from 'expo-router';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Image, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WishlistScreen() {
@@ -323,15 +317,15 @@ const styles = StyleSheet.create({
 
   check: {
     color: Brand.lemon,
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
 
   announcementText: {
     color: '#FFFFFF',
-    fontFamily: 'Manrope',
-    fontSize: 9,
-    fontWeight: '600',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.semibold,
   },
 
   /* Header */
@@ -369,16 +363,16 @@ const styles = StyleSheet.create({
 
   logoLetter: {
     color: Brand.forest,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '900',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
 
   logoText: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 15,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.bodyLarge,
+    fontWeight: FontWeight.extraBold,
   },
 
   navScroll: {
@@ -396,9 +390,9 @@ const styles = StyleSheet.create({
 
   navText: {
     color: '#526159',
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '600',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.semibold,
   },
 
   headerActions: {
@@ -419,7 +413,7 @@ const styles = StyleSheet.create({
 
   heart: {
     color: Brand.forest,
-    fontSize: 21,
+    fontSize: TextSize.displaySmall,
     lineHeight: 22,
   },
 
@@ -435,9 +429,9 @@ const styles = StyleSheet.create({
 
   myTripsText: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
 
   profileButton: {
@@ -452,14 +446,14 @@ const styles = StyleSheet.create({
 
   profileIcon: {
     color: Brand.forest,
-    fontSize: 14,
+    fontSize: TextSize.body,
   },
 
   profileText: {
     color: Brand.forest,
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
 
   /* Main */
@@ -503,23 +497,23 @@ const styles = StyleSheet.create({
 
   avatarText: {
     color: Brand.forest,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
 
   profileName: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     textAlign: 'center',
   },
 
   profileRole: {
     color: '#718078',
-    fontFamily: 'Manrope',
-    fontSize: 8,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
     marginTop: 2,
   },
 
@@ -542,9 +536,9 @@ const styles = StyleSheet.create({
 
   sidebarText: {
     color: '#526159',
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    fontWeight: '600',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.semibold,
   },
 
   sidebarActiveText: {
@@ -559,18 +553,18 @@ const styles = StyleSheet.create({
 
   eyebrow: {
     color: Brand.forestLight,
-    fontFamily: 'Manrope',
-    fontSize: 8,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1.3,
     marginBottom: 6,
   },
 
   pageTitle: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 25,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.display,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 16,
   },
 
@@ -602,32 +596,32 @@ const styles = StyleSheet.create({
 
   savedLabel: {
     color: Brand.forestLight,
-    fontFamily: 'Manrope',
-    fontSize: 6,
-    fontWeight: '900',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 0.7,
     marginBottom: 3,
   },
 
   cardName: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 11,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 3,
   },
 
   cardDetails: {
     color: '#64736B',
-    fontFamily: 'Manrope',
-    fontSize: 7,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
     marginBottom: 2,
   },
 
   bookingText: {
     color: '#64736B',
-    fontFamily: 'Manrope',
-    fontSize: 7,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
   },
 
   wishlistButton: {
@@ -640,9 +634,9 @@ const styles = StyleSheet.create({
 
   wishlistButtonText: {
     color: Brand.forest,
-    fontFamily: 'Manrope',
-    fontSize: 7,
-    fontWeight: '700',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
 
   /* Empty state */
@@ -655,16 +649,16 @@ const styles = StyleSheet.create({
 
   emptyTitle: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.bodyLarge,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 7,
   },
 
   emptySubtitle: {
     color: '#64736B',
-    fontFamily: 'Manrope',
-    fontSize: 11,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -701,15 +695,15 @@ const styles = StyleSheet.create({
 
   footerLogoText: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 12,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
   },
 
   footerDescription: {
     color: '#718078',
-    fontFamily: 'Manrope',
-    fontSize: 9,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
     lineHeight: 15,
     maxWidth: 190,
   },
@@ -721,16 +715,16 @@ const styles = StyleSheet.create({
 
   footerHeading: {
     color: '#10231A',
-    fontFamily: 'Manrope',
-    fontSize: 9,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 2,
   },
 
   footerLink: {
     color: '#718078',
-    fontFamily: 'Manrope',
-    fontSize: 8,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
   },
 
   supportBox: {
@@ -745,16 +739,16 @@ const styles = StyleSheet.create({
 
   supportSmall: {
     color: Brand.lemon,
-    fontFamily: 'Manrope',
-    fontSize: 6,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 4,
   },
 
   supportPhone: {
     color: '#FFFFFF',
-    fontFamily: 'Manrope',
-    fontSize: 9,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
 });

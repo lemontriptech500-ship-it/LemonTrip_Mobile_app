@@ -1,3 +1,4 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Colors } from './colors';
 
 const cardShadow = {
@@ -21,18 +22,18 @@ export const Ui = {
   },
   shadow: cardShadow,
   typography: {
-    pageTitle: { fontFamily: 'Manrope', fontSize: 28, lineHeight: 34, fontWeight: '800' },
-    heading: { fontFamily: 'Manrope', fontSize: 20, lineHeight: 28, fontWeight: '800' },
-    body: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 22 },
-    button: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 20, fontWeight: '800' },
+    pageTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.display, lineHeight: 34, fontWeight: FontWeight.extraBold },
+    heading: { fontFamily: FontFamily.sans, fontSize: TextSize.heading, lineHeight: 28, fontWeight: FontWeight.extraBold },
+    body: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 22 },
+    button: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, fontWeight: FontWeight.extraBold },
   },
   button: { minHeight: 52, borderRadius: 18 },
   compactButton: { minHeight: 44, borderRadius: 16 },
   field: { minHeight: 50, borderRadius: 16 },
   eyebrow: {
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1.4,
   },
 } as const;

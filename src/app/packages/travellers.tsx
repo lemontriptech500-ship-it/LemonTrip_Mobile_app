@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { PACKAGE_ROUTES, PackageFareSummary, PackageProgress, PackageSummary, TypePill } from '@/components/packages/PackageUi';
 import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
@@ -7,7 +9,7 @@ import { useAuth } from '@/utils/authStore';
 import { currentPackageFare, setContact, updateTraveller, usePackageBooking } from '@/utils/packageBookingStore';
 import { isTraveller, usePersonalItems } from '@/utils/personalStore';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 type Errors = { travellers: Record<number, { name?: string; age?: string; gender?: string }>; email?: string; phone?: string; passport?: string };
 const GENDERS = [{ id: 'M', label: 'Male' }, { id: 'F', label: 'Female' }, { id: 'O', label: 'Other' }] as const;
@@ -115,8 +117,8 @@ const s = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   scrollChips: { flexDirection: 'row', gap: 8 },
   pair: { flexDirection: 'row', gap: 12 },
-  label: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
-  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 4 },
-  hint: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, lineHeight: 18 },
-  notes: { minHeight: 84, textAlignVertical: 'top', padding: 12, marginBottom: 8, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: 'Manrope', fontSize: 14, color: Colors.textDark },
+  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
+  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 4 },
+  hint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, lineHeight: 18 },
+  notes: { minHeight: 84, textAlignVertical: 'top', padding: 12, marginBottom: 8, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textDark },
 });

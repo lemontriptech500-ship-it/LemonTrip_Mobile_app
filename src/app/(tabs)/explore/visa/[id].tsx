@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { VisaHeader, visaCountryFlag } from '@/components/visa/VisaHeader';
 import { Colors } from '@/constants/colors';
 import type { VisaCountry } from '@/types/content';
@@ -8,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type Upload = { name: string; mimeType: string; size: number; uri: string };
@@ -196,17 +198,17 @@ function Field(props: { label: string; value: string; onChangeText: (value: stri
 const styles = StyleSheet.create({
   safe: { flex: 1 }, page: { paddingBottom: 24 }, content: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: 16, gap: 12 },
   card: { padding: 16, borderRadius: 8, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, gap: 10 },
-  serviceHeading: { flexDirection: 'row', alignItems: 'center', gap: 12 }, flag: { fontSize: 30 }, grow: { flex: 1, minWidth: 0 },
-  title: { color: Colors.textDark, fontFamily: 'Manrope', fontWeight: '800', fontSize: 17 }, copy: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18 },
+  serviceHeading: { flexDirection: 'row', alignItems: 'center', gap: 12 }, flag: { fontSize: TextSize.hero }, grow: { flex: 1, minWidth: 0 },
+  title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.title }, copy: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18 },
   featureIcons: { flexDirection: 'row', alignItems: 'center', gap: 8 }, requirement: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  label: { color: Colors.textDark, fontFamily: 'Manrope', fontWeight: '700', fontSize: 12, marginBottom: 6 },
-  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, marginTop: 10, gap: 12, borderTopWidth: 1, borderTopColor: Colors.border }, price: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', flexShrink: 1 },
-  field: { marginBottom: 4 }, input: { minHeight: 44, borderWidth: 1, borderColor: Colors.borderStrong, borderRadius: 6, paddingHorizontal: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, backgroundColor: Colors.background },
+  label: { color: Colors.textDark, fontFamily: FontFamily.sans, fontWeight: FontWeight.bold, fontSize: TextSize.caption, marginBottom: 6 },
+  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, marginTop: 10, gap: 12, borderTopWidth: 1, borderTopColor: Colors.border }, price: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, flexShrink: 1 },
+  field: { marginBottom: 4 }, input: { minHeight: 44, borderWidth: 1, borderColor: Colors.borderStrong, borderRadius: 6, paddingHorizontal: 10, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, backgroundColor: Colors.background },
   visaOption: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderWidth: 1, borderColor: Colors.border, borderRadius: 6 },
   upload: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 8, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  uploadIcon: { width: 40, height: 44, borderRadius: 6, backgroundColor: Colors.surfaceMuted, justifyContent: 'center', alignItems: 'center' }, uploadTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' },
+  uploadIcon: { width: 40, height: 44, borderRadius: 6, backgroundColor: Colors.surfaceMuted, justifyContent: 'center', alignItems: 'center' }, uploadTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   remove: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-end', paddingHorizontal: 8 },
   footer: { padding: 16, backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border },
-  button: { width: '100%', maxWidth: 608, alignSelf: 'center', minHeight: 48, flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 8, backgroundColor: Colors.secondary }, buttonText: { color: Colors.white, fontFamily: 'Manrope', fontWeight: '800', fontSize: 14 }, disabled: { opacity: 0.5 },
-  secondaryButton: { minHeight: 44, justifyContent: 'center', alignItems: 'center' }, linkText: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 13, fontWeight: '800' }, auth: { padding: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 8 }, error: { color: Colors.error, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, marginTop: 6 }, reference: { color: Colors.secondary, fontFamily: 'Manrope', fontWeight: '800', fontSize: 14 },
+  button: { width: '100%', maxWidth: 608, alignSelf: 'center', minHeight: 48, flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 8, backgroundColor: Colors.secondary }, buttonText: { color: Colors.white, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body }, disabled: { opacity: 0.5 },
+  secondaryButton: { minHeight: 44, justifyContent: 'center', alignItems: 'center' }, linkText: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, auth: { padding: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 8 }, error: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, marginTop: 6 }, reference: { color: Colors.secondary, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body },
 });

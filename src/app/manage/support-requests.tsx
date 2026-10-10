@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { SupportScreen, supportStyles as s } from '@/components/support/SupportScreen';
 import { Colors } from '@/constants/colors';
 import { getAccessToken, useAuth } from '@/utils/authStore';
@@ -5,7 +7,7 @@ import { getSupportRequest, listSupportRequests, type SupportRequest, type Suppo
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const statusColors = { new: Colors.textLight, open: '#997500', in_progress: '#087EA4', closed: Colors.success };
 const statusLabels = { new: 'NEW', open: 'OPEN', in_progress: 'IN PROGRESS', closed: 'CLOSED' };
@@ -34,4 +36,4 @@ export default function SupportRequestsScreen() {
     <TouchableOpacity accessibilityRole="button" style={s.button} onPress={() => router.push('/contact')}><Text style={s.buttonText}>Contact Support</Text></TouchableOpacity>
   </SupportScreen>;
 }
-const styles = StyleSheet.create({ refresh: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-end' }, request: { minHeight: 84, justifyContent: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: Colors.border, paddingVertical: 12 }, subject: { fontFamily: 'Manrope', fontSize: 14, color: Colors.textDark }, meta: { flexDirection: 'row', alignItems: 'center', gap: 7 }, badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }, badgeText: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', color: Colors.white }, count: { marginLeft: 'auto' }, details: { padding: 12, backgroundColor: Colors.background, gap: 12, borderRadius: 8 }, update: { paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border }, date: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 5 }, link: { fontFamily: 'Manrope', color: Colors.secondary, fontWeight: '800', paddingVertical: 12 } });
+const styles = StyleSheet.create({ refresh: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-end' }, request: { minHeight: 84, justifyContent: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: Colors.border, paddingVertical: 12 }, subject: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textDark }, meta: { flexDirection: 'row', alignItems: 'center', gap: 7 }, badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }, badgeText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.white }, count: { marginLeft: 'auto' }, details: { padding: 12, backgroundColor: Colors.background, gap: 12, borderRadius: 8 }, update: { paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border }, date: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 5 }, link: { fontFamily: FontFamily.sans, color: Colors.secondary, fontWeight: FontWeight.extraBold, paddingVertical: 12 } });

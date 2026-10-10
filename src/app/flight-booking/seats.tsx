@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightJourney, FlightProgress, formatPrice } from '@/components/flights/FlightFlowUi';
 import {
@@ -11,7 +13,7 @@ import { Colors } from '@/constants/colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -176,28 +178,28 @@ export default function SeatsAddOnsScreen() {
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  count: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.textLight },
+  count: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, color: Colors.textLight },
   legend: { flexDirection: 'row', gap: 16, marginBottom: 10 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: { width: 14, height: 14, borderRadius: 4, borderWidth: 1, borderColor: Colors.borderStrong },
-  legendText: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  legendText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
   seatMap: { alignItems: 'center', gap: 8, marginTop: 6 },
   seatRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   seatGroup: { flexDirection: 'row', gap: 8 },
-  rowNumber: { width: 22, textAlign: 'center', fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.textLight },
+  rowNumber: { width: 22, textAlign: 'center', fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, color: Colors.textLight },
   seat: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 8, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
   seatFront: { backgroundColor: Colors.accentSoft, borderColor: Colors.accent },
   seatTaken: { backgroundColor: Colors.surfaceMuted, borderColor: Colors.surfaceMuted },
   seatSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  seatText: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.primary },
+  seatText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary },
   seatTextTaken: { color: Colors.textLight },
   seatTextSelected: { color: Colors.accent },
-  note: { marginTop: 14, fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, color: Colors.textLight },
+  note: { marginTop: 14, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight },
   addOn: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   addOnOn: { borderColor: Colors.primary, backgroundColor: Colors.surfaceMuted },
   addOnIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.accentSoft },
-  addOnTitle: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  addOnDetail: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  addOnTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  addOnDetail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   addOnRight: { alignItems: 'flex-end', gap: 4 },
-  addOnPrice: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primaryDark },
+  addOnPrice: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
 });

@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { FareSummary, JourneySummary } from '@/components/trains/TrainCards';
 import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
@@ -8,7 +10,7 @@ import { isTraveller, usePersonalItems } from '@/utils/personalStore';
 import { MAX_PASSENGERS, addPassenger, currentFare, removePassenger, setContact, setOptions, updatePassenger, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
 
 type Errors = { passengers: Record<number, { name?: string; age?: string; gender?: string }>; email?: string; phone?: string };
 const GENDERS = [{ id: 'M', label: 'Male' }, { id: 'F', label: 'Female' }, { id: 'O', label: 'Other' }] as const;
@@ -131,13 +133,13 @@ const s = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   scrollChips: { flexDirection: 'row', gap: 8 },
   pair: { flexDirection: 'row', gap: 12 },
-  label: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
-  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 4 },
+  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
+  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 4 },
   remove: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.errorSoft },
   addWrap: { marginHorizontal: 20, marginBottom: 14 },
-  hint: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, lineHeight: 18 },
+  hint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, lineHeight: 18 },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  toggleTitle: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  toggleText: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  toggleTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  toggleText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   sep: { height: 1, backgroundColor: Colors.border, marginVertical: 12 },
 });

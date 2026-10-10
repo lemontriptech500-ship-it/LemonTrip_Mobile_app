@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { PACKAGE_ROUTES, PackageFareSummary, PackageProgress, TypePill } from '@/components/packages/PackageUi';
 import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, SectionTitle, goTo, replaceTo } from '@/components/trains/TrainUi';
@@ -6,7 +8,7 @@ import { Ui } from '@/constants/theme';
 import { addDaysISO, countsLabel, formatLongDate, formatShortDate, inr } from '@/data/packages';
 import { resetPackageBooking, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 /** Decorative barcode derived from the voucher number (demo only, not scannable). */
 function Barcode({ value }: { value: string }) {
@@ -113,40 +115,40 @@ const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   hero: { alignItems: 'center', marginHorizontal: 20, marginBottom: 14, padding: 22, borderRadius: 24, backgroundColor: Colors.primaryDark },
   check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  heroTitle: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.white, marginTop: 12 },
-  heroText: { fontFamily: 'Manrope', fontSize: 13, color: Colors.onDarkMuted, marginTop: 4, textAlign: 'center' },
+  heroTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, marginTop: 12 },
+  heroText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.onDarkMuted, marginTop: 4, textAlign: 'center' },
   refBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 22, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
   refLabel: { ...Ui.eyebrow, color: Colors.onDarkMuted },
-  ref: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.white, letterSpacing: 2, marginTop: 3 },
+  ref: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, letterSpacing: 2, marginTop: 3 },
   ticket: { ...Ui.card, marginHorizontal: 20, marginBottom: 14, padding: 18, overflow: 'visible' },
   cover: { width: '100%', height: 130, borderRadius: 14, marginBottom: 14, backgroundColor: Colors.surfaceMuted },
   ticketTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { fontFamily: 'Manrope', fontSize: 16, lineHeight: 22, fontWeight: '800', color: Colors.textDark },
-  meta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  title: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 22, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  meta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   dates: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 18 },
   dateLabel: { ...Ui.eyebrow, color: Colors.secondary },
-  dateValue: { fontFamily: 'Manrope', fontSize: 24, fontWeight: '800', color: Colors.textDark, marginTop: 2 },
-  dateSub: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 1 },
+  dateValue: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
+  dateSub: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
   mid: { flex: 1, alignItems: 'center', gap: 4 },
   rule: { alignSelf: 'stretch', height: 1, backgroundColor: Colors.borderStrong },
-  who: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark, marginTop: 14 },
+  who: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, marginTop: 14 },
   perforation: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, height: 20 },
   dash: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
   notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   ticketBottom: { alignItems: 'center', gap: 8 },
   barcode: { flexDirection: 'row', alignItems: 'center', height: 44, overflow: 'hidden', maxWidth: '100%' },
-  voucher: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight, letterSpacing: 0.5 },
+  voucher: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, letterSpacing: 0.5 },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  paxName: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  paxMeta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  paxName: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  paxMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   bullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 5 },
-  bulletText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, color: Colors.textDark },
+  bulletText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textDark },
   txn: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  txnText: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  txnText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
   actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 16 },
   action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  actionLabel: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.textDark },
+  actionLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   cta: { marginHorizontal: 20 },
 });

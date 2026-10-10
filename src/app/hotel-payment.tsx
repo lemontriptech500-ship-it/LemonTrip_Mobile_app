@@ -1,9 +1,11 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { addBooking } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const paymentOptions = ['Credit / Debit Card', 'UPI', 'Wallet'];
@@ -126,37 +128,37 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#f5f6f3' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   backButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
-  headerTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 18, fontWeight: '900' },
-  headerStep: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '800' },
+  headerTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
+  headerStep: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   progressRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingBottom: 10 },
   progressItem: { flex: 1, alignItems: 'center', position: 'relative' },
   progressDot: { width: 25, height: 25, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.surfaceMuted },
   progressDotActive: { backgroundColor: Colors.primary },
-  progressNumber: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9, fontWeight: '900' },
+  progressNumber: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
   progressNumberActive: { color: Colors.white },
-  progressLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 8, marginTop: 5 },
-  progressLabelActive: { color: Colors.primary, fontWeight: '900' },
+  progressLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 5 },
+  progressLabelActive: { color: Colors.primary, fontWeight: FontWeight.extraBold },
   progressLine: { position: 'absolute', top: 12, left: '60%', right: '-40%', height: 1, backgroundColor: Colors.border },
   progressLineActive: { backgroundColor: Colors.primary },
   page: { paddingHorizontal: 16, paddingBottom: 24 },
   summaryCard: { padding: 16, borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  summaryEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
-  hotelName: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '900', marginTop: 8 },
-  roomName: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 3 },
+  summaryEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
+  hotelName: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 8 },
+  roomName: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 3 },
   summaryRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 },
-  summaryLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 9 },
-  summaryValue: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 9, fontWeight: '700' },
+  summaryLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
+  summaryValue: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
   amountRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
-  totalLabel: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '800' },
-  totalValue: { color: Colors.primary, fontFamily: 'Manrope', fontSize: 15, fontWeight: '900' },
+  totalLabel: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
+  totalValue: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   methodCard: { marginTop: 18, padding: 16, borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  methodEyebrow: { color: Colors.secondary, fontFamily: 'Manrope', fontSize: 8, fontWeight: '800', letterSpacing: 1 },
-  methodTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', marginTop: 5 },
+  methodEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
+  methodTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 5 },
   methodRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 10, borderRadius: 12, marginTop: 12, borderWidth: 1, borderColor: Colors.border },
   methodRowActive: { backgroundColor: '#f3faf6', borderColor: Colors.primary },
-  methodText: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 11, fontWeight: '700' },
+  methodText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
   footer: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 18, backgroundColor: Colors.surface },
   primaryButton: { minHeight: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accent },
   primaryButtonDisabled: { opacity: 0.7 },
-  primaryButtonText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 12, fontWeight: '900' },
+  primaryButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
 });

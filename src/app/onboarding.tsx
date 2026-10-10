@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Brand } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,7 +8,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AppRoute = Parameters<typeof router.replace>[0];
@@ -125,10 +127,10 @@ const styles = StyleSheet.create({
   slide: { flex: 1, overflow: 'hidden', backgroundColor: Brand.forest },
   planeDecoration: { position: 'absolute', top: '31%', left: '47%', transform: [{ rotate: '-24deg' }], opacity: 0.95 },
   content: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 27, paddingBottom: 18 },
-  heading: { color: '#FFFFFF', fontFamily: 'Manrope', fontSize: 34, lineHeight: 41, fontWeight: '800' },
-  headingCompact: { fontSize: 26, lineHeight: 32 },
+  heading: { color: '#FFFFFF', fontFamily: FontFamily.sans, fontSize: TextSize.hero, lineHeight: 41, fontWeight: FontWeight.extraBold },
+  headingCompact: { fontSize: TextSize.display, lineHeight: 32 },
   headingAccent: { color: Brand.lemon },
-  description: { maxWidth: 350, marginTop: 11, color: 'rgba(255,255,255,0.86)', fontFamily: 'Manrope', fontSize: 14, lineHeight: 21 },
+  description: { maxWidth: 350, marginTop: 11, color: 'rgba(255,255,255,0.86)', fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 21 },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 25 },
   pagination: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.55)' },

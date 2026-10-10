@@ -1,8 +1,10 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { formatDuration, formatShortDate, getClassOptions, inr, lowestFare, type FareBreakdown, type Quota, type TrainResult } from '@/data/trains';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Pill, Row } from './TrainUi';
 
 const TYPE_TONE = { Rajdhani: 'brand', Shatabdi: 'brand', Superfast: 'neutral', Express: 'neutral' } as const;
@@ -107,31 +109,31 @@ const s = StyleSheet.create({
   card: { ...Ui.card, padding: 14, marginBottom: 12 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  name: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
-  number: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  name: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  number: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   heart: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
   times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 16 },
-  time: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.textDark },
-  code: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.secondary, marginTop: 1 },
-  sub: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 1 },
+  time: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  code: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.secondary, marginTop: 1 },
+  sub: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
   line: { flex: 1, alignItems: 'center', gap: 4 },
-  duration: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight },
+  duration: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight },
   track: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'stretch' },
   rule: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
   dotEnd: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.primary },
   classes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: Colors.border },
   classTile: { flexGrow: 1, flexBasis: '30%', minWidth: 96, padding: 10, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   classHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  classCode: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primaryDark },
-  classFare: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.textDark },
-  avail: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', marginTop: 5 },
+  classCode: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  classFare: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  avail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, marginTop: 5 },
   good: { color: Colors.success }, warn: { color: '#8A6500' }, bad: { color: Colors.error },
   foot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 },
-  footText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight },
-  footBold: { fontWeight: '800', color: Colors.textDark },
-  link: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary },
+  footText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight },
+  footBold: { fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  link: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   summary: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: 16 },
   summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  summaryName: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
+  summaryName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 8 },
 });

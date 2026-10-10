@@ -1,9 +1,11 @@
+import { TextSize, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { SupportScreen, supportStyles as s } from '@/components/support/SupportScreen';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState, type ComponentProps } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const answers: { title: string; icon: ComponentProps<typeof Ionicons>['name']; answer: string }[] = [
   { title: 'General Booking', icon: 'settings-outline', answer: 'Open My Trips to find your booking ID, dates, payment state, and current status. Select a trip to view its details. Keep the booking reference handy when contacting support.' },
@@ -22,4 +24,4 @@ export default function FaqScreen() {
     {!visible.length ? <Text style={s.body}>No matching topics. Try another search or contact support.</Text> : null}
   </View><TouchableOpacity accessibilityRole="button" style={s.button} onPress={() => router.push('/contact')}><Text style={s.buttonText}>Contact Support</Text></TouchableOpacity></SupportScreen>;
 }
-const styles = StyleSheet.create({ row: { minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: Colors.border }, title: { flex: 1, fontFamily: 'Manrope', fontSize: 14, color: Colors.textDark }, answer: { ...s.body, paddingVertical: 12, paddingLeft: 32 } });
+const styles = StyleSheet.create({ row: { minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: Colors.border }, title: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textDark }, answer: { ...s.body, paddingVertical: 12, paddingLeft: 32 } });

@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/utils/authStore';
@@ -5,7 +7,7 @@ import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const sections: { title: string; path: string; route: Href }[] = [
@@ -32,6 +34,6 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
 export const exploreDirectoryPaths = sections.map(section => section.path);
 const styles = StyleSheet.create({
   safe: { backgroundColor: Colors.primaryDark }, content: { width: '100%', maxWidth: 1380, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 9, paddingBottom: 11 }, wide: { minHeight: 72, paddingVertical: 8 }, mainRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 }, brand: { minWidth: 126, height: 50, alignItems: 'flex-start', justifyContent: 'center' }, spacer: { flex: 1 },
-  nav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 }, mobileNav: { gap: 18, alignItems: 'center', paddingTop: 7 }, navLink: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' }, activeLink: { borderBottomColor: Colors.accent }, navText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 14, fontWeight: '700' }, activeText: { color: Colors.accent, fontWeight: '800' },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 7 }, action: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' }, location: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 3 }, locationText: { color: Colors.onDarkMuted, fontFamily: 'Manrope', fontSize: 11 }, avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent }, avatarText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' }, login: { height: 42, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, borderRadius: 21, backgroundColor: Colors.white }, loginText: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  nav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 }, mobileNav: { gap: 18, alignItems: 'center', paddingTop: 7 }, navLink: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' }, activeLink: { borderBottomColor: Colors.accent }, navText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold }, activeText: { color: Colors.accent, fontWeight: FontWeight.extraBold },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 7 }, action: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' }, location: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 3 }, locationText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro }, avatar: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.accent }, avatarText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold }, login: { height: 42, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 18, borderRadius: 21, backgroundColor: Colors.white }, loginText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
 });

@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -7,7 +9,7 @@ import { useContentItems } from '@/utils/contentApi';
 import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function ServiceListingScreen() {
@@ -140,9 +142,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   label: {
-    fontFamily: 'Manrope',
-    fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     color: Colors.textDark,
     marginBottom: 6,
   },
@@ -153,8 +155,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     paddingHorizontal: 13,
     paddingVertical: 13,
-    fontFamily: 'Manrope',
-    fontSize: 14,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
     color: Colors.textDark,
     marginBottom: 16,
   },
@@ -167,9 +169,9 @@ const styles = StyleSheet.create({
   },
   searchButtonText: {
     color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontSize: 13,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
   editSearchBar: {
     minHeight: 48,
@@ -185,10 +187,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   editSearchText: {
-    fontFamily: 'Manrope',
-    fontSize: 13,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.body,
     color: Colors.primary,
-    fontWeight: '600',
+    fontWeight: FontWeight.semibold,
   },
   list: {
     paddingHorizontal: 22,
@@ -203,22 +205,22 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   cardName: {
-    fontFamily: 'Manrope',
-    fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.bodyLarge,
+    fontWeight: FontWeight.extraBold,
     color: Colors.textDark,
     marginBottom: 4,
   },
   cardDetail: {
-    fontFamily: 'Manrope',
-    fontSize: 12,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.caption,
     color: Colors.textLight,
     marginBottom: 6,
   },
   cardPrice: {
-    fontFamily: 'Manrope',
-    fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
     color: Colors.primary,
     marginBottom: 12,
   },
@@ -233,9 +235,9 @@ const styles = StyleSheet.create({
   },
   bookButtonText: {
     color: Colors.primaryDark,
-    fontFamily: 'Manrope',
-    fontWeight: '800',
-    fontSize: 13,
+    fontFamily: FontFamily.sans,
+    fontWeight: FontWeight.extraBold,
+    fontSize: TextSize.body,
   },
   addedButtonText: {
     color: Colors.white,

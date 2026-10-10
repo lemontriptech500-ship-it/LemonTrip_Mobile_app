@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, EmptyState, Notice, Pill, PrimaryButton } from '@/components/trains/TrainUi';
@@ -8,7 +10,7 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { requestPinWidget } from 'react-native-android-widget';
 
 type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
@@ -206,20 +208,20 @@ const styles = StyleSheet.create({
   flex: { flex: 1, minWidth: 0 },
   rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconBox: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  cardTitle: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
-  cardSub: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  cardTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  cardSub: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   widgetBtn: { alignSelf: 'flex-start', marginTop: 10 },
   tabRow: { paddingHorizontal: Ui.space.page, gap: 8, paddingBottom: 14 },
   top: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
-  itemName: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark, marginTop: 3 },
+  itemName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
   destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  destText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, flexShrink: 1 },
+  destText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
   divider: { height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong, marginVertical: 14 },
   bottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
-  label: { fontFamily: 'Manrope', fontSize: 9, fontWeight: '800', letterSpacing: 1.1, color: Colors.textLight, marginBottom: 4 },
-  value: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark },
+  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.1, color: Colors.textLight, marginBottom: 4 },
+  value: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark },
   right: { alignItems: 'flex-end' },
-  price: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.primaryDark },
+  price: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
   noticeGap: { marginTop: 4 },
 });

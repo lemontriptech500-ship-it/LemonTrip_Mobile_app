@@ -1,14 +1,8 @@
+import { TextSize, FontWeight } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 
 import React, { useState } from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const GREEN = "#075638";
@@ -343,7 +337,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     color: "#FFFFFF",
-    fontSize: 29,
+    fontSize: TextSize.hero,
   },
   brand: {
     flexDirection: "row",
@@ -351,36 +345,36 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logo: {
-    fontSize: 22,
+    fontSize: TextSize.displaySmall,
   },
   brandName: {
     color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "900",
+    fontSize: TextSize.bodyLarge,
+    fontWeight: FontWeight.extraBold,
   },
   brandSub: {
     color: "#D7E9DD",
-    fontSize: 8,
+    fontSize: TextSize.micro,
     marginTop: 3,
   },
   secure: {
-    fontSize: 15,
+    fontSize: TextSize.bodyLarge,
   },
   eyebrow: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     letterSpacing: 1,
   },
   title: {
     color: DARK,
-    fontSize: 25,
-    fontWeight: "900",
+    fontSize: TextSize.display,
+    fontWeight: FontWeight.extraBold,
     marginTop: 5,
   },
   subtitle: {
     color: "#78857B",
-    fontSize: 11,
+    fontSize: TextSize.micro,
     marginTop: 6,
   },
   steps: {
@@ -405,8 +399,8 @@ const styles = StyleSheet.create({
   },
   stepText: {
     color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "900",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
   },
   currentStepText: {
     color: DARK,
@@ -431,8 +425,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: DARK,
-    fontSize: 14,
-    fontWeight: "900",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 12,
   },
   badge: {
@@ -443,8 +437,8 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: GREEN,
-    fontSize: 8,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   operatorRow: {
     flexDirection: "row",
@@ -461,16 +455,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   busEmoji: {
-    fontSize: 22,
+    fontSize: TextSize.displaySmall,
   },
   operatorName: {
     color: DARK,
-    fontSize: 12,
-    fontWeight: "900",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
   },
   muted: {
     color: "#839087",
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginTop: 4,
   },
   routeRow: {
@@ -481,8 +475,8 @@ const styles = StyleSheet.create({
   },
   city: {
     color: DARK,
-    fontSize: 17,
-    fontWeight: "900",
+    fontSize: TextSize.title,
+    fontWeight: FontWeight.extraBold,
   },
   routeMiddle: {
     flex: 1,
@@ -498,7 +492,7 @@ const styles = StyleSheet.create({
   routeArrow: {
     color: GREEN,
     marginLeft: -3,
-    fontSize: 15,
+    fontSize: TextSize.bodyLarge,
   },
   divider: {
     height: 1,
@@ -515,14 +509,14 @@ const styles = StyleSheet.create({
   },
   label: {
     color: "#839087",
-    fontSize: 8,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
     marginBottom: 5,
   },
   value: {
     color: DARK,
-    fontSize: 11,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   passengerRow: {
     flexDirection: "row",
@@ -540,12 +534,12 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     color: GREEN,
-    fontSize: 20,
+    fontSize: TextSize.heading,
   },
   verified: {
     color: GREEN,
-    fontSize: 9,
-    fontWeight: "700",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
   paymentOption: {
     flexDirection: "row",
@@ -571,13 +565,13 @@ const styles = StyleSheet.create({
   },
   paymentIconText: {
     color: GREEN,
-    fontSize: 21,
-    fontWeight: "900",
+    fontSize: TextSize.displaySmall,
+    fontWeight: FontWeight.extraBold,
   },
   paymentTitle: {
     color: DARK,
-    fontSize: 11,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   radio: {
     width: 18,
@@ -602,26 +596,26 @@ const styles = StyleSheet.create({
   },
   fareLabel: {
     color: "#738076",
-    fontSize: 11,
+    fontSize: TextSize.micro,
   },
   fareValue: {
     color: DARK,
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.bold,
   },
   totalLabel: {
     color: DARK,
-    fontSize: 13,
-    fontWeight: "900",
+    fontSize: TextSize.body,
+    fontWeight: FontWeight.extraBold,
   },
   totalPrice: {
     color: GREEN,
-    fontSize: 20,
-    fontWeight: "900",
+    fontSize: TextSize.heading,
+    fontWeight: FontWeight.extraBold,
   },
   disclaimer: {
     color: "#87938A",
-    fontSize: 9,
+    fontSize: TextSize.micro,
     lineHeight: 14,
     marginTop: 8,
   },
@@ -634,16 +628,16 @@ const styles = StyleSheet.create({
     marginBottom: 17,
   },
   noticeIcon: {
-    fontSize: 20,
+    fontSize: TextSize.heading,
   },
   noticeTitle: {
     color: DARK,
-    fontSize: 11,
-    fontWeight: "900",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   noticeText: {
     color: "#65766A",
-    fontSize: 10,
+    fontSize: TextSize.micro,
     lineHeight: 15,
     marginTop: 4,
   },
@@ -658,13 +652,13 @@ const styles = StyleSheet.create({
   },
   confirmText: {
     color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "900",
+    fontSize: TextSize.caption,
+    fontWeight: FontWeight.extraBold,
   },
   confirmArrow: {
     color: YELLOW,
-    fontSize: 19,
-    fontWeight: "900",
+    fontSize: TextSize.heading,
+    fontWeight: FontWeight.extraBold,
   },
   backLink: {
     alignItems: "center",
@@ -672,13 +666,13 @@ const styles = StyleSheet.create({
   },
   backLinkText: {
     color: GREEN,
-    fontSize: 11,
-    fontWeight: "800",
+    fontSize: TextSize.micro,
+    fontWeight: FontWeight.extraBold,
   },
   footer: {
     textAlign: "center",
     color: "#89948C",
-    fontSize: 10,
+    fontSize: TextSize.micro,
     marginTop: 8,
   },
 });

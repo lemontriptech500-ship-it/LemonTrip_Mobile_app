@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, EmptyState, FlowScreen, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
@@ -7,7 +9,7 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 // Same as CANCELLATION_FEE_PERCENT in booking/cancel.tsx
 const CANCELLATION_FEE_PERCENT = 10;
@@ -166,15 +168,15 @@ const styles = StyleSheet.create({
   summary: { flexDirection: 'row', alignItems: 'center' },
   summaryItem: { flex: 1, alignItems: 'center' },
   summaryDivider: { width: 1, height: 36, backgroundColor: Colors.border },
-  summaryLabel: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 1.1, marginBottom: 6 },
-  summaryValue: { color: Colors.primaryDark, fontFamily: 'Manrope', fontSize: 22, fontWeight: '800' },
+  summaryLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.1, marginBottom: 6 },
+  summaryValue: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
   filters: { flexDirection: 'row', gap: 8, marginHorizontal: Ui.space.page, marginBottom: 14 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   rowIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.surfaceMuted },
   rowIconRefund: { backgroundColor: Colors.successSoft },
   rowInfo: { flex: 1, minWidth: 0 },
-  rowTitle: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800' },
-  rowSub: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 12, marginTop: 2 },
-  rowDate: { color: Colors.textLight, fontFamily: 'Manrope', fontSize: 11, marginTop: 2 },
-  rowAmount: { color: Colors.textDark, fontFamily: 'Manrope', fontSize: 15, fontWeight: '800' },
+  rowTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  rowSub: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 2 },
+  rowDate: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 2 },
+  rowAmount: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
 });

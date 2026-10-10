@@ -1,6 +1,8 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export function VisaHeader({ title, onBack, action }: { title: string; onBack: () => void; action?: { label: string; onPress: () => void } }) {
   return <View style={styles.header}>
@@ -12,7 +14,7 @@ export function VisaHeader({ title, onBack, action }: { title: string; onBack: (
 const styles = StyleSheet.create({
   header: { minHeight: 56, paddingHorizontal: 8, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
   back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, textAlign: 'center', fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark },
+  title: { flex: 1, textAlign: 'center', fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
 });
 
 export function visaCountryFlag(name: string) {

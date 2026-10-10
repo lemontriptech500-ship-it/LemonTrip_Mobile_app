@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightProgress, formatPrice, formatTime } from '@/components/flights/FlightFlowUi';
 import { getFlightBookingDraft, resetFlightBookingDraft } from '@/components/flights/flightBookingStore';
@@ -6,7 +8,7 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 /** Decorative barcode derived from the PNR (demo only, not scannable). */
 function Barcode({ value }: { value: string }) {
@@ -183,21 +185,21 @@ const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   hero: { alignItems: 'center', marginHorizontal: 20, marginBottom: 14, padding: 22, borderRadius: 24, backgroundColor: Colors.primaryDark },
   check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  heroTitle: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.white, marginTop: 12 },
-  heroText: { fontFamily: 'Manrope', fontSize: 13, color: Colors.onDarkMuted, marginTop: 4, textAlign: 'center' },
+  heroTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, marginTop: 12 },
+  heroText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.onDarkMuted, marginTop: 4, textAlign: 'center' },
   pnrBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 22, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
   pnrLabel: { ...Ui.eyebrow, color: Colors.onDarkMuted },
-  pnr: { fontFamily: 'Manrope', fontSize: 24, fontWeight: '800', color: Colors.white, letterSpacing: 3, marginTop: 3 },
+  pnr: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, letterSpacing: 3, marginTop: 3 },
   ticket: { ...Ui.card, marginHorizontal: 20, marginBottom: 14, padding: 18, overflow: 'visible' },
   ticketTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  airline: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark },
-  airlineMeta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  airline: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  airlineMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 18 },
-  time: { fontFamily: 'Manrope', fontSize: 26, fontWeight: '800', color: Colors.textDark },
-  code: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.secondary, marginTop: 1 },
-  date: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight, marginTop: 2 },
+  time: { fontFamily: FontFamily.sans, fontSize: TextSize.display, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  code: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.secondary, marginTop: 1 },
+  date: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 2 },
   mid: { flex: 1, alignItems: 'center', gap: 5 },
-  dur: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight },
+  dur: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight },
   midLine: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'stretch' },
   rule: { flex: 1, height: 1, backgroundColor: Colors.borderStrong },
   dotEnd: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.primary },
@@ -206,17 +208,17 @@ const s = StyleSheet.create({
   notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   ticketBottom: { alignItems: 'center', gap: 8 },
   barcode: { flexDirection: 'row', alignItems: 'center', height: 44, overflow: 'hidden', maxWidth: '100%' },
-  bookingId: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight, letterSpacing: 0.5 },
+  bookingId: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, letterSpacing: 0.5 },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  paxName: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  paxMeta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
-  addOnText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 8 },
+  paxName: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  paxMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  addOnText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 8 },
   txn: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  txnText: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
+  txnText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
   actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 16 },
   action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  actionLabel: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.textDark },
+  actionLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   cta: { marginHorizontal: 20 },
 });

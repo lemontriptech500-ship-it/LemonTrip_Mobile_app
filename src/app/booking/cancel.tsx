@@ -1,3 +1,4 @@
+import { Text } from '@/components/ui/Text';
 ﻿import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
@@ -6,7 +7,7 @@ import { shortId } from '@/utils/bookingFormat';
 import { updateBookingStatus, useBookings } from '@/utils/bookingStore';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 const CANCELLATION_FEE_PERCENT = 10;
 const REASONS = ['Change of plans', 'Found a better price', 'Booked by mistake', 'Travel dates changed', 'Other'];

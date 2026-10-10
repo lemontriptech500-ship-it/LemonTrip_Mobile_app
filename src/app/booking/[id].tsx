@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 ﻿import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
@@ -9,7 +11,7 @@ import { useBookings } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Linking, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 /** Decorative barcode derived from the booking id (demo only). */
@@ -223,20 +225,20 @@ const s = StyleSheet.create({
   ticketTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   ticketIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   service: { ...Ui.eyebrow, color: Colors.secondary },
-  itemName: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.textDark, marginTop: 3 },
+  itemName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
   destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  destText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, flexShrink: 1 },
+  destText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
   perforation: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, height: 20 },
   dash: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
   notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   ticketBottom: { alignItems: 'center', gap: 12 },
   qrWrap: { padding: 10, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: Colors.border },
   barcode: { flexDirection: 'row', alignItems: 'center', height: 40, overflow: 'hidden', maxWidth: '100%' },
-  bookingIdText: { fontFamily: 'Manrope', fontSize: 11, fontWeight: '700', color: Colors.textLight, letterSpacing: 0.5 },
+  bookingIdText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, letterSpacing: 0.5 },
   actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 14 },
   action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  actionLabel: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '800', color: Colors.textDark },
+  actionLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   assistRow: { flexDirection: 'row', gap: 10 },
   assistBtn: { flex: 1 },
   cancelButton: {
@@ -251,5 +253,5 @@ const s = StyleSheet.create({
     borderColor: Colors.error,
     backgroundColor: Colors.surface,
   },
-  cancelText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.error },
+  cancelText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.error },
 });

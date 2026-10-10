@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { FareSummary, JourneySummary } from '@/components/trains/TrainCards';
 import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
@@ -6,7 +8,7 @@ import { CLASS_INFO, formatLongDate, getAvailability, inr } from '@/data/trains'
 import { currentFare, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function TrainReviewScreen() {
   const { selection, passengers, contact, options } = useTrainBooking();
@@ -90,26 +92,26 @@ function Line({ icon, label, value }: { icon: React.ComponentProps<typeof Ionico
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  edit: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary },
+  edit: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   line: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7 },
-  lineLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight, width: 84 },
-  lineValue: { flex: 1, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark, textAlign: 'right' },
+  lineLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight, width: 84 },
+  lineValue: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, textAlign: 'right' },
   status: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
-  statusLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight },
+  statusLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
   avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  avatarText: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.primaryDark },
-  paxName: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
-  paxMeta: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  avatarText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  paxName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  paxMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   opts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   info: { marginHorizontal: 20, marginBottom: 14, padding: 16, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
   infoHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  infoTitle: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primaryDark },
+  infoTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
   bullet: { flexDirection: 'row', gap: 8, marginTop: 5 },
-  dot: { color: Colors.primary, fontSize: 14, lineHeight: 19 },
-  infoText: { flex: 1, fontFamily: 'Manrope', fontSize: 12, lineHeight: 19, color: Colors.textDark },
+  dot: { color: Colors.primary, fontSize: TextSize.body, lineHeight: 19 },
+  infoText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 19, color: Colors.textDark },
   agree: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginHorizontal: 20, marginTop: 2 },
-  agreeText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, color: Colors.textDark },
-  error: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginHorizontal: 20, marginTop: 8 },
+  agreeText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textDark },
+  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginHorizontal: 20, marginTop: 8 },
 });

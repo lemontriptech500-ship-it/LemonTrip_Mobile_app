@@ -1,3 +1,4 @@
+import { TextSize, FontFamily } from '@/constants/typography';
 
 import { Brand, Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -107,8 +108,8 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   label: {
-    fontFamily: 'Manrope',
-    fontSize: 11,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
     marginTop: 4,
   },
   iconWrap: {

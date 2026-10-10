@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
@@ -5,7 +7,7 @@ import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, type TextInputProps } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View, type TextInputProps } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -110,29 +112,29 @@ const s = StyleSheet.create({
   card: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: Ui.space.card },
   heading: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary, marginBottom: 3 },
-  headingText: { fontFamily: 'Manrope', fontSize: 17, fontWeight: '800', color: Colors.textDark },
+  headingText: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   item: { minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
   itemDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   itemIcon: { width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  itemTitle: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
-  itemDetail: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 17, color: Colors.textLight, marginTop: 2 },
+  itemTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  itemDetail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 17, color: Colors.textLight, marginTop: 2 },
   field: { marginBottom: 14 },
   fieldHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  fieldLabel: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9, color: Colors.textLight },
-  counter: { fontFamily: 'Manrope', fontSize: 11, color: Colors.textLight },
-  input: { minHeight: Ui.field.minHeight, paddingHorizontal: 14, paddingVertical: 10, borderRadius: Ui.field.borderRadius, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: 'Manrope', fontSize: 15, color: Colors.textDark },
+  fieldLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight },
+  counter: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
+  input: { minHeight: Ui.field.minHeight, paddingHorizontal: 14, paddingVertical: 10, borderRadius: Ui.field.borderRadius, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, color: Colors.textDark },
   inputMulti: { minHeight: 130, textAlignVertical: 'top', paddingTop: 12 },
   inputError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
-  errorText: { fontFamily: 'Manrope', fontSize: 12, color: Colors.error, marginTop: 5 },
+  errorText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 5 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 38, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
   chipOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark },
+  chipText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark },
   chipTextOn: { color: Colors.white },
   button: { ...Ui.button, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 18 },
   buttonOutline: { borderWidth: 1, borderColor: Colors.borderStrong },
-  buttonText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primaryDark },
+  buttonText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
   notice: { flexDirection: 'row', gap: 10, padding: 14, borderRadius: 16, marginHorizontal: Ui.space.page, marginBottom: 14 },
-  noticeText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, color: Colors.textDark },
+  noticeText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textDark },
   footer: { backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border },
   footerInner: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingHorizontal: Ui.space.page, paddingVertical: 12 },
 });

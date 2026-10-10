@@ -1,3 +1,5 @@
+import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { PACKAGE_ROUTES, PackageFareSummary, PackageProgress, PackageSummary, Stepper, packageDetailsRoute } from '@/components/packages/PackageUi';
 import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
@@ -5,7 +7,7 @@ import { Colors } from '@/constants/colors';
 import { MAX_GUESTS, departureDates, formatLongDate, inr, minRooms, seatsLeft, totalTravellers } from '@/data/packages';
 import { currentPackageFare, setCounts, setDepartureDate, setRooms, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const MONTH = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { month: 'short' });
 const DAY = (iso: string) => new Date(`${iso}T00:00:00`).getDate();
@@ -90,15 +92,15 @@ const s = StyleSheet.create({
   dates: { flexDirection: 'row', gap: 8, paddingVertical: 2 },
   date: { width: 66, alignItems: 'center', paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   dateOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  dateWeek: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.6, color: Colors.textLight },
-  dateDay: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.textDark, marginVertical: 1 },
-  dateLeft: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', color: Colors.success, marginTop: 4 },
+  dateWeek: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.6, color: Colors.textLight },
+  dateDay: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginVertical: 1 },
+  dateLeft: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.success, marginTop: 4 },
   dateLeftLow: { color: Colors.error },
   dateTextOn: { color: Colors.white },
   range: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
-  rangeText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, fontWeight: '700', color: Colors.textDark },
+  rangeText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark },
   sep: { height: 1, backgroundColor: Colors.border },
-  limit: { fontFamily: 'Manrope', fontSize: 12, color: Colors.textLight, marginTop: 8 },
+  limit: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 8 },
   bullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 5 },
-  bulletText: { flex: 1, fontFamily: 'Manrope', fontSize: 13, lineHeight: 19, color: Colors.textDark },
+  bulletText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textDark },
 });
