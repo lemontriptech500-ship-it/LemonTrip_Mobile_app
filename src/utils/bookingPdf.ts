@@ -23,8 +23,10 @@ function buildHtml(d: VoucherPdfData) {
   const row = (label: string, value: string) =>
     '<tr><td class="l">' + esc(label) + '</td><td class="v">' + esc(value) + '</td></tr>';
   return (
-    '<html><head><meta charset="utf-8" /><style>' +
-    'body{font-family:Arial,Helvetica,sans-serif;color:#0F3D2E;padding:28px;}' +
+    '<html><head><meta charset="utf-8" /><title>LemonTrip ' + esc(d.bookingId) + '</title><style>' +
+    '@page{margin:14mm;}' +
+    '*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+    'body{font-family:Arial,Helvetica,sans-serif;color:#0F3D2E;margin:0;padding:0;}' +
     '.head{background:#0F3D2E;color:#fff;padding:22px;border-radius:14px;}' +
     '.eyebrow{color:#FFD600;font-size:11px;letter-spacing:2px;font-weight:bold;}' +
     '.title{font-size:28px;font-weight:bold;margin-top:6px;}' +
@@ -53,12 +55,40 @@ function buildHtml(d: VoucherPdfData) {
   );
 }
 
-/** Web: opens print dialog (choose "Save as PDF"). Mobile: creates a PDF and opens share sheet. */
+/** Web: prints only the voucher HTML via a hidden iframe (choose "Save as PDF"). */
+function printOnWeb(html: string) {
+  const doc = (globalThis as any).document;
+  if (!doc) return;
+
+  const iframe = doc.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  doc.body.appendChild(iframe);
+
+  const frameDoc = iframe.contentWindow.document;
+  frameDoc.open();
+  frameDoc.write(html);
+  frameDoc.close();
+
+  setTimeout(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(() => {
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 60000);
+  }, 400);
+}
+
+/** Web: print dialog with voucher only. Mobile: creates a PDF and opens share sheet. */
 export async function downloadBookingPdf(data: VoucherPdfData) {
   const html = buildHtml(data);
 
   if (Platform.OS === 'web') {
-    await Print.printAsync({ html });
+    printOnWeb(html);
     return;
   }
 
