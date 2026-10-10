@@ -1,50 +1,142 @@
-import { AppScreen } from '@/components/AppScreen';
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { SupportButton, SupportCard, SupportChip, SupportField, SupportHeading, SupportNotice, SupportPage } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
-import { supportContact } from '@/constants/navigation';
 import { Ui } from '@/constants/theme';
+import { supportContact } from '@/constants/navigation';
+import { getAccessToken, useAuth } from '@/utils/authStore';
+import { submitSupportRequest, supportTopics, type SupportTopic } from '@/utils/supportApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const initial = { name: '', email: '', phone: '', subject: '', message: '' };
+const MESSAGE_MIN = 10;
+const MESSAGE_MAX = 5000;
+
 export default function ContactScreen() {
-  const { reference } = useLocalSearchParams<{ reference?: string }>();
-  const [form, setForm] = useState({ ...initial, subject: reference ? `Help with reference ${reference}` : '' });
+  const { reference, topic: initialTopic } = useLocalSearchParams<{ reference?: string; topic?: string }>();
+  const user = useAuth();
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: user?.email ?? '', subject: reference ? `Help with ${reference}` : '', message: '' });
+  const [topic, setTopic] = useState<SupportTopic | ''>(supportTopics.includes(initialTopic as SupportTopic) ? initialTopic as SupportTopic : '');
   const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState('');
-  const [sent, setSent] = useState(false);
-  const submit = async () => {
-    setSent(false);
-    if (!form.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) || !form.subject.trim() || !form.message.trim()) { setFeedback('Please add your name, a valid email, subject, and message.'); return; }
-    setBusy(true); setFeedback('');
+  const [error, setError] = useState('');
+  const [received, setReceived] = useState('');
+  const submitting = useRef(false);
+  const submissionKey = useRef('');
+
+  const edit = (key: keyof typeof form, value: string) => { setForm((current) => ({ ...current, [key]: value })); submissionKey.current = ''; setError(''); };
+
+  const send = async () => {
+    if (submitting.current) return;
+    if (!form.firstName.trim() || !form.lastName.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) || !topic || form.subject.trim().length < 3 || form.message.trim().length < MESSAGE_MIN) {
+      setError('Add both names, a valid email, topic, subject, and a message of at least 10 characters.');
+      return;
+    }
+    const token = getAccessToken();
+    if (!user || !token) { setError('Sign in to submit and track your support request.'); return; }
+    submitting.current = true; setBusy(true); setError('');
+    if (!submissionKey.current) submissionKey.current = uuid();
     try {
-      const endpoint = process.env.EXPO_PUBLIC_CONTACT_URL;
-      if (endpoint) {
-        const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 15000);
-        try {
-          const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form), signal: controller.signal });
-          const payload: unknown = await response.json().catch(() => null);
-          if (!response.ok) throw new Error('Unable to send your message. Please try email or WhatsApp.');
-          setSent(true); setForm(initial); setFeedback(typeof payload === 'object' && payload !== null && 'message' in payload && typeof payload.message === 'string' ? payload.message : 'Your message has been received.');
-        } finally { clearTimeout(timeout); }
-      } else {
-        const body = `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\n\n${form.message}`;
-        await Linking.openURL(`mailto:${supportContact.email}?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(body)}`);
-        setSent(true); setFeedback('Your email draft is ready. Send it from your email app to contact our team.');
-      }
-    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Your email app could not open. You can email us directly.'); }
-    finally { setBusy(false); }
+      const result = await submitSupportRequest({ ...form, firstName: form.firstName.trim(), lastName: form.lastName.trim(), email: form.email.trim(), topic, reference, submissionKey: submissionKey.current }, token);
+      if (!result.request?.id) throw new Error('Support did not return a request reference. Please retry.');
+      setReceived(result.request.id);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not send your message.');
+    } finally {
+      submitting.current = false; setBusy(false);
+    }
   };
-  const open = async (url: string) => { try { await Linking.openURL(url); } catch { Alert.alert('Contact LemonTrip', `Email ${supportContact.email} for help.`); } };
-  return <AppScreen><KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}><ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-    <ScreenHeader title="Let’s plan the next step." subtitle="Questions about a booking, destination, or travel service? We’re here to help." eyebrow="CONTACT LEMONTRIP" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} />
-    <View style={styles.channels}><TouchableOpacity accessibilityRole="button" onPress={() => void open(`mailto:${supportContact.email}`)} style={styles.channel}><Ionicons name="mail-outline" size={24} color={Colors.accent} /><View style={{ flex: 1 }}><Text style={styles.channelTitle}>Email LemonTrip</Text><Text style={styles.channelCopy}>{supportContact.email}</Text></View></TouchableOpacity><TouchableOpacity accessibilityRole="button" onPress={() => void open(supportContact.whatsapp)} style={styles.channel}><Ionicons name="logo-whatsapp" size={24} color={Colors.accent} /><View style={{ flex: 1 }}><Text style={styles.channelTitle}>WhatsApp us</Text><Text style={styles.channelCopy}>Talk to the LemonTrip team</Text></View><Ionicons name="arrow-forward" size={18} color={Colors.white} /></TouchableOpacity></View>
-    <View style={styles.form}><Text style={styles.title}>Send us a message</Text><Text style={styles.copy}>Share the details and we’ll help you find the next step.</Text>{(Object.keys(initial) as (keyof typeof initial)[]).map(key => <View key={key} style={styles.field}><Text style={styles.label}>{key === 'phone' ? 'Phone (optional)' : key.charAt(0).toUpperCase() + key.slice(1)}</Text><TextInput accessibilityLabel={key} value={form[key]} onChangeText={value => { setForm(current => ({ ...current, [key]: value })); setFeedback(''); }} editable={!busy} autoCapitalize={key === 'email' ? 'none' : 'sentences'} keyboardType={key === 'email' ? 'email-address' : key === 'phone' ? 'phone-pad' : 'default'} multiline={key === 'message'} maxLength={key === 'message' ? 5000 : 200} placeholder={key === 'message' ? 'Tell us a little more about your question…' : key === 'email' ? 'you@example.com' : `Your ${key}`} placeholderTextColor={Colors.textLight} style={[styles.input, key === 'message' && styles.message]} /></View>)}{feedback ? <Text accessibilityRole="alert" style={[styles.feedback, { color: sent ? Colors.primary : Colors.error }]}>{feedback}</Text> : null}<TouchableOpacity accessibilityRole="button" disabled={busy} onPress={() => void submit()} style={[styles.button, busy && { opacity: 0.5 }]}><Text style={styles.buttonText}>{busy ? 'Please wait…' : process.env.EXPO_PUBLIC_CONTACT_URL ? 'Send message' : 'Compose email'}</Text><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></TouchableOpacity></View>
-    <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/help')} style={styles.help}><Text style={styles.buttonText}>Looking for a quick answer? Visit Help</Text></TouchableOpacity>
-  </ScrollView></KeyboardAvoidingView></AppScreen>;
+
+  const open = async (url: string) => { try { await Linking.openURL(url); } catch { setError(`Contact us at ${supportContact.email}.`); } };
+  const back = () => (router.canGoBack() ? router.back() : router.replace('/help' as never));
+
+  if (received) {
+    return (
+      <SupportPage title="Request received" subtitle="Thanks for reaching out. We’ll be in touch." eyebrow="LEMONTRIP / SUPPORT" onBack={back}>
+        <View style={s.done}>
+          <View style={s.doneIcon}><Ionicons name="checkmark" size={34} color={Colors.primaryDark} /></View>
+          <Text style={s.doneTitle}>We’ve got your message</Text>
+          <Text style={s.doneText}>Follow this request and its updates in My Support Requests.</Text>
+          <View style={s.refBox}><Text style={s.refLabel}>REFERENCE</Text><Text selectable style={s.ref}>{received}</Text></View>
+        </View>
+        <View style={s.cta}>
+          <SupportButton label="View my support requests" icon="arrow-forward" onPress={() => router.replace('/manage/support-requests' as never)} />
+          <View style={{ height: 10 }} />
+          <SupportButton variant="soft" label="Back to help" onPress={() => router.replace('/help' as never)} />
+        </View>
+      </SupportPage>
+    );
+  }
+
+  const length = form.message.trim().length;
+
+  return (
+    <SupportPage
+      title="Contact support"
+      subtitle="Tell us what’s going on and we’ll help."
+      onBack={back}
+      footer={<SupportButton label="Send message" icon="send-outline" loading={busy} onPress={() => void send()} />}>
+      {!user ? (
+        <SupportNotice icon="lock-closed-outline">
+          Sign in to submit and track your request.{' '}
+          <Text accessibilityRole="link" onPress={() => router.push('/login')} style={s.inlineLink}>Sign in</Text>
+        </SupportNotice>
+      ) : null}
+
+      <SupportCard>
+        <SupportHeading eyebrow="WE USUALLY REPLY BY EMAIL" title="Send us a message" />
+
+        <View style={s.names}>
+          <View style={s.name}><SupportField label="First name" placeholder="First name" value={form.firstName} onChangeText={(v) => edit('firstName', v)} editable={!busy} maxLength={80} autoCapitalize="words" /></View>
+          <View style={s.name}><SupportField label="Last name" placeholder="Last name" value={form.lastName} onChangeText={(v) => edit('lastName', v)} editable={!busy} maxLength={80} autoCapitalize="words" /></View>
+        </View>
+        <SupportField label="Email address" placeholder="name@example.com" value={form.email} onChangeText={(v) => edit('email', v)} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} editable={!busy} maxLength={255} />
+
+        <Text style={s.label}>TOPIC</Text>
+        <View style={s.topics} accessibilityRole="radiogroup">
+          {supportTopics.map((option) => <SupportChip key={option} label={option} selected={topic === option} disabled={busy} onPress={() => { setTopic(option); submissionKey.current = ''; setError(''); }} />)}
+        </View>
+
+        <View style={{ height: 16 }} />
+        <SupportField label="Subject" placeholder="A short summary" value={form.subject} onChangeText={(v) => edit('subject', v)} maxLength={200} editable={!busy} />
+        <SupportField label="Message" placeholder="Tell us how we can help…" multiline value={form.message} onChangeText={(v) => edit('message', v)} maxLength={MESSAGE_MAX} editable={!busy} counter={length < MESSAGE_MIN ? `${MESSAGE_MIN - length} more to go` : `${length}/${MESSAGE_MAX}`} />
+        {reference ? <View style={s.ref2}><Ionicons name="link-outline" size={15} color={Colors.primary} /><Text style={s.ref2Text}>Booking / application reference: {reference}</Text></View> : null}
+        {error ? <View style={{ marginTop: 12 }}><SupportNotice tone="error">{error}</SupportNotice></View> : null}
+      </SupportCard>
+
+      <View style={s.channels}>
+        <Text style={s.channelsLabel}>Prefer to reach us directly?</Text>
+        <View style={s.channelRow}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Email support" onPress={() => void open(`mailto:${supportContact.email}`)} style={s.channel}><Ionicons name="mail-outline" size={17} color={Colors.primary} /><Text style={s.channelText}>Email</Text></TouchableOpacity>
+          <View style={s.dot} />
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="WhatsApp support" onPress={() => void open(supportContact.whatsapp)} style={s.channel}><Ionicons name="logo-whatsapp" size={17} color={Colors.primary} /><Text style={s.channelText}>WhatsApp</Text></TouchableOpacity>
+        </View>
+      </View>
+    </SupportPage>
+  );
 }
-const styles = StyleSheet.create({
-  page: { paddingBottom: 24, maxWidth: 760, width: '100%', alignSelf: 'center' }, channels: { marginHorizontal: 18, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, gap: 20 }, channel: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 }, channelTitle: { fontFamily: 'Manrope', fontSize: 16, fontWeight: '800', color: Colors.white }, channelCopy: { fontFamily: 'Manrope', fontSize: 12, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 4 }, form: { ...Ui.card, padding: 20, margin: 18 }, title: { fontFamily: 'Manrope', fontSize: 22, fontWeight: '800', color: Colors.primary }, copy: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 22, color: Colors.textLight, marginTop: 8, marginBottom: 18 }, field: { marginBottom: 14 }, label: { fontFamily: 'Manrope', fontSize: 12, fontWeight: '700', color: Colors.primary, marginBottom: 6 }, input: { ...Ui.field, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: 'Manrope', fontSize: 14, color: Colors.textDark, padding: 14 }, message: { minHeight: 140, textAlignVertical: 'top' }, feedback: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 21, marginBottom: 12 }, button: { ...Ui.button, backgroundColor: Colors.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 }, buttonText: { fontFamily: 'Manrope', fontSize: 13, fontWeight: '800', color: Colors.primary }, help: { marginHorizontal: 18, padding: 14, alignItems: 'center' },
+
+function uuid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => { const value = Math.floor(Math.random() * 16); return (character === 'x' ? value : (value & 3) | 8).toString(16); }); }
+
+const s = StyleSheet.create({
+  names: { flexDirection: 'row', gap: 10 },
+  name: { flex: 1, minWidth: 0 },
+  label: { fontFamily: 'Manrope', fontSize: 10, fontWeight: '800', letterSpacing: 0.9, color: Colors.textLight, marginBottom: 8 },
+  topics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  inlineLink: { fontWeight: '800', color: Colors.primary, textDecorationLine: 'underline' },
+  ref2: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 10, borderRadius: 12, backgroundColor: Colors.surfaceMuted },
+  ref2Text: { flex: 1, fontFamily: 'Manrope', fontSize: 12, color: Colors.textDark },
+  channels: { alignItems: 'center', marginHorizontal: Ui.space.page, marginTop: 4 },
+  channelsLabel: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight },
+  channelRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 4 },
+  channel: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 7 },
+  channelText: { fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.primary },
+  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.borderStrong },
+  done: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 14, padding: 24, borderRadius: Ui.radius.card, backgroundColor: Colors.primaryDark },
+  doneIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
+  doneTitle: { fontFamily: 'Manrope', fontSize: 21, fontWeight: '800', color: Colors.white, marginTop: 14 },
+  doneText: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 5, textAlign: 'center' },
+  refBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
+  refLabel: { ...Ui.eyebrow, color: Colors.onDarkMuted },
+  ref: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.white, marginTop: 4 },
+  cta: { marginHorizontal: Ui.space.page },
 });
