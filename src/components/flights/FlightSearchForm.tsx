@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import type { FlightSearchRequest, SpecialFare, TripType } from './types';
+import { DateField, todayISO } from '@/components/DatePickerField';
 
 const tripTypes: { id: TripType; label: string }[] = [
   { id: 'oneWay', label: 'One Way' },
@@ -122,8 +123,8 @@ export default function FlightSearchForm({ compact = false, hideTripTypeSelector
       </View>
 
       <View style={styles.fieldGrid}>
-        <Field compact={compact} grid label="DEPARTURE" value={departureDate} placeholder={compact ? 'Add date' : 'YYYY-MM-DD'} onChangeText={setDepartureDate} keyboardType="numbers-and-punctuation" />
-        {tripType === 'roundTrip' ? <Field compact={compact} grid label="RETURN" value={returnDate} placeholder={compact ? 'Add date' : 'YYYY-MM-DD'} onChangeText={setReturnDate} keyboardType="numbers-and-punctuation" /> : null}
+        <DateField compact={compact} grid label="DEPARTURE" value={departureDate} placeholder="Add date" minDate={todayISO()} onChange={(date) => { setDepartureDate(date); if (returnDate && returnDate < date) setReturnDate(''); }} />
+        {tripType === 'roundTrip' ? <DateField compact={compact} grid label="RETURN" value={returnDate} placeholder="Add date" minDate={departureDate || todayISO()} onChange={setReturnDate} /> : null}
         <View style={[styles.field, styles.gridField, compact && styles.compactField, compact && styles.compactGridField]}>
           <Text style={[styles.fieldLabel, compact && styles.compactFieldLabel]}>TRAVELLERS</Text>
           <View style={[styles.counter, compact && styles.compactCounter]}>
@@ -157,7 +158,7 @@ export default function FlightSearchForm({ compact = false, hideTripTypeSelector
             <Field label="FROM" value={secondOrigin} placeholder="City / airport" onChangeText={setSecondOrigin} />
             <Field label="TO" value={secondDestination} placeholder="City / airport" onChangeText={setSecondDestination} />
           </View>
-          <View style={styles.secondDate}><Field label="DEPARTURE" value={secondDate} placeholder="YYYY-MM-DD" onChangeText={setSecondDate} keyboardType="numbers-and-punctuation" /></View>
+          <View style={styles.secondDate}><DateField label="DEPARTURE" value={secondDate} placeholder="Add date" minDate={departureDate || todayISO()} onChange={setSecondDate} /></View>
         </View>
       ) : null}
 
