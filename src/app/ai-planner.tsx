@@ -1,17 +1,20 @@
-import { FontFamily, TextSize } from '@/constants/typography';
-import { Text, TextInput } from '@/components/ui/Text';
+﻿import { Text, TextInput } from '@/components/ui/Text';
 import { Brand, Colors, Radius } from '@/constants/colors';
-import { sendChatMessage, type ChatMessage } from '@/utils/chatApi';
+import { FontFamily, TextSize } from '@/constants/typography';
+import type { ChatMessage } from '@/utils/chatApi';
+import { streamChatMessage } from '@/utils/chatStream';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Message = { id: string; role: 'user' | 'assistant'; text: string };
 
+const BULLET = String.fromCharCode(8226) + '  ';
+
 const suggestions = [
-  'Plan a 5-day Goa trip under ₹30,000',
+  'Plan a 5-day Goa trip under Rs 30,000',
   'Best time to visit Maldives?',
   'Weekend getaway near Delhi',
   'Visa tips for Thailand',
@@ -34,7 +37,7 @@ function RichText({ text, style, boldStyle }: { text: string; style: object; bol
         const parts = content.split(/(\*\*[^*]+\*\*)/g).filter((part) => part !== '');
         return (
           <Text key={lineIndex}>
-            {bulletMatch ? '•  ' : ''}
+            {bulletMatch ? BULLET : ''}
             {parts.map((part, partIndex) =>
               part.startsWith('**') && part.endsWith('**') && part.length > 4 ? (
                 <Text key={partIndex} style={boldStyle}>
@@ -58,6 +61,10 @@ export default function AiPlannerScreen() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const conversationIdRef = useRef<string | undefined>(undefined);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Stop any running reply when the user leaves the screen.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const goBack = () => {
     if (router.canGoBack()) router.back();
@@ -72,25 +79,43 @@ export default function AiPlannerScreen() {
 
     // Previous messages (without the welcome text) as chat history for the API
     const history: ChatMessage[] = messages
-      .filter((m) => m.id !== 'welcome')
+      .filter((m) => m.id !== 'welcome' && m.text.trim())
       .map((m) => ({ role: m.role, content: m.text }));
 
-    setMessages((prev) => [...prev, { id: `u-${Date.now()}`, role: 'user', text }]);
+    const stamp = Date.now();
+    const replyId = `a-${stamp}`;
+    setMessages((prev) => [
+      ...prev,
+      { id: `u-${stamp}`, role: 'user', text },
+      { id: replyId, role: 'assistant', text: '' },
+    ]);
     setInput('');
     setLoading(true);
     scrollToEnd();
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
-      const result = await sendChatMessage(text, history, undefined, conversationIdRef.current);
-      conversationIdRef.current = result.conversationId;
-      setMessages((prev) => [...prev, { id: `a-${Date.now()}`, role: 'assistant', text: result.reply }]);
+      const result = await streamChatMessage(text, history, {
+        mode: 'planner',
+        conversationId: conversationIdRef.current,
+        signal: controller.signal,
+        onDelta: (delta) =>
+          setMessages((prev) => prev.map((m) => (m.id === replyId ? { ...m, text: m.text + delta } : m))),
+      });
+      if (result.conversationId) conversationIdRef.current = result.conversationId;
     } catch (error) {
+      if (controller.signal.aborted) return;
       console.error('Planner request failed:', error);
       const reason = error instanceof Error ? error.message : 'Something went wrong. Please try again.';
-      setMessages((prev) => [...prev, { id: `e-${Date.now()}`, role: 'assistant', text: reason }]);
+      // Keep any partial reply; otherwise show the error in the empty reply bubble.
+      setMessages((prev) => prev.map((m) => (m.id === replyId && !m.text ? { ...m, text: reason } : m)));
     } finally {
-      setLoading(false);
-      scrollToEnd();
+      if (!controller.signal.aborted) {
+        setLoading(false);
+        scrollToEnd();
+      }
     }
   };
 
@@ -124,6 +149,7 @@ export default function AiPlannerScreen() {
           >
             {messages.map((message) => {
               const mine = message.role === 'user';
+              const waiting = !mine && message.text === '';
               return (
                 <View key={message.id} style={[styles.row, mine && styles.rowMine]}>
                   {!mine ? (
@@ -134,6 +160,8 @@ export default function AiPlannerScreen() {
                   <View style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleBot]}>
                     {mine ? (
                       <Text style={[styles.bubbleText, styles.bubbleTextMine]}>{message.text}</Text>
+                    ) : waiting ? (
+                      <ActivityIndicator size="small" color={Brand.forest} />
                     ) : (
                       <RichText text={message.text} style={styles.bubbleText} boldStyle={styles.boldText} />
                     )}
@@ -141,17 +169,6 @@ export default function AiPlannerScreen() {
                 </View>
               );
             })}
-
-            {loading ? (
-              <View style={styles.row}>
-                <View style={styles.avatar}>
-                  <Ionicons name="sparkles" size={14} color={Brand.forest} />
-                </View>
-                <View style={[styles.bubble, styles.bubbleBot]}>
-                  <ActivityIndicator size="small" color={Brand.forest} />
-                </View>
-              </View>
-            ) : null}
 
             {showSuggestions ? (
               <View style={styles.suggestions}>
@@ -166,20 +183,24 @@ export default function AiPlannerScreen() {
             ) : null}
           </ScrollView>
 
+          <Text style={styles.disclaimer}>AI suggestions are estimates. Check prices and availability in the app.</Text>
+
           {/* Input bar */}
           <View style={styles.inputBar}>
             <TextInput
               style={styles.input}
               value={input}
               onChangeText={setInput}
-              placeholder="Ask about your next trip…"
+              placeholder="Ask about your next trip..."
               placeholderTextColor={Colors.textLight}
               multiline
+              maxLength={1000}
               onSubmitEditing={() => send(input)}
               returnKeyType="send"
             />
             <TouchableOpacity
               accessibilityRole="button"
+              accessibilityLabel="Send message"
               style={[styles.sendButton, (!input.trim() || loading) && styles.sendDisabled]}
               onPress={() => send(input)}
               disabled={!input.trim() || loading}
@@ -251,7 +272,7 @@ const styles = StyleSheet.create({
   bubbleMine: { backgroundColor: Brand.forest, borderBottomRightRadius: 4 },
   bubbleText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 21 },
   bubbleTextMine: { color: Colors.white },
-  boldText: { fontFamily: FontFamily.sans, color: Brand.forest },
+  boldText: { fontFamily: FontFamily.sans, fontWeight: '800', color: Brand.forest },
 
   suggestions: { gap: 8, marginTop: 4 },
   suggestLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1.4 },
@@ -269,6 +290,14 @@ const styles = StyleSheet.create({
   },
   chipText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
 
+  disclaimer: {
+    textAlign: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    color: Colors.textLight,
+    fontFamily: FontFamily.sans,
+    fontSize: TextSize.micro,
+  },
   inputBar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
