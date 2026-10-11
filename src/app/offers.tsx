@@ -181,19 +181,12 @@ export default function OffersScreen() {
           <View style={styles.header}>
             <View style={styles.headerInner}>
 
-              <TouchableOpacity
-                style={styles.logoArea}
-                onPress={handleBack}
-                activeOpacity={0.8}
-              >
-                <View style={styles.logoCircle}>
-                  <Text style={styles.logoLetter}>L</Text>
-                </View>
-
-                <Text style={styles.logoText}>LemonTrip</Text>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" style={styles.logoArea} onPress={handleBack} activeOpacity={0.8}>
+                <Ionicons name="arrow-back" size={21} color={Colors.textDark} />
+                <Text style={styles.logoText}>Offers</Text>
               </TouchableOpacity>
 
-              <ScrollView
+              {desktop ? <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.navScroll}
@@ -244,9 +237,9 @@ export default function OffersScreen() {
                 <TouchableOpacity style={styles.navItem}>
                   <Text style={styles.navText}>Travel stories</Text>
                 </TouchableOpacity>
-              </ScrollView>
+              </ScrollView> : null}
 
-              <View style={styles.headerActions}>
+              {desktop ? <View style={styles.headerActions}>
 
                 <TouchableOpacity
                   style={styles.iconButton}
@@ -277,13 +270,13 @@ export default function OffersScreen() {
                   />
                 </TouchableOpacity>
 
-              </View>
+              </View> : null}
             </View>
           </View>
 
           {/* ================= HERO / TITLE ================= */}
 
-          <View style={styles.heroSection}>
+          {desktop ? <View style={styles.heroSection}>
             <Text style={styles.heroEyebrow}>
               LIMITED-TIME COLLECTION
             </Text>
@@ -296,7 +289,7 @@ export default function OffersScreen() {
               Member-only fares and curated package savings,
               with every condition shown upfront.
             </Text>
-          </View>
+          </View> : null}
 
           {/* ================= DEMO NOTICE ================= */}
 
@@ -356,15 +349,11 @@ export default function OffersScreen() {
 
           <View style={styles.resultsHeading}>
             <View>
-              <Text style={styles.resultsEyebrow}>
-                HANDPICKED FOR YOUR NEXT TRIP
-              </Text>
-
-              <Text style={styles.resultsTitle}>
-                {activeCategory === 'All'
-                  ? 'Current offers'
-                  : `${activeCategory} offers`}
-              </Text>
+              {!desktop ? <Text style={styles.resultsTitle}>
+                Active Offers <Text style={styles.resultsCount}>{activeOffers.length}</Text>
+              </Text> : <><Text style={styles.resultsEyebrow}>HANDPICKED FOR YOUR NEXT TRIP</Text><Text style={styles.resultsTitle}>
+                {activeCategory === 'All' ? 'Current offers' : `${activeCategory} offers`}
+              </Text></>}
             </View>
 
             <Text style={styles.resultsCount}>
@@ -638,6 +627,10 @@ function OfferCard({
         >
           {offer.description}
         </Text>
+        <TouchableOpacity accessibilityRole="button" onPress={() => router.push({ pathname: '/offers/[id]', params: { id: offer.id } })} style={styles.detailsLink}>
+          <Text style={styles.detailsLinkText}>View Details</Text>
+          <Ionicons name="arrow-forward" size={12} color={Colors.error} />
+        </TouchableOpacity>
 
         <View style={styles.validityRow}>
           <Ionicons
@@ -790,7 +783,7 @@ function OfferCard({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5F8F5',
+    backgroundColor: Colors.background,
   },
 
   page: {
@@ -812,10 +805,10 @@ const styles = StyleSheet.create({
   },
 
   headerInner: {
-    minHeight: 64,
+    minHeight: 58,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 22,
+    paddingHorizontal: 16,
     gap: 18,
   },
 
@@ -843,8 +836,8 @@ const styles = StyleSheet.create({
   logoText: {
     color: Colors.textDark,
     fontFamily: 'Manrope',
-    fontSize: 15,
-    fontWeight: '900',
+    fontSize: 17,
+    fontWeight: '800',
   },
 
   navScroll: {
@@ -929,8 +922,8 @@ const styles = StyleSheet.create({
   heroSection: {
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 48,
-    paddingBottom: 25,
+    paddingTop: 52,
+    paddingBottom: 24,
   },
 
   heroEyebrow: {
@@ -1006,17 +999,23 @@ const styles = StyleSheet.create({
   },
 
   categoryChip: {
-    paddingHorizontal: 13,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: Colors.border,
     backgroundColor: Colors.white,
+    shadowColor: '#0F3D2E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
 
   categoryChipActive: {
     borderColor: Colors.primary,
     backgroundColor: Colors.primary,
+    shadowOpacity: 0.12,
   },
 
   categoryText: {
@@ -1037,7 +1036,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     paddingHorizontal: 22,
-    marginTop: 28,
+    marginTop: 14,
     marginBottom: 13,
   },
 
@@ -1052,7 +1051,7 @@ const styles = StyleSheet.create({
   resultsTitle: {
     color: Colors.textDark,
     fontFamily: 'Manrope',
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '900',
     marginTop: 4,
   },
@@ -1066,8 +1065,11 @@ const styles = StyleSheet.create({
   /* ================= GRID ================= */
 
   offerGrid: {
-    gap: 14,
-    paddingHorizontal: 22,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 14,
+    paddingHorizontal: 16,
   },
 
   offerGridDesktop: {
@@ -1079,11 +1081,17 @@ const styles = StyleSheet.create({
   /* ================= OFFER CARD ================= */
 
   offerCard: {
+    width: '48.5%',
     overflow: 'hidden',
     borderRadius: 17,
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: '#E4EBE6',
+    shadowColor: '#0F3D2E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
 
   offerCardDesktop: {
@@ -1092,7 +1100,7 @@ const styles = StyleSheet.create({
   },
 
   imageWrap: {
-    height: 190,
+    height: 104,
     position: 'relative',
     backgroundColor: Colors.surfaceMuted,
   },
@@ -1120,7 +1128,7 @@ const styles = StyleSheet.create({
   },
 
   offerBody: {
-    padding: 13,
+    padding: 10,
   },
 
   offerMeta: {
@@ -1157,8 +1165,8 @@ const styles = StyleSheet.create({
   offerTitle: {
     color: Colors.textDark,
     fontFamily: 'Manrope',
-    fontSize: 14,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 18,
     fontWeight: '900',
     marginTop: 6,
   },
@@ -1166,11 +1174,13 @@ const styles = StyleSheet.create({
   offerDescription: {
     color: Colors.textLight,
     fontFamily: 'Manrope',
-    fontSize: 8,
-    lineHeight: 13,
+    fontSize: 10,
+    lineHeight: 14,
     marginTop: 5,
   },
 
+  detailsLink: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', marginTop: 6 },
+  detailsLinkText: { color: Colors.error, fontFamily: 'Manrope', fontSize: 11, fontWeight: '800' },
   validityRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1181,7 +1191,7 @@ const styles = StyleSheet.create({
   validityText: {
     color: Colors.textLight,
     fontFamily: 'Manrope',
-    fontSize: 7,
+    fontSize: 9,
   },
 
   /* ================= COUPON ================= */
@@ -1295,8 +1305,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     marginTop: 11,
-    borderRadius: 9,
+    borderRadius: 10,
     backgroundColor: Colors.accent,
+    shadowColor: '#F7CB00',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 2,
   },
 
   bookButtonDisabled: {
