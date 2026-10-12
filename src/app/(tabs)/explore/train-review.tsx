@@ -23,7 +23,7 @@ export default function TrainReviewScreen() {
   const proceed = () => { if (!agreed) { setShowError(true); return; } goTo(TRAIN_ROUTES.payment); };
 
   return (
-    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
+    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
           <ScreenHeader title="Review your booking" subtitle="Check every detail before you pay." eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr(TRAIN_ROUTES.passengers)} />
@@ -56,7 +56,7 @@ export default function TrainReviewScreen() {
           <Card>
             <SectionTitle eyebrow="CONTACT" title="E-ticket delivery" right={<TouchableOpacity accessibilityRole="button" onPress={() => goBackOr(TRAIN_ROUTES.passengers)}><Text style={s.edit}>Edit</Text></TouchableOpacity>} />
             <Line icon="mail-outline" label="Email" value={contact.email} />
-            <Line icon="call-outline" label="Mobile" value={`+91 ${contact.phone}`} />
+            <Line icon="call-outline" label="Mobile" value={contact.phone} />
             <View style={s.opts}>
               {options.autoUpgrade ? <Pill icon="trending-up-outline" label="Auto-upgrade on" /> : null}
               {options.confirmedOnly ? <Pill icon="checkmark-done-outline" label="Confirmed only" /> : null}

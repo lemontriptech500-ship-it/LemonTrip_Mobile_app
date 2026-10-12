@@ -2,7 +2,8 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
-import { StyleSheet, View, type ReactNode } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import type { ReactNode } from 'react';
 
 export function ExploreSectionIntro({
   eyebrow,

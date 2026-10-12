@@ -11,6 +11,7 @@ import { useCart } from '@/utils/cartStore';
 import { useContentItems } from '@/utils/contentApi';
 import { getOfferValidity, loadOffers } from '@/utils/offerApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
+import { getPackageGallery } from '@/data/packageImages';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -171,7 +172,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.aiCopy}>
             <Text style={styles.aiEyebrow}>AI TRIP PLANNER</Text>
-            <Text style={styles.aiTitle}>Dream it. I'll design it.</Text>
+            <Text style={styles.aiTitle}>Dream it. I’ll design it.</Text>
             <Text style={styles.aiSub}>Plan flights, stays and moments in seconds.</Text>
           </View>
           <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
@@ -206,7 +207,7 @@ export default function HomeScreen() {
           </ScrollView>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hRow}>
             {visiblePackages.map((travelPackage) => <TouchableOpacity key={travelPackage.id} style={styles.pkgCard} onPress={() => router.push(`/packages/${travelPackage.id}`)} activeOpacity={0.92}>
-              <View><Image source={{ uri: travelPackage.image }} style={styles.pkgImage} /><View style={styles.pkgBadgePill}><Text style={styles.pkgBadgeText}>{travelPackage.badge ?? 'Featured'}</Text></View></View>
+              <View><Image source={{ uri: getPackageGallery(travelPackage.id, travelPackage.title, travelPackage.destination, travelPackage.image, travelPackage.gallery)[0] }} style={styles.pkgImage} /><View style={styles.pkgBadgePill}><Text style={styles.pkgBadgeText}>{travelPackage.badge ?? 'Featured'}</Text></View></View>
               <View style={styles.pkgBody}><Text style={styles.pkgTitle} numberOfLines={1}>{travelPackage.title}</Text><View style={styles.pkgMetaRow}><Ionicons name="calendar-outline" size={12} color={Colors.textLight}/><Text style={styles.pkgMeta}>{travelPackage.duration}</Text></View><View style={styles.pkgPriceRow}><Text style={styles.pkgFrom}>From </Text><Text style={styles.pkgPrice}>{travelPackage.price}</Text><View style={styles.pkgArrow}><Ionicons name="arrow-forward" size={14} color={Colors.primary}/></View></View></View>
             </TouchableOpacity>)}
           </ScrollView>

@@ -33,7 +33,7 @@ export default function SignupScreen() {
       else if (password.length < 8) nextErrors.password = 'Use at least 8 characters';
     } else {
       if (!phone.trim()) nextErrors.phone = 'Mobile number is required';
-      else if (!normalizePhoneInput(phone)) nextErrors.phone = 'Enter a valid number. India (+91) is used when no country code is entered.';
+      else if (!normalizePhoneInput(phone)) nextErrors.phone = 'Enter a valid number. Include your country code if needed.';
     }
 
     setErrors(nextErrors);

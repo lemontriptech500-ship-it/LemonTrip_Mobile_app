@@ -1,5 +1,6 @@
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
+import { PriceDisplay } from '@/components/PriceDisplay';
 import { Pill } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -43,7 +44,7 @@ export default function FlightCard({ offer, onSelect, best = false, dateLabel }:
         {(fares ?? [{ id: 'base', name: refundNote ?? 'Fare', price: { total: offer.price.amount, currency: offer.price.currency } }]).map((f) => (
           <TouchableOpacity key={f.id} accessibilityRole="button" accessibilityLabel={`${f.name}, ${formatPrice(f.price.total, f.price.currency)}`} onPress={open} style={s.classTile} activeOpacity={0.8}>
             <Text style={s.classCode} numberOfLines={1}>{f.name.replace(/\s*·\s*sample/i, '')}</Text>
-            <Text style={s.classFare}>{formatPrice(f.price.total, f.price.currency)}</Text>
+            <PriceDisplay amount={f.price.total} currency={f.price.currency} amountStyle={s.classFare} />
             {'refundable' in f && f.refundable !== undefined ? <Text style={[s.avail, f.refundable ? s.good : s.warn]}>{f.refundable ? 'Refundable' : 'Non-refundable'}</Text> : null}
           </TouchableOpacity>
         ))}

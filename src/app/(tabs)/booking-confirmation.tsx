@@ -1,7 +1,7 @@
 import { TextSize, FontWeight } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter } from "expo-router";
 
@@ -11,6 +11,19 @@ const BG = "#F3F7F3";
 const BORDER = "#DCE8DF";
 const MUTED = "#879289";
 const YELLOW = "#FFD83D";
+
+const Detail = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: string;
+  }) => (
+    <View style={styles.detailRow}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue}>{value}</Text>
+    </View>
+  );
 
 export default function BookingConfirmationScreen() {
   const router = useRouter();
@@ -28,20 +41,9 @@ export default function BookingConfirmationScreen() {
   const passengers = Number(params.passengers || 1);
 
   // Demo confirmation reference; replace with a real booking ID from your backend.
-  const bookingId = `LT${Date.now().toString().slice(-8)}`;
+  const [bookingId] = useState(() => `LT${Date.now().toString().slice(-8)}`);
 
-  const Detail = ({
-    label,
-    value,
-  }: {
-    label: string;
-    value: string;
-  }) => (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
-    </View>
-  );
+
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -149,7 +151,7 @@ export default function BookingConfirmationScreen() {
 
         <Pressable
           style={styles.secondaryButton}
-          onPress={() => router.replace("/(tabs)" as any)}
+          onPress={() => router.replace("/home" as any)}
         >
           <Text style={styles.secondaryButtonText}>Go to Home</Text>
         </Pressable>

@@ -3,6 +3,7 @@ import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { PriceDisplay } from '@/components/PriceDisplay';
 import { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import type { FlightFareOption } from './types';
@@ -13,14 +14,6 @@ type FlightFareOptionsProps = {
   onSelect: (option: FlightFareOption) => void;
   onFareConditions: (option: FlightFareOption) => void;
 };
-
-function formatPrice(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount);
-  } catch {
-    return `${currency} ${amount.toLocaleString('en-IN')}`;
-  }
-}
 
 function Detail({ label, value }: { label: string; value?: string | boolean }) {
   let displayValue = 'Not provided';
@@ -64,7 +57,7 @@ export default function FlightFareOptions({ options, selectedId, onSelect, onFar
               style={styles.cardHeader}>
               <View style={styles.nameWrap}>
                 <Text style={styles.name}>{option.name}</Text>
-                <Text style={styles.price}>{formatPrice(option.price.total, option.price.currency)}</Text>
+                <PriceDisplay amount={option.price.total} currency={option.price.currency} amountStyle={styles.price} />
               </View>
               <Ionicons name={selected ? 'radio-button-on' : 'radio-button-off'} size={20} color={selected ? Colors.primary : Colors.textLight} />
               {mobile ? <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color={Colors.textLight} /> : null}

@@ -2,6 +2,7 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
+import { PriceDisplay } from '@/components/PriceDisplay';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
@@ -115,10 +116,10 @@ export function PrimaryButton({ label, onPress, loading, disabled, icon, variant
 }
 
 /** Sticky bottom bar: price on the left, action on the right. */
-export function FooterBar({ caption, amount, action }: { caption: string; amount: string; action: ReactNode }) {
+export function FooterBar({ caption, amount, action, estimateAmount, estimateCurrency = 'INR' }: { caption: string; amount: string; action: ReactNode; estimateAmount?: number; estimateCurrency?: string }) {
   return (
     <View style={s.footer}>
-      <View style={s.footerPrice}><Text style={s.footerCaption}>{caption}</Text><Text style={s.footerAmount}>{amount}</Text></View>
+      <View style={s.footerPrice}><Text style={s.footerCaption}>{caption}</Text>{estimateAmount === undefined ? <Text style={s.footerAmount}>{amount}</Text> : <PriceDisplay amount={estimateAmount} currency={estimateCurrency} amountStyle={s.footerAmount} />}</View>
       <View style={s.footerAction}>{action}</View>
     </View>
   );

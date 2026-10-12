@@ -97,7 +97,7 @@ export default function PackageConfirmationScreen() {
           </View>
 
           <View style={s.cta}>
-            <PrimaryButton label="Back to home" icon="home-outline" onPress={() => done('/(tabs)')} />
+            <PrimaryButton label="Back to home" icon="home-outline" onPress={() => done('/home')} />
             <View style={{ height: 10 }} />
             <PrimaryButton variant="soft" label="Explore more packages" icon="umbrella-outline" onPress={() => { resetPackageBooking(); goTo(PACKAGE_ROUTES.list); }} />
           </View>
