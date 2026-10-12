@@ -1,5 +1,7 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -18,13 +20,14 @@ function parseAmount(price: string) {
 
 function money(value: number) {
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(value));
+    return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(value));
   } catch {
     return 'Rs ' + Math.round(value);
   }
 }
 
 export default function CancelBookingScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const bookings = useBookings();
   const booking = bookings.find((item) => String(item.id) === String(id));

@@ -1,3 +1,4 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
@@ -7,7 +8,7 @@ import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const sections: { title: string; path: string; route: Href }[] = [

@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -9,7 +12,7 @@ import { logout, useAuth } from '@/utils/authStore';
 import { useAccountBookings } from '@/utils/accountBookings';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 const SOFT_GREEN = Colors.surfaceMuted;
@@ -38,6 +41,7 @@ const accountLinks = [
 ];
 
 export default function ProfileScreen() {
+  useAppLanguage();
   const user = useAuth();
   const { bookings } = useAccountBookings();
   const { width } = useWindowDimensions();

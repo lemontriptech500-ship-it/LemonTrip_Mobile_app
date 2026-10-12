@@ -1,3 +1,4 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
@@ -5,7 +6,7 @@ import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ComponentProps, ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 export function SupportScreen({ title, children, footer, scroll = true }: { title: string; children: ReactNode; footer?: ReactNode; scroll?: boolean }) {
   return <AppScreen edges={['top', 'bottom']}><View style={{ flex: 1, backgroundColor: Colors.primaryDark }}><View style={supportStyles.header}><TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" style={supportStyles.back} onPress={() => { if (router.canGoBack()) router.back(); else router.replace('/(tabs)/profile'); }}><Ionicons name="chevron-back" size={20} color={Colors.white} /></TouchableOpacity><Text accessibilityRole="header" style={supportStyles.headerTitle}>{title}</Text></View>

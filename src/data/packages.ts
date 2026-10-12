@@ -1,3 +1,4 @@
+import { getAppLocale } from '@/utils/intl';
 import { addDaysISO, fromISO, toISO } from '@/data/trains';
 
 export { BANKS, WALLET_BALANCE, addDaysISO, formatLongDate, formatShortDate, inr } from '@/data/trains';
@@ -85,6 +86,6 @@ export const PACKAGE_COUPONS: PackageCoupon[] = [
 export function validatePackageCoupon(code: string, amount: number): { ok: true; coupon: PackageCoupon; discount: number } | { ok: false; error: string } {
   const coupon = PACKAGE_COUPONS.find((c) => c.code === code.trim().toUpperCase());
   if (!coupon) return { ok: false, error: 'This coupon code is not valid.' };
-  if (amount < coupon.min) return { ok: false, error: `Add ₹${(coupon.min - Math.round(amount)).toLocaleString('en-IN')} more to use ${coupon.code}.` };
+  if (amount < coupon.min) return { ok: false, error: `Add ₹${(coupon.min - Math.round(amount)).toLocaleString(getAppLocale())} more to use ${coupon.code}.` };
   return { ok: true, coupon, discount: coupon.compute(amount) };
 }

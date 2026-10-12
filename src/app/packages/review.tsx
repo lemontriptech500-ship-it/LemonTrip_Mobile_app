@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -8,9 +10,10 @@ import { formatLongDate, inr, travellerType } from '@/data/packages';
 import { currentPackageFare, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 export default function PackageReviewScreen() {
+  useAppLanguage();
   const { pkg, date, counts, rooms, travellers, contact } = usePackageBooking();
   const [agreed, setAgreed] = useState(false);
   const [showError, setShowError] = useState(false);

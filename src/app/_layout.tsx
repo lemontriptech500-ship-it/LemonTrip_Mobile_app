@@ -17,6 +17,7 @@ export default function RootLayout() {
     ...Ionicons.font,
     Manrope: require('../../assets/fonts/Manrope[wght].ttf'),
     Caveat: require('../../assets/fonts/Caveat[wght].ttf'),
+    NotoSansDevanagari: require('../../assets/fonts/NotoSansDevanagari[wdth,wght].ttf'),
   });
 
   return (

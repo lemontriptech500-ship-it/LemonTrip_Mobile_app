@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -8,9 +10,10 @@ import { CLASS_INFO, formatLongDate, getAvailability, inr } from '@/data/trains'
 import { currentFare, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 export default function TrainReviewScreen() {
+  useAppLanguage();
   const { selection, passengers, contact, options } = useTrainBooking();
   const [agreed, setAgreed] = useState(false);
   const [showError, setShowError] = useState(false);

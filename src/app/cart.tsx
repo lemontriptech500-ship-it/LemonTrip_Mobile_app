@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -7,10 +9,11 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
 import { removeFromCart, useCart } from '@/utils/cartStore';
 import { router } from 'expo-router';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function CartScreen() {
+  useAppLanguage();
   const cart = useCart();
 
   const handleBack = () => {

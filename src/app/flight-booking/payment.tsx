@@ -1,6 +1,8 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightProgress, formatPrice } from '@/components/flights/FlightFlowUi';
 import { confirmFlightBooking, getFlightBookingDraft } from '@/components/flights/flightBookingStore';
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
@@ -10,7 +12,7 @@ import { BANKS, WALLET_BALANCE, inr } from '@/data/trains';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 type Method = 'upi' | 'card' | 'netbanking' | 'wallet';
 const METHODS: { id: Method; label: string; hint: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
@@ -27,6 +29,7 @@ const formatExpiry = (v: string) => {
 };
 
 export default function FlightPaymentScreen() {
+  useAppLanguage();
   const selection = getFlightSelection();
   const draft = getFlightBookingDraft();
 

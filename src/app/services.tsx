@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
@@ -7,9 +9,10 @@ import { travelServices } from '@/constants/navigation';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ImageBackground, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function ServicesScreen() {
+  useAppLanguage();
   return <AppScreen><ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
     <ScreenHeader title="Travel planning, made simple." subtitle="Everything in one place, from the first search to the final itinerary." eyebrow="TRAVEL SMARTER. TRAVEL BETTER." onBack={() => router.canGoBack() ? router.back() : router.replace('/home')} />
     <View style={styles.catalog}>{travelServices.map(service => <TouchableOpacity key={service.title} accessibilityRole="button" accessibilityLabel={`Explore ${service.title}`} onPress={() => router.push(service.route)} style={styles.card}><ImageBackground source={{ uri: service.image }} style={styles.image}><View style={styles.shade} /><View style={styles.imageCopy}><Ionicons name={service.icon} size={24} color={Colors.accent} /><Text style={styles.title}>{service.title}</Text></View></ImageBackground><View style={styles.body}><Text style={styles.description}>{service.description}</Text><View style={styles.cta}><Text style={styles.ctaText}>Explore {service.shortTitle}</Text><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></View></View></TouchableOpacity>)}</View>

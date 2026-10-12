@@ -1,3 +1,6 @@
+import { translate, useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
+import { Text } from '@/components/ui/Text';
 import { SupportButton, SupportCard, SupportField, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
 import { travelServices } from '@/constants/navigation';
@@ -10,7 +13,7 @@ import { usePreferences } from '@/utils/preferencesStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState, type ComponentProps, type ReactNode } from 'react';
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 type Note = { text: string; tone: 'good' | 'error' } | null;
@@ -24,6 +27,7 @@ const updateLabels = {
 } as const;
 
 export default function ManageScreen() {
+  useAppLanguage();
   const { section } = useLocalSearchParams<{ section: string }>();
   const user = useAuth();
   const accountBookings = useAccountBookings(section === 'notifications');
@@ -59,7 +63,7 @@ export default function ManageScreen() {
   };
 
   const searches = section === 'recent-searches' ? recentStore : searchStore;
-  const visibleServices = travelServices.filter((service) => `${service.title} ${service.description}`.toLowerCase().includes(query.toLowerCase()));
+  const visibleServices = travelServices.filter((service) => `${service.title} ${service.description} ${translate(service.title)} ${translate(service.description)}`.toLowerCase().includes(query.toLowerCase()));
   const optionList = section === 'language' ? ['English', 'Hindi'] : ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'IDR', 'JPY', 'MYR', 'NZD', 'SAR', 'SGD', 'THB', 'TRY', 'ZAR'];
   const selectedOption = section === 'language' ? language : currency;
 
@@ -188,7 +192,7 @@ export default function ManageScreen() {
             );
           })}
         </SupportCard>
-        <SupportNotice icon="information-circle-outline">{section === 'language' ? 'English and Hindi are available for translated app copy. Some provider content may remain in its original language.' : 'Converted amounts use Frankfurter daily reference rates and are estimates only. The provider currency remains the amount used for checkout.'}</SupportNotice>
+        <SupportNotice icon="information-circle-outline">{section === 'language' ? 'Choose the language for app menus, forms and messages.' : 'Converted amounts use Frankfurter daily reference rates and are estimates only. The provider currency remains the amount used for checkout.'}</SupportNotice>
       </>
     );
   } else if (section === 'edit-profile' || section === 'account-setup') {

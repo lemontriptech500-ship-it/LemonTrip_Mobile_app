@@ -1,5 +1,6 @@
 export const FontFamily = {
   sans: 'Manrope',
+  hindi: 'NotoSansDevanagari',
 } as const;
 
 /** Shared app type scale. Keep display, headings, body, and labels on these steps. */

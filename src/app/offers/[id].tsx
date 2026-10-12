@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
@@ -10,9 +12,10 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function OfferDetailsScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [offer, setOffer] = useState<Offer | null>(null); const [source, setSource] = useState<OfferSource | null>(null); const [error, setError] = useState(''); const [loading, setLoading] = useState(true); const [copied, setCopied] = useState(false);
   useEffect(() => { let active = true; void loadOffers().then(result => { if (active) { setOffer(result.offers.find(item => item.id === id) ?? null); setSource(result.source); } }).catch(cause => { if (active) setError(cause instanceof Error ? cause.message : 'Could not load this offer.'); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, [id]);

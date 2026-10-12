@@ -1,8 +1,11 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { FlightFareOption } from './types';
 
 type FlightTripSummaryProps = {
@@ -13,13 +16,14 @@ type FlightTripSummaryProps = {
 function formatPrice(amount: number | undefined, currency: string) {
   if (amount === undefined) return 'Not provided';
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(amount);
+    return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency }).format(amount);
   } catch {
-    return `${currency} ${amount.toLocaleString('en-IN')}`;
+    return `${currency} ${amount.toLocaleString(getAppLocale())}`;
   }
 }
 
 export default function FlightTripSummary({ fareOption, onContinue }: FlightTripSummaryProps) {
+  useAppLanguage();
   const currency = fareOption?.price.currency ?? '';
   const rows: Array<{ label: string; amount: number | undefined; total?: boolean }> = [
     { label: 'Base fare', amount: fareOption?.price.baseFare },

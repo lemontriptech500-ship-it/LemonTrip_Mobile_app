@@ -25,7 +25,7 @@ const icon = (active: IconName, inactive: IconName) => {
 };
 
 export default function TabsLayout() {
-  useAppLanguage();
+  const language = useAppLanguage();
   const insets = useSafeAreaInsets();
 
   return (
@@ -37,7 +37,7 @@ export default function TabsLayout() {
         tabBarLabelPosition: 'below-icon',
         tabBarActiveTintColor: Brand.forest,
         tabBarInactiveTintColor: Colors.textLight,
-        tabBarLabelStyle: styles.label,
+        tabBarLabelStyle: [styles.label, language === 'Hindi' && { fontFamily: FontFamily.hindi }],
         tabBarItemStyle: { paddingTop: 6 },
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
@@ -102,7 +102,7 @@ export default function TabsLayout() {
         name="booking-confirmation"
         options={{
           href: null,
-          title: 'Booking Confirmation',
+          title: translate('Booking Confirmation'),
         }}
       />
     </Tabs>

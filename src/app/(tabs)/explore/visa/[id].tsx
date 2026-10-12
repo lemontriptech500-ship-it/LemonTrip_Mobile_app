@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { VisaHeader, visaCountryFlag } from '@/components/visa/VisaHeader';
@@ -10,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type Upload = { name: string; mimeType: string; size: number; uri: string };
@@ -30,6 +32,7 @@ function mimeFor(name: string, supplied?: string | null) {
 }
 
 export default function VisaApplicationScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const user = useAuth();
   const [step, setStep] = useState<'service' | 'application' | 'documents'>('service');

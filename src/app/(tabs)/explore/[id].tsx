@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -9,10 +11,11 @@ import { useContentItems } from '@/utils/contentApi';
 import { addToCart, isInCart, useCart } from '@/utils/cartStore';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 export default function ServiceListingScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { items: services } = useContentItems<TravelService>('service');
   const { items: allListings } = useContentItems<Listing>('listing');

@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
@@ -8,9 +10,10 @@ import { useCart } from '@/utils/cartStore';
 import { getCheckoutDetails, getTravelPreferences } from '@/utils/checkoutStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 export default function ReviewScreen() {
+  useAppLanguage();
   const preferences = getTravelPreferences();
   const cart = useCart(); const details = getCheckoutDetails();
   return <AppScreen><ScrollView contentContainerStyle={styles.page}><ScreenHeader title="One last look." subtitle="Review your journey and traveller details before payment." eyebrow="CHECKOUT / REVIEW" onBack={() => router.canGoBack() ? router.back() : router.replace('/checkout')} /><View style={styles.content}>{cart.map(item => <View key={item.id} style={styles.card}><Text style={styles.label}>{item.serviceName}</Text><Text style={styles.title}>{item.itemName}</Text>{item.tripDate ? <Text style={styles.copy}>{item.tripDate}</Text> : null}<Text style={styles.price}>{item.price}</Text></View>)}{details ? <><View style={styles.card}><Text style={styles.title}>Contact</Text><Text style={styles.copy}>{details.name}</Text><Text style={styles.copy}>{details.email}</Text><Text style={styles.copy}>{details.phone}</Text></View><View style={styles.card}><Text style={styles.title}>Travellers</Text>{details.travellers.map((traveller, index) => <Text key={index} style={styles.copy}>{index + 1}. {traveller.firstName} {traveller.lastName}</Text>)}<TouchableOpacity accessibilityRole="button" onPress={() => router.replace('/checkout')} style={styles.edit}><Text style={styles.buttonText}>Edit details</Text></TouchableOpacity></View><View style={styles.card}><Text style={styles.title}>Travel preferences</Text><Text style={styles.copy}>{preferences.seat} · {preferences.note}</Text><Text style={styles.copy}>Preferences are unconfirmed until accepted by your provider.</Text><TouchableOpacity accessibilityRole="button" onPress={() => router.push("/add-ons")} style={styles.edit}><Text style={styles.buttonText}>Edit preferences</Text></TouchableOpacity></View><Text style={styles.copy}>Booking confirmation follows successful payment and availability verification.</Text><View style={styles.links}><TouchableOpacity accessibilityRole="button" onPress={() => router.push('/terms')}><Text style={styles.buttonText}>Terms of service</Text></TouchableOpacity><TouchableOpacity accessibilityRole="button" onPress={() => router.push('/privacy')}><Text style={styles.buttonText}>Privacy policy</Text></TouchableOpacity></View></> : <Text style={styles.copy}>Add your contact and traveller details to continue.</Text>}<TouchableOpacity accessibilityRole="button" disabled={!cart.length} onPress={() => router.push(details ? '/payment' : '/checkout')} style={[styles.button, !cart.length && { opacity: 0.5 }]}><Text style={styles.buttonText}>{details ? 'Continue to payment' : 'Add traveller details'}</Text><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></TouchableOpacity></View></ScrollView></AppScreen>;

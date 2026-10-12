@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -9,11 +11,12 @@ import { currentFare, selectTrain, updateSelection, useTrainBooking } from '@/ut
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function TrainDetailsScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const booking = useTrainBooking();
   const sel = booking.selection;

@@ -1,6 +1,10 @@
+import { useAppLanguage } from '@/utils/intl';
+import { translate } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { AppScreen } from '@/components/AppScreen';
+import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, EmptyState, Notice, Pill, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
@@ -10,7 +14,7 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Platform, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { requestPinWidget } from 'react-native-android-widget';
 
 type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
@@ -23,6 +27,7 @@ const statusTabs: { key: StatusFilter; label: string }[] = [
 ];
 
 export default function BookingsScreen() {
+  useAppLanguage();
   const bookings = useBookings();
   const [refreshing, setRefreshing] = useState(false);
   const [addingWidget, setAddingWidget] = useState(false);
@@ -49,7 +54,7 @@ export default function BookingsScreen() {
 
   const handleAddWidget = async () => {
     if (Platform.OS !== 'android') {
-      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert('The Upcoming Trip widget is available on the Android app only.'); else Alert.alert('Android feature', 'The Upcoming Trip widget is currently available on Android.');
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(translate('The Upcoming Trip widget is available on the Android app only.')); else Alert.alert('Android feature', 'The Upcoming Trip widget is currently available on Android.');
       return;
     }
     if (addingWidget) return;

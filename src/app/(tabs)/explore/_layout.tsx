@@ -1,9 +1,11 @@
+import { useAppLanguage } from '@/utils/intl';
 import { ExploreHeader, exploreDirectoryPaths } from '@/components/explore/ExploreHeader';
 import { Colors } from '@/constants/colors';
 import { Stack, usePathname } from 'expo-router';
 import { View } from 'react-native';
 
 export default function ExploreLayout() {
+  useAppLanguage();
   const pathname = usePathname();
   return <View style={{ flex: 1, backgroundColor: Colors.background }}>
     {exploreDirectoryPaths.includes(pathname) ? <ExploreHeader pathname={pathname} /> : null}

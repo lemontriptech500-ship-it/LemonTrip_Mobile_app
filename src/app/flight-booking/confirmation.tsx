@@ -1,6 +1,9 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightProgress, formatPrice, formatTime } from '@/components/flights/FlightFlowUi';
 import { getFlightBookingDraft, resetFlightBookingDraft } from '@/components/flights/flightBookingStore';
 import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
@@ -8,7 +11,7 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 /** Decorative barcode derived from the PNR (demo only, not scannable). */
 function Barcode({ value }: { value: string }) {
@@ -25,10 +28,11 @@ function Barcode({ value }: { value: string }) {
 
 const longDate = (value: string) => {
   const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString(getAppLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 export default function FlightConfirmationScreen() {
+  useAppLanguage();
   const { ticket } = getFlightBookingDraft();
 
   const done = (path: string) => {
@@ -147,7 +151,7 @@ export default function FlightConfirmationScreen() {
             <Row label="Total paid" value={formatPrice(ticket.total, ticket.currency)} bold />
             <View style={s.txn}>
               <Text style={s.txnText}>Txn {ticket.txnId}</Text>
-              <Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text>
+              <Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text>
             </View>
           </Card>
 
