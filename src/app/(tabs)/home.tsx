@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
@@ -15,7 +17,7 @@ import { getPackageGallery } from '@/data/packageImages';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type ServiceItem = {
@@ -66,6 +68,7 @@ function SectionHeader({ eyebrow, title, action, onPress }: { eyebrow: string; t
 }
 
 export default function HomeScreen() {
+  useAppLanguage();
   const mainScrollRef = useRef<ScrollView>(null);
   const [activeService, setActiveService] = useState<ServiceItem>(services[0]);
   const [selectedPackageCategory, setSelectedPackageCategory] = useState<string | null>(null);

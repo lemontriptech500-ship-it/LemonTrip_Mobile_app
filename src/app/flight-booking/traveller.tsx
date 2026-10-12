@@ -1,6 +1,7 @@
+import { useAppLanguage } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightJourney, FlightProgress, formatPrice } from '@/components/flights/FlightFlowUi';
 import {
   getFlightBookingDraft,
@@ -20,6 +21,7 @@ const GENDERS: Exclude<Gender, ''>[] = ['Male', 'Female', 'Other'];
 const emptyTraveller = (): TravellerInfo => ({ firstName: '', lastName: '', gender: '', dob: '' });
 
 export default function TravellerDetailsScreen() {
+  useAppLanguage();
   const selection = getFlightSelection();
   const saved = getFlightBookingDraft();
   const count = Math.max(1, selection?.request.travellers ?? 1);

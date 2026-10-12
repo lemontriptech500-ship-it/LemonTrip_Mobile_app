@@ -1,8 +1,9 @@
+import { Text } from '@/components/ui/Text';
 import { FontFamily } from '@/constants/typography';
 import { Colors } from '@/constants/colors';
 import { convertReferenceAmount, formatLocalizedCurrency, translate, useAppLanguage, useSelectedCurrency } from '@/utils/intl';
 import { useEffect, useState } from 'react';
-import { Text, View, type StyleProp, type TextStyle } from 'react-native';
+import { View, type StyleProp, type TextStyle } from 'react-native';
 
 /** Keeps the provider's payable price primary and labels the converted reference estimate. */
 export function PriceDisplay({ amount, currency, amountStyle, estimate = true }: { amount: number; currency: string; amountStyle?: StyleProp<TextStyle>; estimate?: boolean }) {

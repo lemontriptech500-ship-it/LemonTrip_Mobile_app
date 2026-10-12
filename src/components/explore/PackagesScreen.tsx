@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -9,10 +11,11 @@ import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ImageBackground, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { getPackageGallery } from '@/data/packageImages';
 
 export default function PackagesListScreen() {
+  useAppLanguage();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;
   const [query, setQuery] = useState('');

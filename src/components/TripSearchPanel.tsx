@@ -1,10 +1,12 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Pressable, TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon, type TravelArtworkName } from '@/components/TravelArtworkIcon';
 import { useState } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export type SearchType = 'flights' | 'hotels' | 'buses' | 'trains' | 'packages';
 
@@ -31,6 +33,7 @@ export default function TripSearchPanel({
   error = null,
   onSearch,
 }: TripSearchPanelProps) {
+  useAppLanguage();
   const [selectedType, setSelectedType] = useState<SearchType>(defaultType);
   const [selectedMode, setSelectedMode] = useState('Round trip');
 

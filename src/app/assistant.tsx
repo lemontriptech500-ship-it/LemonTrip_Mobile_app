@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { SupportButton, SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage } from '@/components/support/SupportKit';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -7,7 +9,7 @@ import { sendChatMessage, type ChatMessage } from '@/utils/chatApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { useRef, useState, type ComponentProps } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -20,6 +22,7 @@ const shortcuts: { title: string; detail: string; icon: IconName; route?: Href; 
 ];
 
 export default function AssistantScreen() {
+  useAppLanguage();
   const user = useAuth();
   return <AssistantChat key={user?.id ?? 'guest'} />;
 }

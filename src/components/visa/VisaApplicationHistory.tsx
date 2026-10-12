@@ -1,10 +1,11 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Linking, StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/colors';
 import { getVisaApplications, getVisaDocumentUrl, type VisaApplication, type VisaDocumentKey } from '@/utils/visaService';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';

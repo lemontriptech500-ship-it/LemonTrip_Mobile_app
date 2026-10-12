@@ -1,3 +1,4 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -6,7 +7,7 @@ import { PriceDisplay } from '@/components/PriceDisplay';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View, type TextInputProps } from 'react-native';
+import { ActivityIndicator, StyleSheet, View, type TextInputProps } from 'react-native';
 import { AppScreen } from '@/components/AppScreen';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];

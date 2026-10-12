@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Action, Copy, FeatureScreen, Panel, Row } from '@/components/FeatureScreen';
@@ -7,8 +9,9 @@ import { useCart } from '@/utils/cartStore';
 import { getCheckoutDetails, getTravelPreferences, setTravelPreferences } from '@/utils/checkoutStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 export default function AddOnsScreen() {
+  useAppLanguage();
   const cart = useCart(); const details = getCheckoutDetails(); const flight = getFlightSelection();
   const [seat, setSeat] = useState(getTravelPreferences().seat); const [note, setNote] = useState(getTravelPreferences().note);
   const isFlight = cart.some(item => item.serviceName.toLowerCase().includes('flight'));

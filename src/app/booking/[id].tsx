@@ -1,6 +1,8 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from '@/constants/support';
@@ -11,7 +13,7 @@ import { useBookings } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 /** Decorative barcode derived from the booking id (demo only). */
@@ -30,6 +32,7 @@ function Barcode({ value }: { value: string }) {
 }
 
 export default function BookingDetailScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const bookings = useBookings();
   const booking = bookings.find((item) => String(item.id) === String(id));

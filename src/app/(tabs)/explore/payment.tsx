@@ -1,8 +1,12 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { Pressable } from '@/components/ui/Pressable';
 import { TextSize, FontWeight } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, View, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const GREEN = "#075638";
@@ -12,6 +16,7 @@ const BORDER = "#DCE8DF";
 const YELLOW = "#FFD83D";
 
 export default function PaymentScreen() {
+  useAppLanguage();
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -247,14 +252,14 @@ const handleConfirm = () => {
               Bus fare × {passengers}
             </Text>
             <Text style={styles.fareValue}>
-              ₹{total.toLocaleString("en-IN")}
+              ₹{total.toLocaleString(getAppLocale())}
             </Text>
           </View>
 
           <View style={styles.fareRow}>
             <Text style={styles.fareLabel}>Estimated taxes (5%)</Text>
             <Text style={styles.fareValue}>
-              ₹{taxes.toLocaleString("en-IN")}
+              ₹{taxes.toLocaleString(getAppLocale())}
             </Text>
           </View>
 
@@ -263,7 +268,7 @@ const handleConfirm = () => {
           <View style={styles.fareRow}>
             <Text style={styles.totalLabel}>Total payable</Text>
             <Text style={styles.totalPrice}>
-              ₹{grandTotal.toLocaleString("en-IN")}
+              ₹{grandTotal.toLocaleString(getAppLocale())}
             </Text>
           </View>
 

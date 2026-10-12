@@ -1,16 +1,19 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { VisaHeader } from '@/components/visa/VisaHeader';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { getAccessToken, useAuth } from '@/utils/authStore';
 import { getVisaApplication, openVisaApplicationDocument, type VisaDocumentKey, type VisaTracking } from '@/utils/visaService';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState, type ComponentProps } from 'react';
 
 export default function VisaTrackingScreen() {
+  useAppLanguage();
   const { id, view = 'tracking' } = useLocalSearchParams<{ id: string; view?: string }>();
   const user = useAuth();
   const token = user ? getAccessToken() : null;

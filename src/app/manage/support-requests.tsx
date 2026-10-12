@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { SupportButton, SupportCard, SupportHeading, SupportNotice, SupportPage, goBackOr } from '@/components/support/SupportKit';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -7,12 +9,13 @@ import { getSupportRequest, listSupportRequests, type SupportRequest, type Suppo
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 const statusColors = { new: Colors.textLight, open: '#997500', in_progress: '#087EA4', closed: Colors.success };
 const statusLabels = { new: 'NEW', open: 'OPEN', in_progress: 'IN PROGRESS', closed: 'CLOSED' };
 
 export default function SupportRequestsScreen() {
+  useAppLanguage();
   const user = useAuth();
   const token = user ? getAccessToken() : null;
   const [result, setResult] = useState<{ actor: string; items: SupportRequest[]; error: string } | null>(null);

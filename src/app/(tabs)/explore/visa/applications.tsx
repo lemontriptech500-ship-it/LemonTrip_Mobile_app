@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -8,12 +10,13 @@ import { getVisaApplications, openVisaApplicationDocument, type VisaApplication 
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 const documentLabels = { passportFront: 'Passport front', passportBack: 'Passport back', applicantPhoto: 'Applicant photo' } as const;
 
 export default function VisaApplicationsScreen() {
+  useAppLanguage();
   const user = useAuth();
   const [items, setItems] = useState<VisaApplication[]>([]);
   const [loading, setLoading] = useState(true);

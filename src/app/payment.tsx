@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -9,7 +12,7 @@ import { useCart } from '@/utils/cartStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type PaymentState = 'idle' | 'loading' | 'success' | 'failure' | 'cancelled';
@@ -23,10 +26,11 @@ function parseAmount(value: string) {
 }
 
 function formatAmount(value: number) {
-  return `₹${Math.round(value).toLocaleString('en-IN')}`;
+  return `₹${Math.round(value).toLocaleString(getAppLocale())}`;
 }
 
 export default function PaymentScreen() {
+  useAppLanguage();
   const cart = useCart();
   const user = useAuth();
   const { width } = useWindowDimensions();

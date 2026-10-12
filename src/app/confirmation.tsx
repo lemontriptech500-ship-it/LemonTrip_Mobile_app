@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -7,7 +10,7 @@ import { useAccountBookings } from '@/utils/accountBookings';
 import { useBookings } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 function getServiceIcon(serviceName: string): keyof typeof Ionicons.glyphMap {
@@ -22,10 +25,11 @@ function getServiceIcon(serviceName: string): keyof typeof Ionicons.glyphMap {
 function formatDate(value?: string) {
   if (!value) return 'Date to be confirmed';
   const date = new Date(`${value.slice(0, 10)}T00:00:00`);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString(getAppLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 export default function ConfirmationScreen() {
+  useAppLanguage();
   const localBookings = useBookings();
   const { bookings: accountBookings } = useAccountBookings();
   const { bookingId } = useLocalSearchParams<{ bookingId?: string }>();

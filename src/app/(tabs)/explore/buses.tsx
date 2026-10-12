@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -12,7 +15,7 @@ import { selectBus, setBusSearch, useBusBooking } from '@/utils/busBookingStore'
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 type Sort = 'earliest' | 'fastest' | 'cheapest' | 'rated';
 type Slot = 'any' | 'morning' | 'afternoon' | 'evening' | 'night';
@@ -25,6 +28,7 @@ const KINDS: { id: Kind; label: string }[] = [
 ];
 
 export default function BusesScreen() {
+  useAppLanguage();
   const { query } = useLocalSearchParams<{ query?: string }>();
   const { search } = useBusBooking();
   const [picker, setPicker] = useState<'from' | 'to' | null>(null);
@@ -91,9 +95,9 @@ export default function BusesScreen() {
                 const d = fromISO(iso); const on = iso === search.date;
                 return (
                   <TouchableOpacity key={iso} accessibilityRole="button" accessibilityState={{ selected: on }} accessibilityLabel={d.toDateString()} onPress={() => setBusSearch({ date: iso })} style={[s.date, on && s.dateOn]}>
-                    <Text style={[s.dow, on && s.dateTextOn]}>{d.toLocaleDateString('en-IN', { weekday: 'short' }).toUpperCase()}</Text>
+                    <Text style={[s.dow, on && s.dateTextOn]}>{d.toLocaleDateString(getAppLocale(), { weekday: 'short' }).toUpperCase()}</Text>
                     <Text style={[s.dayNum, on && s.dateTextOn]}>{d.getDate()}</Text>
-                    <Text style={[s.mon, on && s.dateTextOn]}>{d.toLocaleDateString('en-IN', { month: 'short' })}</Text>
+                    <Text style={[s.mon, on && s.dateTextOn]}>{d.toLocaleDateString(getAppLocale(), { month: 'short' })}</Text>
                   </TouchableOpacity>
                 );
               })}

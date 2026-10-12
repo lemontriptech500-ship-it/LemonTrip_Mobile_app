@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -9,10 +11,11 @@ type FareSummaryProps = { request: FlightSearchRequest; offer?: FlightOffer };
 
 function formatDate(value: string) {
   const parsed = new Date(`${value}T12:00:00`);
-  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString(getAppLocale(), { day: 'numeric', month: 'short' });
 }
 
 export default function FareSummary({ request, offer }: FareSummaryProps) {
+  useAppLanguage();
   const origin = offer?.departure.airportCode ?? request.origin;
   const destination = offer?.arrival.airportCode ?? request.destination;
   const route = `${origin.toUpperCase()} → ${destination.toUpperCase()}`;

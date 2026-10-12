@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -9,7 +11,7 @@ import { BANKS, COUPONS, WALLET_BALANCE, inr, validateCoupon } from '@/data/trai
 import { confirmTrainBooking, currentFare, setCoupon, useTrainBooking, type TrainPayment } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 type Method = TrainPayment['method'];
 const METHODS: { id: Method; label: string; hint: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
@@ -23,6 +25,7 @@ const formatCard = (v: string) => v.replace(/\D/g, '').slice(0, 16).replace(/(\d
 const formatExpiry = (v: string) => { const d = v.replace(/\D/g, '').slice(0, 4); return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d; };
 
 export default function TrainPaymentScreen() {
+  useAppLanguage();
   const { selection, passengers, coupon } = useTrainBooking();
   const [method, setMethod] = useState<Method>('upi');
   const [upi, setUpi] = useState('');

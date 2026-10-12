@@ -1,9 +1,12 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 import type { Hotel } from '@/types/content';
 import type { HotelSearchCriteria } from '@/utils/hotelSearchStore';
 
@@ -28,10 +31,11 @@ function parseNightlyPrice(price: string) {
 }
 
 function formatINR(amount: number) {
-  return `₹${amount.toLocaleString('en-IN')}`;
+  return `₹${amount.toLocaleString(getAppLocale())}`;
 }
 
 export default function HotelCard({ hotel, search, onPress }: HotelCardProps) {
+  useAppLanguage();
   const { width } = useWindowDimensions();
   const desktop = width >= 820;
   const nights = getNightCount(search.checkIn, search.checkOut);

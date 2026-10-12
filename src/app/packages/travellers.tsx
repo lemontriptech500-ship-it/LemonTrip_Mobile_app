@@ -1,3 +1,4 @@
+import { useAppLanguage } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -16,6 +17,7 @@ type Errors = { travellers: Record<number, { name?: string; age?: string; gender
 const GENDERS = [{ id: 'M', label: 'Male' }, { id: 'F', label: 'Female' }, { id: 'O', label: 'Other' }] as const;
 
 export default function PackageTravellersScreen() {
+  useAppLanguage();
   const { pkg, date, counts, travellers, contact } = usePackageBooking();
   const user = useAuth();
   const saved = usePersonalItems('travellers', isTraveller);

@@ -1,10 +1,12 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import type { FlightSearchRequest, SpecialFare, TripType } from './types';
 import { DateField, todayISO } from '@/components/DatePickerField';
 
@@ -57,6 +59,7 @@ function Field({ label, value, placeholder, onChangeText, keyboardType, grid = f
 }
 
 export default function FlightSearchForm({ compact = false, hideTripTypeSelector = false, searchButtonLabel = 'Search Flights', initialOrigin = '', initialTravellers = 1, loading, onSearch }: FlightSearchFormProps) {
+  useAppLanguage();
   const [showOptions, setShowOptions] = useState(!compact);
   const [tripType, setTripType] = useState<TripType>('roundTrip');
   const [origin, setOrigin] = useState(initialOrigin);

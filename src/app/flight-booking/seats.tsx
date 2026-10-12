@@ -1,6 +1,8 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { FlightJourney, FlightProgress, formatPrice } from '@/components/flights/FlightFlowUi';
 import {
   getFlightBookingDraft,
@@ -14,7 +16,7 @@ import { formatShortDate } from '@/data/trains';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -32,6 +34,7 @@ const ADDONS: { key: keyof FlightAddOns; title: string; detail: string; price: n
 ];
 
 export default function SeatsAddOnsScreen() {
+  useAppLanguage();
   const selection = getFlightSelection();
   const saved = getFlightBookingDraft();
   const count = Math.max(1, selection?.request.travellers ?? 1);

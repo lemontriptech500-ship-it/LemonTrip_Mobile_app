@@ -1,15 +1,19 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const steps = ['Search', 'Select', 'Passenger', 'Payment', 'Confirmation'];
 
 export default function HotelPassengerDetailsScreen() {
+  useAppLanguage();
   const params = useLocalSearchParams<{ hotelId?: string; hotelName?: string; roomName?: string; price?: string; checkIn?: string; checkOut?: string; guests?: string; rooms?: string }>();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');

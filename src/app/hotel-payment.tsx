@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -5,13 +8,14 @@ import { addBooking } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const paymentOptions = ['Credit / Debit Card', 'UPI', 'Wallet'];
 const steps = ['Search', 'Select', 'Passenger', 'Payment', 'Confirmation'];
 
 export default function HotelPaymentScreen() {
+  useAppLanguage();
   const params = useLocalSearchParams<{
     hotelId?: string;
     hotelName?: string;
@@ -46,7 +50,7 @@ export default function HotelPaymentScreen() {
       serviceName: 'Hotels',
       itemName: `${hotelName} · ${roomName}`,
       price: totalText,
-      bookedAt: new Date().toLocaleDateString('en-IN'),
+      bookedAt: new Date().toLocaleDateString(getAppLocale()),
       tripDate: checkIn || new Date().toISOString().slice(0, 10),
       destination: hotelName,
       status: 'confirmed',

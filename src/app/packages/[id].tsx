@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -11,13 +14,14 @@ import { PACKAGE_ROUTES } from '@/components/packages/PackageUi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, Linking, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, Linking, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getPackageGallery } from '@/data/packageImages';
 
 export default function PackageDetailScreen() {
+  useAppLanguage();
   useWishlist();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();

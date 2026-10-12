@@ -1,3 +1,4 @@
+import { getAppLocale } from '@/utils/intl';
 import { useEffect, useState } from 'react';
 import { addBooking } from '@/utils/bookingStore';
 import type { TravelPackage } from '@/types/content';
@@ -129,7 +130,7 @@ export function confirmPackageBooking(payment: PackagePayment): PackageTicket | 
   };
   addBooking({
     id: ticket.bookingId, serviceName: 'Holiday Package', itemName: `${pkg.title} · ${pkg.duration}`,
-    price: `₹${fare.total.toLocaleString('en-IN')}`, bookedAt: ticket.bookedAt, tripDate: ticket.startDate, destination: pkg.destination, status: 'confirmed',
+    price: `₹${fare.total.toLocaleString(getAppLocale())}`, bookedAt: ticket.bookedAt, tripDate: ticket.startDate, destination: pkg.destination, status: 'confirmed',
   });
   set({ ticket });
   return ticket;

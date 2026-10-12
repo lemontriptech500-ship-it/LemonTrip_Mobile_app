@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -8,7 +11,7 @@ import { Ui } from '@/constants/theme';
 import { addDaysISO, countsLabel, formatLongDate, formatShortDate, inr } from '@/data/packages';
 import { resetPackageBooking, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 /** Decorative barcode derived from the voucher number (demo only, not scannable). */
 function Barcode({ value }: { value: string }) {
@@ -17,6 +20,7 @@ function Barcode({ value }: { value: string }) {
 }
 
 export default function PackageConfirmationScreen() {
+  useAppLanguage();
   const { ticket } = usePackageBooking();
   const done = (path: string) => { resetPackageBooking(); replaceTo(path); };
 
@@ -51,9 +55,9 @@ export default function PackageConfirmationScreen() {
               <Pill label="CONFIRMED" tone="good" icon="checkmark-circle" />
             </View>
             <View style={s.dates}>
-              <View><Text style={s.dateLabel}>STARTS</Text><Text style={s.dateValue}>{formatShortDate(ticket.startDate)}</Text><Text style={s.dateSub}>{new Date(`${ticket.startDate}T00:00:00`).toLocaleDateString('en-IN', { weekday: 'long' })}</Text></View>
+              <View><Text style={s.dateLabel}>STARTS</Text><Text style={s.dateValue}>{formatShortDate(ticket.startDate)}</Text><Text style={s.dateSub}>{new Date(`${ticket.startDate}T00:00:00`).toLocaleDateString(getAppLocale(), { weekday: 'long' })}</Text></View>
               <View style={s.mid}><Ionicons name="umbrella-outline" size={18} color={Colors.primary} /><View style={s.rule} /></View>
-              <View style={{ alignItems: 'flex-end' }}><Text style={s.dateLabel}>ENDS</Text><Text style={s.dateValue}>{formatShortDate(ticket.endDate)}</Text><Text style={s.dateSub}>{new Date(`${ticket.endDate}T00:00:00`).toLocaleDateString('en-IN', { weekday: 'long' })}</Text></View>
+              <View style={{ alignItems: 'flex-end' }}><Text style={s.dateLabel}>ENDS</Text><Text style={s.dateValue}>{formatShortDate(ticket.endDate)}</Text><Text style={s.dateSub}>{new Date(`${ticket.endDate}T00:00:00`).toLocaleDateString(getAppLocale(), { weekday: 'long' })}</Text></View>
             </View>
             <Text style={s.who}>{countsLabel(ticket.counts)} · {ticket.rooms} room{ticket.rooms > 1 ? 's' : ''}</Text>
             <View style={s.perforation}><View style={[s.notch, { left: -10 }]} /><View style={s.dash} /><View style={[s.notch, { right: -10 }]} /></View>
@@ -84,7 +88,7 @@ export default function PackageConfirmationScreen() {
           <Card>
             <SectionTitle eyebrow="PAYMENT" title="Receipt" />
             <PackageFareSummary fare={ticket.fare} couponCode={ticket.couponCode} />
-            <View style={s.txn}><Text style={s.txnText}>Txn {ticket.txnId}</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text></View>
+            <View style={s.txn}><Text style={s.txnText}>Txn {ticket.txnId}</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text></View>
           </Card>
 
           <Notice icon="mail-outline" title="Voucher sent">A confirmation was sent to {ticket.contact.email}. Our team will share final hotel and pick-up details before departure. This is a demo voucher and is not valid for travel.</Notice>
