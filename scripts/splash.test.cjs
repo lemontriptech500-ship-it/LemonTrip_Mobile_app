@@ -66,6 +66,7 @@ function harness(file) {
     'expo-router': { router: { replace: route => routes.push(route) }, Stack: Object.assign('Stack', {}) },
     'expo-splash-screen': { hide: () => hidden++, preventAutoHideAsync: () => Promise.resolve() },
     'expo-font': { useFonts: () => fontResult },
+    '@expo/vector-icons': { Ionicons: { font: { ionicons: 'ionicons.ttf' } } },
     '@/utils/preferencesStore': { usePreferences: () => {} },
     '@/constants/colors': { Brand: { forest: '#0F3D2E', lemon: '#FFD000' } },
     '@/components/TripWordmark': { TripWordmark: 'TripWordmark' },
