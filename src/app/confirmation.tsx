@@ -44,7 +44,7 @@ export default function ConfirmationScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
         <View style={styles.content}>
-          <ScreenHeader title="Journey details" subtitle="Everything you need for your next escape." eyebrow="YOUR LEMONTRIP JOURNEY" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')}  />
+          <ScreenHeader title="Journey details" subtitle="Everything you need for your next escape." eyebrow="YOUR LEMONTRIP JOURNEY" onBack={() => router.canGoBack() ? router.back() : router.replace('/home')}  />
           <View style={styles.successHero}>
             <View style={styles.successIcon}><Ionicons name="checkmark" size={34} color={Colors.primaryDark} /></View>
             <Text style={styles.successTitle}>{booking.status === 'confirmed' ? 'Your trip is confirmed' : 'Your trip record'}</Text>

@@ -23,7 +23,7 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
   return <SafeAreaView edges={['top']} style={styles.safe}><StatusBar style="light" /><BrandGradientBar>
     <View testID="explore-shared-header" style={[styles.content, wide && styles.wide]}>
       <View style={styles.mainRow}>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => navigate('/(tabs)')} style={styles.brand}><LemonTripBrand size={50} /></TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="LemonTrip home" onPress={() => navigate('/home')} style={styles.brand}><LemonTripBrand size={50} /></TouchableOpacity>
         {wide ? <View style={styles.nav}>{links}</View> : <View style={styles.spacer} />}
         <View style={styles.actions}><TouchableOpacity accessibilityRole="button" accessibilityLabel="Saved places" onPress={() => navigate('/(tabs)/wishlist')} style={styles.action}><Ionicons name="heart-outline" size={21} color={Colors.white} /></TouchableOpacity>{user ? <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open profile" onPress={() => navigate('/(tabs)/profile')} style={styles.avatar}><Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text></TouchableOpacity> : <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log in" onPress={() => navigate('/login')} style={styles.login}><Ionicons name="person-outline" size={16} color={Colors.primaryDark} /><Text style={styles.loginText}>Login</Text></TouchableOpacity>}</View>
       </View>

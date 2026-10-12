@@ -25,7 +25,7 @@ export default function BlogScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
         <View style={styles.content}>
-          <ScreenHeader title="Travel stories" subtitle="Ideas, guides, and places worth taking the long way to." eyebrow="THE LEMONTRIP JOURNAL" onBack={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)'))} />
+          <ScreenHeader title="Travel stories" subtitle="Ideas, guides, and places worth taking the long way to." eyebrow="THE LEMONTRIP JOURNAL" onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))} />
 
           {featured ? <TouchableOpacity accessibilityRole="button" onPress={() => router.push(`/blog/${featured.id}`)} style={styles.hero} activeOpacity={0.94}>
             <ImageBackground source={{ uri: featured.image }} style={styles.heroImage} imageStyle={styles.heroImageStyle}>

@@ -1,6 +1,7 @@
 import { TextSize, FontFamily } from '@/constants/typography';
 
 import { Brand, Colors } from '@/constants/colors';
+import { translate, useAppLanguage } from '@/utils/intl';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, type ColorValue } from 'react-native';
@@ -24,10 +25,12 @@ const icon = (active: IconName, inactive: IconName) => {
 };
 
 export default function TabsLayout() {
+  useAppLanguage();
   const insets = useSafeAreaInsets();
 
   return (
     <Tabs
+      initialRouteName="home"
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
@@ -52,9 +55,9 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
+          title: translate('Home'),
           tabBarIcon: icon('home', 'home-outline'),
         }}
       />
@@ -62,7 +65,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: translate('Explore'),
           tabBarIcon: icon('compass', 'compass-outline'),
         }}
       />
@@ -70,7 +73,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="bookings"
         options={{
-          title: 'My Trips',
+          title: translate('My Trips'),
           tabBarIcon: icon('briefcase', 'briefcase-outline'),
         }}
       />
@@ -78,7 +81,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="wallet"
         options={{
-          title: 'Wallet',
+          title: translate('Wallet'),
           tabBarIcon: icon('wallet', 'wallet-outline'),
         }}
       />
@@ -86,7 +89,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: translate('Profile'),
           tabBarIcon: icon('person', 'person-outline'),
         }}
       />

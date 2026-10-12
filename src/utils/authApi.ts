@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js';
+import { getDeviceRegion } from '@/utils/intl';
 
 export type AuthPlatform = 'app' | 'website';
 export type AuthUser = {
@@ -25,7 +26,7 @@ const authEndpoint = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:400
 export const currentAuthPlatform: AuthPlatform = Platform.OS === 'web' ? 'website' : 'app';
 
 export function normalizePhoneInput(value: string) {
-  const parsed = parsePhoneNumberFromString(value.trim(), 'IN');
+  const parsed = parsePhoneNumberFromString(value.trim(), getDeviceRegion() as CountryCode);
   return parsed?.isValid() ? parsed.number : null;
 }
 

@@ -1,4 +1,4 @@
-﻿import { Text, TextInput } from '@/components/ui/Text';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Brand, Colors, Radius } from '@/constants/colors';
 import { FontFamily, TextSize } from '@/constants/typography';
 import type { ChatMessage } from '@/utils/chatApi';
@@ -68,7 +68,7 @@ export default function AiPlannerScreen() {
 
   const goBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace('/(tabs)' as never);
+    else router.replace('/home' as never);
   };
 
   const scrollToEnd = () => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
@@ -82,6 +82,7 @@ export default function AiPlannerScreen() {
       .filter((m) => m.id !== 'welcome' && m.text.trim())
       .map((m) => ({ role: m.role, content: m.text }));
 
+    // eslint-disable-next-line react-hooks/purity -- Timestamp is created only by the send event, never during render.
     const stamp = Date.now();
     const replyId = `a-${stamp}`;
     setMessages((prev) => [

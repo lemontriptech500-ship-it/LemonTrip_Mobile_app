@@ -1,3 +1,5 @@
+import { formatLocalizedCurrency, formatLocalizedDate } from '@/utils/intl';
+
 /**
  * Dummy rail catalogue for the LemonTrip mobile app.
  * Everything here is local sample data: no network, no real inventory.
@@ -167,7 +169,7 @@ export function generateTrains(fromCode: string, toCode: string): Train[] {
   });
 }
 
-export const inr = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+export const inr = (n: number) => formatLocalizedCurrency(Math.round(n), 'INR');
 
 const pad = (n: number) => String(n).padStart(2, '0');
 export const toISO = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -175,8 +177,8 @@ export const fromISO = (iso: string) => new Date(`${iso}T00:00:00`);
 export const addDaysISO = (iso: string, days: number) => { const d = fromISO(iso); d.setDate(d.getDate() + days); return toISO(d); };
 export const upcomingDates = (count = 14) => { const out: string[] = []; const base = new Date(); base.setHours(0, 0, 0, 0); for (let i = 0; i < count; i += 1) { const d = new Date(base); d.setDate(base.getDate() + i); out.push(toISO(d)); } return out; };
 export const defaultTravelDate = () => upcomingDates(2)[1];
-export const formatLongDate = (iso: string) => fromISO(iso).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-export const formatShortDate = (iso: string) => fromISO(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+export const formatLongDate = (iso: string) => formatLocalizedDate(iso, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+export const formatShortDate = (iso: string) => formatLocalizedDate(iso, { day: 'numeric', month: 'short' });
 export const isRealDate = (iso: string) => /^\d{4}-\d{2}-\d{2}$/.test(iso) && !Number.isNaN(fromISO(iso).getTime());
 
 const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));

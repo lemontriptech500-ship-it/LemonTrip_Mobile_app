@@ -60,7 +60,7 @@ export default function ManageScreen() {
 
   const searches = section === 'recent-searches' ? recentStore : searchStore;
   const visibleServices = travelServices.filter((service) => `${service.title} ${service.description}`.toLowerCase().includes(query.toLowerCase()));
-  const optionList = section === 'language' ? ['English'] : ['INR', 'USD', 'EUR', 'GBP'];
+  const optionList = section === 'language' ? ['English', 'Hindi'] : ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'IDR', 'JPY', 'MYR', 'NZD', 'SAR', 'SGD', 'THB', 'TRY', 'ZAR'];
   const selectedOption = section === 'language' ? language : currency;
 
   let content: ReactNode;
@@ -188,7 +188,7 @@ export default function ManageScreen() {
             );
           })}
         </SupportCard>
-        <SupportNotice icon="information-circle-outline">{section === 'language' ? 'English is currently available throughout the app. More translations are coming.' : 'Prices remain in the currency supplied by the provider. Currency conversion is not applied.'}</SupportNotice>
+        <SupportNotice icon="information-circle-outline">{section === 'language' ? 'English and Hindi are available for translated app copy. Some provider content may remain in its original language.' : 'Converted amounts use Frankfurter daily reference rates and are estimates only. The provider currency remains the amount used for checkout.'}</SupportNotice>
       </>
     );
   } else if (section === 'edit-profile' || section === 'account-setup') {

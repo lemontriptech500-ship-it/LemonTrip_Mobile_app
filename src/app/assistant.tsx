@@ -1,4 +1,5 @@
 import { SupportButton, SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage } from '@/components/support/SupportKit';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { getAccessToken, useAuth } from '@/utils/authStore';

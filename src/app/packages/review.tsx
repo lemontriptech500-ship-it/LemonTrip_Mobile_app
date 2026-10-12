@@ -28,7 +28,7 @@ export default function PackageReviewScreen() {
   ];
 
   return (
-    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
+    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
           <ScreenHeader title="Review your booking" subtitle="Check every detail before you pay." eyebrow="LEMONTRIP / HOLIDAYS" onBack={() => goBackOr(PACKAGE_ROUTES.travellers)} />
@@ -61,7 +61,7 @@ export default function PackageReviewScreen() {
           <Card>
             <SectionTitle eyebrow="CONTACT" title="Voucher delivery" right={<TouchableOpacity accessibilityRole="button" onPress={() => goBackOr(PACKAGE_ROUTES.travellers)}><Text style={s.edit}>Edit</Text></TouchableOpacity>} />
             <Line icon="mail-outline" label="Email" value={contact.email} />
-            <Line icon="call-outline" label="Mobile" value={`+91 ${contact.phone}`} />
+            <Line icon="call-outline" label="Mobile" value={contact.phone} />
             {contact.passport ? <Line icon="document-text-outline" label="Passport" value={contact.passport.toUpperCase()} /> : null}
             {contact.requests.trim() ? <View style={s.req}><Pill icon="chatbubble-ellipses-outline" label="Special request" /><Text style={s.reqText}>{contact.requests.trim()}</Text></View> : null}
           </Card>

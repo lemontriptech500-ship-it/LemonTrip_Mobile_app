@@ -47,7 +47,7 @@ export default function TrainDetailsScreen() {
 
   return (
     <FlowScreen footer={
-      <FooterBar caption={`${selected.code} · per passenger`} amount={inr(fare.perPassenger)} action={<PrimaryButton label="Continue" icon="arrow-forward" disabled={!runsOnDate} onPress={() => goTo(TRAIN_ROUTES.passengers)} />} />
+      <FooterBar caption={`${selected.code} · per passenger`} amount={inr(fare.perPassenger)} estimateAmount={fare.perPassenger} action={<PrimaryButton label="Continue" icon="arrow-forward" disabled={!runsOnDate} onPress={() => goTo(TRAIN_ROUTES.passengers)} />} />
     }>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>

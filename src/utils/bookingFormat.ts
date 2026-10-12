@@ -1,4 +1,5 @@
 import { Brand } from '@/constants/colors';
+import { formatLocalizedDate } from '@/utils/intl';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -30,7 +31,7 @@ export const serviceIcon = (serviceName?: string): IconName => {
 export const formatDate = (value?: string) => {
   if (!value) return '';
   try {
-    return new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    return formatLocalizedDate(value, { day: '2-digit', month: 'short', year: 'numeric' });
   } catch {
     return value;
   }

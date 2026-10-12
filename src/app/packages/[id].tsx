@@ -15,6 +15,7 @@ import { Alert, Image, Linking, ScrollView, StyleSheet, TouchableOpacity, View, 
 import { StatusBar } from 'expo-status-bar';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getPackageGallery } from '@/data/packageImages';
 
 export default function PackageDetailScreen() {
   useWishlist();
@@ -52,11 +53,16 @@ export default function PackageDetailScreen() {
     return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Package not found.</Text><TouchableOpacity onPress={() => router.replace('/packages')} style={styles.backToPackages}><Text style={styles.backToPackagesText}>Browse journeys</Text></TouchableOpacity></View></SafeAreaView>;
   }
 
-  const gallery = pkg.gallery?.length ? pkg.gallery : [pkg.image];
+  const gallery = getPackageGallery(pkg.id, pkg.title, pkg.destination, pkg.image, pkg.gallery);
   const galleryImageWidth = gallery.length === 1 ? Math.min(width, 1160) : 265;
   const included = pkg.inclusions ?? [];
   const excluded = pkg.exclusions ?? [];
   const itinerary = pkg.itinerary?.map((day) => `${day.day}: ${day.title}${day.description ? ` — ${day.description}` : ''}`) ?? [];
+  const summaryItems = [
+    { icon: 'bed-outline' as const, label: 'Accommodation', value: pkg.hotels?.[0] ?? 'Hotel, subject to availability' },
+    { icon: 'restaurant-outline' as const, label: 'Meals', value: pkg.meals?.[0] ?? 'Breakfast as specified' },
+    { icon: 'car-outline' as const, label: 'Transfers', value: pkg.transfers?.[0] ?? 'Selected transfers' },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -99,7 +105,15 @@ export default function PackageDetailScreen() {
                 {pkg.categories?.length ? <View style={styles.categoryList}>{pkg.categories.map((category) => <View key={category} style={styles.categoryTag}><Text style={styles.categoryText}>{category}</Text></View>)}</View> : null}
               </View>
 
-              <DetailSection title="Overview" icon="book-outline" defaultExpanded>
+              <View style={styles.summaryGrid}>
+                {summaryItems.map((item) => <View key={item.label} style={styles.summaryCard}>
+                  <Ionicons name={item.icon} size={16} color={Colors.primary} />
+                  <Text style={styles.summaryLabel}>{item.label}</Text>
+                  <Text style={styles.summaryValue}>{item.value}</Text>
+                </View>)}
+              </View>
+
+              <DetailSection title="About this package" icon="book-outline" defaultExpanded>
                 <Text style={styles.overview}>{pkg.description}</Text>
               </DetailSection>
               <View style={styles.journeyHeading}><Text style={styles.bookingEyebrow}>YOUR JOURNEY</Text><Text style={styles.journeyTitle}>Day-by-day itinerary</Text></View>
@@ -107,9 +121,9 @@ export default function PackageDetailScreen() {
               <DetailSection title="Hotels" icon="bed-outline" values={pkg.hotels} />
               <DetailSection title="Meals" icon="restaurant-outline" values={pkg.meals} />
               <DetailSection title="Transfers" icon="car-outline" values={pkg.transfers} />
-              <DetailSection title="Sightseeing" icon="camera-outline" values={pkg.highlights} defaultExpanded />
-              <DetailSection title="Inclusions" icon="checkmark-circle-outline" values={included} />
-              <DetailSection title="Exclusions" icon="close-circle-outline" values={excluded} />
+              <DetailSection title="Top experiences" icon="camera-outline" values={pkg.highlights} defaultExpanded />
+              <DetailSection title="Package includes" icon="checkmark-circle-outline" values={included} />
+              <DetailSection title="Package excludes" icon="close-circle-outline" values={excluded} />
               <DetailSection title="Terms" icon="document-text-outline" text={pkg.terms} />
               <DetailSection title="Cancellation" icon="calendar-clear-outline" text={pkg.cancellation} />
             </View>
@@ -180,9 +194,9 @@ function BookingPanel({ title, duration, price, onEnquire, onBook }: {
       <Text style={styles.bookingTitle}>{title}</Text>
       <View style={styles.bookingMeta}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.bookingMetaText}>{duration}</Text></View>
       <View style={styles.bookingPriceArea}><Text style={styles.bookingPriceLabel}>STARTING FROM</Text><Text style={styles.bookingPrice}>{price}</Text></View>
-      <Text style={styles.priceNote}>Per person, twin sharing. Choose dates and travellers on the next step to see your total.</Text>
+      <Text style={styles.priceNote}>Per person, twin sharing. Choose your date, travellers and room preference next. Availability and final details are confirmed separately.</Text>
       <TouchableOpacity onPress={onEnquire} style={styles.enquireButtonWide}><Ionicons name="mail-outline" size={15} color={Colors.primary} /><Text style={styles.enquireWideText}>Enquire now</Text></TouchableOpacity>
-      <TouchableOpacity onPress={onBook} style={styles.bookButtonWide}><Text style={styles.bookWideText}>Book now</Text></TouchableOpacity>
+      <TouchableOpacity onPress={onBook} style={styles.bookButtonWide}><Text style={styles.bookWideText}>Select your trip</Text></TouchableOpacity>
     </View>
   );
 }
@@ -205,6 +219,10 @@ const styles = StyleSheet.create({
   detailLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start', gap: 22 },
   mainColumn: { flex: 1, minWidth: 0 },
   titleArea: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 8 },
+  summaryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: Ui.space.page, marginBottom: 8 },
+  summaryCard: { flexGrow: 1, flexBasis: 100, padding: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
+  summaryLabel: { marginTop: 7, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, textTransform: 'uppercase' },
+  summaryValue: { marginTop: 3, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, fontWeight: FontWeight.bold },
   metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   destination: { backgroundColor: Colors.accentSoft, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 7, color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   rating: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 9, backgroundColor: Colors.primaryDark },

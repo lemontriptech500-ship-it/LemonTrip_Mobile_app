@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View, type TextInputProps } from 'react-native';
 
 export function FeatureScreen({ title, subtitle, eyebrow = 'YOUR LEMONTRIP', children }: { title: string; subtitle?: string; eyebrow?: string; children: ReactNode }) {
-  return <AppScreen><ScrollView contentContainerStyle={featureStyles.page} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}><ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)')} /><View style={featureStyles.content}>{children}</View></ScrollView></AppScreen>;
+  return <AppScreen><ScrollView contentContainerStyle={featureStyles.page} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}><ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={() => router.canGoBack() ? router.back() : router.replace('/home')} /><View style={featureStyles.content}>{children}</View></ScrollView></AppScreen>;
 }
 export function Panel({ title, children }: { title?: string; children: ReactNode }) { return <View style={featureStyles.panel}>{title ? <Text style={featureStyles.title}>{title}</Text> : null}{children}</View>; }
 export function Copy({ children }: { children: ReactNode }) { return <Text style={featureStyles.copy}>{children}</Text>; }

@@ -1,4 +1,5 @@
 import { SupportButton, SupportCard, SupportHeading, SupportNotice, SupportPage, goBackOr } from '@/components/support/SupportKit';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { getAccessToken, useAuth } from '@/utils/authStore';
