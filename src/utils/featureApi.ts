@@ -25,3 +25,19 @@ export async function validateCoupon(code: string, serviceType: string, orderAmo
   if (data.valid !== true || typeof data.code !== 'string' || !Number.isFinite(data.discountAmount)) throw new Error('This coupon could not be verified.');
   return data;
 }
+
+export type AccountProfile = { id: string; email: string | null; phone: string | null; name: string; firstName: string; lastName: string | null; emailVerified: boolean; phoneVerified: boolean; dateOfBirth: string | null; gender: string | null; nationality: string | null };
+function accountBase() { return process.env.EXPO_PUBLIC_API_URL ? `${process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')}/api` : undefined; }
+export async function loadProfile() {
+  const data = await featureRequest<{ profile: AccountProfile }>(accountBase(), '/profile');
+  if (typeof data.profile !== 'object' || data.profile === null || typeof data.profile.id !== 'string') throw new Error('Your profile could not be verified. Please try again.');
+  return data.profile;
+}
+export async function updateProfile(input: { firstName?: string; lastName?: string | null }) {
+  const data = await featureRequest<{ profile: AccountProfile }>(accountBase(), '/profile', { method: 'PATCH', body: input });
+  if (typeof data.profile !== 'object' || data.profile === null || typeof data.profile.name !== 'string') throw new Error('Your profile update could not be verified.');
+  return data.profile;
+}
+export async function changePassword(currentPassword: string | undefined, newPassword: string) {
+  return featureRequest<{ success: boolean; otherSessionsLoggedOut?: number }>(accountBase(), '/profile/password', { method: 'POST', body: { ...(currentPassword ? { currentPassword } : {}), newPassword } });
+}

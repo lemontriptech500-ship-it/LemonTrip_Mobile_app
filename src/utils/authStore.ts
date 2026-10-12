@@ -79,3 +79,8 @@ export function useAuth() {
 
   return currentUser;
 }
+export function patchUser(patch: Partial<User>) {
+  if (!currentUser) return;
+  currentUser = { ...currentUser, ...patch };
+  notify();
+}
