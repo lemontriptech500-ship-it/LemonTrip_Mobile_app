@@ -33,7 +33,7 @@ const slides = [
     description: 'Make every trip memorable with experiences worth travelling for.',
   },
   {
-    image: require('../../assets/images/onboarding4.png'),
+    image: require('../../assets/images/onboarding4.jpg'),
     title: 'Your Journey',
     accent: 'Our Priority',
     description: 'Flights, hotels, buses, trains and more — all in one place.',
