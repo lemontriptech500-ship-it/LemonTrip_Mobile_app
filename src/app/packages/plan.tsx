@@ -5,13 +5,14 @@ import { PACKAGE_ROUTES, PackageFareSummary, PackageProgress, PackageSummary, St
 import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { MAX_GUESTS, departureDates, formatLongDate, inr, minRooms, seatsLeft, totalTravellers } from '@/data/packages';
+import { formatLocalizedDate } from '@/utils/intl';
 import { currentPackageFare, setCounts, setDepartureDate, setRooms, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-const MONTH = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { month: 'short' });
-const DAY = (iso: string) => new Date(`${iso}T00:00:00`).getDate();
-const WEEKDAY = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString('en-IN', { weekday: 'short' });
+const MONTH = (iso: string) => formatLocalizedDate(iso, { month: 'short' });
+const DAY = (iso: string) => formatLocalizedDate(iso, { day: 'numeric' });
+const WEEKDAY = (iso: string) => formatLocalizedDate(iso, { weekday: 'short' });
 
 export default function PackagePlanScreen() {
   const { pkg, date, counts, rooms } = usePackageBooking();
@@ -31,7 +32,7 @@ export default function PackagePlanScreen() {
   const dates = departureDates();
 
   return (
-    <FlowScreen footer={<FooterBar caption={`Total · ${totalTravellers(counts)} traveller${totalTravellers(counts) > 1 ? 's' : ''}`} amount={inr(fare.total)} action={<PrimaryButton label="Add traveller details" icon="arrow-forward" onPress={() => goTo(PACKAGE_ROUTES.travellers)} />} />}>
+    <FlowScreen footer={<FooterBar caption={`Total · ${totalTravellers(counts)} traveller${totalTravellers(counts) > 1 ? 's' : ''}`} amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Add traveller details" icon="arrow-forward" onPress={() => goTo(PACKAGE_ROUTES.travellers)} />} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
           <ScreenHeader title="Plan your trip" subtitle="Pick a departure and who is travelling." eyebrow="LEMONTRIP / HOLIDAYS" onBack={back} />

@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ImageBackground, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { getPackageGallery } from '@/data/packageImages';
 
 export default function PackagesListScreen() {
   const { width } = useWindowDimensions();
@@ -89,9 +90,10 @@ export default function PackagesListScreen() {
 }
 
 function PackageCard({ item, desktop, onPress }: { item: TravelPackage; desktop: boolean; onPress: () => void }) {
+  const cover = getPackageGallery(item.id, item.title, item.destination, item.image, item.gallery)[0];
   return (
     <TouchableOpacity accessibilityRole="button" activeOpacity={0.9} onPress={onPress} style={[styles.packageCard, desktop && styles.packageCardDesktop]}>
-      <ImageBackground source={{ uri: item.image }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
+      <ImageBackground source={{ uri: cover }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
         <View style={styles.imageTop}>{item.badge ? <Text style={styles.packageBadge}>{item.badge}</Text> : null}{item.rating ? <View style={styles.rating}><Ionicons name="star" size={11} color={Colors.accent} /><Text style={styles.ratingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}</View>
         <View style={styles.imageArrow}><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View>
       </ImageBackground>

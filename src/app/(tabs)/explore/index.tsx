@@ -8,6 +8,7 @@ import type { Destination, TravelPackage } from '@/types/content';
 import { useAuth } from '@/utils/authStore';
 import { useContentItems } from '@/utils/contentApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
+import { getPackageGallery } from '@/data/packageImages';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -299,7 +300,7 @@ export default function ExploreScreen() {
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.packageRow}>
                 {filteredPackages.map((item) => (
                   <TouchableOpacity key={item.id} style={styles.packageCard} activeOpacity={0.9} onPress={() => router.push(`/packages/${item.id}`)}>
-                    <ImageBackground source={{ uri: item.image }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
+                    <ImageBackground source={{ uri: getPackageGallery(item.id, item.title, item.destination, item.image, item.gallery)[0] }} style={styles.packageImage} imageStyle={styles.packageImageStyle}>
                       {item.badge ? <Text style={styles.packageBadge}>{item.badge}</Text> : <View />}
                       {item.rating ? <View style={styles.packageRating}><Ionicons name="star" size={13} color={Colors.accent} /><Text style={styles.packageRatingText}>{item.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}
                     </ImageBackground>

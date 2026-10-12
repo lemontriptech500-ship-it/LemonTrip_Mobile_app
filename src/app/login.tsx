@@ -39,7 +39,7 @@ export default function LoginScreen() {
     const authMode = identifier.includes('@') ? 'email' : 'phone';
     const phoneNumber = authMode === 'phone' ? normalizePhoneInput(identifier) : null;
     if (authMode === 'phone' && !phoneNumber) {
-      setIdentifierError('Enter a valid number. India (+91) is used when no country code is entered.');
+      setIdentifierError('Enter a valid number. Include your country code if needed.');
       return;
     }
 
@@ -67,7 +67,7 @@ export default function LoginScreen() {
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace('/(tabs)');
+    else router.replace('/home');
   };
 
   // Open the sign-up screen. Never leave the user stranded on login if the push is rejected.

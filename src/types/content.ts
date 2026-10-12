@@ -33,6 +33,9 @@ export interface TravelPackage {
   categories?: PackageCategory[];
   gallery?: string[];
   itinerary?: { day: string; title: string; description: string }[];
+  location?: string;
+  bestFor?: string;
+  availableDates?: string[];
   hotels?: string[];
   meals?: string[];
   transfers?: string[];

@@ -162,7 +162,7 @@ export default function FlightConfirmationScreen() {
           </View>
 
           <View style={s.cta}>
-            <PrimaryButton label="Back to home" icon="home-outline" onPress={() => done('/(tabs)')} />
+            <PrimaryButton label="Back to home" icon="home-outline" onPress={() => done('/home')} />
             <View style={{ height: 10 }} />
             <PrimaryButton variant="soft" label="Book another flight" icon="airplane-outline" onPress={() => done('/(tabs)/explore/flights')} />
           </View>

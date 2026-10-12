@@ -7,6 +7,7 @@ import { Colors } from '@/constants/colors';
 import { AGE_RANGE, inr, travellerType } from '@/data/packages';
 import { useAuth } from '@/utils/authStore';
 import { currentPackageFare, setContact, updateTraveller, usePackageBooking } from '@/utils/packageBookingStore';
+import { normalizePhoneInput } from '@/utils/authApi';
 import { isTraveller, usePersonalItems } from '@/utils/personalStore';
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
@@ -23,7 +24,7 @@ export default function PackageTravellersScreen() {
   // Prefill contact once from the signed-in account.
   useEffect(() => {
     if (!contact.email && user?.email) setContact({ email: user.email });
-    if (!contact.phone && user?.phone) setContact({ phone: String(user.phone).replace(/^\+?91/, '').replace(/\D/g, '').slice(-10) });
+    if (!contact.phone && user?.phone) setContact({ phone: String(user.phone) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.email, user?.phone]);
 
@@ -45,16 +46,16 @@ export default function PackageTravellersScreen() {
       if (Object.keys(e).length) next.travellers[i] = e;
     });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email.trim())) next.email = 'Enter a valid email address.';
-    if (!/^[6-9]\d{9}$/.test(contact.phone.replace(/\D/g, ''))) next.phone = 'Enter a valid 10-digit mobile number.';
+    if (!normalizePhoneInput(contact.phone)) next.phone = 'Enter a valid phone number with country code.';
     if (pkg.international && !/^[A-Za-z0-9]{6,9}$/.test(contact.passport.trim())) next.passport = 'Enter the lead traveller’s passport number.';
     setErrors(next);
     return !Object.keys(next.travellers).length && !next.email && !next.phone && !next.passport;
   };
-  const proceed = () => { if (validate()) goTo(PACKAGE_ROUTES.review); };
+  const proceed = () => { if (validate()) { setContact({ phone: normalizePhoneInput(contact.phone) ?? contact.phone }); goTo(PACKAGE_ROUTES.review); } };
   const fillSaved = (index: number, first: string, last: string) => updateTraveller(index, { name: `${first} ${last}`.trim() });
 
   return (
-    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} action={<PrimaryButton label="Review booking" icon="arrow-forward" onPress={proceed} />} />}>
+    <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Review booking" icon="arrow-forward" onPress={proceed} />} />}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
@@ -89,9 +90,9 @@ export default function PackageTravellersScreen() {
             <Card>
               <SectionTitle eyebrow="CONTACT" title="Where should we send your voucher?" />
               <Field label="EMAIL" icon="mail-outline" keyboardType="email-address" autoCapitalize="none" autoCorrect={false} value={contact.email} onChangeText={(v) => setContact({ email: v })} placeholder="name@example.com" error={errors.email} />
-              <Field label="MOBILE NUMBER" icon="call-outline" keyboardType="phone-pad" maxLength={10} value={contact.phone} onChangeText={(v) => setContact({ phone: v.replace(/\D/g, '') })} placeholder="10-digit number" error={errors.phone} />
+              <Field label="MOBILE NUMBER" icon="call-outline" keyboardType="phone-pad" maxLength={20} value={contact.phone} onChangeText={(v) => setContact({ phone: v })} placeholder="Include country code, e.g. +1" error={errors.phone} />
               {pkg.international ? <Field label="PASSPORT NUMBER (LEAD TRAVELLER)" icon="document-text-outline" autoCapitalize="characters" autoCorrect={false} maxLength={9} value={contact.passport} onChangeText={(v) => setContact({ passport: v.toUpperCase() })} placeholder="e.g. N1234567" error={errors.passport} /> : null}
-              <Text style={s.hint}>Voucher and trip alerts are sent here. Country code +91 is assumed.</Text>
+              <Text style={s.hint}>Enter a number for your region; include its country code if needed.</Text>
             </Card>
 
             <Card>

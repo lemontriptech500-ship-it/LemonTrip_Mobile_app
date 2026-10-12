@@ -8,7 +8,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { getGoogleIdToken, signOutGoogleUser } from '@/utils/googleNativeAuth';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions, type TextInput as NativeTextInput } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -132,7 +132,7 @@ export function AuthField({ label, value, placeholder, onChangeText, error, hint
 
 /** Six boxes backed by one hidden numeric input, so SMS autofill and paste keep working. */
 export function OtpCodeField({ value, onChangeText, error }: { value: string; onChangeText: (value: string) => void; error?: string }) {
-  const ref = useRef<TextInput>(null);
+  const ref = useRef<NativeTextInput>(null);
   return (
     <View style={styles.fieldGroup}>
       <Text style={styles.fieldLabel}>VERIFICATION CODE</Text>
