@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+import { translateCopy } from '@/i18n/translate';
 
 export type AppLanguage = 'English' | 'Hindi';
 export type CurrencyCode = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD' | 'CAD' | 'CHF' | 'CNY' | 'HKD' | 'IDR' | 'JPY' | 'MYR' | 'NZD' | 'SAR' | 'SGD' | 'THB' | 'TRY' | 'ZAR';
@@ -9,31 +10,28 @@ let currentCurrency: CurrencyCode = 'INR';
 const preferenceListeners = new Set<() => void>();
 
 export function setIntlPreferences(language: string, currency: string) {
-  currentLanguage = language === 'Hindi' ? 'Hindi' : 'English';
-  currentCurrency = isCurrencyCode(currency) ? currency : 'INR';
+  const nextLanguage = language === 'Hindi' ? 'Hindi' : 'English';
+  const nextCurrency = isCurrencyCode(currency) ? currency : 'INR';
+  if (currentLanguage === nextLanguage && currentCurrency === nextCurrency) return;
+  currentLanguage = nextLanguage;
+  currentCurrency = nextCurrency;
   preferenceListeners.forEach((listener) => listener());
 }
 
+function subscribe(listener: () => void) {
+  preferenceListeners.add(listener);
+  return () => { preferenceListeners.delete(listener); };
+}
+
 export function getSelectedCurrency() { return currentCurrency; }
+export function getAppLanguage() { return currentLanguage; }
 
 export function useSelectedCurrency() {
-  const [currency, setCurrency] = useState(currentCurrency);
-  useEffect(() => {
-    const listener = () => setCurrency(currentCurrency);
-    preferenceListeners.add(listener);
-    listener();
-    return () => { preferenceListeners.delete(listener); };
-  }, []);
-  return currency;
+  return useSyncExternalStore(subscribe, getSelectedCurrency, () => 'INR' as CurrencyCode);
 }
 
 export function useAppLanguage() {
-  const [, setVersion] = useState(0);
-  useEffect(() => {
-    const listener = () => setVersion((value) => value + 1);
-    preferenceListeners.add(listener);
-    return () => { preferenceListeners.delete(listener); };
-  }, []);
+  return useSyncExternalStore(subscribe, getAppLanguage, () => 'English' as AppLanguage);
 }
 
 export function isCurrencyCode(value: string): value is CurrencyCode {
@@ -49,21 +47,8 @@ export function getDeviceRegion() {
   return /[-_]([A-Z]{2})(?:[-_]|$)/.exec(locale)?.[1] ?? 'IN';
 }
 
-const hindi: Record<string, string> = {
-  Home: 'होम', Explore: 'खोजें', 'My Trips': 'मेरी यात्राएँ', Wallet: 'वॉलेट', Profile: 'प्रोफ़ाइल',
-  Flights: 'उड़ानें', Hotels: 'होटल', Trains: 'ट्रेन', Buses: 'बसें', Holidays: 'छुट्टियाँ', Visa: 'वीज़ा',
-  'Display language': 'ऐप की भाषा', 'Preferred currency': 'पसंदीदा मुद्रा', Personalise: 'अपनी पसंद चुनें',
-  English: 'अंग्रेज़ी', Hindi: 'हिन्दी', 'Your account': 'आपका खाता', 'Saved travellers': 'सहेजे गए यात्री',
-  'Saved searches': 'सहेजी गई खोजें', 'Recent searches': 'हाल की खोजें', Notifications: 'सूचनाएँ',
-  'Notification settings': 'सूचना सेटिंग', Security: 'सुरक्षा', 'Edit profile': 'प्रोफ़ाइल संपादित करें',
-  'Personal information': 'व्यक्तिगत जानकारी', 'About LemonTrip': 'LemonTrip के बारे में',
-  'Choose your updates': 'अपनी सूचनाएँ चुनें', 'Booking updates': 'बुकिंग अपडेट', 'Offers and inspiration': 'ऑफ़र और सुझाव',
-  'Email updates': 'ईमेल अपडेट', 'Your trips': 'आपकी यात्राएँ', Search: 'खोजें', Cancel: 'रद्द करें', Save: 'सहेजें',
-  'Indicative rate': 'संकेतात्मक दर',
-};
-
 export function translate(value: string): string {
-  return currentLanguage === 'Hindi' ? (hindi[value] ?? value) : value;
+  return translateCopy(value, currentLanguage);
 }
 
 function validLocale() {

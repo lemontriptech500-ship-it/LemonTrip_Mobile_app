@@ -1,3 +1,4 @@
+import { useAppLanguage } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
@@ -8,6 +9,7 @@ import { router, type Href } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 export default function AccountRecoveryScreen() {
+  useAppLanguage();
   return (
     <SupportPage title="Let’s get you back in." subtitle="Choose a way to access your LemonTrip account." eyebrow="ACCOUNT RECOVERY" onBack={() => router.replace('/login')}>
       <View style={s.hero}>

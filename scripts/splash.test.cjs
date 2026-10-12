@@ -52,7 +52,7 @@ function harness(file) {
     react,
     'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     'react-native': {
-      Animated, View: 'View', Platform: { select: choices => choices.ios },
+      Animated, View: 'View', Image: 'Image', Platform: { select: choices => choices.ios },
       Easing: { linear: () => {}, cubic: () => {}, in: x => x },
       StyleSheet: { create: x => x, absoluteFill: {} },
       useWindowDimensions: () => dimensions,
@@ -66,10 +66,13 @@ function harness(file) {
     'expo-router': { router: { replace: route => routes.push(route) }, Stack: Object.assign('Stack', {}) },
     'expo-splash-screen': { hide: () => hidden++, preventAutoHideAsync: () => Promise.resolve() },
     'expo-font': { useFonts: () => fontResult },
+    'expo-image': { Image: 'Image' },
     '@expo/vector-icons': { Ionicons: { font: { ionicons: 'ionicons.ttf' } } },
     '@/utils/preferencesStore': { usePreferences: () => {} },
+    '@/utils/intl': { useAppLanguage: () => 'English' },
     '@/constants/colors': { Brand: { forest: '#0F3D2E', lemon: '#FFD000' } },
     '@/components/TripWordmark': { TripWordmark: 'TripWordmark' },
+    '@/components/ui/Text': { Text: 'Text' },
   };
   const source = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
   const code = ts.transpileModule(source, { compilerOptions: {
@@ -79,7 +82,7 @@ function harness(file) {
   vm.runInNewContext(code, {
     exports: exported,
     require: name => {
-      if (name.endsWith('.ttf')) return name;
+      if (/\.(ttf|png|jpg|avif)$/.test(name)) return name;
       assert.ok(name in modules, `Unexpected dependency: ${name}`);
       return modules[name];
     },

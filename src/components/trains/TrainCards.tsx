@@ -1,10 +1,11 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { formatDuration, formatShortDate, getClassOptions, inr, lowestFare, type FareBreakdown, type Quota, type TrainResult } from '@/data/trains';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Pill, Row } from './TrainUi';
 
 const TYPE_TONE = { Rajdhani: 'brand', Shatabdi: 'brand', Superfast: 'neutral', Express: 'neutral' } as const;

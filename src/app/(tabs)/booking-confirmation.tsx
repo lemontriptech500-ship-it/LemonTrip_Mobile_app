@@ -1,8 +1,11 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { Pressable } from '@/components/ui/Pressable';
 import { TextSize, FontWeight } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, View, Pressable, StyleSheet, StatusBar } from 'react-native';
+import { SafeAreaView, ScrollView, View, StyleSheet, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 const GREEN = "#075638";
@@ -26,6 +29,7 @@ const Detail = ({
   );
 
 export default function BookingConfirmationScreen() {
+  useAppLanguage();
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -120,7 +124,7 @@ export default function BookingConfirmationScreen() {
               </Text>
             </View>
             <Text style={styles.totalAmount}>
-              ₹{Math.max(0, price).toLocaleString("en-IN")}
+              ₹{Math.max(0, price).toLocaleString(getAppLocale())}
             </Text>
           </View>
         </View>

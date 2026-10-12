@@ -1,19 +1,25 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Text } from '@/components/ui/Text';
 import { Brand } from '@/constants/colors';
 import { TripWordmark } from '@/components/TripWordmark';
 import { router } from 'expo-router';
+import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { Animated, AppState, Dimensions, Easing, Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const WRITE_DURATION = 1350;
+const WRITE_DELAY = 400;
 const REVEAL_DURATION = 2450;
 const EXIT_DURATION = 520;
 const MAX_SPLASH_DURATION = 4000;
 
 export default function LaunchScreen() {
+  useAppLanguage();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const [lemonEntrance] = useState(() => new Animated.Value(0));
   const [writeProgress] = useState(() => new Animated.Value(0));
   const [taglineOpacity] = useState(() => new Animated.Value(0));
   const [transitionScale] = useState(() => new Animated.Value(1));
@@ -24,6 +30,7 @@ export default function LaunchScreen() {
     let active = true;
     let completed = false;
     const startedAt = Date.now();
+    lemonEntrance.setValue(0);
     writeProgress.setValue(0);
     taglineOpacity.setValue(0);
     transitionScale.setValue(1);
@@ -40,8 +47,13 @@ export default function LaunchScreen() {
     spinner.start();
 
     const entrance = Animated.parallel([
+      Animated.timing(lemonEntrance, {
+        toValue: 1,
+        duration: WRITE_DELAY,
+        useNativeDriver: true,
+      }),
       Animated.sequence([
-        Animated.delay(100),
+        Animated.delay(WRITE_DELAY),
         Animated.timing(writeProgress, {
           toValue: 1,
           duration: WRITE_DURATION,
@@ -50,7 +62,7 @@ export default function LaunchScreen() {
         }),
       ]),
       Animated.sequence([
-        Animated.delay(100 + WRITE_DURATION),
+        Animated.delay(WRITE_DELAY + WRITE_DURATION),
         Animated.timing(taglineOpacity, { toValue: 1, duration: 380, useNativeDriver: true }),
       ]),
     ]);
@@ -103,20 +115,49 @@ export default function LaunchScreen() {
       entrance.stop();
       transition?.stop();
     };
-  }, [writeProgress, spin, taglineOpacity, transitionOpacity, transitionScale]);
+  }, [lemonEntrance, writeProgress, spin, taglineOpacity, transitionOpacity, transitionScale]);
 
   const spinRotation = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const wordmarkWidth = Math.min(width * 0.48, 200);
+  const lemonSize = wordmarkWidth * 0.75;
+  // Frame the fruit within the original 1024px image, excluding the corner mark.
+  const lemonImageScale = lemonSize / 680;
 
   return (
     <View style={styles.container} onLayout={() => SplashScreen.hide()}>
       <View style={styles.centerContent}>
-        <Animated.View style={{ opacity: transitionOpacity, transform: [{ scale: transitionScale }] }}>
-          <TripWordmark progress={writeProgress} width={Math.min(width * 0.48, 200)} />
+        <Animated.View style={[styles.brandRow, { opacity: transitionOpacity, transform: [{ scale: transitionScale }] }]}>
+          <Animated.View style={{
+            opacity: lemonEntrance,
+            width: lemonSize,
+            height: lemonImageScale * 800,
+            overflow: 'hidden',
+            marginBottom: wordmarkWidth * 0.12,
+            transform: [
+              { translateY: lemonEntrance.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) },
+              { scale: lemonEntrance.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] }) },
+              { rotate: lemonEntrance.interpolate({ inputRange: [0, 1], outputRange: ['-25deg', '0deg'] }) },
+            ],
+          }}>
+            <Image
+              source={require('../../assets/images/lemonImage.avif')}
+              style={{
+                position: 'absolute',
+                width: lemonImageScale * 1024,
+                height: lemonImageScale * 1024,
+                left: -lemonImageScale * 140,
+                top: -lemonImageScale * 110,
+              }}
+              contentFit="contain"
+              accessibilityLabel="Lemon"
+            />
+          </Animated.View>
+          <TripWordmark progress={writeProgress} width={wordmarkWidth} />
         </Animated.View>
       </View>
       <Animated.View style={[styles.loadingRow, { bottom: insets.bottom + 32, opacity: taglineOpacity }]}>
         <Animated.View style={[styles.spinner, { transform: [{ rotate: spinRotation }] }]} />
-        <Animated.Text style={styles.tagline}>Travel smarter. Travel better.</Animated.Text>
+        <Text style={styles.tagline}>Travel smarter. Travel better.</Text>
       </Animated.View>
     </View>
   );
@@ -125,6 +166,7 @@ export default function LaunchScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
   centerContent: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
   loadingRow: { position: 'absolute', left: 20, right: 20, alignItems: 'center', gap: 20 },
   spinner: { width: 32, height: 32, borderWidth: 3, borderColor: 'rgba(255,208,0,0.16)', borderTopColor: Brand.lemon, borderLeftColor: Brand.lemon, borderRightColor: Brand.lemon, borderRadius: 16 },
   tagline: { color: '#FFFFFF', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'system-ui' }), fontSize: 14, fontWeight: '400', lineHeight: 20, letterSpacing: 0, textAlign: 'center', includeFontPadding: false },

@@ -1,3 +1,4 @@
+import { useAppLanguage } from '@/utils/intl';
 import { useClientReady } from '@/utils/useClientReady';
 import { Action, Copy, Empty, FeatureScreen, Panel, Row } from '@/components/FeatureScreen';
 import { destinationIdeas } from '@/data/mock/destinations';
@@ -7,6 +8,7 @@ import { useContentItems } from '@/utils/contentApi';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Image } from 'react-native';
 export default function DestinationScreen() {
+  useAppLanguage();
   const { id } = useLocalSearchParams<{ id: string }>(); const hydrated = useClientReady(); const { items, loading } = useContentItems<Destination>('destination'); const { items: packages } = useContentItems<TravelPackage>('package');
   const destination = hydrated ? items.find(item => item.id === id) : undefined;
   const matching = destination ? packages.filter(item => `${item.destination ?? ''} ${item.title}`.toLowerCase().includes(destination.name.toLowerCase())) : [];

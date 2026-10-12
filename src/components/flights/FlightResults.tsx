@@ -1,3 +1,4 @@
+import { useAppLanguage } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { EmptyState, PrimaryButton } from '@/components/trains/TrainUi';
@@ -13,6 +14,7 @@ import { emptyFlightFilters, type FlightFiltersState, type FlightOffer, type Fli
 type FlightResultsProps = { offers: FlightOffer[]; loading: boolean; onSelect: (offer: FlightOffer) => void; dateLabel?: string };
 
 export default function FlightResults({ offers, loading, onSelect, dateLabel }: FlightResultsProps) {
+  useAppLanguage();
   const [filters, setFilters] = useState<FlightFiltersState>(emptyFlightFilters);
   const [sort, setSort] = useState<FlightSortOption>('recommended');
 

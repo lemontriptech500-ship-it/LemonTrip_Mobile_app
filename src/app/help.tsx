@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { SupportCard, SupportHeading, SupportItem, SupportPage, goTo } from '@/components/support/SupportKit';
@@ -5,7 +7,7 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { supportContact } from '@/constants/navigation';
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -16,6 +18,7 @@ const QUICK: { icon: IconName; label: string; route: string }[] = [
 ];
 
 export default function HelpScreen() {
+  useAppLanguage();
   const openExternal = (url: string) => { Linking.openURL(url).catch(() => undefined); };
 
   return (

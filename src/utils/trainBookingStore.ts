@@ -1,3 +1,4 @@
+import { getAppLocale } from '@/utils/intl';
 import { useEffect, useState } from 'react';
 import { addBooking } from '@/utils/bookingStore';
 import {
@@ -136,7 +137,7 @@ export function confirmTrainBooking(payment: TrainPayment): TrainTicket | null {
   };
   addBooking({
     id: ticket.bookingId, serviceName: 'Trains', itemName: `${ticket.trainName} (${ticket.trainNumber}) · ${ticket.fromCode} → ${ticket.toCode}`,
-    price: `₹${fare.total.toLocaleString('en-IN')}`, bookedAt: ticket.bookedAt, tripDate: ticket.date, destination: ticket.toName, status: 'confirmed',
+    price: `₹${fare.total.toLocaleString(getAppLocale())}`, bookedAt: ticket.bookedAt, tripDate: ticket.date, destination: ticket.toName, status: 'confirmed',
   });
   set({ ticket });
   return ticket;

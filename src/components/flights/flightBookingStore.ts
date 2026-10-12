@@ -1,4 +1,5 @@
-﻿import { getFlightSelection } from '@/components/flights/flightSelectionStore';
+import { getAppLocale } from '@/utils/intl';
+import { getFlightSelection } from '@/components/flights/flightSelectionStore';
 import { addBooking } from '@/utils/bookingStore';
 
 export type Gender = 'Male' | 'Female' | 'Other' | '';
@@ -91,9 +92,9 @@ const rand = (len: number, chars = '0123456789') =>
 
 function money(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
   } catch {
-    return `${currency} ${amount.toLocaleString('en-IN')}`;
+    return `${currency} ${amount.toLocaleString(getAppLocale())}`;
   }
 }
 

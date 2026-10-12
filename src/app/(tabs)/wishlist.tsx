@@ -1,13 +1,16 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Brand, Radius } from '@/constants/colors';
 import { useAuth } from '@/utils/authStore';
 import { toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { router } from 'expo-router';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function WishlistScreen() {
+  useAppLanguage();
   const wishlist = useWishlist();
   const user = useAuth();
   const { width } = useWindowDimensions();

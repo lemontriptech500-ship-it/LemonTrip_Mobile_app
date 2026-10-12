@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -5,7 +7,7 @@ import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { PriceDisplay } from '@/components/PriceDisplay';
 import { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import type { FlightFareOption } from './types';
 
 type FlightFareOptionsProps = {
@@ -29,6 +31,7 @@ function Detail({ label, value }: { label: string; value?: string | boolean }) {
 }
 
 export default function FlightFareOptions({ options, selectedId, onSelect, onFareConditions }: FlightFareOptionsProps) {
+  useAppLanguage();
   const { width } = useWindowDimensions();
   const mobile = width < 720;
   const threeColumns = width >= 1100;

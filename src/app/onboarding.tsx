@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Pressable } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Brand } from '@/constants/colors';
@@ -8,7 +10,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type AppRoute = Parameters<typeof router.replace>[0];
@@ -46,6 +48,7 @@ async function leave(path: AppRoute) {
 }
 
 export default function OnboardingScreen() {
+  useAppLanguage();
   const { width } = useWindowDimensions();
   const [activeSlide, setActiveSlide] = useState(0);
   const carouselRef = useRef<ScrollView>(null);

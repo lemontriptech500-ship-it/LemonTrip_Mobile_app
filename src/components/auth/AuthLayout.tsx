@@ -1,3 +1,4 @@
+import { Pressable, TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -8,7 +9,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { getGoogleIdToken, signOutGoogleUser } from '@/utils/googleNativeAuth';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions, type TextInput as NativeTextInput } from 'react-native';
+import { ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions, type TextInput as NativeTextInput } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 WebBrowser.maybeCompleteAuthSession();

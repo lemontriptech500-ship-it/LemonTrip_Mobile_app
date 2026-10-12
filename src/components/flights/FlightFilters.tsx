@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Card, Chip } from '@/components/trains/TrainUi';
@@ -5,7 +8,7 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { emptyFlightFilters, type FlightFiltersState, type FlightOffer } from './types';
 
 type FlightFiltersProps = { offers: FlightOffer[]; value: FlightFiltersState; onChange: (filters: FlightFiltersState) => void };
@@ -36,6 +39,7 @@ function ChipRow({ label, children }: { label: string; children: React.ReactNode
 
 /** Chip-based filters (same chips as the train time-slot filter), with the rarer ones tucked under "More filters". */
 export default function FlightFilters({ offers, value, onChange }: FlightFiltersProps) {
+  useAppLanguage();
   const [more, setMore] = useState(false);
   const airlines = useMemo(() => [...new Set(offers.map((o) => o.airline.name))], [offers]);
   const maxPrice = Math.max(0, ...offers.map((o) => o.price.amount));
@@ -72,7 +76,7 @@ export default function FlightFilters({ offers, value, onChange }: FlightFilters
           <ChipRow label="PRICE">
             {[null, 0.5, 0.75].map((f) => {
               const ceiling = f === null ? null : Math.round(maxPrice * f);
-              return <Chip key={f ?? 'any'} label={ceiling === null ? 'Any price' : `Up to ₹${ceiling.toLocaleString('en-IN')}`} selected={value.maxPrice === ceiling} onPress={() => onChange({ ...value, maxPrice: ceiling })} />;
+              return <Chip key={f ?? 'any'} label={ceiling === null ? 'Any price' : `Up to ₹${ceiling.toLocaleString(getAppLocale())}`} selected={value.maxPrice === ceiling} onPress={() => onChange({ ...value, maxPrice: ceiling })} />;
             })}
           </ChipRow>
           {hasBaggage ? (

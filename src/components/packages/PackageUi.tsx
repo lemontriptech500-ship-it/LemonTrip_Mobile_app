@@ -1,3 +1,4 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Pill, Row } from '@/components/trains/TrainUi';
@@ -7,7 +8,7 @@ import { countsLabel, formatShortDate, inr, type PackageFare } from '@/data/pack
 import type { PackageSnapshot } from '@/utils/packageBookingStore';
 import type { Counts } from '@/data/packages';
 import { Ionicons } from '@expo/vector-icons';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 export const PACKAGE_ROUTES = {
   list: '/packages',
