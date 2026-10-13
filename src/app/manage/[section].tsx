@@ -7,12 +7,13 @@ import { travelServices } from '@/constants/navigation';
 import { Ui } from '@/constants/theme';
 import { useAccountBookings } from '@/utils/accountBookings';
 import { useAuth } from '@/utils/authStore';
-import { featureRequest } from '@/utils/featureApi';
+import { loadProfile, updateProfile } from '@/utils/featureApi';
+import { patchUser } from '@/utils/authStore';
 import { isSearch, isTraveller, usePersonalItems, type SavedTraveller } from '@/utils/personalStore';
 import { usePreferences } from '@/utils/preferencesStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
-import { useState, type ComponentProps, type ReactNode } from 'react';
+import { useEffect, useState, type ComponentProps, type ReactNode } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -40,7 +41,7 @@ export default function ManageScreen() {
   const [editing, setEditing] = useState<string | null>(null);
   const [note, setNote] = useState<Note>(null);
   const [query, setQuery] = useState('');
-  const [profile, setProfile] = useState({ name: user?.name ?? '', email: user?.email ?? '', phone: user?.phone ?? '' });
+  const [pf, setPf] = useState({ first: '', last: '' });
   const preferences = usePreferences();
   const { language, currency } = preferences.value;
   const updates = { bookings: preferences.value.bookings, offers: preferences.value.offers, emails: preferences.value.emails };
@@ -52,16 +53,24 @@ export default function ManageScreen() {
     if (await travellerStore.save(next)) { setFirstName(''); setLastName(''); setEditing(null); setNote({ text: 'Traveller saved on this device.', tone: 'good' }); }
   };
 
+  useEffect(() => {
+    if (section !== 'edit-profile' && section !== 'account-setup') return;
+    if (!user) return;
+    let active = true;
+    void loadProfile().then((data) => { if (active) setPf({ first: data.firstName, last: data.lastName ?? '' }); }).catch((cause) => { if (active) setNote({ text: cause instanceof Error ? cause.message : 'Profile unavailable.', tone: 'error' }); });
+    return () => { active = false; };
+  }, [section, user?.id]);
+
   const saveProfile = async () => {
-    if (!profile.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email)) { setNote({ text: 'Enter your name and a valid email.', tone: 'error' }); return; }
+    if (!pf.first.trim()) { setNote({ text: 'Enter your first name.', tone: 'error' }); return; }
     try {
-      await featureRequest(process.env.EXPO_PUBLIC_ACCOUNT_API_URL, '/profile', { method: 'PATCH', body: profile });
-      setNote({ text: 'Your profile update was received.', tone: 'good' });
+      const saved = await updateProfile({ firstName: pf.first.trim(), lastName: pf.last.trim() || null });
+      patchUser({ name: saved.name });
+      setNote({ text: 'Your profile has been updated.', tone: 'good' });
     } catch (cause) {
       setNote({ text: cause instanceof Error ? cause.message : 'Profile updates are unavailable.', tone: 'error' });
     }
   };
-
   const searches = section === 'recent-searches' ? recentStore : searchStore;
   const visibleServices = travelServices.filter((service) => `${service.title} ${service.description} ${translate(service.title)} ${translate(service.description)}`.toLowerCase().includes(query.toLowerCase()));
   const optionList = section === 'language' ? ['English', 'Hindi'] : ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'IDR', 'JPY', 'MYR', 'NZD', 'SAR', 'SGD', 'THB', 'TRY', 'ZAR'];
@@ -200,18 +209,22 @@ export default function ManageScreen() {
       <>
         <SupportCard>
           <SupportHeading eyebrow="YOUR PROFILE" title="Your details" />
-          {(['name', 'email', 'phone'] as const).map((key) => (
-            <SupportField key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={profile[key]} onChangeText={(value) => setProfile((current) => ({ ...current, [key]: value }))} keyboardType={key === 'email' ? 'email-address' : key === 'phone' ? 'phone-pad' : 'default'} autoCapitalize={key === 'email' ? 'none' : 'words'} autoCorrect={false} />
-          ))}
-          <SupportButton label="Save profile" icon="checkmark" disabled={!user || !process.env.EXPO_PUBLIC_ACCOUNT_API_URL} onPress={() => void saveProfile()} />
+          <SupportField label="First name" value={pf.first} onChangeText={(value) => setPf((current) => ({ ...current, first: value }))} autoCapitalize="words" autoCorrect={false} />
+          <SupportField label="Last name" value={pf.last} onChangeText={(value) => setPf((current) => ({ ...current, last: value }))} autoCapitalize="words" autoCorrect={false} />
+          <SupportButton label="Save profile" icon="checkmark" disabled={!user} onPress={() => void saveProfile()} />
         </SupportCard>
-        <SupportNotice icon="shield-checkmark-outline">{!user ? 'Sign in to manage your account.' : !process.env.EXPO_PUBLIC_ACCOUNT_API_URL ? 'Profile updates are unavailable right now. Contact support to update your details.' : 'Your verified contact details are used for booking updates.'}</SupportNotice>
         <SupportCard>
+          <SupportHeading eyebrow="CONTACT DETAILS" title="Email and phone" />
+          <InfoRow icon="mail-outline" label="EMAIL" value={user?.email ?? 'Not added'} />
+          <InfoRow icon="call-outline" label="PHONE" value={user?.phone ?? 'Not added'} last />
+        </SupportCard>
+        <SupportNotice icon="shield-checkmark-outline">{!user ? 'Sign in to manage your account.' : 'Email and phone are used for booking updates. To change them, contact support so we can verify the change.'}</SupportNotice>
+        <SupportCard>
+          <SupportItem icon="key-outline" title="Change password" detail="Update your sign-in password" onPress={() => goTo('/change-password')} />
           <SupportItem icon="headset-outline" title="Account support" detail="Need help changing your details?" onPress={() => goTo('/contact')} last />
         </SupportCard>
       </>
-    );
-  } else if (section === 'personal-information') {
+    );  } else if (section === 'personal-information') {
     content = (
       <SupportCard>
         <SupportHeading eyebrow="YOUR PROFILE" title="Your account" />

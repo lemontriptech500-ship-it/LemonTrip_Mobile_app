@@ -93,7 +93,7 @@ export default function SettingsScreen() {
 
             <View style={styles.column}>
               <SettingsSection eyebrow="PROTECT" title="Security & privacy" icon="shield-checkmark-outline" artwork="security">
-                <SettingRow icon="key-outline" artwork="password" title="Change password" detail="Help accessing your account" onPress={() => go('/forgot-password')} />
+                <SettingRow icon="key-outline" artwork="password" title="Change password" detail="Update or recover your password" onPress={() => go(user ? '/change-password' : '/forgot-password')} />
                 <SettingRow icon="phone-portrait-outline" artwork="device" title="Account security" detail="Verification and account access" onPress={() => go('/manage/security')} />
                 <SettingRow icon="eye-outline" artwork="privacy" title="Privacy policy" onPress={() => go('/privacy')} />
                 <SettingRow icon="document-text-outline" artwork="document" title="Terms of service" onPress={() => go('/terms')} last />
