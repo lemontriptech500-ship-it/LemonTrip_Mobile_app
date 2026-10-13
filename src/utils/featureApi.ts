@@ -41,3 +41,10 @@ export async function updateProfile(input: { firstName?: string; lastName?: stri
 export async function changePassword(currentPassword: string | undefined, newPassword: string) {
   return featureRequest<{ success: boolean; otherSessionsLoggedOut?: number }>(accountBase(), '/profile/password', { method: 'POST', body: { ...(currentPassword ? { currentPassword } : {}), newPassword } });
 }
+export type TopupOrder = { orderId: string; amount: number; currency: string; keyId: string; topupId: string; topupReference: string };
+export async function createTopupOrder(amountRupees: number) {
+  const base = process.env.EXPO_PUBLIC_WALLET_API_URL;
+  const data = await featureRequest<TopupOrder>(base, '/wallet/topups', { method: 'POST', body: { amount: amountRupees } });
+  if (typeof data.orderId !== 'string' || !Number.isFinite(data.amount) || typeof data.keyId !== 'string') throw new Error('The top-up order could not be verified. Please try again.');
+  return data;
+}
