@@ -1,8 +1,9 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export function VisaHeader({ title, onBack, action }: { title: string; onBack: () => void; action?: { label: string; onPress: () => void } }) {
   return <View style={styles.header}>

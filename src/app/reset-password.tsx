@@ -1,10 +1,12 @@
-﻿import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
+import { useAppLanguage } from '@/utils/intl';
+import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Field, Notice, PrimaryButton } from '@/components/trains/TrainUi';
 import { confirmPasswordReset } from '@/utils/accountApi';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState } from 'react';
 
 export default function ResetPasswordScreen() {
+  useAppLanguage();
   const params = useLocalSearchParams<{ token?: string | string[] }>();
   const linkToken = Array.isArray(params.token) ? params.token[0] : params.token;
 

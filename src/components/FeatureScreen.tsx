@@ -1,3 +1,4 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
@@ -7,7 +8,7 @@ import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View, type TextInputProps } from 'react-native';
+import { ScrollView, StyleSheet, View, type TextInputProps } from 'react-native';
 
 export function FeatureScreen({ title, subtitle, eyebrow = 'YOUR LEMONTRIP', children }: { title: string; subtitle?: string; eyebrow?: string; children: ReactNode }) {
   return <AppScreen><ScrollView contentContainerStyle={featureStyles.page} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}><ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={() => router.canGoBack() ? router.back() : router.replace('/home')} /><View style={featureStyles.content}>{children}</View></ScrollView></AppScreen>;

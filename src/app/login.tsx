@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -7,9 +10,10 @@ import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 export default function LoginScreen() {
+  useAppLanguage();
   const { mode: initialMode } = useLocalSearchParams<{ mode?: string }>();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');

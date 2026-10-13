@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { formatINR, getNightCount, parseNightlyPrice } from '@/components/hotels/HotelCard';
@@ -7,12 +9,13 @@ import { getHotelSearch, getSelectedHotel } from '@/utils/hotelSearchStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const steps = ['Search', 'Select', 'Passenger', 'Payment', 'Confirmation'];
 
 export default function HotelRoomSelectionScreen() {
+  useAppLanguage();
   const hotel = getSelectedHotel() ?? mockHotels[0] ?? null;
   const search = getHotelSearch();
   const [selectedRoomId, setSelectedRoomId] = useState(hotel?.roomOptions?.[0]?.id ?? '');

@@ -1,2 +1,4 @@
+import { useAppLanguage } from '@/utils/intl';
 import { Redirect } from 'expo-router';
-export default function PlannerRedirect() { return <Redirect href="/assistant" />; }
+export default function PlannerRedirect() {
+  useAppLanguage(); return <Redirect href="/assistant" />; }

@@ -1,4 +1,5 @@
-﻿import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
+import { useAppLanguage } from '@/utils/intl';
+import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Field, Notice, PrimaryButton } from '@/components/trains/TrainUi';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -13,6 +14,7 @@ import { StyleSheet, View } from 'react-native';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function AccountRecoveryScreen() {
+  useAppLanguage();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

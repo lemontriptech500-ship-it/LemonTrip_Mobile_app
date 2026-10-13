@@ -1,3 +1,4 @@
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -5,7 +6,7 @@ import { BrandMotif } from '@/components/BrandMotif';
 import { Colors } from '@/constants/colors';
 import { LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 type ScreenHeaderProps = {
   title: string;

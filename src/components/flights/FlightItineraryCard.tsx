@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
@@ -11,7 +13,7 @@ type FlightItineraryCardProps = { offer: FlightOffer };
 function formatTime(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return parsed.toLocaleTimeString(getAppLocale(), { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 function formatDuration(minutes: number) {
@@ -21,6 +23,7 @@ function formatDuration(minutes: number) {
 }
 
 export default function FlightItineraryCard({ offer }: FlightItineraryCardProps) {
+  useAppLanguage();
   return (
     <View style={styles.card}>
       <View style={styles.heading}>

@@ -1,6 +1,9 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-﻿import { ScreenHeader } from '@/components/ScreenHeader';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, EmptyState, FlowScreen, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -9,7 +12,7 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 // Same as CANCELLATION_FEE_PERCENT in booking/cancel.tsx
 const CANCELLATION_FEE_PERCENT = 10;
@@ -38,13 +41,14 @@ function parseAmount(price: string) {
 
 function money(value: number) {
   try {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(value));
+    return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(value));
   } catch {
     return 'Rs ' + Math.round(value);
   }
 }
 
 export default function TransactionsScreen() {
+  useAppLanguage();
   const bookings = useBookings();
   const [filter, setFilter] = useState<Filter>('all');
 

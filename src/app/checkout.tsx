@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { isTraveller, usePersonalItems } from '@/utils/personalStore';
@@ -13,9 +15,10 @@ import { getCheckoutDetails, setCheckoutDetails, type Traveller } from '@/utils/
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function CheckoutScreen() {
+  useAppLanguage();
   const user = useAuth();
   const savedTravellers = usePersonalItems('travellers', isTraveller);
   const cart = useCart();

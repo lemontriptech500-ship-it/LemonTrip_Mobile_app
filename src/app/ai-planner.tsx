@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Brand, Colors, Radius } from '@/constants/colors';
 import { FontFamily, TextSize } from '@/constants/typography';
@@ -6,7 +8,7 @@ import { streamChatMessage } from '@/utils/chatStream';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Message = { id: string; role: 'user' | 'assistant'; text: string };
@@ -56,6 +58,7 @@ function RichText({ text, style, boldStyle }: { text: string; style: object; bol
 }
 
 export default function AiPlannerScreen() {
+  useAppLanguage();
   const [messages, setMessages] = useState<Message[]>([WELCOME]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

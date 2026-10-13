@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Copy, FeatureScreen, Field } from '@/components/FeatureScreen';
@@ -6,8 +8,9 @@ import type { Destination } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 export default function DestinationsScreen() {
+  useAppLanguage();
   const { items, loading } = useContentItems<Destination>('destination'); const [query, setQuery] = useState('');
   const destinations = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
   return <FeatureScreen title="Somewhere wonderful." subtitle="Find the place that feels like your next adventure." eyebrow="DESTINATIONS"><Field label="Find a destination" value={query} onChangeText={setQuery} placeholder="Mountains, islands, your favourite city…" />{!items.length ? <Copy>{loading ? 'Loading destinations…' : 'Published destinations will appear here when they are available.'}</Copy> : null}{destinations.map(item => <TouchableOpacity key={item.id} accessibilityRole="button" onPress={() => router.push({ pathname: '/destinations/[id]', params: { id: item.id } })}><ImageBackground source={{ uri: item.image }} style={styles.hero} imageStyle={{ borderRadius: 24 }}><View style={styles.shade} /><Text style={styles.name}>{item.name}</Text><Text style={styles.caption}>{item.priceFrom}</Text></ImageBackground></TouchableOpacity>)}{items.length > 0 && !destinations.length ? <Copy>No destinations match. Try another name.</Copy> : null}</FeatureScreen>;

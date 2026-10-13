@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
@@ -12,7 +14,7 @@ import { getPackageGallery } from '@/data/packageImages';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -56,6 +58,7 @@ type FilterKey = keyof typeof filterOptions;
 const defaultFilters: Record<FilterKey, string> = { duration: 'Any', budget: 'Any', destination: 'Any', category: 'Any' };
 
 export default function ExploreScreen() {
+  useAppLanguage();
   useWishlist();
   const user = useAuth();
   const { width } = useWindowDimensions();

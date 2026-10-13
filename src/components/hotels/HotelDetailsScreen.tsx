@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
@@ -10,10 +13,11 @@ import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { formatINR, getNightCount, parseNightlyPrice } from './HotelCard';
 
 export default function HotelDetailsScreen() {
+  useAppLanguage();
   useWishlist();
   const hotel = getSelectedHotel() ?? mockHotels[0] ?? null;
   const search = getHotelSearch();

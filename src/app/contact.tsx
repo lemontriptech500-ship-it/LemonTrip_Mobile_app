@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { SupportButton, SupportCard, SupportChip, SupportField, SupportHeading, SupportNotice, SupportPage } from '@/components/support/SupportKit';
@@ -9,12 +11,13 @@ import { submitSupportRequest, supportTopics, type SupportTopic } from '@/utils/
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 
 const MESSAGE_MIN = 10;
 const MESSAGE_MAX = 5000;
 
 export default function ContactScreen() {
+  useAppLanguage();
   const { reference, topic: initialTopic } = useLocalSearchParams<{ reference?: string; topic?: string }>();
   const user = useAuth();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: user?.email ?? '', subject: reference ? `Help with ${reference}` : '', message: '' });

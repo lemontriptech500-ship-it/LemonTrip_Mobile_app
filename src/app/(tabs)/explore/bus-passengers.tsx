@@ -1,3 +1,4 @@
+import { useAppLanguage } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -15,6 +16,7 @@ type Errors = { passengers: Record<number, { name?: string; age?: string; gender
 const GENDERS = [{ id: 'M', label: 'Male' }, { id: 'F', label: 'Female' }, { id: 'O', label: 'Other' }] as const;
 
 export default function BusPassengersScreen() {
+  useAppLanguage();
   const { selection, passengers, contact, options } = useBusBooking();
   const user = useAuth();
   const saved = usePersonalItems('travellers', isTraveller);

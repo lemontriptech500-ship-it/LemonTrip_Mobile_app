@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -11,12 +13,13 @@ import { isTraveller, usePersonalItems } from '@/utils/personalStore';
 import { MAX_PASSENGERS, addPassenger, currentFare, removePassenger, setContact, setOptions, updatePassenger, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, View } from 'react-native';
 
 type Errors = { passengers: Record<number, { name?: string; age?: string; gender?: string }>; email?: string; phone?: string };
 const GENDERS = [{ id: 'M', label: 'Male' }, { id: 'F', label: 'Female' }, { id: 'O', label: 'Other' }] as const;
 
 export default function TrainPassengersScreen() {
+  useAppLanguage();
   const { selection, passengers, contact, options } = useTrainBooking();
   const user = useAuth();
   const saved = usePersonalItems('travellers', isTraveller);

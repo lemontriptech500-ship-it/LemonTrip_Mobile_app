@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
@@ -14,7 +17,7 @@ import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 const filterOptions = [
   { id: 'rating-5-star', label: '5 Star', matches: (hotel: Hotel) => hotel.rating === '5 Star' },
@@ -45,6 +48,7 @@ function toDate(value: string) {
 }
 
 export default function HotelsScreen() {
+  useAppLanguage();
   const { query } = useLocalSearchParams<{ query?: string }>();
   const initial = parseSavedQuery(query);
   const { width } = useWindowDimensions();

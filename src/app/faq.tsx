@@ -1,9 +1,12 @@
+import { translate, useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
+import { Text } from '@/components/ui/Text';
 import { SupportButton, SupportCard, SupportField, SupportHeading, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState, type ComponentProps } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -18,13 +21,14 @@ const answers: { title: string; icon: IconName; answer: string }[] = [
 ];
 
 export default function FaqScreen() {
+  const language = useAppLanguage();
   const [open, setOpen] = useState('');
   const [search, setSearch] = useState('');
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return query ? answers.filter((item) => `${item.title} ${item.answer}`.toLowerCase().includes(query)) : answers;
-  }, [search]);
+    return query ? answers.filter((item) => `${item.title} ${item.answer} ${translate(item.title)} ${translate(item.answer)}`.toLowerCase().includes(query)) : answers;
+  }, [search, language]);
 
   const back = () => (router.canGoBack() ? router.back() : router.replace('/help' as never));
 

@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -8,13 +10,14 @@ import { MAX_GUESTS, departureDates, formatLongDate, inr, minRooms, seatsLeft, t
 import { formatLocalizedDate } from '@/utils/intl';
 import { currentPackageFare, setCounts, setDepartureDate, setRooms, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 
 const MONTH = (iso: string) => formatLocalizedDate(iso, { month: 'short' });
 const DAY = (iso: string) => formatLocalizedDate(iso, { day: 'numeric' });
 const WEEKDAY = (iso: string) => formatLocalizedDate(iso, { weekday: 'short' });
 
 export default function PackagePlanScreen() {
+  useAppLanguage();
   const { pkg, date, counts, rooms } = usePackageBooking();
   const derived = currentPackageFare();
 

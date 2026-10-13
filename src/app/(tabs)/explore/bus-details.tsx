@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -9,9 +12,10 @@ import { MAX_SEATS, currentFare, selectBus, setBoarding, setDropping, toggleSeat
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 export default function BusDetailsScreen() {
+  useAppLanguage();
   const { id, deck: deckParam } = useLocalSearchParams<{ id?: string; deck?: string }>();
   const booking = useBusBooking();
   const sel = booking.selection;
@@ -108,7 +112,7 @@ export default function BusDetailsScreen() {
           </Card>
 
           <Card>
-            <SectionTitle eyebrow="ON BOARD" title="Amenities" right={<Pill icon="star" label={`${bus.rating.toFixed(1)} · ${bus.reviews.toLocaleString('en-IN')} reviews`} />} />
+            <SectionTitle eyebrow="ON BOARD" title="Amenities" right={<Pill icon="star" label={`${bus.rating.toFixed(1)} · ${bus.reviews.toLocaleString(getAppLocale())} reviews`} />} />
             <View style={s.amenities}>{bus.amenities.map((a) => <Pill key={a} icon="checkmark-circle-outline" label={a} tone="good" />)}</View>
           </Card>
 

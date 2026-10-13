@@ -1,7 +1,9 @@
+import { useAppLanguage } from '@/utils/intl';
 import { PolicyScreen } from '@/components/PolicyScreen';
 
 // Policy text mirrors the website's published local source.
 export default function TermsScreen() {
+  useAppLanguage();
   return <PolicyScreen title="Terms of Service" introduction="By using LemonTrip, you agree to use our website and travel services lawfully and to provide accurate information for bookings and support requests." sections={[
   {
     "title": "Bookings and payments",

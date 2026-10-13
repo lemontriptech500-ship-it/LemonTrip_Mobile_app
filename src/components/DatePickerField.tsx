@@ -1,10 +1,12 @@
-﻿import { Text } from '@/components/ui/Text';
+import { getAppLocale, formatLocalizedDate, useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
+import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { FontFamily, FontWeight, TextSize } from '@/constants/typography';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 export const toISO = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
@@ -13,8 +15,7 @@ export const todayISO = () => {
   return toISO(now.getFullYear(), now.getMonth(), now.getDate());
 };
 
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+const weekdays = () => Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat(getAppLocale(), { weekday: 'short' }).format(new Date(2026, 0, 4 + index)));
 
 const parse = (iso: string) => {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
@@ -23,7 +24,7 @@ const parse = (iso: string) => {
 
 export const formatDisplay = (iso: string) => {
   const p = parse(iso);
-  return p ? `${p.d} ${MONTHS[p.m].slice(0, 3)} ${p.y}` : '';
+  return p ? formatLocalizedDate(iso) : '';
 };
 
 type DateFieldProps = {
@@ -39,6 +40,7 @@ type DateFieldProps = {
 
 /** A date field that opens a calendar. Value is always YYYY-MM-DD. */
 export function DateField({ label, value, onChange, minDate, maxDate, placeholder = 'Select date', grid = false, compact = false }: DateFieldProps) {
+  useAppLanguage();
   const min = minDate || todayISO();
   const [open, setOpen] = useState(false);
   const [view, setView] = useState({ y: 2026, m: 0 });
@@ -91,14 +93,14 @@ export function DateField({ label, value, onChange, minDate, maxDate, placeholde
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Previous month" disabled={prevDisabled} onPress={() => shift(-1)} style={[s.nav, prevDisabled && s.navDisabled]}>
                 <Ionicons name="chevron-back" size={18} color={Colors.primaryDark} />
               </TouchableOpacity>
-              <Text style={s.title}>{MONTHS[view.m]} {view.y}</Text>
+              <Text style={s.title}>{new Intl.DateTimeFormat(getAppLocale(), { month: 'long' }).format(new Date(view.y, view.m, 1))} {view.y}</Text>
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Next month" disabled={nextDisabled} onPress={() => shift(1)} style={[s.nav, nextDisabled && s.navDisabled]}>
                 <Ionicons name="chevron-forward" size={18} color={Colors.primaryDark} />
               </TouchableOpacity>
             </View>
 
             <View style={s.weekRow}>
-              {WEEKDAYS.map((day, index) => (
+              {weekdays().map((day, index) => (
                 <View key={`${day}-${index}`} style={s.cell}><Text style={s.weekday}>{day}</Text></View>
               ))}
             </View>

@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -13,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Image, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Image, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 const categories = ['Flights', 'Hotels', 'Buses', 'Packages', 'Visa'] as const;
 
@@ -40,7 +43,7 @@ function formatValidity(validUntil: string | undefined) {
 
   if (Number.isNaN(date.getTime())) return null;
 
-  return date.toLocaleDateString('en-IN', {
+  return date.toLocaleDateString(getAppLocale(), {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -60,6 +63,7 @@ function getBookRoute(category: string) {
 }
 
 export default function OffersScreen() {
+  useAppLanguage();
   const { width } = useWindowDimensions();
 
   // Figma desktop layout = 3 cards

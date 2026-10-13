@@ -1,7 +1,9 @@
+import { useAppLanguage } from '@/utils/intl';
 import { PolicyScreen } from '@/components/PolicyScreen';
 
 // Policy text mirrors the website's published local source.
 export default function PrivacyScreen() {
+  useAppLanguage();
   return <PolicyScreen title="Privacy Policy" introduction="LemonTrip respects your privacy and uses your information only to provide travel services, process bookings, respond to support requests, and improve our website." sections={[
   {
     "title": "Information we collect",

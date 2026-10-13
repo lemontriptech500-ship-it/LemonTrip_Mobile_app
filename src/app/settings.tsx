@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { Alert } from '@/components/ui/Alert';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { usePreferences } from '@/utils/preferencesStore';
@@ -10,7 +13,7 @@ import { logout, useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { type ReactNode } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, Switch, View, useWindowDimensions } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -23,6 +26,7 @@ const QUICK_LINKS: { icon: IconName; label: string; route: string }[] = [
 ];
 
 export default function SettingsScreen() {
+  useAppLanguage();
   const user = useAuth();
   const { width } = useWindowDimensions();
   const desktop = width >= 900;

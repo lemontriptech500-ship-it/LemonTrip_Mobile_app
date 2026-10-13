@@ -1,10 +1,12 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { PriceDisplay } from '@/components/PriceDisplay';
 import { Pill } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { formatPrice, formatTime } from './flightFormat';
 import { AirlineBadge, FlightRouteLine, TimeBlock } from './FlightParts';
 import type { FlightOffer } from './types';
@@ -19,6 +21,7 @@ type FlightCardProps = {
 
 /** Result card — mirrors TrainCard: header, timeline, fare tiles, footer. */
 export default function FlightCard({ offer, onSelect, best = false, dateLabel }: FlightCardProps) {
+  useAppLanguage();
   const fares = offer.fareOptions?.length ? offer.fareOptions : null;
   const refundNote = offer.refundable === true ? 'Refundable' : offer.refundable === false ? 'Non-refundable' : null;
   const open = () => onSelect(offer);

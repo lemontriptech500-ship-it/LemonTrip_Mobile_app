@@ -1,3 +1,5 @@
+import { useAppLanguage } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -6,7 +8,7 @@ import { Colors } from '@/constants/colors';
 import { formatShortDate } from '@/data/trains';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { FlightJourney, FlightProgress } from './FlightFlowUi';
 import { airportLabel, getAirport } from './airports';
 import { formatDuration, formatPrice } from './flightFormat';
@@ -17,6 +19,7 @@ const clean = (name: string) => name.replace(/\s*·\s*sample/i, '');
 const BOOKING_ROUTE = '/flight-booking/traveller';
 
 export default function FlightDetailsScreen() {
+  useAppLanguage();
   const selection = getFlightSelection();
   const fares = selection?.offer.fareOptions ?? [];
   const [selectedFareId, setSelectedFareId] = useState(fares[0]?.id ?? null);

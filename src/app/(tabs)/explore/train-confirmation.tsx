@@ -1,3 +1,6 @@
+import { useAppLanguage } from '@/utils/intl';
+import { getAppLocale } from '@/utils/intl';
+import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { FareSummary } from '@/components/trains/TrainCards';
@@ -8,7 +11,7 @@ import { Ui } from '@/constants/theme';
 import { formatLongDate, formatShortDate, inr } from '@/data/trains';
 import { resetTrainBooking, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Linking, ScrollView, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 /** Decorative barcode derived from the PNR (demo only, not scannable). */
 function Barcode({ value }: { value: string }) {
@@ -19,6 +22,7 @@ function Barcode({ value }: { value: string }) {
 const statusTone = (status: string) => status === 'CNF' ? 'good' : status.startsWith('RAC') ? 'warn' : 'bad';
 
 export default function TrainConfirmationScreen() {
+  useAppLanguage();
   const { ticket } = useTrainBooking();
   const done = (path: string) => { resetTrainBooking(); replaceTo(path); };
 
@@ -77,7 +81,7 @@ export default function TrainConfirmationScreen() {
           <Card>
             <SectionTitle eyebrow="PAYMENT" title="Receipt" />
             <FareSummary fare={ticket.fare} couponCode={ticket.couponCode} />
-            <View style={s.txn}><Text style={s.txnText}>Txn {ticket.txnId}</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text></View>
+            <View style={s.txn}><Text style={s.txnText}>Txn {ticket.txnId}</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text></View>
           </Card>
 
           <Notice icon="mail-outline" title="E-ticket sent">A confirmation was sent to {ticket.contact.email}. Carry a valid photo ID that matches the passenger names. This is a demo ticket and is not valid for travel.</Notice>
