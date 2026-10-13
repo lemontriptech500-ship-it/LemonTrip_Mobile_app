@@ -5,7 +5,7 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { AuthButton, AuthDivider, AuthField, AuthLayout, AuthLegalLinks, AuthLink, AuthNotice, AuthSwitch, GoogleAuthButton, OtpCodeField } from '@/components/auth/AuthLayout';
-import { exchangeFirebasePhoneIdentity, loginWithGoogle, normalizePhoneInput, signupWithEmail } from '@/utils/authApi';
+import { checkPhoneAccount, exchangeFirebasePhoneIdentity, loginWithGoogle, normalizePhoneInput, signupWithEmail } from '@/utils/authApi';
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router, type Href } from 'expo-router';
@@ -48,7 +48,9 @@ export default function SignupScreen() {
         const result = await signupWithEmail({ name: name.trim(), email: email.trim(), password });
         Alert.alert('Verify your email', result.message, [{ text: 'Continue to sign in', onPress: () => router.replace('/login') }]);
       } else if (!phoneOtp.challenge) {
-        await phoneOtp.sendCode(normalizePhoneInput(phone)!);
+        const number = normalizePhoneInput(phone)!;
+        await checkPhoneAccount(number, 'signup'); // stop before any SMS is sent if the number already has an account
+        await phoneOtp.sendCode(number);
         return;
       } else {
         const idToken = await phoneOtp.verifyCode();

@@ -5,7 +5,7 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { AuthButton, AuthDivider, AuthField, AuthLayout, AuthLink, AuthNotice, AuthSwitch, GoogleAuthButton, OtpCodeField } from '@/components/auth/AuthLayout';
-import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput } from '@/utils/authApi';
+import { checkPhoneAccount, exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput, resendVerificationEmail } from '@/utils/authApi';
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -54,7 +54,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       if (authMode === 'email') await login(await loginWithEmail({ email: identifier.trim(), password }));
-      else if (!phoneOtp.challenge) { await phoneOtp.sendCode(phoneNumber!); return; }
+      else if (!phoneOtp.challenge) { await checkPhoneAccount(phoneNumber!, 'login'); await phoneOtp.sendCode(phoneNumber!); return; } // no SMS for unknown numbers
       else {
         const idToken = await phoneOtp.verifyCode();
         if (!idToken) return;
@@ -62,8 +62,20 @@ export default function LoginScreen() {
       }
       router.replace('/(tabs)/profile');
     } catch (error) {
-      if (authMode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.');
-      else Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
+      if (authMode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.', (error as { code?: string } | null)?.code ?? '');
+      else if ((error as { code?: string } | null)?.code === 'EMAIL_NOT_VERIFIED') {
+        Alert.alert('Verify your email', 'We sent a verification link to your inbox. Check spam too, or request a new one.', [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Resend email',
+            onPress: () => {
+              resendVerificationEmail(identifier.trim())
+                .then((result) => Alert.alert('Check your email', result.message))
+                .catch((resendError) => Alert.alert('Could not resend', resendError instanceof Error ? resendError.message : 'Please try again later.'));
+            },
+          },
+        ]);
+      } else Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
     } finally {
       setLoading(false);
     }
@@ -136,6 +148,7 @@ export default function LoginScreen() {
       {mode === 'phone' && !phoneOtp.challenge && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
       {mode === 'phone' && !phoneOtp.challenge ? <AuthNotice>We’ll send an SMS to verify your number. Standard messaging rates may apply.</AuthNotice> : null}
       {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <AuthNotice tone="error">{phoneOtp.error}</AuthNotice> : null}
+      {mode === 'phone' && phoneOtp.errorCode === 'PHONE_ACCOUNT_NOT_FOUND' ? <AuthLink onPress={openSignup}>Create an account</AuthLink> : null}
 
       <AuthButton label={mode === 'phone' && !phoneOtp.challenge ? 'Send OTP' : mode === 'phone' ? 'Verify' : 'Log in'} loading={busy} onPress={() => void validateAndLogin()} />
 
