@@ -2,6 +2,7 @@ import { useAppLanguage } from '@/utils/intl';
 import { Text } from '@/components/ui/Text';
 import { Brand } from '@/constants/colors';
 import { TripWordmark } from '@/components/TripWordmark';
+import { getUser, restoreSession } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
@@ -29,6 +30,9 @@ export default function LaunchScreen() {
   useEffect(() => {
     let active = true;
     let completed = false;
+    let sessionReady = false;
+    let revealRequested = false;
+    let finishRequested = false;
     const startedAt = Date.now();
     lemonEntrance.setValue(0);
     writeProgress.setValue(0);
@@ -71,17 +75,19 @@ export default function LaunchScreen() {
     // Navigation must not depend on the native animation delivering a callback.
     const finish = () => {
       if (!active || completed) return;
+      if (!sessionReady) { finishRequested = true; return; }
       completed = true;
       clearTimeout(revealTimer);
       clearTimeout(fallbackTimer);
       entrance.stop();
       transition?.stop();
       spinner.stop();
-      router.replace('/onboarding');
+      router.replace(getUser() ? '/(tabs)/home' : '/onboarding');
     };
 
     const reveal = () => {
       if (!active || completed) return;
+      if (!sessionReady) { revealRequested = true; return; }
       const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
       transition = Animated.parallel([
@@ -101,6 +107,14 @@ export default function LaunchScreen() {
     };
     const revealTimer = setTimeout(reveal, REVEAL_DURATION);
     const fallbackTimer = setTimeout(finish, MAX_SPLASH_DURATION);
+    // Keep the logo visible until saved credentials are checked, even on a cold backend.
+    // The animation watchdog must never mistake a pending restore for a signed-out user.
+    void restoreSession().then(() => {
+      sessionReady = true;
+      if (!active || completed) return;
+      if (finishRequested) finish();
+      else if (revealRequested) reveal();
+    });
     // Timers and native animations may pause while the app is backgrounded.
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active' && Date.now() - startedAt >= REVEAL_DURATION + EXIT_DURATION) finish();

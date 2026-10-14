@@ -1,3 +1,4 @@
+import { APP_API_URL } from './apiConfig';
 import { Platform } from 'react-native';
 import { parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js';
 import { getDeviceRegion } from '@/utils/intl';
@@ -22,7 +23,7 @@ export type AuthSession = {
   expiresIn: number;
 };
 
-const authEndpoint = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/auth`;
+const authEndpoint = `${APP_API_URL}/api/auth`;
 const REQUEST_TIMEOUT_MS = 30_000; // per attempt; never leave the login spinner running forever
 export const currentAuthPlatform: AuthPlatform = Platform.OS === 'web' ? 'website' : 'app';
 

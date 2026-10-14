@@ -4,7 +4,9 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Get started
 
-Copy `.env.example` to `.env` and set the public API base URLs for your device or emulator. `EXPO_PUBLIC_API_URL` points to the mobile backend (port 4000); `EXPO_PUBLIC_VISA_API_URL` points to the website backend (port 5000), which owns visa application submission and documents. Use a reachable host address when running on a physical device.
+Copy `.env.example` to `.env`. `EXPO_PUBLIC_API_URL` defaults to the deployed mobile backend at `https://lemontripapp-backend.onrender.com`, including when previewing the app on localhost. To use a local mobile backend intentionally, set `EXPO_PUBLIC_API_URL=http://localhost:4000` and start that backend. Fully reload the app after changing public environment variables.
+
+`EXPO_PUBLIC_VISA_API_URL` points to the website backend (local port 5000), which owns visa application submission and documents. Use a reachable host address when running on a physical device.
 
 1. Install dependencies
 

@@ -109,8 +109,8 @@ export default function OnboardingScreen() {
                 </View>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={index === slides.length - 1 ? 'Create account' : 'Next introduction'}
-                  onPress={() => index < slides.length - 1 ? goToSlide(index + 1) : leave('/signup')}
+                  accessibilityLabel={index === slides.length - 1 ? 'Sign in' : 'Next introduction'}
+                  onPress={() => index < slides.length - 1 ? goToSlide(index + 1) : leave('/login')}
                   style={({ pressed }) => [styles.nextButton, pressed && styles.nextButtonPressed]}
                 >
                   <Ionicons name="arrow-forward" size={23} color={Brand.forest} />

@@ -60,7 +60,7 @@ export default function LoginScreen() {
         if (!idToken) return;
         await login(await exchangeFirebasePhoneIdentity({ idToken, purpose: 'login' }));
       }
-      router.replace('/(tabs)/profile');
+      router.replace('/(tabs)/home');
     } catch (error) {
       if (authMode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.', (error as { code?: string } | null)?.code ?? '');
       else if ((error as { code?: string } | null)?.code === 'EMAIL_NOT_VERIFIED') {
@@ -83,7 +83,7 @@ export default function LoginScreen() {
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace('/home');
+    else router.replace('/onboarding');
   };
 
   // Open the sign-up screen. Never leave the user stranded on login if the push is rejected.
@@ -155,7 +155,7 @@ export default function LoginScreen() {
       {!phoneOtp.challenge ? (
         <>
           <AuthDivider />
-          <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'login')); router.replace('/(tabs)/profile'); }} />
+          <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'login')); router.replace('/(tabs)/home'); }} />
           <AuthSwitch prompt="Don’t have an account?" action="Sign up" onPress={openSignup} />
         </>
       ) : null}
