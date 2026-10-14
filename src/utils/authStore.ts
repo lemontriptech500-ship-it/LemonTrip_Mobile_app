@@ -11,6 +11,7 @@ export type User = AuthUser;
 let currentUser: User | null = null;
 let accessToken: string | null = null;
 let restoring = false;
+let restorePromise: Promise<void> | null = null;
 let restoreAttempted = false;
 let authEpoch = 0; // bumped on every login/logout so a slow background restore can't overwrite newer state
 let listeners: (() => void)[] = [];
@@ -34,6 +35,7 @@ export async function login(session: AuthSession) {
 
 export function logout() {
   authEpoch += 1;
+  restoreAttempted = true;
   clearCheckoutDetails();
   if (accessToken) void revokeAuthSession(accessToken);
   void signOutFirebasePhoneUser().catch(() => undefined);
@@ -52,7 +54,14 @@ export function getAccessToken() {
   return accessToken;
 }
 
-async function restoreSession() {
+export function restoreSession(): Promise<void> {
+  if (restorePromise) return restorePromise;
+  if (restoreAttempted || currentUser) return Promise.resolve();
+  restorePromise = restoreSavedSession().finally(() => { restorePromise = null; });
+  return restorePromise;
+}
+
+async function restoreSavedSession() {
   if (restoring || restoreAttempted || currentUser) return; // restore only once, and never when already signed in
   restoring = true;
   restoreAttempted = true;
@@ -64,12 +73,17 @@ async function restoreSession() {
     if (epoch !== authEpoch) return; // user logged in/out while this was running
     currentUser = session.user;
     accessToken = session.accessToken;
-    if (Platform.OS !== 'web' && session.refreshToken) await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken);
-  } catch {
+    if (Platform.OS !== 'web' && session.refreshToken) {
+      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken).catch(() => undefined);
+    }
+  } catch (error) {
     if (epoch !== authEpoch) return;
     currentUser = null;
     accessToken = null;
-    if (Platform.OS !== 'web') await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY).catch(() => undefined);
+    // A connection failure must not erase a saved login. Only a rejected session does.
+    if (Platform.OS !== 'web' && (error as { status?: number } | null)?.status === 401) {
+      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY).catch(() => undefined);
+    }
   } finally {
     restoring = false;
     notify();

@@ -7,13 +7,14 @@ const vm = require('node:vm');
 const ts = require('typescript');
 
 // Exercise the actual screen effects with controllable native callbacks and time.
-function harness(file) {
+function harness(file, { user = null, pendingSession = false } = {}) {
   let now = 0, cursor = 0, timerId = 0;
   let dimensions = { width: 390, height: 844 };
   let fontResult = [true, null];
   const slots = [], effects = [], timers = new Map(), listeners = new Set();
   const routes = [], animations = [];
   let hidden = 0;
+  const restoreCallbacks = [];
   function animation() {
     const instance = {
       stopped: false,
@@ -70,6 +71,10 @@ function harness(file) {
     '@expo/vector-icons': { Ionicons: { font: { ionicons: 'ionicons.ttf' } } },
     '@/utils/preferencesStore': { usePreferences: () => {} },
     '@/utils/intl': { useAppLanguage: () => 'English' },
+    '@/utils/authStore': {
+      getUser: () => user,
+      restoreSession: () => ({ then: callback => pendingSession ? restoreCallbacks.push(callback) : callback() }),
+    },
     '@/constants/colors': { Brand: { forest: '#0F3D2E', lemon: '#FFD000' } },
     '@/components/TripWordmark': { TripWordmark: 'TripWordmark' },
     '@/components/ui/Text': { Text: 'Text' },
@@ -96,6 +101,7 @@ function harness(file) {
   }, { filename: file });
   return {
     routes, animations, timers, listeners,
+    restore(userAfterRestore) { user = userAfterRestore; for (const callback of restoreCallbacks.splice(0)) callback(); },
     render() { cursor = 0; return exported.default(); },
     advance(ms) {
       const until = now + ms;
@@ -118,7 +124,50 @@ function harness(file) {
   };
 }
 
-const launch = () => { const h = harness('src/app/index.tsx'); h.render(); return h; };
+const launch = options => { const h = harness('src/app/index.tsx', options); h.render(); return h; };
+
+test('a signed-in user sees the splash then goes directly home', () => {
+  const h = launch({ user: { id: 'returning-user' } });
+  assert.deepEqual(h.routes, []);
+  h.advance(2450);
+  h.transition().complete();
+  assert.deepEqual(h.routes, ['/(tabs)/home']);
+});
+
+test('a slow session restore keeps the splash visible beyond the animation watchdog', () => {
+  const h = launch({ pendingSession: true });
+  h.advance(10000);
+  assert.deepEqual(h.routes, []);
+  h.restore({ id: 'returning-user' });
+  assert.deepEqual(h.routes, ['/(tabs)/home']);
+  h.advance(10000);
+  assert.equal(h.routes.length, 1);
+});
+
+test('a signed-out or expired session opens onboarding only after restore finishes', () => {
+  const h = launch({ pendingSession: true });
+  h.advance(4000);
+  assert.deepEqual(h.routes, []);
+  h.restore(null);
+  assert.deepEqual(h.routes, ['/onboarding']);
+});
+
+test('restoring before the reveal finishes preserves the logo animation', () => {
+  const h = launch({ pendingSession: true });
+  h.advance(2450);
+  h.restore({ id: 'returning-user' });
+  assert.deepEqual(h.routes, []);
+  h.transition().complete();
+  assert.deepEqual(h.routes, ['/(tabs)/home']);
+});
+
+test('an unmounted splash never navigates after a late restore', () => {
+  const h = launch({ pendingSession: true });
+  h.advance(4000);
+  h.unmount();
+  h.restore({ id: 'returning-user' });
+  assert.deepEqual(h.routes, []);
+});
 
 test('normal animation opens onboarding once and clears the watchdog', () => {
   const h = launch();

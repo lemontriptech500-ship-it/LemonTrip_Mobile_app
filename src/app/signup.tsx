@@ -56,7 +56,7 @@ export default function SignupScreen() {
         const idToken = await phoneOtp.verifyCode();
         if (!idToken) return;
         await login(await exchangeFirebasePhoneIdentity({ idToken, purpose: 'signup', name: name.trim() }));
-        router.replace('/(tabs)/profile');
+        router.replace('/(tabs)/home');
       }
     } catch (error) {
       if (mode === 'phone') {
@@ -154,7 +154,7 @@ export default function SignupScreen() {
       {!phoneOtp.challenge ? (
         <>
           <AuthDivider />
-          <GoogleAuthButton label="Sign up with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'signup')); router.replace('/(tabs)/profile'); }} />
+          <GoogleAuthButton label="Sign up with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'signup')); router.replace('/(tabs)/home'); }} />
           <AuthLegalLinks onTerms={() => router.push('/terms' as Href)} onPrivacy={() => router.push('/privacy' as Href)} />
           <AuthSwitch prompt="Already have an account?" action="Log in" onPress={() => router.replace('/login')} />
         </>
