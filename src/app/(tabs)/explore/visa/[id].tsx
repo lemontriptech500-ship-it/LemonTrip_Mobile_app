@@ -115,6 +115,7 @@ export default function VisaApplicationScreen() {
       const form = new FormData();
       // The website visa API accepts the established nested multipart contract.
       form.append('serviceId', destination.id);
+      form.append('platform', 'mobile');
       form.append('personalDetails', JSON.stringify({ fullName: fullName.trim(), email: email.trim(), dateOfBirth }));
       form.append('passportDetails', JSON.stringify({ passportNumber: passportNumber.trim() }));
       form.append('travelDetails', JSON.stringify({ intendedEntryDate: entryDate }));
