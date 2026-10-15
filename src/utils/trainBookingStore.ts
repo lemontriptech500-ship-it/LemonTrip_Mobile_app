@@ -13,7 +13,7 @@ export interface TrainPassengerInput { name: string; age: string; gender: 'M' | 
 export interface TrainContact { email: string; phone: string }
 export interface TrainSelection { trainId: string; fromCode: string; toCode: string; date: string; classCode: ClassCode; quota: Quota }
 export interface TrainOptions { autoUpgrade: boolean; confirmedOnly: boolean }
-export interface TrainPayment { method: 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
+export interface TrainPayment { method: 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
 export interface TicketPassenger { name: string; age: number; gender: string; berth: string; status: string; seat: string }
 export interface TrainTicket {
   pnr: string; bookingId: string; bookedAt: string;
@@ -108,7 +108,7 @@ export function currentFare(s: State = state): { fare: FareBreakdown; result: Tr
 const rand = (len: number, chars = '0123456789') => Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
 /** Simulates a successful payment and issues a dummy e-ticket. Also records it in My Trips. */
-export function confirmTrainBooking(payment: TrainPayment): TrainTicket | null {
+export function confirmTrainBooking(payment: TrainPayment, gatewayPaymentId?: string): TrainTicket | null {
   const derived = currentFare();
   const sel = state.selection;
   if (!derived || !sel) return null;
@@ -133,7 +133,7 @@ export function confirmTrainBooking(payment: TrainPayment): TrainTicket | null {
     fromCode: sel.fromCode, fromName: getStation(sel.fromCode)?.name ?? sel.fromCode, toCode: sel.toCode, toName: getStation(sel.toCode)?.name ?? sel.toCode,
     date: sel.date, arrivalDate: addDaysISO(sel.date, result.arrivalDayOffset), departure: result.departure, arrival: result.arrival, duration: formatDuration(result.durationMin),
     classCode: sel.classCode, className: CLASS_INFO[sel.classCode].name, quota: sel.quota,
-    passengers, contact: { ...state.contact }, fare, couponCode: state.coupon?.code ?? null, payment, txnId: `TXN${rand(12)}`,
+    passengers, contact: { ...state.contact }, fare, couponCode: state.coupon?.code ?? null, payment, txnId: gatewayPaymentId ?? `TXN${rand(12)}`,
   };
   addBooking({
     id: ticket.bookingId, serviceName: 'Trains', itemName: `${ticket.trainName} (${ticket.trainNumber}) · ${ticket.fromCode} → ${ticket.toCode}`,

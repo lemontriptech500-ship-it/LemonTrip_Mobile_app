@@ -9,8 +9,8 @@ import { Colors } from '@/constants/colors';
 import { CLASS_INFO, computeFare, formatDuration, formatLongDate, getAvailability, getClassOptions, getStation, getTrain, inr, type ClassCode, type TrainResult } from '@/data/trains';
 import { currentFare, selectTrain, updateSelection, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
-import { useEffect } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -23,13 +23,16 @@ export default function TrainDetailsScreen() {
   const train = getTrain(id ?? sel?.trainId);
 
   // Deep link with just a train id: build a default selection from the last search.
-  useEffect(() => {
+  // Runs only while this screen is focused: older train-details screens stay mounted lower in the
+  // navigation stack, and two of them with different train ids would otherwise keep overwriting each
+  // other's selection in an endless loop.
+  useFocusEffect(useCallback(() => {
     if (!train || (sel && sel.trainId === train.id)) return;
     const first = train.route[0]; const last = train.route[train.route.length - 1];
     const from = booking.search.from && train.route.some((r) => r.code === booking.search.from) ? booking.search.from : first.code;
     const to = booking.search.to && train.route.some((r) => r.code === booking.search.to) ? booking.search.to : last.code;
     selectTrain({ trainId: train.id, fromCode: from, toCode: to, date: booking.search.date, classCode: train.classes[0], quota: 'GN' });
-  }, [train, sel, booking.search]);
+  }, [train, sel, booking.search]));
 
   const derived = currentFare();
   if (!train || !sel || !derived || sel.trainId !== train.id) {
