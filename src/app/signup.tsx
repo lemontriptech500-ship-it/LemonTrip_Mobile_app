@@ -1,5 +1,4 @@
 import { useAppLanguage } from '@/utils/intl';
-import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
@@ -23,11 +22,15 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ name: '', email: '', phone: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [notice, setNotice] = useState<{ message: string; tone: 'info' | 'error' } | null>(null);
+  const [verificationSent, setVerificationSent] = useState(false);
 
   // Clear reCAPTCHA when leaving the screen so it never touches a removed element.
   useEffect(() => () => { phoneOtp.reset().catch(() => undefined); }, []);
 
   const validateAndSignup = async () => {
+    setNotice(null);
+    setVerificationSent(false);
     const nextErrors = { name: '', email: '', phone: '', password: '' };
     if (!name.trim()) nextErrors.name = 'Your name is required';
     if (mode === 'email') {
@@ -46,7 +49,8 @@ export default function SignupScreen() {
     try {
       if (mode === 'email') {
         const result = await signupWithEmail({ name: name.trim(), email: email.trim(), password });
-        Alert.alert('Verify your email', result.message, [{ text: 'Continue to sign in', onPress: () => router.replace('/login') }]);
+        setVerificationSent(true);
+        setNotice({ tone: 'info', message: result.message + ' Open the verification link in your inbox or spam folder before signing in.' });
       } else if (!phoneOtp.challenge) {
         const number = normalizePhoneInput(phone)!;
         await checkPhoneAccount(number, 'signup'); // stop before any SMS is sent if the number already has an account
@@ -62,7 +66,7 @@ export default function SignupScreen() {
       if (mode === 'phone') {
         const code = typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string' ? error.code : '';
         phoneOtp.showError(error instanceof Error ? error.message : 'Phone registration could not be completed.', code);
-      } else Alert.alert('Sign-up failed', error instanceof Error ? error.message : 'Please try again.');
+      } else setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'Sign-up failed. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -98,6 +102,8 @@ export default function SignupScreen() {
             value={mode === 'email' ? email : phone}
             placeholder="you@example.com or 98765 43210"
             onChangeText={(value) => {
+              setNotice(null);
+              setVerificationSent(false);
               const phoneMode = Boolean(value.trim()) && /^[+\d\s()-]+$/.test(value.trim());
               setMode(phoneMode ? 'phone' : 'email');
               if (phoneMode) {
@@ -149,7 +155,9 @@ export default function SignupScreen() {
         />
       ) : null}
 
-      <AuthButton label={mode === 'phone' && !phoneOtp.challenge ? 'Send OTP' : mode === 'phone' ? 'Verify' : 'Create account'} loading={busy} onPress={() => void validateAndSignup()} />
+      {mode === 'email' && notice ? <AuthNotice tone={notice.tone}>{notice.message}</AuthNotice> : null}
+      {mode === 'email' && verificationSent ? <AuthButton label="Continue to sign in" onPress={() => router.replace('/login')} /> :
+        <AuthButton label={mode === 'phone' && !phoneOtp.challenge ? 'Send OTP' : mode === 'phone' ? 'Verify' : 'Create account'} loading={busy} onPress={() => void validateAndSignup()} />}
 
       {!phoneOtp.challenge ? (
         <>

@@ -115,13 +115,13 @@ export default function BusesScreen() {
           {!searched ? (
             <Card>
               <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
-              <View style={s.popular}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.popular}>
                 {POPULAR_ROUTES.map((r) => (
                   <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setBusSearch({ from: r.from, to: r.to }); setSearched(true); setErrorMsg(''); }} style={s.route}>
                     <Text style={s.routeText}>{getCity(r.from)?.name}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getCity(r.to)?.name}</Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             </Card>
           ) : (
             <View style={s.pad}>
@@ -193,7 +193,7 @@ const s = StyleSheet.create({
   dateTextOn: { color: Colors.white },
   chips: { gap: 8, alignItems: 'center' },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },
-  popular: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   resultHead: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12, marginTop: 4 },
