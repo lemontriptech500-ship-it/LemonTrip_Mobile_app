@@ -4,33 +4,30 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { FareSummary } from '@/components/trains/TrainCards';
-import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, replaceTo } from '@/components/trains/TrainUi';
+import { Card, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, replaceTo } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
-import { Ui } from '@/constants/theme';
-import { BANKS, COUPONS, WALLET_BALANCE, inr, validateCoupon } from '@/data/trains';
+import { COUPONS, WALLET_BALANCE, inr, validateCoupon } from '@/data/trains';
 import { confirmTrainBooking, currentFare, setCoupon, useTrainBooking, type TrainPayment } from '@/utils/trainBookingStore';
+import { RazorpayCancelled, openRazorpayCheckout } from '@/utils/razorpayCheckout';
+import { createTrainOrder, verifyTrainPayment } from '@/utils/trainPaymentApi';
+import { useAuth } from '@/utils/authStore';
+import { RazorpayCheckoutHost } from '@/components/RazorpayCheckoutHost';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 type Method = TrainPayment['method'];
 const METHODS: { id: Method; label: string; hint: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
-  { id: 'upi', label: 'UPI', hint: 'Pay with any UPI app', icon: 'phone-portrait-outline' },
-  { id: 'card', label: 'Credit / Debit card', hint: 'Visa, Mastercard, RuPay', icon: 'card-outline' },
-  { id: 'netbanking', label: 'Net banking', hint: 'All major banks', icon: 'business-outline' },
+  { id: 'razorpay', label: 'Razorpay (test mode)', hint: 'UPI, cards and net banking', icon: 'card-outline' },
   { id: 'wallet', label: 'LemonTrip wallet', hint: `Balance ${inr(WALLET_BALANCE)}`, icon: 'wallet-outline' },
 ];
 
-const formatCard = (v: string) => v.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 ');
-const formatExpiry = (v: string) => { const d = v.replace(/\D/g, '').slice(0, 4); return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d; };
 
 export default function TrainPaymentScreen() {
   useAppLanguage();
-  const { selection, passengers, coupon } = useTrainBooking();
-  const [method, setMethod] = useState<Method>('upi');
-  const [upi, setUpi] = useState('');
-  const [card, setCard] = useState({ name: '', number: '', expiry: '', cvv: '' });
-  const [bank, setBank] = useState('');
+  const { selection, passengers, coupon, contact } = useTrainBooking();
+  const user = useAuth();
+  const [method, setMethod] = useState<Method>('razorpay');
   const [couponInput, setCouponInput] = useState(coupon?.code ?? '');
   const [couponMsg, setCouponMsg] = useState<{ ok: boolean; text: string } | null>(coupon ? { ok: true, text: `${coupon.code} applied. You save ${inr(coupon.discount)}.` } : null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -59,34 +56,46 @@ export default function TrainPaymentScreen() {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (method === 'upi' && !/^[\w.-]{2,}@[A-Za-z]{2,}$/.test(upi.trim())) e.upi = 'Enter a valid UPI ID, e.g. name@bank';
-    if (method === 'card') {
-      if (card.name.trim().length < 2) e.cardName = 'Enter the name on the card.';
-      if (card.number.replace(/\s/g, '').length !== 16) e.cardNumber = 'Enter the 16-digit card number.';
-      const m = /^(\d{2})\/(\d{2})$/.exec(card.expiry);
-      const month = m ? Number(m[1]) : 0; const year = m ? 2000 + Number(m[2]) : 0;
-      const now = new Date();
-      if (!m || month < 1 || month > 12 || year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) e.expiry = 'Enter a valid, unexpired date.';
-      if (!/^\d{3,4}$/.test(card.cvv)) e.cvv = '3 or 4 digits.';
-    }
-    if (method === 'netbanking' && !bank) e.bank = 'Select your bank.';
     if (method === 'wallet' && fare.total > WALLET_BALANCE) e.wallet = `Insufficient wallet balance. You need ${inr(fare.total - WALLET_BALANCE)} more.`;
     setErrors(e);
     return !Object.keys(e).length;
+  };
+
+  const payWithRazorpay = async () => {
+    if (!user) { setPayError('Sign in to pay for your booking.'); return; }
+    if (!selection || !derived) return;
+    const { result } = derived;
+    setProcessing(true);
+    try {
+      const order = await createTrainOrder({
+        amount: fare.total, passengers: passengers.length, trainName: result.train.name,
+        route: `${selection.fromCode} → ${selection.toCode}`, journeyDate: selection.date, couponCode: coupon?.code,
+      });
+      const paid = await openRazorpayCheckout({
+        keyId: order.keyId, orderId: order.orderId, amount: order.amount, currency: order.currency,
+        name: 'LemonTrip', description: `${result.train.name} train booking`,
+        prefill: { email: contact.email, contact: contact.phone, name: user.name },
+      });
+      await verifyTrainPayment({ razorpayOrderId: paid.razorpayOrderId, razorpayPaymentId: paid.razorpayPaymentId, razorpaySignature: paid.razorpaySignature });
+      const ticket = confirmTrainBooking({ method: 'razorpay', label: 'Razorpay (test)' }, paid.razorpayPaymentId);
+      if (!ticket) { setPayError('Payment succeeded but the ticket could not be created. Contact support with payment ID ' + paid.razorpayPaymentId + '.'); setProcessing(false); return; }
+      replaceTo(TRAIN_ROUTES.confirmation);
+    } catch (error) {
+      setProcessing(false);
+      if (error instanceof RazorpayCancelled) { setPayError('Payment was cancelled. You have not been charged.'); return; }
+      setPayError(error instanceof Error ? error.message : 'Payment failed. Please try again.');
+    }
   };
 
   const pay = () => {
     if (processing) return;
     setPayError('');
     if (!validate()) return;
+    if (method === 'razorpay') { void payWithRazorpay(); return; }
     setProcessing(true);
-    // Simulated gateway round-trip. Demo card ending 0002 is declined to exercise the failure path.
+    // LemonTrip wallet is still a local demo balance.
     timer.current = setTimeout(() => {
-      if (method === 'card' && card.number.replace(/\s/g, '').endsWith('0002')) {
-        setProcessing(false); setPayError('Your bank declined this card. Try another payment method.'); return;
-      }
-      const label = method === 'upi' ? `UPI · ${upi.trim()}` : method === 'card' ? `Card ending ${card.number.replace(/\s/g, '').slice(-4)}` : method === 'netbanking' ? bank : 'LemonTrip wallet';
-      const ticket = confirmTrainBooking({ method, label });
+      const ticket = confirmTrainBooking({ method, label: 'LemonTrip wallet' });
       if (!ticket) { setProcessing(false); setPayError('Something went wrong. Please try again.'); return; }
       replaceTo(TRAIN_ROUTES.confirmation);
     }, 1800);
@@ -114,24 +123,7 @@ export default function TrainPaymentScreen() {
               })}
 
               <View style={s.form}>
-                {method === 'upi' ? <Field label="UPI ID" icon="at-outline" autoCapitalize="none" autoCorrect={false} value={upi} onChangeText={setUpi} placeholder="name@bank" error={errors.upi} editable={!processing} /> : null}
-                {method === 'card' ? (
-                  <>
-                    <Field label="NAME ON CARD" icon="person-outline" autoCapitalize="words" value={card.name} onChangeText={(v) => setCard({ ...card, name: v })} placeholder="As printed on the card" error={errors.cardName} editable={!processing} />
-                    <Field label="CARD NUMBER" icon="card-outline" keyboardType="number-pad" value={card.number} onChangeText={(v) => setCard({ ...card, number: formatCard(v) })} placeholder="0000 0000 0000 0000" maxLength={19} error={errors.cardNumber} editable={!processing} />
-                    <View style={s.pair}>
-                      <View style={{ flex: 1 }}><Field label="EXPIRY" keyboardType="number-pad" value={card.expiry} onChangeText={(v) => setCard({ ...card, expiry: formatExpiry(v) })} placeholder="MM/YY" maxLength={5} error={errors.expiry} editable={!processing} /></View>
-                      <View style={{ flex: 1 }}><Field label="CVV" keyboardType="number-pad" secureTextEntry value={card.cvv} onChangeText={(v) => setCard({ ...card, cvv: v.replace(/\D/g, '').slice(0, 4) })} placeholder="•••" maxLength={4} error={errors.cvv} editable={!processing} /></View>
-                    </View>
-                  </>
-                ) : null}
-                {method === 'netbanking' ? (
-                  <View>
-                    <Text style={s.label}>SELECT YOUR BANK</Text>
-                    <View style={s.banks}>{BANKS.map((b) => <Chip key={b} label={b} selected={bank === b} onPress={() => setBank(b)} />)}</View>
-                    {errors.bank ? <Text style={s.error}>{errors.bank}</Text> : null}
-                  </View>
-                ) : null}
+                {method === 'razorpay' ? <Notice icon="shield-checkmark-outline" title="Razorpay test mode">Razorpay Checkout opens next. Use test credentials only, e.g. card 4111 1111 1111 1111 with any future expiry and CVV, or UPI success@razorpay. No real money is charged.</Notice> : null}
                 {method === 'wallet' ? (
                   <View style={s.wallet}>
                     <View style={s.walletRow}><Text style={s.walletLabel}>Wallet balance</Text><Text style={s.walletValue}>{inr(WALLET_BALANCE)}</Text></View>
@@ -159,10 +151,11 @@ export default function TrainPaymentScreen() {
               <FareSummary fare={fare} couponCode={coupon?.code} />
             </Card>
 
-            <Notice icon="lock-closed-outline" title="Secure payment demo">This is a demonstration checkout. No real payment is taken and no card details are stored or sent anywhere. Tip: a card ending in 0002 simulates a declined payment.</Notice>
+            <Notice icon="lock-closed-outline" title="Test mode">Payments run through Razorpay test mode, so no real money moves. Ticket and PNR details are still sample data until a rail provider is connected.</Notice>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <RazorpayCheckoutHost />
     </FlowScreen>
   );
 }
@@ -178,9 +171,6 @@ const s = StyleSheet.create({
   methodTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   methodHint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
   form: { marginTop: 10 },
-  pair: { flexDirection: 'row', gap: 12 },
-  label: { ...Ui.eyebrow, color: Colors.textLight, marginBottom: 8 },
-  banks: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 8 },
   wallet: { padding: 14, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
   walletRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
