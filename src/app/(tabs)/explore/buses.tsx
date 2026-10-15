@@ -112,18 +112,7 @@ export default function BusesScreen() {
             <View style={{ marginTop: 14 }}><PrimaryButton label="Search buses" icon="search" onPress={runSearch} /></View>
           </Card>
 
-          {!searched ? (
-            <Card>
-              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.popular}>
-                {POPULAR_ROUTES.map((r) => (
-                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setBusSearch({ from: r.from, to: r.to }); setSearched(true); setErrorMsg(''); }} style={s.route}>
-                    <Text style={s.routeText}>{getCity(r.from)?.name}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getCity(r.to)?.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </Card>
-          ) : (
+          {searched ? (
             <View style={s.pad}>
               <View style={s.resultHead}>
                 <View>
@@ -147,7 +136,20 @@ export default function BusesScreen() {
                 <EmptyState icon="bus-outline" title="No buses match" text="No buses run on this route for the selected date, type or time. Try another date or clear the filters." action={<PrimaryButton variant="soft" label="Clear filters" onPress={clearFilters} />} />
               )}
             </View>
-          )}
+          ) : null}
+
+          {!searched ? (
+            <Card>
+              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.popular}>
+                {POPULAR_ROUTES.map((r) => (
+                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setBusSearch({ from: r.from, to: r.to }); setSearched(true); setErrorMsg(''); }} style={s.route}>
+                    <Text style={s.routeText}>{getCity(r.from)?.name}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getCity(r.to)?.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </Card>
+          ) : null}
 
           <Notice icon="shield-checkmark-outline" title="Demo inventory">Schedules, fares and seat availability shown here are sample data for demonstration. No real bus ticket is issued.</Notice>
         </View>
