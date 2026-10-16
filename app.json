@@ -4,20 +4,19 @@
     "slug": "LemonTripMobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Glossy Green_new.png",
     "scheme": "lemontripmobile",
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.gokul.lemontrip",
-      "googleServicesFile": "./GoogleService-Info.plist",
-      "icon": "./assets/expo.icon"
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "package": "com.gokul.lemontrip",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "backgroundColor": "#0B5D2A",
-        "foregroundImage": "./assets/images/android-icon-foreground.png"
+        "backgroundColor": "#0F3D2E",
+        "foregroundImage": "./assets/images/Glossy Green_new.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -32,6 +31,9 @@
       [
         "expo-splash-screen",
         {
+          "image": "./assets/images/splash-transparent.png",
+          "imageWidth": 100,
+          "resizeMode": "contain",
           "backgroundColor": "#0F3D2E"
         }
       ],

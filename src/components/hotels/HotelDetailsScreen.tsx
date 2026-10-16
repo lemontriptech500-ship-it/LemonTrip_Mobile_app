@@ -9,6 +9,8 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { defaultHotelSearch, mockHotels } from '@/data/mockHotels';
 import { getHotelSearch, getSelectedHotel, selectHotel } from '@/utils/hotelSearchStore';
+import { startHotelBooking } from '@/utils/hotelBookingStore';
+import { HOTEL_ROUTES, goTo } from '@/components/hotels/HotelUi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -71,7 +73,8 @@ const handleBook = () => {
   }
 
   setSelectedRoomId(roomToUse.id);
-  router.push('/hotel-room-selection');
+  startHotelBooking(finalHotel, updatedSearch, roomToUse.id);
+  goTo(HOTEL_ROUTES.rooms);
 };
 
 
