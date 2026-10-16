@@ -29,7 +29,7 @@ Sources reviewed: website home page, desktop/mobile navigation, navigation const
 
 ## Existing integration limits
 
-The mobile backend exposes auth, bookings, chat, and content routes. It does not currently expose the website's wallet, contact submission, or password-reset routes. The mobile payment screen also has no configured payment methods. These are integration gaps, not missing native payment implementations introduced by the visual redesign.
+The mobile backend exposes auth, bookings, chat, content, and test-mode Razorpay order and verification routes for flights, buses, hotels, packages, cart checkout, trains, and wallet top-ups. It does not currently expose the website's wallet, contact submission, or password-reset routes. Test payments create app-side booking records; they do not confirm reservations with travel suppliers.
 
 - Wallet access opens the website wallet and uses its own sign-in session.
 - Contact composes an email unless `EXPO_PUBLIC_CONTACT_URL` points to a compatible contact endpoint; it never reports an email draft as sent.

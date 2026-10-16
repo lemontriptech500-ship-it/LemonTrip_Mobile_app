@@ -1,4 +1,7 @@
 import { useAppLanguage } from '@/utils/intl';
+import { useBookingPayment } from '@/utils/useBookingPayment';
+import { RazorpayCheckoutHost } from '@/components/RazorpayCheckoutHost';
+import { RazorpayPaymentDetails } from '@/components/RazorpayPaymentDetails';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
@@ -7,11 +10,9 @@ import { Colors } from '@/constants/colors';
 import { addBooking } from '@/utils/bookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const paymentOptions = ['Credit / Debit Card', 'UPI', 'Wallet'];
 const steps = ['Search', 'Select', 'Passenger', 'Payment', 'Confirmation'];
 
 export default function HotelPaymentScreen() {
@@ -29,8 +30,7 @@ export default function HotelPaymentScreen() {
     email?: string;
     phone?: string;
   }>();
-  const [selectedMethod, setSelectedMethod] = useState('Credit / Debit Card');
-  const [paying, setPaying] = useState(false);
+  const payment = useBookingPayment();
 
   const hotelName = typeof params.hotelName === 'string' ? params.hotelName : 'Hotel stay';
   const roomName = typeof params.roomName === 'string' ? params.roomName : 'Standard room';
@@ -39,14 +39,14 @@ export default function HotelPaymentScreen() {
   const rooms = typeof params.rooms === 'string' ? params.rooms : '1';
   const checkIn = typeof params.checkIn === 'string' ? params.checkIn : '';
   const checkOut = typeof params.checkOut === 'string' ? params.checkOut : '';
+  const amount = Number(totalText.replace(/[^\d.]/g, ''));
 
-  const handlePay = () => {
-    if (paying) return;
-    setPaying(true);
-
-    const bookingId = `hotel-${Date.now()}`;
+  const handlePay = () => void payment.pay({
+    service: 'hotels', amount, currency: 'INR', itemName: `${hotelName} · ${roomName}`,
+    ...(checkIn ? { tripDate: checkIn } : {}),
+  }, { email: typeof params.email === 'string' ? params.email : '', contact: typeof params.phone === 'string' ? params.phone : '' }, (verified) => {
     addBooking({
-      id: bookingId,
+      id: verified.bookingId,
       serviceName: 'Hotels',
       itemName: `${hotelName} · ${roomName}`,
       price: totalText,
@@ -55,11 +55,8 @@ export default function HotelPaymentScreen() {
       destination: hotelName,
       status: 'confirmed',
     });
-
-    setTimeout(() => {
-      router.replace({ pathname: '/confirmation', params: { bookingId } });
-    }, 400);
-  };
+    router.replace({ pathname: '/confirmation', params: { bookingId: verified.bookingId } });
+  });
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -106,24 +103,16 @@ export default function HotelPaymentScreen() {
           <Text style={styles.methodEyebrow}>PAYMENT METHOD</Text>
           <Text style={styles.methodTitle}>Choose how to pay</Text>
 
-          {paymentOptions.map((option) => (
-            <TouchableOpacity
-              key={option}
-              onPress={() => setSelectedMethod(option)}
-              style={[styles.methodRow, selectedMethod === option && styles.methodRowActive]}
-            >
-              <Ionicons name={selectedMethod === option ? 'radio-button-on' : 'radio-button-off'} size={18} color={selectedMethod === option ? Colors.primary : Colors.textLight} />
-              <Text style={styles.methodText}>{option}</Text>
-            </TouchableOpacity>
-          ))}
+          <RazorpayPaymentDetails error={payment.error} />
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={handlePay} style={[styles.primaryButton, paying && styles.primaryButtonDisabled]}>
-          <Text style={styles.primaryButtonText}>{paying ? 'Processing...' : `Pay ${totalText}`}</Text>
+        <TouchableOpacity disabled={payment.processing || (!payment.needsVerification && (payment.locked || !Number.isFinite(amount) || amount <= 0))} onPress={handlePay} style={[styles.primaryButton, (payment.processing || !Number.isFinite(amount) || amount <= 0) && styles.primaryButtonDisabled]}>
+          <Text style={styles.primaryButtonText}>{payment.processing ? 'Processing...' : payment.needsVerification ? 'Retry verification' : `Pay ${totalText}`}</Text>
         </TouchableOpacity>
       </View>
+      <RazorpayCheckoutHost />
     </SafeAreaView>
   );
 }
