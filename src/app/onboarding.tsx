@@ -84,10 +84,6 @@ export default function OnboardingScreen() {
               style={StyleSheet.absoluteFill}
             />
 
-            {index === 0 ? <View pointerEvents="none" style={styles.planeDecoration}>
-              <Ionicons name="airplane" size={48} color="#FFFFFF" />
-            </View> : null}
-
             <View style={styles.content}>
               <Text style={[styles.heading, compact && styles.headingCompact]}>
                 {item.title}{'\n'}<Text style={styles.headingAccent}>{item.accent}</Text>
@@ -128,7 +124,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Brand.forest },
   carousel: { flex: 1 },
   slide: { flex: 1, overflow: 'hidden', backgroundColor: Brand.forest },
-  planeDecoration: { position: 'absolute', top: '31%', left: '47%', transform: [{ rotate: '-24deg' }], opacity: 0.95 },
   content: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 27, paddingBottom: 18 },
   heading: { color: '#FFFFFF', fontFamily: FontFamily.sans, fontSize: TextSize.hero, lineHeight: 41, fontWeight: FontWeight.extraBold },
   headingCompact: { fontSize: TextSize.display, lineHeight: 32 },
