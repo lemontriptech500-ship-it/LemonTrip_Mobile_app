@@ -10,6 +10,7 @@ import { getVisaServices, visaApiConfigured, visaApiRoot } from '@/utils/visaSer
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
+import { File as ExpoFile } from 'expo-file-system';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, Platform, ScrollView, StyleSheet, View } from 'react-native';
@@ -125,7 +126,8 @@ export default function VisaApplicationScreen() {
           const blob = await fetch(file.uri).then((result) => result.blob());
           form.append(key === 'applicantPhoto' ? 'photograph' : key, blob, file.name);
         } else {
-          form.append(key === 'applicantPhoto' ? 'photograph' : key, { uri: file.uri, name: file.name, type: file.mimeType } as unknown as Blob);
+          const bytes = await new ExpoFile(file.uri).bytes();
+          form.append(key === 'applicantPhoto' ? 'photograph' : key, new Blob([bytes], { type: file.mimeType }), file.name);
         }
       }
       const token = getAccessToken();
