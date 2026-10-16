@@ -1,3 +1,4 @@
+import type { VerifiedBookingPayment } from '@/utils/bookingPaymentApi';
 import { getAppLocale } from '@/utils/intl';
 import { useEffect, useState } from 'react';
 import { addBooking } from '@/utils/bookingStore';
@@ -13,7 +14,7 @@ export interface BusSelection { busId: string; fromCode: string; toCode: string;
 export interface BusPassengerInput { name: string; age: string; gender: 'M' | 'F' | 'O' | '' }
 export interface BusContact { email: string; phone: string }
 export interface BusOptions { insurance: boolean; delayAlerts: boolean }
-export interface BusPayment { method: 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
+export interface BusPayment { method: 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
 export interface TicketPassenger { name: string; age: number; gender: string; seat: string }
 export interface TicketPoint { name: string; landmark: string; time: string }
 export interface BusTicket {
@@ -138,8 +139,8 @@ export function currentPoints(s: State = state) {
 
 const rand = (len: number, chars = '0123456789') => Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
-/** Simulates a successful payment and issues a dummy e-ticket. Also records it in My Trips. */
-export function confirmBusBooking(payment: BusPayment): BusTicket | null {
+/** Creates a sample travel confirmation after payment and issues a dummy e-ticket. Also records it in My Trips. */
+export function confirmBusBooking(payment: BusPayment, verified?: VerifiedBookingPayment): BusTicket | null {
   const derived = currentFare();
   const sel = state.selection;
   const points = currentPoints();
@@ -150,14 +151,14 @@ export function confirmBusBooking(payment: BusPayment): BusTicket | null {
   }));
   const from = getCity(sel.fromCode); const to = getCity(sel.toCode);
   const ticket: BusTicket = {
-    ticketNo: `LTB${rand(8)}`, bookingId: `LT-BS-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`, bookedAt: new Date().toISOString(),
+    ticketNo: `LTB${rand(8)}`, bookingId: verified?.bookingId ?? `LT-BS-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`, bookedAt: new Date().toISOString(),
     busId: bus.id, operator: bus.operator, busType: bus.type, ac: bus.ac,
     fromCode: sel.fromCode, fromName: from?.name ?? sel.fromCode, toCode: sel.toCode, toName: to?.name ?? sel.toCode,
     date: sel.date, arrivalDate: addDaysISO(sel.date, points.dropping.dayOffset), departure: bus.departure, arrival: bus.arrival, duration: formatDuration(bus.durationMin),
     boarding: { name: points.boarding.name, landmark: points.boarding.landmark, time: points.boarding.time },
     dropping: { name: points.dropping.name, landmark: points.dropping.landmark, time: points.dropping.time },
     passengers, contact: { ...state.contact }, insurance: state.options.insurance,
-    fare, couponCode: state.coupon?.code ?? null, payment, txnId: `TXN${rand(12)}`,
+    fare, couponCode: state.coupon?.code ?? null, payment, txnId: verified?.paymentId ?? `TXN${rand(12)}`,
   };
   addBooking({
     id: ticket.bookingId, serviceName: 'Buses', itemName: `${ticket.operator} · ${ticket.fromName} → ${ticket.toName} · Seats ${sel.seats.join(', ')}`,

@@ -1,3 +1,4 @@
+import type { VerifiedBookingPayment } from '@/utils/bookingPaymentApi';
 import { getAppLocale } from '@/utils/intl';
 import { useEffect, useState } from 'react';
 import { addBooking } from '@/utils/bookingStore';
@@ -17,7 +18,7 @@ export interface PackageSnapshot {
 }
 export interface PackageTravellerInput { name: string; age: string; gender: 'M' | 'F' | 'O' | '' }
 export interface PackageContact { email: string; phone: string; passport: string; requests: string }
-export interface PackagePayment { method: 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
+export interface PackagePayment { method: 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
 export interface PackageTicketTraveller { name: string; age: number; gender: string; type: TravellerType }
 export interface PackageTicket {
   bookingId: string; voucher: string; bookedAt: string;
@@ -113,20 +114,20 @@ export function currentPackageFare(s: State = state): { fare: PackageFare; endDa
 
 const rand = (len: number, chars = '0123456789') => Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
-/** Simulates a successful payment, issues a dummy voucher and records it in My Trips. */
-export function confirmPackageBooking(payment: PackagePayment): PackageTicket | null {
+/** Creates a sample travel confirmation after payment, issues a dummy voucher and records it in My Trips. */
+export function confirmPackageBooking(payment: PackagePayment, verified?: VerifiedBookingPayment): PackageTicket | null {
   const derived = currentPackageFare();
   const pkg = state.pkg;
   if (!derived || !pkg) return null;
   const { fare, endDate, nights } = derived;
   const ticket: PackageTicket = {
-    bookingId: `LT-PK-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`, voucher: `PKG${rand(9)}`, bookedAt: new Date().toISOString(),
+    bookingId: verified?.bookingId ?? `LT-PK-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`, voucher: `PKG${rand(9)}`, bookedAt: new Date().toISOString(),
     packageId: pkg.id, title: pkg.title, destination: pkg.destination, image: pkg.image, duration: pkg.duration, nights,
     startDate: state.date, endDate, counts: { ...state.counts }, rooms: state.rooms,
     travellers: state.travellers.map((t, i) => ({ name: t.name.trim(), age: Number(t.age), gender: t.gender === 'M' ? 'Male' : t.gender === 'F' ? 'Female' : 'Other', type: travellerType(i, state.counts) })),
     contact: { ...state.contact, passport: state.contact.passport.trim().toUpperCase(), requests: state.contact.requests.trim() },
     inclusions: pkg.inclusions.slice(0, 6), hotels: pkg.hotels.slice(0, 3), cancellation: pkg.cancellation,
-    fare, couponCode: state.coupon?.code ?? null, payment, txnId: `TXN${rand(12)}`,
+    fare, couponCode: state.coupon?.code ?? null, payment, txnId: verified?.paymentId ?? `TXN${rand(12)}`,
   };
   addBooking({
     id: ticket.bookingId, serviceName: 'Holiday Package', itemName: `${pkg.title} · ${pkg.duration}`,

@@ -1,3 +1,4 @@
+import type { VerifiedBookingPayment } from '@/utils/bookingPaymentApi';
 import { getAppLocale } from '@/utils/intl';
 import { useEffect, useState } from 'react';
 import { addBooking } from '@/utils/bookingStore';
@@ -13,7 +14,7 @@ import {
 export interface HotelSelection { hotel: Hotel; roomId: string; checkIn: string; checkOut: string; guests: number; rooms: number }
 export interface HotelContact { email: string; phone: string }
 export interface HotelRequests { bed: string; arrival: string; note: string; earlyCheckIn: boolean; lateCheckOut: boolean }
-export interface HotelPayment { method: 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
+export interface HotelPayment { method: 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet'; label: string }
 export interface VoucherGuest { name: string; lead: boolean }
 export interface HotelVoucher {
   confirmationNo: string; bookingId: string; bookedAt: string;
@@ -108,8 +109,8 @@ export function currentFare(s: State = state): { fare: HotelFare; room: HotelRoo
 
 const rand = (len: number, chars = '0123456789') => Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
-/** Simulates a successful payment and issues a dummy hotel voucher. Also records it in My Trips. */
-export function confirmHotelBooking(payment: HotelPayment): HotelVoucher | null {
+/** Creates a sample travel confirmation after payment and issues a dummy hotel voucher. Also records it in My Trips. */
+export function confirmHotelBooking(payment: HotelPayment, verified?: VerifiedBookingPayment): HotelVoucher | null {
   const derived = currentFare();
   const sel = state.selection;
   if (!derived || !sel || !derived.nights) return null;
@@ -118,12 +119,12 @@ export function confirmHotelBooking(payment: HotelPayment): HotelVoucher | null 
   const lead = `${state.leadTitle} ${state.guestNames[0] ?? ''}`.trim();
   const guests: VoucherGuest[] = state.guestNames.map((n, i) => ({ name: i === 0 ? lead : n.trim() || `Guest ${i + 1}`, lead: i === 0 }));
   const voucher: HotelVoucher = {
-    confirmationNo: rand(9), bookingId: `LT-HT-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`, bookedAt: new Date().toISOString(),
+    confirmationNo: rand(9), bookingId: verified?.bookingId ?? `LT-HT-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`, bookedAt: new Date().toISOString(),
     hotelId: hotel.id, hotelName: hotel.name, image: hotel.gallery?.[0] ?? hotel.image, address: hotel.address ?? hotel.location, location: hotel.location,
     roomName: room.name, breakfast: room.breakfast ?? hotel.breakfast ?? false, cancellation: cancellationInfo(room, hotel),
     checkIn: sel.checkIn, checkOut: sel.checkOut, checkInTime: CHECK_IN_TIME, checkOutTime: CHECK_OUT_TIME, nights, rooms: sel.rooms,
     guests, contact: { ...state.contact }, requests: { ...state.requests },
-    fare, couponCode: state.coupon?.code ?? null, payment, txnId: `TXN${rand(12)}`,
+    fare, couponCode: state.coupon?.code ?? null, payment, txnId: verified?.paymentId ?? `TXN${rand(12)}`,
   };
   addBooking({
     id: voucher.bookingId, serviceName: 'Hotels', itemName: `${hotel.name} · ${room.name}`,

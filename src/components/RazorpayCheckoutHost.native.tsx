@@ -9,11 +9,11 @@ import { registerCheckoutHost, type CheckoutRequest } from '@/utils/razorpayBus'
 import { RazorpayCancelled } from '@/utils/razorpayTypes';
 
 // react-native-webview is optional here: without it the host never registers and the app uses the browser-sheet fallback.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let WebViewComponent: any = null;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 try { WebViewComponent = require('react-native-webview').WebView; } catch { WebViewComponent = null; }
 
-const RETURN_URL = 'lemontripmobile://razorpay-result'; // must match an allowed prefix in the backend's /pay/train page
+const RETURN_URL = 'lemontripmobile://razorpay-result'; // must match an allowed prefix in the backend's /pay/checkout page
 
 function parseQuery(url: string) {
   const out: Record<string, string> = {};
@@ -95,7 +95,7 @@ export function RazorpayCheckoutHost() {
           <View style={{ flex: 1 }}>
             <WebViewComponent
               key={request.options.orderId}
-              source={{ uri: `${APP_API_URL}/pay/train?${params}` }}
+              source={{ uri: `${APP_API_URL}/pay/checkout?${params}` }}
               originWhitelist={['*']}
               javaScriptEnabled
               domStorageEnabled
@@ -122,5 +122,5 @@ const s = StyleSheet.create({
   close: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
   title: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   sub: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight },
-  loading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
+  loading: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
 });

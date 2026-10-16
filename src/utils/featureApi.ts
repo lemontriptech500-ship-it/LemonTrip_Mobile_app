@@ -1,4 +1,5 @@
 import { getAccessToken } from './authStore';
+import { APP_API_URL } from './apiConfig';
 
 export async function featureRequest<T>(base: string | undefined, path: string, options?: { method: string; body: unknown }): Promise<T> {
   if (!base) throw new Error('This service is temporarily unavailable. Please contact LemonTrip for help.');
@@ -14,7 +15,7 @@ export async function featureRequest<T>(base: string | undefined, path: string, 
 }
 export type WalletData = { balance: number; currency: string; status: string };
 export async function loadWallet() {
-  const data = await featureRequest<WalletData>(process.env.EXPO_PUBLIC_WALLET_API_URL, '/wallet');
+  const data = await featureRequest<WalletData>(APP_API_URL, '/api/wallet');
   if (!Number.isFinite(data.balance) || data.balance < 0 || typeof data.currency !== 'string' || !/^[A-Z]{3}$/.test(data.currency)) throw new Error('Wallet balance could not be verified. Please try again.');
   return data;
 }
@@ -43,8 +44,12 @@ export async function changePassword(currentPassword: string | undefined, newPas
 }
 export type TopupOrder = { orderId: string; amount: number; currency: string; keyId: string; topupId: string; topupReference: string };
 export async function createTopupOrder(amountRupees: number) {
-  const base = process.env.EXPO_PUBLIC_WALLET_API_URL;
-  const data = await featureRequest<TopupOrder>(base, '/wallet/topups', { method: 'POST', body: { amount: amountRupees } });
-  if (typeof data.orderId !== 'string' || !Number.isFinite(data.amount) || typeof data.keyId !== 'string') throw new Error('The top-up order could not be verified. Please try again.');
+  const data = await featureRequest<TopupOrder>(APP_API_URL, '/api/wallet/topups', { method: 'POST', body: { amount: amountRupees } });
+  if (typeof data.orderId !== 'string' || !Number.isFinite(data.amount) || data.amount !== Math.round(amountRupees * 100) || !data.keyId?.startsWith('rzp_test_') || data.currency !== 'INR') throw new Error('The test top-up order could not be verified. Please try again.');
+  return data;
+}
+export async function verifyTopupPayment(input: { razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string }) {
+  const data = await featureRequest<{ status: string; balance: number; currency: string }>(APP_API_URL, '/api/wallet/topups/verify', { method: 'POST', body: input });
+  if (data.status !== 'SUCCESS' || !Number.isFinite(data.balance) || data.currency !== 'INR') throw new Error('Wallet top-up payment could not be verified. Please try again.');
   return data;
 }

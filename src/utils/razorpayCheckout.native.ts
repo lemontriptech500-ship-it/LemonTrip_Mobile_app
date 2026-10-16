@@ -15,7 +15,7 @@ async function openInBrowser(options: RazorpayOptions): Promise<RazorpaySuccess>
     order: options.orderId, name: options.name, description: options.description, redirect: returnUrl,
     email: options.prefill?.email ?? '', contact: options.prefill?.contact ?? '', customer: options.prefill?.name ?? '',
   });
-  const result = await WebBrowser.openAuthSessionAsync(`${APP_API_URL}/pay/train?${params.toString()}`, returnUrl);
+  const result = await WebBrowser.openAuthSessionAsync(`${APP_API_URL}/pay/checkout?${params.toString()}`, returnUrl);
   if (result.type !== 'success' || !result.url) throw new RazorpayCancelled();
 
   const query = Linking.parse(result.url).queryParams ?? {};
