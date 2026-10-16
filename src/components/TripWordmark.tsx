@@ -1,9 +1,6 @@
 import { Brand } from '@/constants/colors';
-import { useId } from 'react';
 import { Animated } from 'react-native';
-import Svg, { ClipPath, Defs, Path, Rect } from 'react-native-svg';
-
-const AnimatedRect = Animated.createAnimatedComponent(Rect);
+import Svg, { Path } from 'react-native-svg';
 
 // Actual Great Vibes Regular glyph outlines for "trip", bundled so the splash
 // renders immediately without waiting for font loading. See the font OFL license.
@@ -12,32 +9,53 @@ const WORDMARK_WIDTH = 983;
 const WORDMARK_HEIGHT = 825;
 
 export function TripWordmark({ progress, width = 240 }: { progress: Animated.Value; width?: number }) {
-  const clipId = `trip-${useId().replace(/:/g, '')}`;
+  const height = width * (WORDMARK_HEIGHT / WORDMARK_WIDTH);
+
+  // Reveal left-to-right by animating the width of an overflow-hidden wrapper.
+  // The inner Svg keeps its full size, so the wrapper simply crops it.
+  const revealWidth = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, width],
+    extrapolate: 'clamp',
+  });
 
   return (
-    <Svg width={width} height={width * (WORDMARK_HEIGHT / WORDMARK_WIDTH)} viewBox={`0 0 ${WORDMARK_WIDTH} ${WORDMARK_HEIGHT}`} accessible accessibilityRole="image" accessibilityLabel="Trip">
-      <Defs>
-        <ClipPath id={clipId}>
-          <AnimatedRect
-            x={0}
-            y={0}
-            height={WORDMARK_HEIGHT}
-            width={progress.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, WORDMARK_WIDTH],
-              extrapolate: 'clamp',
-            })}
+    // Fixed-size outer box keeps layout stable (and centering correct) during the reveal.
+    <Animated.View style={{ width, height, alignItems: 'flex-start' }}>
+      <Animated.View style={{ width: revealWidth, height, overflow: 'hidden' }}>
+        <Svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${WORDMARK_WIDTH} ${WORDMARK_HEIGHT}`}
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel="Trip"
+        >
+          <Path
+            d={TRIP_OUTLINE}
+            fill={Brand.lemon}
+            stroke={Brand.lemon}
+            strokeWidth={4}
+            strokeLinejoin="round"
           />
-        </ClipPath>
-      </Defs>
-      <Path
-        d={TRIP_OUTLINE}
-        fill={Brand.lemon}
-        stroke={Brand.lemon}
-        strokeWidth={4}
-        strokeLinejoin="round"
-        clipPath={`url(#${clipId})`}
-      />
-    </Svg>
+        </Svg>
+      </Animated.View>
+    </Animated.View>
   );
 }
+
+/*
+ * Usage (in your splash screen):
+ *
+ * const progress = useRef(new Animated.Value(0)).current;
+ *
+ * useEffect(() => {
+ *   Animated.timing(progress, {
+ *     toValue: 1,
+ *     duration: 1400,
+ *     useNativeDriver: false, // required: width can't run on the native driver
+ *   }).start();
+ * }, [progress]);
+ *
+ * <TripWordmark progress={progress} />
+ */
