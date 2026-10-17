@@ -12,6 +12,7 @@ import {
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
 import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
+import { DateField } from '@/components/visa/DateField';
 import { formatShortDate } from '@/data/trains';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -125,13 +126,12 @@ export default function TravellerDetailsScreen() {
                 </View>
                 {submitted && !t.gender ? <Text style={s.error}>Select gender.</Text> : null}
                 <View style={{ height: 12 }} />
-                <Field
+                <DateField
                   label="DATE OF BIRTH (OPTIONAL)"
-                  icon="calendar-outline"
                   value={t.dob}
-                  onChangeText={(v) => updateTraveller(i, { dob: v })}
-                  placeholder="YYYY-MM-DD"
-                  keyboardType="numbers-and-punctuation"
+                  onChange={(v) => updateTraveller(i, { dob: v })}
+                  maximumDate={new Date()}
+                  initialDate={new Date(1995, 0, 1)}
                 />
               </Card>
             ))}

@@ -5,6 +5,7 @@ import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
 import FlightSearchForm from '@/components/flights/FlightSearchForm';
+import { DateField } from '@/components/DatePickerField';
 import { Colors } from '@/constants/colors';
 import type { Offer } from '@/data/mock/offers';
 import type { BlogPost, Destination, TravelPackage } from '@/types/content';
@@ -326,8 +327,8 @@ function HomeServiceWidget({ service, story, offer, travelPackage }: { service: 
         <View>
           <WidgetField label="DESTINATION" value={destination} onChangeText={setDestination} placeholder="City, region or property" />
           <View style={styles.widgetFieldRow}>
-            <WidgetField label="CHECK IN" value={checkIn} onChangeText={setCheckIn} placeholder="YYYY-MM-DD" />
-            <WidgetField label="CHECK OUT" value={checkOut} onChangeText={setCheckOut} placeholder="YYYY-MM-DD" />
+            <DateField label="CHECK IN" value={checkIn} onChange={setCheckIn} compact />
+            <DateField label="CHECK OUT" value={checkOut} onChange={setCheckOut} minDate={checkIn || undefined} compact />
           </View>
           <WidgetButton label="Search hotels" onPress={searchHotels} />
         </View>
@@ -337,7 +338,7 @@ function HomeServiceWidget({ service, story, offer, travelPackage }: { service: 
             <WidgetField label="FROM" value={from} onChangeText={setFrom} placeholder={name === 'Trains' ? 'Departure station' : 'Departure city'} />
             <WidgetField label="TO" value={to} onChangeText={setTo} placeholder={name === 'Trains' ? 'Arrival station' : 'Destination city'} />
           </View>
-          <WidgetField label="TRAVEL DATE" value={travelDate} onChangeText={setTravelDate} placeholder="YYYY-MM-DD" />
+          <DateField label="TRAVEL DATE" value={travelDate} onChange={setTravelDate} compact />
           <WidgetButton label={`Search ${name.toLowerCase()}`} onPress={searchGroundTravel} />
         </View>
       ) : (

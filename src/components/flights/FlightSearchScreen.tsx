@@ -1,5 +1,4 @@
 import { useAppLanguage } from '@/utils/intl';
-import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
@@ -7,11 +6,12 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, Chip, FlowScreen, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
-import { addDaysISO, defaultTravelDate, formatShortDate, fromISO, isRealDate, upcomingDates } from '@/data/trains';
+import { addDaysISO, defaultTravelDate, formatShortDate, isRealDate } from '@/data/trains';
 import { recordRecentSearch } from '@/utils/personalStore';
 import { Ionicons } from '@expo/vector-icons';
+import { DateField, todayISO } from '@/components/DatePickerField';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { AirportPicker } from './AirportPicker';
 import { POPULAR_FLIGHT_ROUTES, airportLabel, getAirport, resolveAirport } from './airports';
@@ -32,7 +32,6 @@ export default function FlightSearchScreen() {
   useAppLanguage();
   const { search } = useLocalSearchParams<{ search?: string }>();
   const lastSearch = useRef<string | undefined>(undefined);
-  const dates = useMemo(() => upcomingDates(14), []);
 
   const [tripType, setTripType] = useState<TripType>('oneWay');
   const [origin, setOrigin] = useState('');
@@ -140,8 +139,10 @@ export default function FlightSearchScreen() {
               <AirportButton label="TO" code={destination} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to')} />
             </View>
 
-            <DateStrip label="DEPARTURE DATE" dates={dates} value={departureDate} onChange={(d) => { setDepartureDate(d); if (returnDate < d) setReturnDate(d); }} />
-            {tripType === 'roundTrip' ? <DateStrip label="RETURN DATE" dates={dates.filter((d) => d >= departureDate)} value={returnDate} onChange={setReturnDate} /> : null}
+            <View style={{ flexDirection: 'row', gap: 14, marginTop: 16 }}>
+              <DateField compact label="DEPARTURE" value={departureDate} placeholder="Add date" minDate={todayISO()} onChange={(d) => { setDepartureDate(d); if (returnDate < d) setReturnDate(d); if (date2 < d) setDate2(d); }} />
+              {tripType === 'roundTrip' ? <DateField compact label="RETURN" value={returnDate} placeholder="Add date" minDate={departureDate} onChange={setReturnDate} /> : null}
+            </View>
 
             {tripType === 'multiCity' ? (
               <>
@@ -150,7 +151,9 @@ export default function FlightSearchScreen() {
                   <AirportButton label="FROM" code={origin2} placeholder="Select departure" icon="radio-button-on-outline" onPress={() => setPicker('from2')} />
                   <AirportButton label="TO" code={destination2} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to2')} />
                 </View>
-                <DateStrip label="SECOND LEG DATE" dates={dates.filter((d) => d >= departureDate)} value={date2} onChange={setDate2} />
+                <View style={{ flexDirection: 'row' }}>
+                  <DateField compact label="SECOND LEG DATE" value={date2} placeholder="Add date" minDate={departureDate} onChange={setDate2} />
+                </View>
               </>
             ) : null}
 
@@ -228,27 +231,6 @@ function AirportButton({ label, code, placeholder, icon, onPress }: { label: str
   );
 }
 
-function DateStrip({ label, dates, value, onChange }: { label: string; dates: string[]; value: string; onChange: (iso: string) => void }) {
-  const list = dates.includes(value) ? dates : [value, ...dates];
-  return (
-    <>
-      <Text style={s.label}>{label}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.dates}>
-        {list.map((iso) => {
-          const d = fromISO(iso); const on = iso === value;
-          return (
-            <TouchableOpacity key={iso} accessibilityRole="button" accessibilityState={{ selected: on }} accessibilityLabel={d.toDateString()} onPress={() => onChange(iso)} style={[s.date, on && s.dateOn]}>
-              <Text style={[s.dow, on && s.dateTextOn]}>{d.toLocaleDateString(getAppLocale(), { weekday: 'short' }).toUpperCase()}</Text>
-              <Text style={[s.dayNum, on && s.dateTextOn]}>{d.getDate()}</Text>
-              <Text style={[s.mon, on && s.dateTextOn]}>{d.toLocaleDateString(getAppLocale(), { month: 'short' })}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    </>
-  );
-}
-
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   pad: { paddingHorizontal: Ui.space.page },
@@ -260,13 +242,6 @@ const s = StyleSheet.create({
   stationCode: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
   swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginTop: 16, marginBottom: 8 },
-  dates: { gap: 8 },
-  date: { width: 58, alignItems: 'center', paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  dateOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  dow: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.textLight, letterSpacing: 0.6 },
-  dayNum: { fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginVertical: 1 },
-  mon: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight },
-  dateTextOn: { color: Colors.white },
   counter: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   counterBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   counterText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
