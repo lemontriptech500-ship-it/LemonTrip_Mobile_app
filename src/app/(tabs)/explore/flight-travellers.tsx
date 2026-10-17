@@ -7,6 +7,7 @@ import { getFlightBookingDraft, updateFlightBookingDraft, type Gender, type Trav
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
 import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
+import { DateField } from '@/components/visa/DateField';
 import { formatShortDate } from '@/data/trains';
 import { useAuth } from '@/utils/authStore';
 import { normalizePhoneInput } from '@/utils/authApi';
@@ -45,7 +46,7 @@ export default function FlightTravellersScreen() {
 
   // Prefill contact once from the signed-in account.
   useEffect(() => {
-    if (user?.email) setEmail((v) => v || user.email);
+    if (user?.email) setEmail((v) => v || user.email || '');
     if (user?.phone) setPhone((v) => v || String(user.phone));
   }, [user?.email, user?.phone]);
 
@@ -118,7 +119,7 @@ export default function FlightTravellersScreen() {
                   <View style={s.chips}>{GENDERS.map((g) => <Chip key={g} label={g} selected={t.gender === g} onPress={() => update(i, { gender: g })} />)}</View>
                   {e.gender ? <Text style={s.error}>{e.gender}</Text> : null}
                   <View style={{ height: 12 }} />
-                  <Field label="DATE OF BIRTH (OPTIONAL)" icon="calendar-outline" value={t.dob} onChangeText={(v) => update(i, { dob: v })} placeholder="YYYY-MM-DD" keyboardType="numbers-and-punctuation" maxLength={10} error={e.dob} />
+                  <DateField label="DATE OF BIRTH (OPTIONAL)" value={t.dob} onChange={(v) => update(i, { dob: v })} error={e.dob} maximumDate={new Date()} initialDate={new Date(1995, 0, 1)} />
                 </Card>
               );
             })}

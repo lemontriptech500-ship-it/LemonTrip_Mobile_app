@@ -1,5 +1,6 @@
 import { useAppLanguage } from '@/utils/intl';
 import { Alert } from '@/components/ui/Alert';
+import { DateField } from '@/components/DatePickerField';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
@@ -135,13 +136,9 @@ export default function HotelsScreen() {
                 <Text style={styles.fieldLabel}>DESTINATION</Text>
                 <View style={styles.inputWrap}><Ionicons name="location-outline" size={16} color={Colors.textLight} /><TextInput value={destination} onChangeText={setDestination} placeholder="City, region or property" placeholderTextColor={Colors.textLight} style={styles.input} /></View>
               </View>
-              <View style={styles.field}>
-                <Text style={styles.fieldLabel}>CHECK-IN</Text>
-                <TextInput value={checkIn} onChangeText={setCheckIn} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textLight} style={styles.dateInput} />
-              </View>
-              <View style={styles.field}>
-                <Text style={styles.fieldLabel}>CHECK-OUT</Text>
-                <TextInput value={checkOut} onChangeText={setCheckOut} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textLight} style={styles.dateInput} />
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <DateField label="CHECK-IN" value={checkIn} onChange={setCheckIn} />
+                <DateField label="CHECK-OUT" value={checkOut} onChange={setCheckOut} minDate={checkIn || undefined} />
               </View>
               <View style={[styles.field, styles.fullWidthField]}>
                 <Text style={styles.fieldLabel}>GUESTS & ROOMS</Text>
