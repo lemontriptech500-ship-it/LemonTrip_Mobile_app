@@ -3,278 +3,171 @@ import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { Ui } from '@/constants/theme';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { PACKAGE_ROUTES, PackageProgress } from '@/components/packages/PackageUi';
+import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
-import { BrandGradientBar, LemonTripBrand } from '@/components/BrandGradientBar';
-import { Ionicons } from '@expo/vector-icons';
+import { Ui } from '@/constants/theme';
+import { getPackageGallery } from '@/data/packageImages';
 import type { TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { selectPackage } from '@/utils/packageBookingStore';
-import { PACKAGE_ROUTES } from '@/components/packages/PackageUi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { Image, Linking, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getPackageGallery } from '@/data/packageImages';
+
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function PackageDetailScreen() {
   useAppLanguage();
   useWishlist();
-  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { items: travelPackages, loading } = useContentItems<TravelPackage>('package');
   const pkg = travelPackages.find((item) => item.id === id);
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
+  const back = () => goBackOr(PACKAGE_ROUTES.list);
 
-  const handleBack = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace('/packages');
-  };
-
-  const handleBook = () => {
-    if (!pkg) return;
-    selectPackage(pkg);
-    router.push(PACKAGE_ROUTES.plan);
-  };
-
-  const handleEnquire = async () => {
+  const enquire = async () => {
     if (!pkg) return;
     const subject = encodeURIComponent(`Enquiry: ${pkg.title}`);
     const body = encodeURIComponent(`Hello LemonTrip, I would like to know more about ${pkg.title}.`);
-    try {
-      await Linking.openURL(`mailto:lemontripindia@gmail.com?subject=${subject}&body=${body}`);
-    } catch {
-      Alert.alert('Enquire about this journey', 'Contact lemontripindia@gmail.com to ask about this package.');
-    }
+    try { await Linking.openURL(`mailto:lemontripindia@gmail.com?subject=${subject}&body=${body}`); }
+    catch { Alert.alert('Enquire about this journey', 'Contact lemontripindia@gmail.com to ask about this package.'); }
   };
 
-  if (loading) return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Loading package…</Text></View></SafeAreaView>;
-  if (!pkg) {
-    return <SafeAreaView style={styles.safeArea}><View style={styles.notFound}><Text style={styles.notFoundText}>Package not found.</Text><TouchableOpacity onPress={() => router.replace('/packages')} style={styles.backToPackages}><Text style={styles.backToPackagesText}>Browse journeys</Text></TouchableOpacity></View></SafeAreaView>;
+  if (loading || !pkg) {
+    return (
+      <FlowScreen>
+        <ScrollView>
+          <ScreenHeader title="Package details" eyebrow="LEMONTRIP / HOLIDAYS" onBack={back} />
+          <EmptyState icon="umbrella-outline" title={loading ? 'Loading package…' : 'Package not found'} text={loading ? 'Fetching the latest details.' : 'This journey is no longer available.'} action={loading ? undefined : <PrimaryButton label="Browse packages" onPress={() => replaceTo(PACKAGE_ROUTES.list)} />} />
+        </ScrollView>
+      </FlowScreen>
+    );
   }
 
+  const book = () => { selectPackage(pkg); goTo(PACKAGE_ROUTES.plan); };
   const gallery = getPackageGallery(pkg.id, pkg.title, pkg.destination, pkg.image, pkg.gallery);
-  const galleryImageWidth = gallery.length === 1 ? Math.min(width, 1160) : 265;
-  const included = pkg.inclusions ?? [];
-  const excluded = pkg.exclusions ?? [];
-  const itinerary = pkg.itinerary?.map((day) => `${day.day}: ${day.title}${day.description ? ` — ${day.description}` : ''}`) ?? [];
-  const summaryItems = [
-    { icon: 'bed-outline' as const, label: 'Accommodation', value: pkg.hotels?.[0] ?? 'Hotel, subject to availability' },
-    { icon: 'restaurant-outline' as const, label: 'Meals', value: pkg.meals?.[0] ?? 'Breakfast as specified' },
-    { icon: 'car-outline' as const, label: 'Transfers', value: pkg.transfers?.[0] ?? 'Selected transfers' },
+  const saved = isInWishlist(pkg.id);
+  const heroWidth = Math.min(width, 760) - Ui.space.page * 2;
+  const summary: { icon: IconName; label: string; value: string }[] = [
+    { icon: 'bed-outline', label: 'Stay', value: pkg.hotels?.[0] ?? 'Hotel, subject to availability' },
+    { icon: 'restaurant-outline', label: 'Meals', value: pkg.meals?.[0] ?? 'As specified' },
+    { icon: 'car-outline', label: 'Transfers', value: pkg.transfers?.[0] ?? 'Selected transfers' },
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <StatusBar style="light" />
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <BrandGradientBar style={styles.navRow}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}><Ionicons name="arrow-back" size={18} color={Colors.white} /></TouchableOpacity>
-            <LemonTripBrand size={38} />
-            <Text style={styles.breadcrumb}>{pkg.destination?.toUpperCase() ?? 'JOURNEYS'}</Text>
-            <View style={styles.navSpacer} />
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open wishlist" onPress={() => router.push('/(tabs)/wishlist')} style={styles.iconButton}><Ionicons name="heart-outline" size={18} color={Colors.primaryDark} /></TouchableOpacity>
-          </BrandGradientBar>
+    <FlowScreen footer={<FooterBar caption="From · per person" amount={pkg.price.replace(/\s*\/\s*person/i, '')} action={<PrimaryButton label="Select your trip" icon="arrow-forward" onPress={book} />} />}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+        <View style={s.content}>
+          <ScreenHeader
+            title={pkg.title}
+            subtitle={pkg.destination && pkg.destination !== pkg.title ? `${pkg.destination} · ${pkg.duration}` : pkg.duration}
+            eyebrow="LEMONTRIP / HOLIDAYS"
+            onBack={back}
+            rightAction={{ label: saved ? 'Saved' : 'Save', icon: saved ? 'heart' : 'heart-outline', onPress: () => toggleWishlist({ id: pkg.id, name: pkg.title, image: pkg.image, price: pkg.price, category: 'Packages', location: pkg.destination }) }}
+          />
+          <PackageProgress current={0} />
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>
-            {gallery.map((image, index) => <Image key={`${pkg.id}-gallery-${index}`} source={{ uri: image }} style={[styles.galleryImage, { width: galleryImageWidth }, gallery.length === 1 && styles.singleGalleryImage]} />)}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.gallery} style={s.galleryWrap}>
+            {gallery.map((uri, i) => <Image key={`${pkg.id}-${i}`} source={{ uri }} style={[s.image, { width: gallery.length === 1 ? heroWidth : Math.min(heroWidth * 0.8, 300) }]} />)}
           </ScrollView>
 
-          <View style={[styles.detailLayout, desktop && styles.detailLayoutDesktop]}>
-            <View style={styles.mainColumn}>
-              <View style={styles.titleArea}>
-                <View style={styles.metaRow}>
-                  <Text style={styles.destination}>{pkg.destination ?? 'Destination details unavailable'}</Text>
-                  {pkg.rating ? <View style={styles.rating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.ratingText}>{pkg.rating.replace(/[^0-9.]/g, '')}</Text></View> : null}
-                </View>
-                <View style={styles.titleRow}>
-                  <Text style={styles.title}>{pkg.title}</Text>
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    accessibilityLabel={isInWishlist(pkg.id) ? 'Remove package from wishlist' : 'Save package to wishlist'}
-                    onPress={() => toggleWishlist({ id: pkg.id, name: pkg.title, image: pkg.image, price: pkg.price, category: 'Packages', location: pkg.destination })}
-                    style={styles.saveButton}>
-                    <Ionicons name={isInWishlist(pkg.id) ? 'heart' : 'heart-outline'} size={17} color={isInWishlist(pkg.id) ? Colors.error : Colors.primary} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.tripMeta}>
-                  <View style={styles.metaItem}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.duration}</Text></View>
-                  {pkg.badge ? <View style={styles.metaItem}><Ionicons name="pricetag-outline" size={14} color={Colors.textLight} /><Text style={styles.metaText}>{pkg.badge}</Text></View> : null}
-                </View>
-                {pkg.categories?.length ? <View style={styles.categoryList}>{pkg.categories.map((category) => <View key={category} style={styles.categoryTag}><Text style={styles.categoryText}>{category}</Text></View>)}</View> : null}
-              </View>
-
-              <View style={styles.summaryGrid}>
-                {summaryItems.map((item) => <View key={item.label} style={styles.summaryCard}>
-                  <Ionicons name={item.icon} size={16} color={Colors.primary} />
-                  <Text style={styles.summaryLabel}>{item.label}</Text>
-                  <Text style={styles.summaryValue}>{item.value}</Text>
-                </View>)}
-              </View>
-
-              <DetailSection title="About this package" icon="book-outline" defaultExpanded>
-                <Text style={styles.overview}>{pkg.description}</Text>
-              </DetailSection>
-              <View style={styles.journeyHeading}><Text style={styles.bookingEyebrow}>YOUR JOURNEY</Text><Text style={styles.journeyTitle}>Day-by-day itinerary</Text></View>
-              {pkg.itinerary?.length ? pkg.itinerary.map((day, index) => <View key={`${day.day}-${index}`} style={styles.dayRow}><View style={styles.dayNumber}><Text style={styles.dayNumberText}>{String(index + 1).padStart(2, '0')}</Text></View><View style={styles.dayCard}><DetailSection embedded title={day.title} icon="location-outline" text={day.description} defaultExpanded={index === 0} /></View></View>) : <DetailSection title="Itinerary details" icon="calendar-outline" values={itinerary} /> }
-              <DetailSection title="Hotels" icon="bed-outline" values={pkg.hotels} />
-              <DetailSection title="Meals" icon="restaurant-outline" values={pkg.meals} />
-              <DetailSection title="Transfers" icon="car-outline" values={pkg.transfers} />
-              <DetailSection title="Top experiences" icon="camera-outline" values={pkg.highlights} defaultExpanded />
-              <DetailSection title="Package includes" icon="checkmark-circle-outline" values={included} />
-              <DetailSection title="Package excludes" icon="close-circle-outline" values={excluded} />
-              <DetailSection title="Terms" icon="document-text-outline" text={pkg.terms} />
-              <DetailSection title="Cancellation" icon="calendar-clear-outline" text={pkg.cancellation} />
+          <Card>
+            <SectionTitle eyebrow="OVERVIEW" title="About this package" right={pkg.rating ? <Pill icon="star" label={pkg.rating.replace(/[^0-9.]/g, '')} tone="brand" /> : undefined} />
+            <Text style={s.body}>{pkg.description}</Text>
+            <View style={s.pills}>
+              <Pill icon="time-outline" label={pkg.duration} />
+              {pkg.badge ? <Pill icon="pricetag-outline" label={pkg.badge} tone="brand" /> : null}
+              {pkg.categories?.map((c) => <Pill key={c} label={c} />)}
             </View>
+          </Card>
 
-            {desktop ? <View style={styles.bookingColumn}><BookingPanel title={pkg.title} duration={pkg.duration} price={pkg.price} onEnquire={handleEnquire} onBook={handleBook} /></View> : null}
-          </View>
+          <Card>
+            <SectionTitle eyebrow="AT A GLANCE" title="What to expect" />
+            {summary.map((item, i) => (
+              <View key={item.label} style={[s.line, i > 0 && s.lineBorder]}>
+                <Ionicons name={item.icon} size={16} color={Colors.primary} />
+                <Text style={s.lineLabel}>{item.label}</Text>
+                <Text style={s.lineValue} numberOfLines={2}>{item.value}</Text>
+              </View>
+            ))}
+          </Card>
+
+          {pkg.itinerary?.length ? (
+            <Card>
+              <SectionTitle eyebrow="YOUR JOURNEY" title="Day-by-day itinerary" right={<Pill icon="calendar-outline" label={`${pkg.itinerary.length} days`} />} />
+              {pkg.itinerary.map((day, i) => (
+                <View key={`${day.day}-${i}`} style={s.stop}>
+                  <View style={s.rail}>
+                    <View style={s.node} />
+                    {i < pkg.itinerary!.length - 1 ? <View style={s.link} /> : null}
+                  </View>
+                  <View style={{ flex: 1, minWidth: 0, paddingBottom: 18 }}>
+                    <Text style={s.stopTitle}>{day.title}</Text>
+                    <Text style={s.stopMeta}>{day.day}</Text>
+                    {day.description ? <Text style={s.body}>{day.description}</Text> : null}
+                  </View>
+                </View>
+              ))}
+            </Card>
+          ) : null}
+
+          <ListCard eyebrow="HIGHLIGHTS" title="Top experiences" icon="camera-outline" values={pkg.highlights} />
+          <ListCard eyebrow="STAY" title="Hotels" icon="bed-outline" values={pkg.hotels} />
+          <ListCard eyebrow="FOOD" title="Meals" icon="restaurant-outline" values={pkg.meals} />
+          <ListCard eyebrow="GETTING AROUND" title="Transfers" icon="car-outline" values={pkg.transfers} />
+          <ListCard eyebrow="INCLUDED" title="Package includes" icon="checkmark-circle" values={pkg.inclusions} color={Colors.success} />
+          <ListCard eyebrow="NOT INCLUDED" title="Package excludes" icon="close-circle" values={pkg.exclusions} color={Colors.error} />
+
+          {pkg.terms || pkg.cancellation ? (
+            <Card>
+              <SectionTitle eyebrow="POLICIES" title="Terms & cancellation" />
+              {pkg.terms ? <Text style={s.body}>{pkg.terms}</Text> : null}
+              {pkg.cancellation ? <Text style={[s.body, pkg.terms ? { marginTop: 10 } : null]}>{pkg.cancellation}</Text> : null}
+            </Card>
+          ) : null}
+
+          <Notice icon="information-circle-outline">Prices are per person on twin sharing. Choose your date, travellers and rooms next; availability is confirmed at booking.</Notice>
+          <View style={s.enquireWrap}><PrimaryButton variant="soft" icon="mail-outline" label="Enquire about this package" onPress={() => void enquire()} /></View>
         </View>
       </ScrollView>
-
-      {!desktop ? (
-        <View style={[styles.mobileBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-          <View style={styles.mobilePrice}><Text style={styles.mobilePriceLabel}>FROM · PER PERSON</Text><Text style={styles.mobilePriceValue}>{pkg.price}</Text></View>
-          <TouchableOpacity onPress={handleEnquire} style={styles.enquireButton}><Text style={styles.enquireText}>Enquire</Text></TouchableOpacity>
-          <TouchableOpacity onPress={handleBook} style={styles.bookButton}><Text style={styles.bookText}>Book now  →</Text></TouchableOpacity>
-        </View>
-      ) : null}
-    </SafeAreaView>
+    </FlowScreen>
   );
 }
 
-function DetailSection({
-  title,
-  icon,
-  children,
-  values,
-  text,
-  defaultExpanded = false,
-  embedded = false,
-}: {
-  title: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  children?: React.ReactNode;
-  values?: string[];
-  text?: string;
-  defaultExpanded?: boolean;
-  embedded?: boolean;
-}) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-  const hasData = Boolean(children || text || values?.length);
+/** Collapsible list card, expanded by default, hidden when the package has no data. */
+function ListCard({ eyebrow, title, icon, values, color = Colors.primary }: { eyebrow: string; title: string; icon: IconName; values?: string[]; color?: string }) {
+  const [open, setOpen] = useState(true);
+  if (!values?.length) return null;
   return (
-    <View style={[styles.section, embedded && styles.embeddedSection]}>
-      <TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded }} onPress={() => setExpanded((current) => !current)} style={styles.sectionHeader}>
-        <View style={styles.sectionTitleRow}><Ionicons name={icon} size={16} color={Colors.primary} /><Text style={styles.sectionTitle}>{title}</Text></View>
-        <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={15} color={Colors.textLight} />
-      </TouchableOpacity>
-      {expanded ? (
-        <View style={styles.sectionContent}>
-          {children}
-          {values?.length ? values.map((value) => <View key={value} style={styles.detailBullet}><Ionicons name="ellipse" size={5} color={Colors.secondary} /><Text style={styles.detailText}>{value}</Text></View>) : null}
-          {text ? <Text style={styles.detailText}>{text}</Text> : null}
-          {!hasData ? <Text style={styles.unavailable}>Details not supplied for this package.</Text> : null}
-        </View>
-      ) : null}
-    </View>
+    <Card>
+      <SectionTitle eyebrow={eyebrow} title={title} right={<TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded: open }} accessibilityLabel={`${open ? 'Collapse' : 'Expand'} ${title}`} onPress={() => setOpen((v) => !v)} hitSlop={8}><Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textLight} /></TouchableOpacity>} />
+      {open ? values.map((v) => <View key={v} style={s.bullet}><Ionicons name={icon} size={16} color={color} /><Text style={s.bulletText}>{v}</Text></View>) : null}
+    </Card>
   );
 }
 
-function BookingPanel({ title, duration, price, onEnquire, onBook }: {
-  title: string;
-  duration: string;
-  price: string;
-  onEnquire: () => void;
-  onBook: () => void;
-}) {
-  return (
-    <View style={styles.bookingPanel}>
-      <Text style={styles.bookingEyebrow}>YOUR JOURNEY</Text>
-      <Text style={styles.bookingTitle}>{title}</Text>
-      <View style={styles.bookingMeta}><Ionicons name="time-outline" size={14} color={Colors.textLight} /><Text style={styles.bookingMetaText}>{duration}</Text></View>
-      <View style={styles.bookingPriceArea}><Text style={styles.bookingPriceLabel}>STARTING FROM</Text><Text style={styles.bookingPrice}>{price}</Text></View>
-      <Text style={styles.priceNote}>Per person, twin sharing. Choose your date, travellers and room preference next. Availability and final details are confirmed separately.</Text>
-      <TouchableOpacity onPress={onEnquire} style={styles.enquireButtonWide}><Ionicons name="mail-outline" size={15} color={Colors.primary} /><Text style={styles.enquireWideText}>Enquire now</Text></TouchableOpacity>
-      <TouchableOpacity onPress={onBook} style={styles.bookButtonWide}><Text style={styles.bookWideText}>Select your trip</Text></TouchableOpacity>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  journeyHeading: { marginHorizontal: Ui.space.page, marginTop: 20, marginBottom: 8 }, journeyTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.primary, marginTop: 5 }, dayRow: { flexDirection: 'row', marginHorizontal: Ui.space.page, gap: 10, marginBottom: 8, alignItems: 'flex-start' }, dayNumber: { width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 12 }, dayNumberText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.white, fontWeight: FontWeight.extraBold }, dayCard: { ...Ui.card, flex: 1, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  scroll: { flex: 1 },
-  page: { paddingBottom: 30 },
-  content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
-  navRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14 },
-  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.onDarkSurface },
-  breadcrumb: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
-  navSpacer: { flex: 1 },
-  iconButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accent },
-  gallery: { paddingHorizontal: 0, gap: 8 },
-  galleryImage: { height: 210, borderRadius: 15, backgroundColor: Colors.surfaceMuted },
-  singleGalleryImage: { height: 290, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
-  detailLayout: { marginTop: 3 },
-  detailLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start', gap: 22 },
-  mainColumn: { flex: 1, minWidth: 0 },
-  titleArea: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 8 },
-  summaryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: Ui.space.page, marginBottom: 8 },
-  summaryCard: { flexGrow: 1, flexBasis: 100, padding: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  summaryLabel: { marginTop: 7, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, textTransform: 'uppercase' },
-  summaryValue: { marginTop: 3, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, fontWeight: FontWeight.bold },
-  metaRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  destination: { backgroundColor: Colors.accentSoft, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 7, color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  rating: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 5, borderRadius: 9, backgroundColor: Colors.primaryDark },
-  ratingText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
-  title: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, lineHeight: 28, fontWeight: FontWeight.extraBold, marginTop: 5 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  saveButton: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 11, backgroundColor: Colors.surfaceMuted },
-  tripMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 13, marginTop: 8 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  metaText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
-  categoryList: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 9 },
-  categoryTag: { paddingHorizontal: 7, paddingVertical: 5, borderRadius: Ui.radius.pill, backgroundColor: Colors.accentSoft },
-  categoryText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  embeddedSection: { marginHorizontal: 0, marginVertical: 0, borderWidth: 0, shadowOpacity: 0, elevation: 0 },
-  section: { ...Ui.card, marginHorizontal: Ui.space.page, marginVertical: 4, paddingHorizontal: 14, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  sectionHeader: { minHeight: 45, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  sectionTitleRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sectionTitle: { flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
-  sectionContent: { paddingBottom: 12 },
-  overview: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 21 },
-  detailBullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 4 },
-  detailText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 20 },
-  unavailable: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20 },
-  bookingColumn: { width: 295, marginRight: 16, marginTop: 20, position: 'sticky' as 'relative', top: 14 },
-  bookingPanel: { ...Ui.card, padding: Ui.space.card, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  bookingEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
-  bookingTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 24, fontWeight: FontWeight.extraBold, marginTop: 5 },
-  bookingMeta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
-  bookingMetaText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
-  bookingPriceArea: { marginTop: 13, paddingTop: 11, borderTopWidth: 1, borderTopColor: Colors.border },
-  bookingPriceLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
-  bookingPrice: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 3 },
-  priceNote: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, marginTop: 5 },
-  enquireButtonWide: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 13, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.button },
-  enquireWideText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  bookButtonWide: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 7, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  bookedButton: { backgroundColor: Colors.success },
-  bookWideText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  mobileBar: { minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 11, paddingVertical: 8, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.surface },
-  mobilePrice: { flex: 1, minWidth: 70 },
-  mobilePriceLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  mobilePriceValue: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 2 },
-  enquireButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.button },
-  enquireText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  bookButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 13, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  bookText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  notFound: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 25 },
-  notFoundText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  backToPackages: { marginTop: 12, paddingHorizontal: 13, paddingVertical: 9, borderRadius: 9, backgroundColor: Colors.accent },
-  backToPackagesText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+const s = StyleSheet.create({
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  galleryWrap: { marginBottom: 14 },
+  gallery: { gap: 10, paddingHorizontal: Ui.space.page },
+  image: { height: 200, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  body: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, color: Colors.textDark },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  line: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 9 },
+  lineBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
+  lineLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight, width: 72 },
+  lineValue: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, textAlign: 'right' },
+  stop: { flexDirection: 'row', gap: 12 },
+  rail: { alignItems: 'center', width: 16 },
+  node: { width: 16, height: 16, borderRadius: 8, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.primary, marginTop: 1 },
+  link: { flex: 1, width: 2, backgroundColor: Colors.secondary, marginTop: 2 },
+  stopTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  stopMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.secondary, fontWeight: FontWeight.bold, marginTop: 2, marginBottom: 4 },
+  bullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 5 },
+  bulletText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textDark },
+  enquireWrap: { marginHorizontal: Ui.space.page },
 });

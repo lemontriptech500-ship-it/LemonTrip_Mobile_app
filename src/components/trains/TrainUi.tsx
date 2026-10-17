@@ -9,6 +9,7 @@ import { router, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, View, type TextInputProps } from 'react-native';
 import { AppScreen } from '@/components/AppScreen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -51,10 +52,11 @@ export function TrainProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
 
 /** Screen with scrollable body + optional sticky footer. */
 export function FlowScreen({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
+  const insets = useSafeAreaInsets();
   return (
     <AppScreen edges={['top']}>
       <View style={s.flex}>{children}</View>
-      {footer ? <View style={s.footerWrap}>{footer}</View> : null}
+      {footer ? <View style={[s.footerWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>{footer}</View> : null}
     </AppScreen>
   );
 }

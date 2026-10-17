@@ -39,7 +39,7 @@ export default function PackageConfirmationScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
           <ScreenHeader title="Booking confirmed" subtitle="Your holiday is booked. Pack your bags!" eyebrow="LEMONTRIP / HOLIDAYS" />
-          <PackageProgress current={4} />
+          <PackageProgress current={5} />
 
           <View style={s.hero}>
             <View style={s.check}><Ionicons name="checkmark" size={32} color={Colors.primaryDark} /></View>
