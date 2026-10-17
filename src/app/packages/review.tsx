@@ -35,7 +35,7 @@ export default function PackageReviewScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
           <ScreenHeader title="Review your booking" subtitle="Check every detail before you pay." eyebrow="LEMONTRIP / HOLIDAYS" onBack={() => goBackOr(PACKAGE_ROUTES.travellers)} />
-          <PackageProgress current={2} />
+          <PackageProgress current={3} />
           <PackageSummary pkg={pkg} date={date} endDate={endDate} counts={counts} />
 
           <Card>
