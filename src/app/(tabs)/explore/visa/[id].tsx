@@ -15,6 +15,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
+import { DateField } from '@/components/visa/DateField';
 
 type Upload = { name: string; mimeType: string; size: number; uri: string };
 type UploadKey = 'passportFront' | 'passportBack' | 'applicantPhoto';
@@ -90,13 +91,13 @@ export default function VisaApplicationScreen() {
     if (fullName.trim().length < 2) next.fullName = 'Enter your full name.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = 'Enter a valid email address.';
     const birthDate = /^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth) ? new Date(`${dateOfBirth}T00:00:00Z`) : null;
-    if (!birthDate || Number.isNaN(birthDate.getTime()) || birthDate.toISOString().slice(0, 10) !== dateOfBirth || birthDate.getTime() > Date.now()) next.dateOfBirth = 'Enter a valid date of birth (YYYY-MM-DD).';
+    if (!birthDate || Number.isNaN(birthDate.getTime()) || birthDate.toISOString().slice(0, 10) !== dateOfBirth || birthDate.getTime() > Date.now()) next.dateOfBirth = 'Select a valid date of birth.';
     if (passportNumber.trim().length < 3) next.passportNumber = 'Enter your passport number.';
     const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(entryDate) ? new Date(`${entryDate}T00:00:00Z`) : null;
     const validCalendarDate = parsedDate && !Number.isNaN(parsedDate.getTime()) && parsedDate.toISOString().slice(0, 10) === entryDate;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (!validCalendarDate || parsedDate!.getTime() < Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())) next.entryDate = 'Enter a valid date that is today or later (YYYY-MM-DD).';
+    if (!validCalendarDate || parsedDate!.getTime() < Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())) next.entryDate = 'Select a travel date that is today or later.';
     return next;
   };
 
@@ -172,10 +173,10 @@ export default function VisaApplicationScreen() {
             <View style={styles.priceRow}><Text style={styles.copy}>Service fee</Text><Text style={styles.price}>{destination.fee ?? 'Not listed'}</Text></View>
           </View> : step === 'application' ? <View style={styles.card}>
             <Field label="Full name" value={fullName} onChangeText={editField('fullName', setFullName)} error={errors.fullName} autoComplete="name" />
-            <Field label="Date of birth" value={dateOfBirth} onChangeText={editField('dateOfBirth', setDateOfBirth)} error={errors.dateOfBirth} placeholder="YYYY-MM-DD" />
+            <DateField label="Date of birth" value={dateOfBirth} onChange={editField('dateOfBirth', setDateOfBirth)} error={errors.dateOfBirth} maximumDate={new Date()} initialDate={new Date(2000, 0, 1)} />
             <Field label="Passport number" value={passportNumber} onChangeText={editField('passportNumber', setPassportNumber)} error={errors.passportNumber} autoCapitalize="characters" />
             <Field label="Email address" value={email} onChangeText={editField('email', setEmail)} error={errors.email} keyboardType="email-address" autoCapitalize="none" />
-            <Field label="Travel date" value={entryDate} onChangeText={editField('entryDate', setEntryDate)} error={errors.entryDate} placeholder="YYYY-MM-DD" />
+            <DateField label="Travel date" value={entryDate} onChange={editField('entryDate', setEntryDate)} error={errors.entryDate} minimumDate={new Date()} />
             <Text style={styles.label}>Visa option</Text><View style={styles.visaOption}><Text style={[styles.copy, styles.grow]}>{destination.visaType}</Text><Ionicons name="checkmark-circle" size={18} color={Colors.secondary} /></View>
           </View> : <>
             {(['applicantPhoto', 'passportFront', 'passportBack'] as UploadKey[]).map(key => <View key={key}>
