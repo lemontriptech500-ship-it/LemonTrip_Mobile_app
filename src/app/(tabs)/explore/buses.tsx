@@ -1,5 +1,4 @@
 import { useAppLanguage } from '@/utils/intl';
-import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
@@ -8,8 +7,9 @@ import { BusCard } from '@/components/buses/BusCards';
 import { CityPicker } from '@/components/buses/CityPicker';
 import { BUS_ROUTES, Card, Chip, EmptyState, FlowScreen, Notice, PrimaryButton, SectionTitle, goBackOr, goTo } from '@/components/buses/BusUi';
 import { Colors } from '@/constants/colors';
+import { DateField } from '@/components/DatePickerField';
 import { Ui } from '@/constants/theme';
-import { POPULAR_ROUTES, fromISO, getCity, isRealDate, lowestFare, resolveCity, searchBuses, timeOfDay, upcomingDates, type DeckId } from '@/data/buses';
+import { POPULAR_ROUTES, getCity, isRealDate, lowestFare, resolveCity, searchBuses, timeOfDay, upcomingDates, type DeckId } from '@/data/buses';
 import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { selectBus, setBusSearch, useBusBooking } from '@/utils/busBookingStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,7 +37,6 @@ export default function BusesScreen() {
   const [sort, setSort] = useState<Sort>('earliest');
   const [slot, setSlot] = useState<Slot>('any');
   const [kind, setKind] = useState<Kind>('all');
-  const dates = useMemo(() => { const base = upcomingDates(14); return base.includes(search.date) ? base : [search.date, ...base]; }, [search.date]);
 
   // Restore a saved/recent search (e.g. from Home → Recent searches or the Home search widget).
   useEffect(() => {
@@ -89,19 +88,9 @@ export default function BusesScreen() {
               <CityButton label="TO" code={search.to} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to')} />
             </View>
 
-            <Text style={s.label}>DEPARTURE DATE</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.dates}>
-              {dates.map((iso) => {
-                const d = fromISO(iso); const on = iso === search.date;
-                return (
-                  <TouchableOpacity key={iso} accessibilityRole="button" accessibilityState={{ selected: on }} accessibilityLabel={d.toDateString()} onPress={() => setBusSearch({ date: iso })} style={[s.date, on && s.dateOn]}>
-                    <Text style={[s.dow, on && s.dateTextOn]}>{d.toLocaleDateString(getAppLocale(), { weekday: 'short' }).toUpperCase()}</Text>
-                    <Text style={[s.dayNum, on && s.dateTextOn]}>{d.getDate()}</Text>
-                    <Text style={[s.mon, on && s.dateTextOn]}>{d.toLocaleDateString(getAppLocale(), { month: 'short' })}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
+            <View style={{ flexDirection: 'row', marginTop: 16 }}>
+              <DateField compact label="DEPARTURE DATE" value={search.date} placeholder="Add date" onChange={(d) => setBusSearch({ date: d })} />
+            </View>
 
             <Text style={s.label}>BUS TYPE</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
@@ -186,13 +175,6 @@ const s = StyleSheet.create({
   stationCode: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
   swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginTop: 16, marginBottom: 8 },
-  dates: { gap: 8 },
-  date: { width: 58, alignItems: 'center', paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  dateOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  dow: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, color: Colors.textLight, letterSpacing: 0.6 },
-  dayNum: { fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginVertical: 1 },
-  mon: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight },
-  dateTextOn: { color: Colors.white },
   chips: { gap: 8, alignItems: 'center' },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },
   popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
