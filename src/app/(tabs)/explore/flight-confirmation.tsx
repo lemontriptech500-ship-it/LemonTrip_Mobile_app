@@ -4,13 +4,12 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { FlightProgress, formatPrice, formatTime } from '@/components/flights/FlightFlowUi';
+import { FLIGHT_ROUTES, FlightProgress, formatPrice, formatTime, replaceTo } from '@/components/flights/FlightFlowUi';
 import { getFlightBookingDraft, resetFlightBookingDraft } from '@/components/flights/flightBookingStore';
 import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 /** Decorative barcode derived from the PNR (demo only, not scannable). */
@@ -37,19 +36,19 @@ export default function FlightConfirmationScreen() {
 
   const done = (path: string) => {
     resetFlightBookingDraft();
-    router.replace(path as never);
+    replaceTo(path);
   };
 
   if (!ticket) {
     return (
       <FlowScreen>
         <ScrollView>
-          <ScreenHeader title="Confirmation" eyebrow="LEMONTRIP / FLIGHTS" onBack={() => router.replace('/(tabs)/explore/flights' as never)} />
+          <ScreenHeader title="Confirmation" eyebrow="LEMONTRIP / FLIGHTS" onBack={() => replaceTo(FLIGHT_ROUTES.results)} />
           <EmptyState
             icon="ticket-outline"
             title="No confirmed ticket yet"
             text="Complete a booking to see your e-ticket here."
-            action={<PrimaryButton label="Search flights" onPress={() => router.replace('/(tabs)/explore/flights' as never)} />}
+            action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
           />
         </ScrollView>
       </FlowScreen>
@@ -67,6 +66,14 @@ export default function FlightConfirmationScreen() {
     `${ticket.travellers.length} traveller(s)`,
   ].join('\n');
 
+  // All-day calendar event on the travel date (Google Calendar treats the end date as exclusive).
+  const calendar = () => {
+    const day = new Date(`${ticket.date}T12:00:00`);
+    if (Number.isNaN(day.getTime())) return;
+    const next = new Date(day.getTime() + 86400000);
+    const ymd = (v: Date) => `${v.getFullYear()}${String(v.getMonth() + 1).padStart(2, '0')}${String(v.getDate()).padStart(2, '0')}`;
+    void Linking.openURL(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`${ticket.airline} ${ticket.flightNumber} ${ticket.fromCode} to ${ticket.toCode}`)}&dates=${ymd(day)}/${ymd(next)}&details=${encodeURIComponent(`PNR ${ticket.pnr}. Departs ${formatTime(ticket.departureTime)}.`)}`);
+  };
   const share = () => void Share.share({ title: 'LemonTrip flight ticket', message: summary });
   const email = () => {
     if (!ticket.contactEmail) return;
@@ -78,7 +85,7 @@ export default function FlightConfirmationScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
           <ScreenHeader title="Booking confirmed" subtitle="Your e-ticket is ready. Have a safe flight!" eyebrow="LEMONTRIP / FLIGHTS" />
-          <FlightProgress current={4} />
+          <FlightProgress current={5} />
 
           <View style={s.hero}>
             <View style={s.check}><Ionicons name="checkmark" size={32} color={Colors.primaryDark} /></View>
@@ -148,6 +155,7 @@ export default function FlightConfirmationScreen() {
             <Row label={`Fare (${ticket.fareName})`} value={formatPrice(ticket.fareTotal, ticket.currency)} />
             {ticket.seatTotal > 0 ? <Row label="Seats" value={formatPrice(ticket.seatTotal, ticket.currency)} /> : null}
             {ticket.addOnTotal > 0 ? <Row label="Add-ons" value={formatPrice(ticket.addOnTotal, ticket.currency)} /> : null}
+            {ticket.discount > 0 ? <Row label={`Coupon ${ticket.couponCode ?? ''}`.trim()} value={`− ${formatPrice(ticket.discount, ticket.currency)}`} tone="good" /> : null}
             <Row label="Total paid" value={formatPrice(ticket.total, ticket.currency)} bold />
             <View style={s.txn}>
               <Text style={s.txnText}>Txn {ticket.txnId}</Text>
@@ -162,13 +170,15 @@ export default function FlightConfirmationScreen() {
           <View style={s.actions}>
             <Action icon="share-social-outline" label="Share" onPress={share} />
             <Action icon="mail-outline" label="Email" onPress={email} />
-            <Action icon="ticket-outline" label="My trips" onPress={() => done('/(tabs)/bookings')} />
+            <Action icon="calendar-outline" label="Calendar" onPress={calendar} />
           </View>
 
           <View style={s.cta}>
-            <PrimaryButton label="Back to home" icon="home-outline" onPress={() => done('/home')} />
+            <PrimaryButton label="View my trips" icon="ticket-outline" onPress={() => done('/(tabs)/bookings')} />
             <View style={{ height: 10 }} />
-            <PrimaryButton variant="soft" label="Book another flight" icon="airplane-outline" onPress={() => done('/(tabs)/explore/flights')} />
+            <PrimaryButton variant="soft" label="Back to home" icon="home-outline" onPress={() => done('/home')} />
+            <View style={{ height: 10 }} />
+            <PrimaryButton variant="soft" label="Book another flight" icon="airplane-outline" onPress={() => done(FLIGHT_ROUTES.results)} />
           </View>
         </View>
       </ScrollView>

@@ -6,31 +6,30 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Card, EmptyState, FlowScreen, FooterBar, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { formatShortDate } from '@/data/trains';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { FlightJourney, FlightProgress } from './FlightFlowUi';
+import { FLIGHT_ROUTES, FlightJourney, FlightProgress, goBackOr, goTo, replaceTo } from './FlightFlowUi';
+import { beginFlightBooking } from './flightBookingStore';
 import { airportLabel, getAirport } from './airports';
 import { formatDuration, formatPrice } from './flightFormat';
 import { getFlightSelection, selectFlightFare } from './flightSelectionStore';
 import type { FlightFareOption } from './types';
 
 const clean = (name: string) => name.replace(/\s*·\s*sample/i, '');
-const BOOKING_ROUTE = '/flight-booking/traveller';
 
 export default function FlightDetailsScreen() {
   useAppLanguage();
   const selection = getFlightSelection();
   const fares = selection?.offer.fareOptions ?? [];
   const [selectedFareId, setSelectedFareId] = useState(fares[0]?.id ?? null);
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore/flights'));
+  const goBack = () => goBackOr(FLIGHT_ROUTES.results);
 
   if (!selection) {
     return (
       <FlowScreen>
         <ScrollView>
           <ScreenHeader title="Flight details" eyebrow="LEMONTRIP / FLIGHTS" onBack={goBack} />
-          <EmptyState icon="airplane-outline" title="No flight selected" text="Search for a flight and select an offer to view its itinerary and fares." action={<PrimaryButton label="Search flights" onPress={() => router.replace('/(tabs)/explore/flights')} />} />
+          <EmptyState icon="airplane-outline" title="No flight selected" text="Search for a flight and select an offer to view its itinerary and fares." action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
         </ScrollView>
       </FlowScreen>
     );
@@ -46,7 +45,8 @@ export default function FlightDetailsScreen() {
 
   const handleContinue = () => {
     if (fare) selectFlightFare(fare);
-    router.push(BOOKING_ROUTE as never);
+    beginFlightBooking(offer.id);
+    goTo(FLIGHT_ROUTES.travellers);
   };
 
   const breakdown: { label: string; amount?: number }[] = fare ? [{ label: 'Base fare', amount: fare.price.baseFare }, { label: 'Taxes', amount: fare.price.taxes }, { label: 'Fees', amount: fare.price.fees }] : [];

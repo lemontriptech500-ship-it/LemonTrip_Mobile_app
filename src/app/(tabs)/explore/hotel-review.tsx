@@ -26,7 +26,7 @@ export default function HotelReviewScreen() {
   const policy = cancellationInfo(room, hotel);
   const breakfast = room.breakfast ?? hotel.breakfast;
   const proceed = () => { if (!agreed) { setShowError(true); return; } goTo(HOTEL_ROUTES.payment); };
-  const edit = (path: string) => <TouchableOpacity accessibilityRole="button" onPress={() => goTo(path)}><Text style={s.edit}>{path === HOTEL_ROUTES.rooms ? 'Change' : 'Edit'}</Text></TouchableOpacity>;
+  const edit = (path: string) => <TouchableOpacity accessibilityRole="button" onPress={() => goTo(path)}><Text style={s.edit}>{path === HOTEL_ROUTES.details ? 'Change' : 'Edit'}</Text></TouchableOpacity>;
 
   return (
     <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
@@ -37,7 +37,7 @@ export default function HotelReviewScreen() {
           <StaySummary hotel={hotel} roomName={room.name} checkIn={selection.checkIn} checkOut={selection.checkOut} nights={nights} guests={selection.guests} rooms={selection.rooms} />
 
           <Card>
-            <SectionTitle eyebrow="STAY" title="Room & dates" right={edit(HOTEL_ROUTES.rooms)} />
+            <SectionTitle eyebrow="STAY" title="Room & dates" right={edit(HOTEL_ROUTES.details)} />
             <Line icon="bed-outline" label="Room" value={`${room.name} × ${selection.rooms}`} />
             <Line icon="log-in-outline" label="Check-in" value={`${formatLongDate(selection.checkIn)} · from ${CHECK_IN_TIME}`} />
             <Line icon="log-out-outline" label="Check-out" value={`${formatLongDate(selection.checkOut)} · until ${CHECK_OUT_TIME}`} />

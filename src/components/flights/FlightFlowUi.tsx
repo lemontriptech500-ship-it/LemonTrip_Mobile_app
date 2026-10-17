@@ -11,9 +11,21 @@ import { StyleSheet, View } from 'react-native';
 
 export { formatDuration, formatPrice, formatTime } from './flightFormat';
 
-const STEPS = ['Select', 'Travellers', 'Seats', 'Payment', 'Done'];
+const STEPS = ['Select', 'Details', 'Seats', 'Review', 'Payment', 'Done'];
 
-export function FlightProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
+export const FLIGHT_ROUTES = {
+  results: '/(tabs)/explore/flights',
+  details: '/(tabs)/explore/flight-details',
+  travellers: '/(tabs)/explore/flight-travellers',
+  seats: '/(tabs)/explore/flight-seats',
+  review: '/(tabs)/explore/flight-review',
+  payment: '/(tabs)/explore/flight-payment',
+  confirmation: '/(tabs)/explore/flight-confirmation',
+} as const;
+
+export { goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
+
+export function FlightProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 | 5 }) {
   return (
     <View style={s.progress} accessibilityRole="progressbar" accessibilityLabel={`Step ${current + 1} of ${STEPS.length}: ${STEPS[current]}`}>
       {STEPS.map((label, i) => {
