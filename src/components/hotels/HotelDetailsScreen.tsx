@@ -3,358 +3,224 @@ import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { StaySummary } from '@/components/hotels/HotelBookingCards';
+import { Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
+import { MAX_GUESTS, MAX_ROOMS, cancellationInfo, computeHotelFare, getRoomOptions, inr, nightsBetween, parsePrice } from '@/data/hotelBooking';
 import { defaultHotelSearch, mockHotels } from '@/data/mockHotels';
 import { getHotelSearch, getSelectedHotel, selectHotel } from '@/utils/hotelSearchStore';
-import { startHotelBooking } from '@/utils/hotelBookingStore';
-import { HOTEL_ROUTES, goTo } from '@/components/hotels/HotelUi';
+import { getHotelBooking, startHotelBooking } from '@/utils/hotelBookingStore';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useState } from 'react';
-import { Image, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { formatINR, getNightCount, parseNightlyPrice } from './HotelCard';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function HotelDetailsScreen() {
   useAppLanguage();
   useWishlist();
   const hotel = getSelectedHotel() ?? mockHotels[0] ?? null;
   const search = getHotelSearch();
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
-  const [selectedRoomId, setSelectedRoomId] = useState(hotel?.roomOptions?.[0]?.id ?? null);
-  const booked = false;
-  const nights = getNightCount(search.checkIn, search.checkOut);
-  const selectedRoom = hotel?.roomOptions?.find((room) => room.id === selectedRoomId);
-  const selectedNightlyPrice = hotel ? selectedRoom?.pricePerNight ?? hotel.price : '';
-  const nightlyPrice = hotel ? parseNightlyPrice(selectedNightlyPrice) : null;
-  const total = nightlyPrice !== null && nights ? nightlyPrice * nights : null;
-
-const handleBook = () => {
-  const activeHotel = getSelectedHotel();
-  const activeSearch = getHotelSearch();
-
-  if (!activeHotel) {
-    Alert.alert('Select a stay', 'Please choose a hotel before continuing.');
-    return;
-  }
-
-  const fallbackRoom = activeHotel.roomOptions?.[0];
-  const roomToUse = selectedRoom ?? fallbackRoom;
-
-  if (!roomToUse) {
-    Alert.alert('Select a room', 'Please choose a room type to continue.');
-    return;
-  }
-
-  const resolvedCheckIn = activeSearch.checkIn || defaultHotelSearch.checkIn;
-  const resolvedCheckOut = activeSearch.checkOut || defaultHotelSearch.checkOut;
-  const resolvedGuests = activeSearch.guests || defaultHotelSearch.guests;
-  const resolvedRooms = activeSearch.rooms || defaultHotelSearch.rooms;
-
-  const updatedSearch = {
-    ...activeSearch,
-    checkIn: resolvedCheckIn,
-    checkOut: resolvedCheckOut,
-    guests: resolvedGuests,
-    rooms: resolvedRooms,
-  };
-
-  const finalHotel = { ...activeHotel, roomOptions: activeHotel.roomOptions ?? [roomToUse] };
-  selectHotel(finalHotel);
-
-  const finalNights = getNightCount(updatedSearch.checkIn, updatedSearch.checkOut);
-  if (!updatedSearch.checkIn || !updatedSearch.checkOut || !finalNights) {
-    Alert.alert('Select dates', 'Please choose valid check-in and check-out dates to book this stay.');
-    return;
-  }
-
-  setSelectedRoomId(roomToUse.id);
-  startHotelBooking(finalHotel, updatedSearch, roomToUse.id);
-  goTo(HOTEL_ROUTES.rooms);
-};
-
+  const rooms = hotel ? getRoomOptions(hotel) : [];
+  // Coming back from a later step ("Change"), restore what the guest had already chosen.
+  const resume = hotel && getHotelBooking().selection?.hotel.id === hotel.id ? getHotelBooking().selection : null;
+  const [selectedRoomId, setSelectedRoomId] = useState(resume?.roomId ?? rooms[0]?.id ?? '');
+  const [guests, setGuests] = useState(resume?.guests ?? (search.guests || defaultHotelSearch.guests));
+  const [roomCount, setRoomCount] = useState(resume?.rooms ?? (search.rooms || defaultHotelSearch.rooms));
 
   if (!hotel) {
     return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.notFound}>
-          <TravelArtworkIcon name="hotel" size={44} />
-          <Text style={styles.notFoundTitle}>Choose a stay to continue</Text>
-          <Text style={styles.notFoundText}>Return to hotel search and open a property to see its details.</Text>
-          <TouchableOpacity onPress={() => router.replace('/(tabs)/explore/hotels')} style={styles.backButton}><Text style={styles.backButtonText}>Search hotels</Text></TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <FlowScreen>
+        <ScrollView>
+          <ScreenHeader title="Hotel details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.results)} />
+          <EmptyState icon="bed-outline" title="Choose a stay to continue" text="Return to hotel search and open a property to see its details." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} />
+        </ScrollView>
+      </FlowScreen>
     );
   }
 
+  const room = rooms.find((r) => r.id === selectedRoomId) ?? rooms[0];
+  const resolved = {
+    destination: search.destination,
+    checkIn: search.checkIn || defaultHotelSearch.checkIn,
+    checkOut: search.checkOut || defaultHotelSearch.checkOut,
+    guests,
+    rooms: roomCount,
+  };
+  const nights = nightsBetween(resolved.checkIn, resolved.checkOut);
+  const nightly = parsePrice(room?.pricePerNight) ?? parsePrice(hotel.price);
+  const fare = nightly !== null && nights ? computeHotelFare(nightly, nights, resolved.rooms) : null;
   const gallery = hotel.gallery?.length ? hotel.gallery : [hotel.image];
+  const policy = cancellationInfo(room, hotel);
+  const saved = isInWishlist(hotel.id);
+
+  const handleBook = () => {
+    if (!room) { Alert.alert('Select a room', 'Please choose a room type to continue.'); return; }
+    if (!nights) { Alert.alert('Select dates', 'Please choose valid check-in and check-out dates to book this stay.'); return; }
+    selectHotel(hotel);
+    startHotelBooking(hotel, resolved, room.id);
+    goTo(HOTEL_ROUTES.guests);
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <View style={styles.brandBar}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backCapsule}>
-              <Ionicons name="arrow-back" size={18} color={Colors.primaryDark} />
-            </TouchableOpacity>
-            <View style={styles.brandBlock}>
-              <View style={styles.brandMark} />
-              <Text style={styles.brandText}>LemonTrip</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => toggleWishlist({ id: hotel.id, name: hotel.name, image: hotel.image, price: hotel.price, category: 'Hotels', location: hotel.location })}
-              style={styles.saveCapsule}
-            >
-              <Ionicons name={isInWishlist(hotel.id) ? 'heart' : 'heart-outline'} size={16} color={Colors.primaryDark} />
-            </TouchableOpacity>
-          </View>
+    <FlowScreen footer={
+      <FooterBar
+        caption={fare ? `${nights} night${nights > 1 ? 's' : ''} · incl. taxes` : 'per night · pick dates for total'}
+        amount={fare ? inr(fare.total) : nightly !== null ? inr(nightly) : hotel.price}
+        estimateAmount={fare ? fare.total : nightly ?? undefined}
+        action={<PrimaryButton label="Continue" icon="arrow-forward" onPress={handleBook} />}
+      />
+    }>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+        <View style={s.content}>
+          <ScreenHeader
+            title={hotel.name}
+            subtitle={hotel.address ?? hotel.location}
+            eyebrow="LEMONTRIP / HOTELS"
+            onBack={() => goBackOr(HOTEL_ROUTES.results)}
+            rightAction={{ label: saved ? 'Saved' : 'Save', icon: saved ? 'heart' : 'heart-outline', onPress: () => toggleWishlist({ id: hotel.id, name: hotel.name, image: hotel.image, price: hotel.price, category: 'Hotels', location: hotel.location }) }}
+          />
+          <HotelProgress current={0} />
+          <StaySummary hotel={hotel} roomName={room?.name ?? 'Standard room'} checkIn={resolved.checkIn} checkOut={resolved.checkOut} nights={nights} guests={resolved.guests} rooms={resolved.rooms} />
 
-          <View style={styles.searchChipBar}>
-            <View style={styles.searchChip}><Ionicons name="location-outline" size={13} color={Colors.primary} /><Text style={styles.searchChipText}>Manali</Text></View>
-            <View style={styles.searchChip}><Ionicons name="calendar-outline" size={13} color={Colors.primary} /><Text style={styles.searchChipText}>{search.checkIn ?? '15-17 Oct'}</Text></View>
-            <View style={styles.searchChip}><Ionicons name="people-outline" size={13} color={Colors.primary} /><Text style={styles.searchChipText}>{search.guests || 2} guests</Text></View>
-          </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>
-            {gallery.map((image, index) => (
-              <Image key={`${hotel.id}-gallery-${index}`} source={{ uri: image }} style={[styles.galleryImage, gallery.length === 1 && styles.singleImage, gallery.length === 1 && { width: Math.min(width, 1120) - 32 }]} />
-            ))}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.gallery} style={{ marginBottom: 14 }}>
+            {gallery.map((image, i) => <Image key={`${hotel.id}-${i}`} source={{ uri: image }} style={[s.galleryImage, gallery.length === 1 && { width: 320 }]} />)}
           </ScrollView>
 
-          <View style={[styles.detailsLayout, desktop && styles.detailsLayoutDesktop]}>
-            <View style={styles.mainColumn}>
-              <View style={styles.titleBlock}>
-                <View style={styles.titleRow}>
-                  <Text style={styles.hotelName}>{hotel.name}</Text>
-                  <View style={styles.propertyBadge}><Text style={styles.propertyBadgeText}>{hotel.propertyType ?? hotel.rating}</Text></View>
-                </View>
-                <View style={styles.locationRow}><Ionicons name="location-outline" size={15} color={Colors.textLight} /><Text style={styles.location}>{hotel.address ?? hotel.location}</Text></View>
-                {hotel.reviewScore !== undefined ? (
-                  <View style={styles.reviewsSummary}><Ionicons name="star" size={14} color={Colors.accent} /><Text style={styles.reviewScore}>{hotel.reviewScore.toFixed(1)}</Text><Text style={styles.reviewCount}>{hotel.reviewCount !== undefined ? `· ${hotel.reviewCount} reviews` : ''}</Text></View>
-                ) : null}
-                <Text style={styles.description}>{hotel.description}</Text>
-              </View>
-
-              <Section title="Amenities" eyebrow="AT THIS PROPERTY">
-                <View style={styles.amenitiesGrid}>
-                  {hotel.amenities.map((amenity) => <View key={amenity} style={styles.amenityItem}><Ionicons name="checkmark-circle-outline" size={16} color={Colors.secondary} /><Text style={styles.amenityText}>{amenity}</Text></View>)}
-                </View>
-              </Section>
-
-              <Section title="Room options" eyebrow="CHOOSE YOUR STAY">
-                {hotel.roomOptions?.length ? (
-                  <View style={styles.roomList}>
-                    {hotel.roomOptions.map((room) => (
-                      <TouchableOpacity key={room.id} onPress={() => setSelectedRoomId(room.id)} style={[styles.roomCard, selectedRoomId === room.id && styles.roomCardSelected]}>
-                        <View style={styles.roomSelectIcon}><Ionicons name={selectedRoomId === room.id ? 'radio-button-on' : 'radio-button-off'} size={18} color={selectedRoomId === room.id ? Colors.primary : Colors.textLight} /></View>
-                        <View style={styles.roomCopy}>
-                          <Text style={styles.roomName}>{room.name}</Text>
-                          {room.amenities?.length ? <Text style={styles.roomAmenities}>{room.amenities.join(' · ')}</Text> : null}
-                          {room.cancellation ? <Text style={styles.roomPolicy}>{room.cancellation}</Text> : null}
-                          {room.breakfast !== undefined ? <Text style={styles.roomPolicy}>{room.breakfast ? 'Breakfast included' : 'Breakfast not included'}</Text> : null}
-                        </View>
-                        <Text style={styles.roomPrice}>{room.pricePerNight}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                ) : (
-                  <Unavailable text="Room types and live availability were not supplied for this property." />
-                )}
-              </Section>
-
-              <Section title="Policies" eyebrow="BEFORE YOU BOOK">
-                {hotel.cancellation ? <InfoRow icon="calendar-outline" label="Cancellation" value={hotel.cancellation} /> : <Unavailable text="Cancellation policy was not provided." />}
-                {hotel.roomOptions?.[0]?.breakfast !== undefined || hotel.breakfast !== undefined ? <InfoRow icon="cafe-outline" label="Breakfast" value={(hotel.roomOptions?.[0]?.breakfast ?? hotel.breakfast) ? 'Included' : 'Not included'} /> : null}
-              </Section>
-
-              <Section title="Location" eyebrow="FIND YOUR WAY">
-                <View style={styles.locationPanel}>
-                  <View style={styles.locationIcon}><Ionicons name="map-outline" size={20} color={Colors.primary} /></View>
-                  <View style={styles.locationCopy}><Text style={styles.locationAddress}>{hotel.address ?? hotel.location}</Text><Text style={styles.locationNote}>{hotel.distanceKm !== undefined ? `${hotel.distanceKm} km from the city centre` : 'Map and distance details unavailable'}</Text></View>
-                </View>
-              </Section>
-
-              {hotel.reviews?.length ? (
-                <Section title="Guest reviews" eyebrow="FROM RECENT STAYS">
-                  {hotel.reviews.map((review) => <View key={review.id} style={styles.reviewCard}><View style={styles.reviewTop}><Text style={styles.reviewAuthor}>{review.author}</Text><View style={styles.reviewRating}><Ionicons name="star" size={12} color={Colors.accent} /><Text style={styles.reviewRatingText}>{review.score.toFixed(1)}</Text></View></View><Text style={styles.reviewComment}>{review.comment}</Text></View>)}
-                </Section>
-              ) : null}
+          <Card>
+            <SectionTitle eyebrow="ABOUT" title="About this stay" right={hotel.propertyType ? <Pill tone="brand" label={hotel.propertyType} /> : undefined} />
+            <View style={s.pills}>
+              {hotel.reviewScore !== undefined ? <Pill icon="star" tone="warn" label={`${hotel.reviewScore.toFixed(1)}${hotel.reviewCount !== undefined ? ` · ${hotel.reviewCount} reviews` : ''}`} /> : null}
+              {hotel.distanceKm !== undefined ? <Pill icon="navigate-outline" label={`${hotel.distanceKm} km from centre`} /> : null}
             </View>
+            <Text style={s.body}>{hotel.description}</Text>
+          </Card>
 
-            {desktop ? (
-              <View style={styles.summaryColumn}>
-                <BookingSummary
-                  hotelName={hotel.name}
-                  nightlyPrice={selectedNightlyPrice}
-                  nights={nights}
-                  total={total}
-                  checkIn={search.checkIn}
-                  checkOut={search.checkOut}
-                  guests={search.guests}
-                  rooms={search.rooms}
-                  booked={booked}
-                  onBook={handleBook}
-                />
+          <Card>
+            <SectionTitle eyebrow="AT THIS PROPERTY" title="Amenities" />
+            <View style={s.amenities}>
+              {hotel.amenities.map((a) => <View key={a} style={s.amenity}><Ionicons name="checkmark-circle-outline" size={16} color={Colors.secondary} /><Text style={s.amenityText}>{a}</Text></View>)}
+            </View>
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="STEP 1" title="Choose your room" />
+            {rooms.map((o) => {
+              const on = o.id === room?.id;
+              const p = cancellationInfo(o, hotel);
+              const price = parsePrice(o.pricePerNight);
+              return (
+                <TouchableOpacity key={o.id} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setSelectedRoomId(o.id)} style={[s.option, on && s.optionOn]}>
+                  <View style={[s.radio, on && s.radioOn]}>{on ? <View style={s.radioDot} /> : null}</View>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={s.optionTitle}>{o.name}</Text>
+                    {o.amenities?.length ? <Text style={s.optionMeta}>{o.amenities.join(' · ')}</Text> : null}
+                    <View style={s.pills}>
+                      {o.breakfast !== undefined ? <Pill icon={o.breakfast ? 'cafe-outline' : 'close-circle-outline'} tone={o.breakfast ? 'good' : 'neutral'} label={o.breakfast ? 'Breakfast included' : 'Room only'} /> : null}
+                      <Pill icon={p.free ? 'shield-checkmark-outline' : 'alert-circle-outline'} tone={p.free ? 'good' : 'warn'} label={p.free ? 'Free cancellation' : 'Limited refund'} />
+                    </View>
+                  </View>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={s.optionFare}>{price !== null ? inr(price) : o.pricePerNight}</Text>
+                    <Text style={s.perNight}>per night</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="STEP 2" title="Guests & rooms" />
+            <Stepper icon="people-outline" label="Guests" hint={`Up to ${MAX_GUESTS}`} value={guests} min={1} max={MAX_GUESTS} onChange={(v) => { setGuests(v); if (roomCount > v) setRoomCount(v); }} />
+            <View style={s.sep} />
+            <Stepper icon="bed-outline" label="Rooms" hint="At least one guest per room" value={roomCount} min={1} max={MAX_ROOMS} onChange={(v) => { setRoomCount(v); if (guests < v) setGuests(v); }} />
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="BEFORE YOU BOOK" title="Policies" />
+            <Line icon="calendar-outline" label="Cancellation" value={policy.text} />
+            {(room?.breakfast ?? hotel.breakfast) !== undefined ? <Line icon="cafe-outline" label="Breakfast" value={(room?.breakfast ?? hotel.breakfast) ? 'Included' : 'Not included'} /> : null}
+            <Line icon="log-in-outline" label="Check-in" value="From 2:00 PM" />
+            <Line icon="log-out-outline" label="Check-out" value="Until 11:00 AM" />
+          </Card>
+
+          <Card>
+            <SectionTitle eyebrow="FIND YOUR WAY" title="Location" />
+            <View style={s.location}>
+              <View style={s.locationIcon}><Ionicons name="map-outline" size={20} color={Colors.primary} /></View>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={s.locationAddress}>{hotel.address ?? hotel.location}</Text>
+                <Text style={s.optionMeta}>{hotel.distanceKm !== undefined ? `${hotel.distanceKm} km from the city centre` : 'Distance details unavailable'}</Text>
               </View>
-            ) : null}
-          </View>
+            </View>
+          </Card>
+
+          {hotel.reviews?.length ? (
+            <Card>
+              <SectionTitle eyebrow="FROM RECENT STAYS" title="Guest reviews" />
+              {hotel.reviews.map((r, i) => (
+                <View key={r.id} style={[s.review, i > 0 && s.reviewBorder]}>
+                  <View style={s.reviewTop}><Text style={s.reviewAuthor}>{r.author}</Text><Pill icon="star" tone="warn" label={r.score.toFixed(1)} /></View>
+                  <Text style={s.body}>{r.comment}</Text>
+                </View>
+              ))}
+            </Card>
+          ) : null}
         </View>
       </ScrollView>
-
-      {!desktop ? (
-        <View style={styles.mobileBookingBar}>
-          <View style={styles.mobilePriceBlock}><Text style={styles.mobilePrice}>{total !== null ? formatINR(total) : hotel.price}</Text><Text style={styles.mobilePriceLabel}>{total !== null ? `${nights} nights total` : 'per night · dates optional'}</Text></View>
-          <TouchableOpacity onPress={handleBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookButtonText}>{booked ? 'View cart' : 'Book stay'}</Text></TouchableOpacity>
-        </View>
-      ) : null}
-    </SafeAreaView>
+    </FlowScreen>
   );
 }
 
-function Section({ title, eyebrow, children }: { title: string; eyebrow: string; children: React.ReactNode }) {
-  return <View style={styles.section}><Text style={styles.sectionEyebrow}>{eyebrow}</Text><Text style={styles.sectionTitle}>{title}</Text><View style={styles.sectionBody}>{children}</View></View>;
-}
-
-function Unavailable({ text }: { text: string }) {
-  return <View style={styles.unavailable}><Ionicons name="information-circle-outline" size={16} color={Colors.textLight} /><Text style={styles.unavailableText}>{text}</Text></View>;
-}
-
-function InfoRow({ icon, label, value }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string }) {
-  return <View style={styles.infoRow}><View style={styles.infoIcon}><Ionicons name={icon} size={16} color={Colors.primary} /></View><Text style={styles.infoLabel}>{label}</Text><Text style={styles.infoValue}>{value}</Text></View>;
-}
-
-function BookingSummary({
-  hotelName,
-  nightlyPrice,
-  nights,
-  total,
-  checkIn,
-  checkOut,
-  guests,
-  rooms,
-  booked,
-  onBook,
-}: {
-  hotelName: string;
-  nightlyPrice: string;
-  nights: number | null;
-  total: number | null;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  rooms: number;
-  booked: boolean;
-  onBook: () => void;
-}) {
-  const numericNightly = parseNightlyPrice(nightlyPrice);
+function Stepper({ icon, label, hint, value, min, max, onChange }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; hint: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
-    <View style={styles.summaryCard}>
-      <Text style={styles.summaryEyebrow}>YOUR STAY</Text>
-      <Text style={styles.summaryHotel} numberOfLines={2}>{hotelName}</Text>
-      <View style={styles.summaryDates}><Ionicons name="calendar-outline" size={15} color={Colors.textLight} /><Text style={styles.summaryDateText}>{checkIn && checkOut ? `${checkIn} – ${checkOut}` : 'Select dates to see your total'}</Text></View>
-      <View style={styles.summaryDates}><Ionicons name="people-outline" size={15} color={Colors.textLight} /><Text style={styles.summaryDateText}>{guests} guests · {rooms} {rooms === 1 ? 'room' : 'rooms'}</Text></View>
-      <View style={styles.priceBreakdown}>
-        <View style={styles.priceRow}><Text style={styles.priceLabel}>{nightlyPrice} × {nights ?? '—'} nights</Text><Text style={styles.priceValue}>{numericNightly !== null && nights ? formatINR(numericNightly * nights) : '—'}</Text></View>
-        <View style={[styles.priceRow, styles.totalRow]}><Text style={styles.totalLabel}>Total</Text><Text style={styles.totalValue}>{total !== null ? formatINR(total) : 'Dates required'}</Text></View>
-      </View>
-      <Text style={styles.summaryNote}>Taxes and fees are not itemized in the available listing.</Text>
-      <TouchableOpacity onPress={onBook} style={[styles.bookButton, booked && styles.bookedButton]}><Text style={styles.bookButtonText}>{booked ? 'View cart' : 'Book this stay'}</Text></TouchableOpacity>
+    <View style={s.stepper}>
+      <View style={s.stepIcon}><Ionicons name={icon} size={18} color={Colors.primary} /></View>
+      <View style={{ flex: 1, minWidth: 0 }}><Text style={s.stepLabel}>{label}</Text><Text style={s.optionMeta}>{hint}</Text></View>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Decrease ${label}`} disabled={value <= min} onPress={() => onChange(value - 1)} style={[s.stepBtn, value <= min && { opacity: 0.4 }]}><Ionicons name="remove" size={18} color={Colors.primary} /></TouchableOpacity>
+      <Text style={s.stepValue} accessibilityLabel={`${value} ${label}`}>{value}</Text>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Increase ${label}`} disabled={value >= max} onPress={() => onChange(value + 1)} style={[s.stepBtn, value >= max && { opacity: 0.4 }]}><Ionicons name="add" size={18} color={Colors.primary} /></TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f5f6f3' },
-  scroll: { flex: 1 },
-  page: { paddingBottom: 28 },
-  content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
-  brandBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 10, paddingHorizontal: 8, paddingVertical: 10, borderRadius: 18, backgroundColor: '#0d382b', shadowColor: '#0d382b', shadowOpacity: 0.15, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 5 },
-  backCapsule: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.white },
-  brandBlock: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  brandMark: { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.accent },
-  brandText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
-  saveCapsule: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.white },
-  searchChipBar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, marginTop: 12, marginBottom: 8 },
-  searchChip: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, backgroundColor: Colors.white, borderWidth: 1, borderColor: Colors.border },
-  searchChipText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
-  gallery: { paddingHorizontal: 16, gap: 8 },
-  galleryImage: { width: 265, height: 205, borderRadius: 15, backgroundColor: Colors.surfaceMuted },
-  singleImage: { width: '100%', height: 250 },
-  detailsLayout: { marginTop: 7 },
-  detailsLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start', gap: 23 },
-  mainColumn: { flex: 1, minWidth: 0 },
-  titleBlock: { paddingHorizontal: 16, paddingTop: 18 },
-  titleRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
-  hotelName: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, lineHeight: 26, fontWeight: FontWeight.extraBold },
-  propertyBadge: { paddingHorizontal: 9, paddingVertical: 6, borderRadius: 9, backgroundColor: Colors.accentSoft },
-  propertyBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 7 },
-  location: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  reviewsSummary: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
-  reviewScore: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
-  reviewCount: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  description: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 12 },
-  section: { marginHorizontal: Ui.space.page, marginTop: 22 },
-  sectionEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
-  sectionTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 3 },
-  sectionBody: { marginTop: 10 },
-  amenitiesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  amenityItem: { width: '46%', minHeight: 30, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  amenityText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  roomList: { gap: 8 },
-  roomCard: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 9, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  roomCardSelected: { borderColor: Colors.primary },
-  roomSelectIcon: { width: 22 },
-  roomCopy: { flex: 1, minWidth: 0 },
-  roomName: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
-  roomAmenities: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 4 },
-  roomPolicy: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, marginTop: 3 },
-  roomPrice: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
-  unavailable: { flexDirection: 'row', alignItems: 'center', gap: 7, padding: 11, borderRadius: 11, backgroundColor: Colors.surfaceMuted },
-  unavailableText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19 },
-  infoRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  infoIcon: { width: 29, height: 29, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.accentSoft },
-  infoLabel: { width: 88, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
-  infoValue: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
-  locationPanel: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 10, padding: Ui.space.card, borderRadius: Ui.radius.card, backgroundColor: Colors.surface },
-  locationIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.accentSoft },
-  locationCopy: { flex: 1 },
-  locationAddress: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  locationNote: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 3 },
-  reviewCard: { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: Colors.border },
+function Line({ icon, label, value }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; value: string }) {
+  return <View style={s.line}><Ionicons name={icon} size={16} color={Colors.primary} /><Text style={s.lineLabel}>{label}</Text><Text style={s.lineValue}>{value}</Text></View>;
+}
+
+const s = StyleSheet.create({
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  gallery: { paddingHorizontal: Ui.space.page, gap: 10 },
+  galleryImage: { width: 270, height: 190, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+  body: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, color: Colors.textLight, marginTop: 10 },
+  amenities: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 10 },
+  amenity: { width: '50%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingRight: 8 },
+  amenityText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textDark },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
+  optionOn: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
+  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
+  radioOn: { borderColor: Colors.primary },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
+  optionTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  optionMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 3 },
+  optionFare: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  perNight: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
+  sep: { height: 1, backgroundColor: Colors.border, marginVertical: 12 },
+  stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  stepIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  stepBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
+  stepValue: { minWidth: 24, textAlign: 'center', fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  line: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7 },
+  lineLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight, width: 90 },
+  lineValue: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, textAlign: 'right' },
+  location: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  locationIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  locationAddress: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  review: { paddingVertical: 10 },
+  reviewBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
   reviewTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  reviewAuthor: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  reviewRating: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  reviewRatingText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
-  reviewComment: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 5 },
-  summaryColumn: { width: 310, marginHorizontal: 0, marginTop: 21, marginRight: 16, position: 'sticky' as 'relative', top: 14 },
-  summaryCard: { ...Ui.card, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  summaryEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
-  summaryHotel: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 18, fontWeight: FontWeight.extraBold, marginTop: 5 },
-  summaryDates: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 12 },
-  summaryDateText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
-  priceBreakdown: { marginTop: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border },
-  priceRow: { minHeight: 29, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  priceLabel: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro },
-  priceValue: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.bold },
-  totalRow: { minHeight: 40, marginTop: 5, borderTopWidth: 1, borderTopColor: Colors.border },
-  totalLabel: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  totalValue: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  summaryNote: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18 },
-  bookButton: { minWidth: 132, paddingHorizontal: 20, minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  bookedButton: { backgroundColor: Colors.success },
-  bookButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  mobileBookingBar: { minHeight: 67, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 16, paddingVertical: 9, borderTopWidth: 1, borderTopColor: Colors.border, backgroundColor: Colors.surface },
-  mobilePriceBlock: { flex: 1 },
-  mobilePrice: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
-  mobilePriceLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 2 },
-  notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  notFoundTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 11 },
-  notFoundText: { maxWidth: 290, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, textAlign: 'center', marginTop: 5 },
-  backButton: { minHeight: 44,  marginTop: 13, paddingHorizontal: 13, paddingVertical: 9, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  backButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  reviewAuthor: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
 });

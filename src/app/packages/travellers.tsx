@@ -62,7 +62,7 @@ export default function PackageTravellersScreen() {
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
             <ScreenHeader title="Traveller details" subtitle="Names must match a valid government ID." eyebrow="LEMONTRIP / HOLIDAYS" onBack={() => goBackOr(PACKAGE_ROUTES.plan)} />
-            <PackageProgress current={1} />
+            <PackageProgress current={2} />
             <PackageSummary pkg={pkg} date={date} endDate={endDate} counts={counts} />
 
             {travellers.map((t, i) => {

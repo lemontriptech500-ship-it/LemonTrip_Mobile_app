@@ -22,8 +22,8 @@ export const packageDetailsRoute = (id: string) => `/packages/${id}`;
 
 /* ---------- progress ---------- */
 
-const STEPS = ['Plan', 'Travellers', 'Review', 'Payment', 'Done'];
-export function PackageProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
+const STEPS = ['Select', 'Plan', 'Travellers', 'Review', 'Payment', 'Done'];
+export function PackageProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 | 5 }) {
   return (
     <View style={s.progress} accessibilityRole="progressbar" accessibilityLabel={`Step ${current + 1} of ${STEPS.length}: ${STEPS[current]}`}>
       {STEPS.map((label, i) => {

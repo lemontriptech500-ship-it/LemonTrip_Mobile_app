@@ -127,8 +127,8 @@ export default function VisaApplicationScreen() {
           const blob = await fetch(file.uri).then((result) => result.blob());
           form.append(key === 'applicantPhoto' ? 'photograph' : key, blob, file.name);
         } else {
-          const bytes = await new ExpoFile(file.uri).bytes();
-          form.append(key === 'applicantPhoto' ? 'photograph' : key, new Blob([bytes], { type: file.mimeType }), file.name);
+          // Expo's global fetch only accepts Blob/File parts; expo-file-system's File is a native-backed Blob (no ArrayBuffer copy needed).
+          form.append(key === 'applicantPhoto' ? 'photograph' : key, new ExpoFile(file.uri) as unknown as Blob, file.name);
         }
       }
       const token = getAccessToken();

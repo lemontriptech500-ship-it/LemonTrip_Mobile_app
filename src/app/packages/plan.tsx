@@ -39,7 +39,7 @@ export default function PackagePlanScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
           <ScreenHeader title="Plan your trip" subtitle="Pick a departure and who is travelling." eyebrow="LEMONTRIP / HOLIDAYS" onBack={back} />
-          <PackageProgress current={0} />
+          <PackageProgress current={1} />
           <PackageSummary pkg={pkg} date={date} endDate={endDate} counts={counts} />
 
           <Card>

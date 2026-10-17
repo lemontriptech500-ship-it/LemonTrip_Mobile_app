@@ -3,7 +3,7 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { FlightJourney, FlightProgress, formatPrice } from '@/components/flights/FlightFlowUi';
+import { FLIGHT_ROUTES, FlightJourney, FlightProgress, formatPrice, goBackOr, goTo, replaceTo } from '@/components/flights/FlightFlowUi';
 import {
   getFlightBookingDraft,
   updateFlightBookingDraft,
@@ -14,7 +14,6 @@ import { Card, EmptyState, FlowScreen, FooterBar, Notice, PrimaryButton, Section
 import { Colors } from '@/constants/colors';
 import { formatShortDate } from '@/data/trains';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
@@ -42,10 +41,7 @@ export default function SeatsAddOnsScreen() {
   const [seats, setSeats] = useState<string[]>(saved.seats);
   const [addOns, setAddOns] = useState<FlightAddOns>(saved.addOns);
 
-  const goBack = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace('/flight-booking/traveller' as never);
-  };
+  const goBack = () => goBackOr(FLIGHT_ROUTES.travellers);
 
   if (!selection) {
     return (
@@ -56,7 +52,7 @@ export default function SeatsAddOnsScreen() {
             icon="airplane-outline"
             title="No flight selected"
             text="Pick a flight and fare first."
-            action={<PrimaryButton label="Search flights" onPress={() => router.replace('/(tabs)/explore/flights' as never)} />}
+            action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
           />
         </ScrollView>
       </FlowScreen>
@@ -82,7 +78,7 @@ export default function SeatsAddOnsScreen() {
 
   const handleContinue = () => {
     updateFlightBookingDraft({ seats, addOns, seatTotal, addOnTotal });
-    router.push('/flight-booking/payment' as never);
+    goTo(FLIGHT_ROUTES.review);
   };
 
   const renderSeat = (row: number, letter: string) => {
@@ -110,7 +106,7 @@ export default function SeatsAddOnsScreen() {
         <FooterBar
           caption="Total"
           amount={formatPrice(grandTotal, currency)}
-          action={<PrimaryButton label="Continue to payment" icon="arrow-forward" onPress={handleContinue} />}
+          action={<PrimaryButton label="Review booking" icon="arrow-forward" onPress={handleContinue} />}
         />
       }
     >

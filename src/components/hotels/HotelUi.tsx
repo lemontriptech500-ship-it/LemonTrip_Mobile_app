@@ -18,7 +18,6 @@ export {
 export const HOTEL_ROUTES = {
   results: '/(tabs)/explore/hotels',
   details: '/(tabs)/explore/hotel-details',
-  rooms: '/(tabs)/explore/hotel-rooms',
   guests: '/(tabs)/explore/hotel-guests',
   review: '/(tabs)/explore/hotel-review',
   payment: '/(tabs)/explore/hotel-payment',
