@@ -1,6 +1,7 @@
+import { APP_API_URL } from './apiConfig';
 import { mockHotels } from '@/data/mockHotels';
 import { useEffect, useState } from 'react';
-const apiRoot = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api`;
+const apiRoot = `${APP_API_URL}/api`;
 
 export type ContentType = 'package' | 'blog' | 'visa' | 'service' | 'destination' | 'listing' | 'hotel';
 

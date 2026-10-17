@@ -35,7 +35,7 @@ const slides = [
     description: 'Make every trip memorable with experiences worth travelling for.',
   },
   {
-    image: require('../../assets/images/onboarding4.png'),
+    image: require('../../assets/images/onboarding4.jpg'),
     title: 'Your Journey',
     accent: 'Our Priority',
     description: 'Flights, hotels, buses, trains and more — all in one place.',
@@ -84,10 +84,6 @@ export default function OnboardingScreen() {
               style={StyleSheet.absoluteFill}
             />
 
-            {index === 0 ? <View pointerEvents="none" style={styles.planeDecoration}>
-              <Ionicons name="airplane" size={48} color="#FFFFFF" />
-            </View> : null}
-
             <View style={styles.content}>
               <Text style={[styles.heading, compact && styles.headingCompact]}>
                 {item.title}{'\n'}<Text style={styles.headingAccent}>{item.accent}</Text>
@@ -109,8 +105,8 @@ export default function OnboardingScreen() {
                 </View>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={index === slides.length - 1 ? 'Create account' : 'Next introduction'}
-                  onPress={() => index < slides.length - 1 ? goToSlide(index + 1) : leave('/signup')}
+                  accessibilityLabel={index === slides.length - 1 ? 'Sign in' : 'Next introduction'}
+                  onPress={() => index < slides.length - 1 ? goToSlide(index + 1) : leave('/login')}
                   style={({ pressed }) => [styles.nextButton, pressed && styles.nextButtonPressed]}
                 >
                   <Ionicons name="arrow-forward" size={23} color={Brand.forest} />
@@ -128,7 +124,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Brand.forest },
   carousel: { flex: 1 },
   slide: { flex: 1, overflow: 'hidden', backgroundColor: Brand.forest },
-  planeDecoration: { position: 'absolute', top: '31%', left: '47%', transform: [{ rotate: '-24deg' }], opacity: 0.95 },
   content: { flex: 1, justifyContent: 'flex-end', paddingHorizontal: 27, paddingBottom: 18 },
   heading: { color: '#FFFFFF', fontFamily: FontFamily.sans, fontSize: TextSize.hero, lineHeight: 41, fontWeight: FontWeight.extraBold },
   headingCompact: { fontSize: TextSize.display, lineHeight: 32 },

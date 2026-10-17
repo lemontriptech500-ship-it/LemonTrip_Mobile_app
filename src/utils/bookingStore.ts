@@ -51,7 +51,7 @@ if (Platform.OS !== 'web' || typeof window !== 'undefined') {
 }
 
 export function addBooking(booking: Booking) {
-  bookings = [booking, ...bookings];
+  bookings = [booking, ...bookings.filter((existing) => existing.id !== booking.id)];
   notify();
   persist();
 }

@@ -2,6 +2,7 @@ import { useAppLanguage } from '@/utils/intl';
 import { Text } from '@/components/ui/Text';
 import { Brand } from '@/constants/colors';
 import { TripWordmark } from '@/components/TripWordmark';
+import { getUser, restoreSession } from '@/utils/authStore';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
@@ -14,6 +15,9 @@ const WRITE_DELAY = 400;
 const REVEAL_DURATION = 2450;
 const EXIT_DURATION = 520;
 const MAX_SPLASH_DURATION = 4000;
+const BRAND_GAP = 32;
+const BRAND_SIDE_PADDING = 24;
+const LEMON_SIZE_RATIO = 0.92;
 
 export default function LaunchScreen() {
   useAppLanguage();
@@ -29,6 +33,9 @@ export default function LaunchScreen() {
   useEffect(() => {
     let active = true;
     let completed = false;
+    let sessionReady = false;
+    let revealRequested = false;
+    let finishRequested = false;
     const startedAt = Date.now();
     lemonEntrance.setValue(0);
     writeProgress.setValue(0);
@@ -71,17 +78,19 @@ export default function LaunchScreen() {
     // Navigation must not depend on the native animation delivering a callback.
     const finish = () => {
       if (!active || completed) return;
+      if (!sessionReady) { finishRequested = true; return; }
       completed = true;
       clearTimeout(revealTimer);
       clearTimeout(fallbackTimer);
       entrance.stop();
       transition?.stop();
       spinner.stop();
-      router.replace('/onboarding');
+      router.replace(getUser() ? '/(tabs)/home' : '/onboarding');
     };
 
     const reveal = () => {
       if (!active || completed) return;
+      if (!sessionReady) { revealRequested = true; return; }
       const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
       transition = Animated.parallel([
@@ -101,6 +110,14 @@ export default function LaunchScreen() {
     };
     const revealTimer = setTimeout(reveal, REVEAL_DURATION);
     const fallbackTimer = setTimeout(finish, MAX_SPLASH_DURATION);
+    // Keep the logo visible until saved credentials are checked, even on a cold backend.
+    // The animation watchdog must never mistake a pending restore for a signed-out user.
+    void restoreSession().then(() => {
+      sessionReady = true;
+      if (!active || completed) return;
+      if (finishRequested) finish();
+      else if (revealRequested) reveal();
+    });
     // Timers and native animations may pause while the app is backgrounded.
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active' && Date.now() - startedAt >= REVEAL_DURATION + EXIT_DURATION) finish();
@@ -118,8 +135,9 @@ export default function LaunchScreen() {
   }, [lemonEntrance, writeProgress, spin, taglineOpacity, transitionOpacity, transitionScale]);
 
   const spinRotation = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-  const wordmarkWidth = Math.min(width * 0.48, 200);
-  const lemonSize = wordmarkWidth * 0.75;
+  // Reserve the gap and screen margins before sizing either part of the logo.
+  const wordmarkWidth = Math.min((width - BRAND_SIDE_PADDING * 2 - BRAND_GAP) / (1 + LEMON_SIZE_RATIO), 200);
+  const lemonSize = wordmarkWidth * LEMON_SIZE_RATIO;
   // Frame the fruit within the original 1024px image, excluding the corner mark.
   const lemonImageScale = lemonSize / 680;
 
@@ -166,7 +184,7 @@ export default function LaunchScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
   centerContent: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: BRAND_GAP },
   loadingRow: { position: 'absolute', left: 20, right: 20, alignItems: 'center', gap: 20 },
   spinner: { width: 32, height: 32, borderWidth: 3, borderColor: 'rgba(255,208,0,0.16)', borderTopColor: Brand.lemon, borderLeftColor: Brand.lemon, borderRightColor: Brand.lemon, borderRadius: 16 },
   tagline: { color: '#FFFFFF', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'system-ui' }), fontSize: 14, fontWeight: '400', lineHeight: 20, letterSpacing: 0, textAlign: 'center', includeFontPadding: false },

@@ -1,3 +1,4 @@
+import type { VerifiedBookingPayment } from '@/utils/bookingPaymentApi';
 import { getAppLocale } from '@/utils/intl';
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
 import { addBooking } from '@/utils/bookingStore';
@@ -18,7 +19,7 @@ export type FlightAddOns = {
 };
 
 export type FlightPayment = {
-  method: 'upi' | 'card' | 'netbanking' | 'wallet';
+  method: 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet';
   label: string;
 };
 
@@ -98,8 +99,8 @@ function money(amount: number, currency: string) {
   }
 }
 
-/** Simulates a successful payment, issues a demo e-ticket and records it in My Trips. */
-export function confirmFlightBooking(payment: FlightPayment): FlightTicket | null {
+/** Creates a sample travel confirmation after payment, issues a demo e-ticket and records it in My Trips. */
+export function confirmFlightBooking(payment: FlightPayment, verified?: VerifiedBookingPayment): FlightTicket | null {
   const selection = getFlightSelection();
   if (!selection) return null;
 
@@ -116,9 +117,9 @@ export function confirmFlightBooking(payment: FlightPayment): FlightTicket | nul
 
   const ticket: FlightTicket = {
     pnr: rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'),
-    bookingId: `LT-FL-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`,
+    bookingId: verified?.bookingId ?? `LT-FL-${rand(6, 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789')}`,
     bookedAt: new Date().toISOString(),
-    txnId: `TXN${rand(12)}`,
+    txnId: verified?.paymentId ?? `TXN${rand(12)}`,
     airline: offer.airline.name,
     flightNumber: offer.flightNumber,
     fromCode: offer.departure.airportCode,

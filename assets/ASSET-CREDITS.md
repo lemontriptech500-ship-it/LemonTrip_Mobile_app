@@ -15,3 +15,5 @@ The onboarding photographs use the same Unsplash image URLs as the prior UI, now
 Unsplash license: https://unsplash.com/license
 
 - Noto Sans Devanagari variable font: Google Fonts, licensed under the SIL Open Font License 1.1. License: `assets/fonts/NotoSansDevanagari-OFL.txt`. Source: https://github.com/google/fonts/tree/main/ofl/notosansdevanagari
+
+- Splash “trip” lettering: outlines from [Great Vibes Regular](https://github.com/google/fonts/tree/main/ofl/greatvibes), with a light stroke for added weight. Licensed under the SIL Open Font License; see `fonts/GreatVibes-OFL.txt`.

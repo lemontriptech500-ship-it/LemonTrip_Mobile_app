@@ -105,19 +105,6 @@ export default function TrainsScreen() {
             <View style={{ marginTop: 14 }}><PrimaryButton label="Search trains" icon="search" onPress={runSearch} /></View>
           </Card>
 
-          {!searched ? (
-            <Card>
-              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
-              <View style={s.popular}>
-                {POPULAR_ROUTES.map((r) => (
-                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setTrainSearch({ from: r.from, to: r.to }); setSearched(true); setErrorMsg(''); }} style={s.route}>
-                    <Text style={s.routeText}>{getStation(r.from)?.city}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getStation(r.to)?.city}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </Card>
-          ) : null}
-
           <View style={s.pad}>
             <View style={s.resultHead}>
               <View>
@@ -140,6 +127,19 @@ export default function TrainsScreen() {
               <EmptyState icon="train-outline" title="No trains match" text={searched ? 'No trains run on this route for the selected date, class or time. Try another date or clear the filters.' : 'No trains available.'} action={<PrimaryButton variant="soft" label="Clear filters" onPress={() => { setSlot('any'); setTrainSearch({ classCode: 'ANY' }); }} />} />
             )}
           </View>
+
+          {!searched ? (
+            <Card>
+              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.popular}>
+                {POPULAR_ROUTES.map((r) => (
+                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setTrainSearch({ from: r.from, to: r.to }); setSearched(true); setErrorMsg(''); }} style={s.route}>
+                    <Text style={s.routeText}>{getStation(r.from)?.city}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getStation(r.to)?.city}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </Card>
+          ) : null}
 
           <Notice icon="shield-checkmark-outline" title="Demo inventory">Schedules, fares and seat availability shown here are sample data for demonstration. No real railway ticket or PNR is issued.</Notice>
         </View>
@@ -186,7 +186,7 @@ const s = StyleSheet.create({
   dateTextOn: { color: Colors.white },
   chips: { gap: 8, alignItems: 'center' },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },
-  popular: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   resultHead: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12, marginTop: 4 },

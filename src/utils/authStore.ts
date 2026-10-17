@@ -11,6 +11,9 @@ export type User = AuthUser;
 let currentUser: User | null = null;
 let accessToken: string | null = null;
 let restoring = false;
+let restorePromise: Promise<void> | null = null;
+let restoreAttempted = false;
+let authEpoch = 0; // bumped on every login/logout so a slow background restore can't overwrite newer state
 let listeners: (() => void)[] = [];
 const REFRESH_TOKEN_KEY = 'lemontrip-refresh-token';
 
@@ -19,14 +22,20 @@ function notify() {
 }
 
 export async function login(session: AuthSession) {
+  authEpoch += 1;
+  restoreAttempted = true;
   if (currentUser?.id !== session.user.id) clearCheckoutDetails();
   currentUser = session.user;
   accessToken = session.accessToken;
-  if (Platform.OS !== 'web' && session.refreshToken) await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken);
   notify();
+  if (Platform.OS !== 'web' && session.refreshToken) {
+    try { await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken); } catch { /* session still works until the app closes */ }
+  }
 }
 
 export function logout() {
+  authEpoch += 1;
+  restoreAttempted = true;
   clearCheckoutDetails();
   if (accessToken) void revokeAuthSession(accessToken);
   void signOutFirebasePhoneUser().catch(() => undefined);
@@ -45,20 +54,36 @@ export function getAccessToken() {
   return accessToken;
 }
 
-async function restoreSession() {
-  if (restoring) return;
+export function restoreSession(): Promise<void> {
+  if (restorePromise) return restorePromise;
+  if (restoreAttempted || currentUser) return Promise.resolve();
+  restorePromise = restoreSavedSession().finally(() => { restorePromise = null; });
+  return restorePromise;
+}
+
+async function restoreSavedSession() {
+  if (restoring || restoreAttempted || currentUser) return; // restore only once, and never when already signed in
   restoring = true;
+  restoreAttempted = true;
+  const epoch = authEpoch;
   try {
     const savedRefreshToken = Platform.OS === 'web' ? '' : await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
     if (Platform.OS !== 'web' && !savedRefreshToken) return;
     const session = await refreshAuthSession(savedRefreshToken ?? '');
+    if (epoch !== authEpoch) return; // user logged in/out while this was running
     currentUser = session.user;
     accessToken = session.accessToken;
-    if (Platform.OS !== 'web' && session.refreshToken) await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken);
-  } catch {
+    if (Platform.OS !== 'web' && session.refreshToken) {
+      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken).catch(() => undefined);
+    }
+  } catch (error) {
+    if (epoch !== authEpoch) return;
     currentUser = null;
     accessToken = null;
-    if (Platform.OS !== 'web') await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+    // A connection failure must not erase a saved login. Only a rejected session does.
+    if (Platform.OS !== 'web' && (error as { status?: number } | null)?.status === 401) {
+      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY).catch(() => undefined);
+    }
   } finally {
     restoring = false;
     notify();
