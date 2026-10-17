@@ -175,18 +175,7 @@ export default function FlightSearchScreen() {
             <View style={{ marginTop: 14 }}><PrimaryButton label="Search flights" icon="search" loading={loading} onPress={submit} /></View>
           </Card>
 
-          {!hasSearched ? (
-            <Card>
-              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
-              <View style={s.popular}>
-                {POPULAR_FLIGHT_ROUTES.map((r) => (
-                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setOrigin(r.from); setDestination(r.to); setErrorMsg(''); }} style={s.route}>
-                    <Text style={s.routeText}>{getAirport(r.from)?.city}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getAirport(r.to)?.city}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </Card>
-          ) : (
+          {hasSearched ? (
             <View style={s.pad}>
               <View style={s.resultHead}>
                 <Text style={s.eyebrow}>{routeEyebrow}{request ? `  ·  ${formatShortDate(request.departureDate)}${request.returnDate ? ` – ${formatShortDate(request.returnDate)}` : ''}  ·  ${request.travellers} ${request.travellers === 1 ? 'traveller' : 'travellers'}` : ''}</Text>
@@ -202,7 +191,20 @@ export default function FlightSearchScreen() {
                 <FlightResults offers={offers} loading={loading} onSelect={selectFlight} dateLabel={request ? formatShortDate(request.departureDate) : undefined} />
               )}
             </View>
-          )}
+          ) : null}
+
+          {!hasSearched ? (
+            <Card>
+              <SectionTitle eyebrow="QUICK PICKS" title="Popular routes" />
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.popular}>
+                {POPULAR_FLIGHT_ROUTES.map((r) => (
+                  <TouchableOpacity key={`${r.from}-${r.to}`} accessibilityRole="button" onPress={() => { setOrigin(r.from); setDestination(r.to); setErrorMsg(''); }} style={s.route}>
+                    <Text style={s.routeText}>{getAirport(r.from)?.city}</Text><Ionicons name="arrow-forward" size={13} color={Colors.primary} /><Text style={s.routeText}>{getAirport(r.to)?.city}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </Card>
+          ) : null}
 
           {resultSource === 'mock' ? <Notice tone="warn" icon="information-circle-outline" title="Demo inventory">Sample flight data for preview only. Prices and availability are not real; payment is disabled.</Notice> : <Notice icon="shield-checkmark-outline" title="Live fares">Live prices appear when the flight service is connected. Sample results are clearly marked.</Notice>}
         </View>
@@ -271,7 +273,7 @@ const s = StyleSheet.create({
   counterBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   counterText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },
-  popular: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
   resultHead: { marginBottom: 12, marginTop: 4 },

@@ -1,11 +1,10 @@
 import { useAppLanguage } from '@/utils/intl';
-import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { AuthButton, AuthDivider, AuthField, AuthLayout, AuthLink, AuthNotice, AuthSwitch, GoogleAuthButton, OtpCodeField } from '@/components/auth/AuthLayout';
-import { exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput } from '@/utils/authApi';
+import { checkPhoneAccount, exchangeFirebasePhoneIdentity, loginWithEmail, loginWithGoogle, normalizePhoneInput, resendVerificationEmail } from '@/utils/authApi';
 import { useFirebasePhoneOtp } from '@/utils/useFirebasePhoneOtp';
 import { login } from '@/utils/authStore';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -23,6 +22,22 @@ export default function LoginScreen() {
   const [identifierError, setIdentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [notice, setNotice] = useState<{ message: string; tone: 'info' | 'error' } | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [sendingVerification, setSendingVerification] = useState(false);
+
+  const resendEmail = async () => {
+    if (sendingVerification) return;
+    setSendingVerification(true);
+    try {
+      const result = await resendVerificationEmail(identifier.trim());
+      setNotice({ tone: 'info', message: result.message + ' Check your inbox and spam folder, then open the verification link before signing in.' });
+    } catch (error) {
+      setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'Could not resend the verification email. Try again.' });
+    } finally {
+      setSendingVerification(false);
+    }
+  };
 
   // Clear reCAPTCHA when leaving the screen so it never touches a removed element.
   // The catch matters: an unhandled rejection from this cleanup can take the screen down while navigating away.
@@ -31,6 +46,8 @@ export default function LoginScreen() {
   const validateAndLogin = async () => {
     setIdentifierError('');
     setPasswordError('');
+    setNotice(null);
+    setNeedsVerification(false);
 
     if (!identifier.trim()) {
       setIdentifierError(mode === 'email' ? 'Email is required' : 'Mobile number is required');
@@ -54,16 +71,19 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       if (authMode === 'email') await login(await loginWithEmail({ email: identifier.trim(), password }));
-      else if (!phoneOtp.challenge) { await phoneOtp.sendCode(phoneNumber!); return; }
+      else if (!phoneOtp.challenge) { await checkPhoneAccount(phoneNumber!, 'login'); await phoneOtp.sendCode(phoneNumber!); return; } // no SMS for unknown numbers
       else {
         const idToken = await phoneOtp.verifyCode();
         if (!idToken) return;
         await login(await exchangeFirebasePhoneIdentity({ idToken, purpose: 'login' }));
       }
-      router.replace('/(tabs)/profile');
+      router.replace('/(tabs)/home');
     } catch (error) {
-      if (authMode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.');
-      else Alert.alert('Sign-in failed', error instanceof Error ? error.message : 'Please try again.');
+      if (authMode === 'phone') phoneOtp.showError(error instanceof Error ? error.message : 'Phone sign-in could not be completed.', (error as { code?: string } | null)?.code ?? '');
+      else if ((error as { code?: string } | null)?.code === 'EMAIL_NOT_VERIFIED') {
+        setNeedsVerification(true);
+        setNotice({ tone: 'info', message: 'Verify your email before signing in. Open the verification link in your inbox or spam folder, or request a new email below.' });
+      } else setNotice({ tone: 'error', message: error instanceof Error ? error.message : 'Sign-in failed. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -71,7 +91,7 @@ export default function LoginScreen() {
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace('/home');
+    else router.replace('/onboarding');
   };
 
   // Open the sign-up screen. Never leave the user stranded on login if the push is rejected.
@@ -80,7 +100,7 @@ export default function LoginScreen() {
   };
 
   const verifying = mode === 'phone' && !!phoneOtp.challenge;
-  const busy = loading || phoneOtp.busy;
+  const busy = loading || phoneOtp.busy || sendingVerification;
 
   return (
     <AuthLayout
@@ -95,6 +115,8 @@ export default function LoginScreen() {
           placeholder="you@example.com or 98765 43210"
           onChangeText={(value) => {
             setIdentifier(value);
+            setNotice(null);
+            setNeedsVerification(false);
             setMode(value.trim() && /^[+\d\s()-]+$/.test(value.trim()) ? 'phone' : 'email');
             if (phoneOtp.challenge) void phoneOtp.reset();
             if (identifierError) setIdentifierError('');
@@ -136,13 +158,16 @@ export default function LoginScreen() {
       {mode === 'phone' && !phoneOtp.challenge && Platform.OS === 'web' ? <View id="lemontrip-phone-recaptcha" style={styles.recaptcha} /> : null}
       {mode === 'phone' && !phoneOtp.challenge ? <AuthNotice>We’ll send an SMS to verify your number. Standard messaging rates may apply.</AuthNotice> : null}
       {mode === 'phone' && phoneOtp.error && !phoneOtp.challenge ? <AuthNotice tone="error">{phoneOtp.error}</AuthNotice> : null}
+      {mode === 'phone' && phoneOtp.errorCode === 'PHONE_ACCOUNT_NOT_FOUND' ? <AuthLink onPress={openSignup}>Create an account</AuthLink> : null}
 
+      {mode === 'email' && notice ? <AuthNotice tone={notice.tone}>{notice.message}</AuthNotice> : null}
+      {mode === 'email' && needsVerification ? <AuthButton label="Resend verification email" loading={sendingVerification} onPress={() => void resendEmail()} /> : null}
       <AuthButton label={mode === 'phone' && !phoneOtp.challenge ? 'Send OTP' : mode === 'phone' ? 'Verify' : 'Log in'} loading={busy} onPress={() => void validateAndLogin()} />
 
       {!phoneOtp.challenge ? (
         <>
           <AuthDivider />
-          <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'login')); router.replace('/(tabs)/profile'); }} />
+          <GoogleAuthButton label="Continue with Google" onSuccess={async (idToken) => { await login(await loginWithGoogle(idToken, 'login')); router.replace('/(tabs)/home'); }} />
           <AuthSwitch prompt="Don’t have an account?" action="Sign up" onPress={openSignup} />
         </>
       ) : null}

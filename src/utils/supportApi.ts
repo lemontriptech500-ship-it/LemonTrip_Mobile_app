@@ -1,9 +1,10 @@
+import { APP_API_URL } from './apiConfig';
 export const supportTopics = ['General Booking', 'Travel & Duration', 'Payments', 'Cancellation', 'Account & Login', 'Feedback', 'Visa', 'Other'] as const;
 export type SupportTopic = typeof supportTopics[number];
 export type SupportRequest = { id: string; topic: string; subject: string; message: string; status: 'new' | 'open' | 'in_progress' | 'closed'; createdAt: string; updateCount: number };
 export type SupportUpdate = { id: string; message: string; createdAt: string };
 export type SupportForm = { firstName: string; lastName: string; email: string; topic: SupportTopic; subject: string; message: string; reference?: string; submissionKey: string };
-const root = `${(process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')}/api/support`;
+const root = `${(APP_API_URL).replace(/\/$/, '')}/api/support`;
 async function request<T>(path: string, token: string, body?: SupportForm): Promise<T> {
   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 15000);
   try {

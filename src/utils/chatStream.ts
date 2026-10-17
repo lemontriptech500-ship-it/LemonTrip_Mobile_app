@@ -1,7 +1,8 @@
-﻿import { fetch as streamFetch } from 'expo/fetch';
+import { APP_API_URL } from './apiConfig';
+import { fetch as streamFetch } from 'expo/fetch';
 import type { ChatMessage } from '@/utils/chatApi';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000';
+const API_URL = APP_API_URL;
 
 export type StreamOptions = {
   token?: string;

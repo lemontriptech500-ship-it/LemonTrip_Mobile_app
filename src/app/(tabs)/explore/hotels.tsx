@@ -17,7 +17,7 @@ import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 const filterOptions = [
   { id: 'rating-5-star', label: '5 Star', matches: (hotel: Hotel) => hotel.rating === '5 Star' },
@@ -51,8 +51,6 @@ export default function HotelsScreen() {
   useAppLanguage();
   const { query } = useLocalSearchParams<{ query?: string }>();
   const initial = parseSavedQuery(query);
-  const { width } = useWindowDimensions();
-  const desktop = width >= 950;
   const [destination, setDestination] = useState(typeof initial.destination === 'string' ? initial.destination : '');
   const [checkIn, setCheckIn] = useState(typeof initial.checkIn === 'string' ? initial.checkIn : '');
   const [checkOut, setCheckOut] = useState(typeof initial.checkOut === 'string' ? initial.checkOut : '');
@@ -133,7 +131,7 @@ export default function HotelsScreen() {
           <View style={styles.searchPanel}>
             <View style={styles.searchTitleRow}><TravelArtworkIcon name="hotel" size={34} /><Text style={styles.searchTitle}>Where are you staying?</Text></View>
             <View style={styles.searchFields}>
-              <View style={[styles.field, desktop && styles.destinationField]}>
+              <View style={[styles.field, styles.fullWidthField]}>
                 <Text style={styles.fieldLabel}>DESTINATION</Text>
                 <View style={styles.inputWrap}><Ionicons name="location-outline" size={16} color={Colors.textLight} /><TextInput value={destination} onChangeText={setDestination} placeholder="City, region or property" placeholderTextColor={Colors.textLight} style={styles.input} /></View>
               </View>
@@ -145,13 +143,33 @@ export default function HotelsScreen() {
                 <Text style={styles.fieldLabel}>CHECK-OUT</Text>
                 <TextInput value={checkOut} onChangeText={setCheckOut} placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textLight} style={styles.dateInput} />
               </View>
-              <View style={styles.field}>
+              <View style={[styles.field, styles.fullWidthField]}>
                 <Text style={styles.fieldLabel}>GUESTS & ROOMS</Text>
                 <View style={styles.occupancy}>
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove guest" onPress={() => setGuests((current) => Math.max(1, current - 1))}><Ionicons name="remove-circle-outline" size={19} color={Colors.primary} /></TouchableOpacity>
-                  <Text style={styles.occupancyText}>{guests} · {rooms} {rooms === 1 ? 'room' : 'rooms'}</Text>
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add guest" onPress={() => setGuests((current) => Math.min(12, current + 1))}><Ionicons name="add-circle-outline" size={19} color={Colors.primary} /></TouchableOpacity>
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add room" onPress={() => setRooms((current) => Math.min(6, current + 1))} style={styles.addRoom}><Text style={styles.addRoomText}>+ Room</Text></TouchableOpacity>
+                  <View style={styles.occupancyRow}>
+                    <Text style={styles.occupancyLabel}>Guests</Text>
+                    <View style={styles.stepper}>
+                      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove guest" accessibilityState={{ disabled: guests <= 1 }} disabled={guests <= 1} onPress={() => setGuests((current) => Math.max(1, current - 1))} style={[styles.stepperButton, guests <= 1 && styles.stepperButtonDisabled]}>
+                        <Ionicons name="remove" size={18} color={Colors.primary} />
+                      </TouchableOpacity>
+                      <Text accessibilityLiveRegion="polite" style={styles.occupancyCount}>{guests}</Text>
+                      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add guest" accessibilityState={{ disabled: guests >= 12 }} disabled={guests >= 12} onPress={() => setGuests((current) => Math.min(12, current + 1))} style={[styles.stepperButton, guests >= 12 && styles.stepperButtonDisabled]}>
+                        <Ionicons name="add" size={18} color={Colors.primary} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={[styles.occupancyRow, styles.occupancyRowDivider]}>
+                    <Text style={styles.occupancyLabel}>Rooms</Text>
+                    <View style={styles.stepper}>
+                      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove room" accessibilityState={{ disabled: rooms <= 1 }} disabled={rooms <= 1} onPress={() => setRooms((current) => Math.max(1, current - 1))} style={[styles.stepperButton, rooms <= 1 && styles.stepperButtonDisabled]}>
+                        <Ionicons name="remove" size={18} color={Colors.primary} />
+                      </TouchableOpacity>
+                      <Text accessibilityLiveRegion="polite" style={styles.occupancyCount}>{rooms}</Text>
+                      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add room" accessibilityState={{ disabled: rooms >= 6 }} disabled={rooms >= 6} onPress={() => setRooms((current) => Math.min(6, current + 1))} style={[styles.stepperButton, rooms >= 6 && styles.stepperButtonDisabled]}>
+                        <Ionicons name="add" size={18} color={Colors.primary} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
               </View>
             </View>
@@ -207,18 +225,22 @@ const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
   searchPanel: { ...Ui.card, marginHorizontal: Ui.space.page, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   searchTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 13 },
-  searchTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  searchTitle: { flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   searchFields: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   field: { flexGrow: 1, flexBasis: '46%', minWidth: 120, marginBottom: 4 },
-  destinationField: { flexBasis: '100%' },
+  fullWidthField: { flexBasis: '100%' },
   fieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8, marginBottom: 5 },
   inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   input: { minHeight: Ui.field.minHeight,  flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   dateInput: { minHeight: Ui.field.minHeight, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  occupancy: { minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, paddingHorizontal: 8, borderRadius: 9, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  occupancyText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, textAlign: 'center' },
-  addRoom: { paddingHorizontal: 5, paddingVertical: 5 },
-  addRoomText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  occupancy: { paddingHorizontal: 12, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
+  occupancyRow: { minHeight: 60, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 8 },
+  occupancyRowDivider: { borderTopWidth: 1, borderTopColor: Colors.border },
+  occupancyLabel: { flexGrow: 1, flexBasis: 72, flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  stepper: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 4, flexShrink: 0 },
+  stepperButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  stepperButtonDisabled: { opacity: 0.35 },
+  occupancyCount: { flexShrink: 0, minWidth: 28, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, textAlign: 'center' },
   searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 7, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
   searchButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   resultsHeader: { marginTop: 23, paddingHorizontal: 16, gap: 12 },

@@ -1,9 +1,10 @@
+import { APP_API_URL } from './apiConfig';
 export type ChatRole = 'user' | 'assistant';
 export type ChatMessage = { role: ChatRole; content: string };
 
 type ChatResponse = { success: true; reply: string; conversationId: string };
 
-const endpoint = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api/chat`;
+const endpoint = `${APP_API_URL}/api/chat`;
 
 export async function sendChatMessage(message: string, history: ChatMessage[], token?: string, conversationId?: string): Promise<ChatResponse> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json', Accept: 'application/json' };

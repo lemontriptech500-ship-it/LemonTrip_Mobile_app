@@ -1,4 +1,5 @@
-﻿const API_BASE = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/api`;
+import { APP_API_URL } from './apiConfig';
+const API_BASE = `${APP_API_URL}/api`;
 
 // Render free servers can take a while to wake up, so allow a long timeout.
 const TIMEOUT_MS = 90_000;
