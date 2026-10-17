@@ -1,7 +1,8 @@
-import type { VerifiedBookingPayment } from '@/utils/bookingPaymentApi';
 import { getAppLocale } from '@/utils/intl';
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
+import type { FlightSelection } from '@/components/flights/types';
 import { addBooking } from '@/utils/bookingStore';
+import type { VerifiedBookingPayment } from '@/utils/bookingPaymentApi';
 
 export type Gender = 'Male' | 'Female' | 'Other' | '';
 
@@ -47,6 +48,8 @@ export type FlightTicket = {
   fareTotal: number;
   seatTotal: number;
   addOnTotal: number;
+  discount: number;
+  couponCode: string | null;
   total: number;
   payment: FlightPayment;
 };
@@ -59,6 +62,9 @@ export type FlightBookingDraft = {
   addOns: FlightAddOns;
   seatTotal: number;
   addOnTotal: number;
+  couponCode: string | null;
+  /** Offer this draft belongs to, so seats/add-ons/coupon never leak into another flight. */
+  offerId: string | null;
   ticket: FlightTicket | null;
 };
 
@@ -70,6 +76,8 @@ const emptyDraft = (): FlightBookingDraft => ({
   addOns: { baggage: false, meal: false, insurance: false },
   seatTotal: 0,
   addOnTotal: 0,
+  couponCode: null,
+  offerId: null,
   ticket: null,
 });
 
@@ -88,6 +96,41 @@ export function resetFlightBookingDraft() {
   draft = emptyDraft();
 }
 
+/** Call when the guest continues from flight details. Keeps travellers/contact, drops stale seats, add-ons and coupon. */
+export function beginFlightBooking(offerId: string) {
+  if (draft.offerId === offerId && !draft.ticket) return;
+  draft = { ...emptyDraft(), travellers: draft.travellers, contactEmail: draft.contactEmail, contactPhone: draft.contactPhone, offerId };
+}
+
+/* ---------- coupons (INR fares only) ---------- */
+
+export interface FlightCoupon { code: string; label: string; min: number; compute: (amount: number) => number }
+export const FLIGHT_COUPONS: FlightCoupon[] = [
+  { code: 'FLY300', label: 'Flat ₹300 off', min: 3000, compute: () => 300 },
+  { code: 'SKY5', label: '5% off up to ₹500', min: 2000, compute: (a) => Math.min(500, Math.round(a * 0.05)) },
+  { code: 'FIRSTFLY', label: '8% off up to ₹1,000', min: 6000, compute: (a) => Math.min(1000, Math.round(a * 0.08)) },
+];
+
+export function validateFlightCoupon(code: string, amount: number): { ok: true; coupon: FlightCoupon; discount: number } | { ok: false; error: string } {
+  const coupon = FLIGHT_COUPONS.find((c) => c.code === code.trim().toUpperCase());
+  if (!coupon) return { ok: false, error: 'This coupon code is not valid.' };
+  if (amount < coupon.min) return { ok: false, error: `Add ₹${coupon.min - Math.round(amount)} more to use ${coupon.code}.` };
+  return { ok: true, coupon, discount: coupon.compute(amount) };
+}
+
+/** Single source of truth for what the guest pays; used by review, payment and confirmation. */
+export function computeFlightTotals(selection: FlightSelection | null = getFlightSelection(), d: FlightBookingDraft = draft) {
+  if (!selection) return null;
+  const { offer, fareOption, request } = selection;
+  const fare = fareOption ?? offer.fareOptions?.[0];
+  const currency = fare ? fare.price.currency : offer.price.currency;
+  const fareTotal = fare ? fare.price.total : offer.price.amount;
+  const subtotal = fareTotal + d.seatTotal + d.addOnTotal;
+  const result = currency === 'INR' && d.couponCode ? validateFlightCoupon(d.couponCode, subtotal) : null;
+  const discount = result && result.ok ? result.discount : 0;
+  return { offer, fare, request, currency, fareTotal, seatTotal: d.seatTotal, addOnTotal: d.addOnTotal, subtotal, discount, total: Math.max(0, subtotal - discount), couponCode: discount ? d.couponCode : null };
+}
+
 const rand = (len: number, chars = '0123456789') =>
   Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
@@ -99,16 +142,12 @@ function money(amount: number, currency: string) {
   }
 }
 
-/** Creates a sample travel confirmation after payment, issues a demo e-ticket and records it in My Trips. */
+/** Simulates a successful payment, issues a demo e-ticket and records it in My Trips. */
 export function confirmFlightBooking(payment: FlightPayment, verified?: VerifiedBookingPayment): FlightTicket | null {
-  const selection = getFlightSelection();
-  if (!selection) return null;
+  const totals = computeFlightTotals();
+  if (!totals) return null;
 
-  const { offer, fareOption, request } = selection;
-  const fare = fareOption ?? offer.fareOptions?.[0];
-  const currency = fare ? fare.price.currency : offer.price.currency;
-  const fareTotal = fare ? fare.price.total : offer.price.amount;
-  const total = fareTotal + draft.seatTotal + draft.addOnTotal;
+  const { offer, fare, request, currency, fareTotal, total, discount, couponCode } = totals;
 
   const addOns: string[] = [];
   if (draft.addOns.baggage) addOns.push('Extra baggage');
@@ -139,6 +178,8 @@ export function confirmFlightBooking(payment: FlightPayment, verified?: Verified
     fareTotal,
     seatTotal: draft.seatTotal,
     addOnTotal: draft.addOnTotal,
+    discount,
+    couponCode,
     total,
     payment,
   };

@@ -33,7 +33,7 @@ export default function HotelGuestsScreen() {
 
   const derived = currentFare();
   if (!selection || !derived) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Guest details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.rooms)} /><EmptyState icon="people-outline" title="No room selected" text="Pick a hotel and room before adding guest details." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <FlowScreen><ScrollView><ScreenHeader title="Guest details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} /><EmptyState icon="people-outline" title="No room selected" text="Pick a hotel and room before adding guest details." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
   }
   const { fare, room, nights } = derived;
   const { hotel } = selection;
@@ -54,7 +54,7 @@ export default function HotelGuestsScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Guest details" subtitle="The lead guest must show a valid photo ID at check-in." eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.rooms)} />
+            <ScreenHeader title="Guest details" subtitle="The lead guest must show a valid photo ID at check-in." eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} />
             <HotelProgress current={1} />
             <StaySummary hotel={hotel} roomName={room.name} checkIn={selection.checkIn} checkOut={selection.checkOut} nights={nights} guests={selection.guests} rooms={selection.rooms} />
 
