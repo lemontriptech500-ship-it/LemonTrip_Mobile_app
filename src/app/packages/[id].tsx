@@ -59,15 +59,15 @@ export default function PackageDetailScreen() {
   ];
 
   return (
-    <FlowScreen footer={<FooterBar caption="From · per person" amount={pkg.price.replace(/\s*\/\s*person/i, '')} action={<PrimaryButton label="Select your trip" icon="arrow-forward" onPress={book} />} />}>
+    <FlowScreen footer={<FooterBar caption="From · per person" amount={pkg.price} action={<PrimaryButton label="Select your trip" icon="arrow-forward" onPress={book} />} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
           <ScreenHeader
             title={pkg.title}
-            subtitle={pkg.destination && pkg.destination !== pkg.title ? `${pkg.destination} · ${pkg.duration}` : pkg.duration}
+            subtitle={`${pkg.destination ?? 'Holiday package'} · ${pkg.duration}`}
             eyebrow="LEMONTRIP / HOLIDAYS"
             onBack={back}
-            rightAction={{ label: saved ? 'Saved' : 'Save', icon: saved ? 'heart' : 'heart-outline', onPress: () => toggleWishlist({ id: pkg.id, name: pkg.title, image: pkg.image, price: pkg.price, category: 'Packages', location: pkg.destination }) }}
+            rightAction={{ label: saved ? 'Remove package from wishlist' : 'Save package to wishlist', icon: saved ? 'heart' : 'heart-outline', onPress: () => toggleWishlist({ id: pkg.id, name: pkg.title, image: pkg.image, price: pkg.price, category: 'Packages', location: pkg.destination }) }}
           />
           <PackageProgress current={0} />
 
