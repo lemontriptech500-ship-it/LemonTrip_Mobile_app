@@ -1,3 +1,4 @@
+import { StepProgress } from '@/components/ui/StepProgress';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
@@ -24,22 +25,7 @@ export const packageDetailsRoute = (id: string) => `/packages/${id}`;
 
 const STEPS = ['Select', 'Plan', 'Travellers', 'Review', 'Payment', 'Done'];
 export function PackageProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 | 5 }) {
-  return (
-    <View style={s.progress} accessibilityRole="progressbar" accessibilityLabel={`Step ${current + 1} of ${STEPS.length}: ${STEPS[current]}`}>
-      {STEPS.map((label, i) => {
-        const done = i < current; const active = i === current;
-        return (
-          <View key={label} style={s.progressItem}>
-            {i > 0 ? <View style={[s.progressLine, (done || active) && s.progressLineOn]} /> : null}
-            <View style={[s.dot, done && s.dotDone, active && s.dotActive]}>
-              {done ? <Ionicons name="checkmark" size={13} color={Colors.white} /> : <Text style={[s.dotText, active && s.dotTextActive]}>{i + 1}</Text>}
-            </View>
-            <Text style={[s.stepLabel, (active || done) && s.stepLabelOn]} numberOfLines={1}>{label}</Text>
-          </View>
-        );
-      })}
-    </View>
-  );
+  return <StepProgress steps={STEPS} current={current} />;
 }
 
 /* ---------- summaries ---------- */

@@ -136,7 +136,7 @@ export default function HotelsScreen() {
                 <Text style={styles.fieldLabel}>DESTINATION</Text>
                 <View style={styles.inputWrap}><Ionicons name="location-outline" size={16} color={Colors.textLight} /><TextInput value={destination} onChangeText={setDestination} placeholder="City, region or property" placeholderTextColor={Colors.textLight} style={styles.input} /></View>
               </View>
-              <View style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={styles.dateRow}>
                 <DateField label="CHECK-IN" value={checkIn} onChange={setCheckIn} />
                 <DateField label="CHECK-OUT" value={checkOut} onChange={setCheckOut} minDate={checkIn || undefined} />
               </View>
@@ -223,17 +223,18 @@ const styles = StyleSheet.create({
   searchPanel: { ...Ui.card, marginHorizontal: Ui.space.page, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   searchTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 13 },
   searchTitle: { flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
-  searchFields: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  field: { flexGrow: 1, flexBasis: '46%', minWidth: 120, marginBottom: 4 },
-  fullWidthField: { flexBasis: '100%' },
+  searchFields: { width: '100%', gap: 8 },
+  field: { width: '100%', marginBottom: 4 },
+  dateRow: { width: '100%', flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  fullWidthField: { width: '100%' },
   fieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8, marginBottom: 5 },
   inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   input: { minHeight: Ui.field.minHeight,  flex: 1, minWidth: 0, paddingVertical: 8, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   dateInput: { minHeight: Ui.field.minHeight, paddingHorizontal: 9, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   occupancy: { paddingHorizontal: 12, borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  occupancyRow: { minHeight: 60, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 8 },
+  occupancyRow: { minHeight: 60, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 8 },
   occupancyRowDivider: { borderTopWidth: 1, borderTopColor: Colors.border },
-  occupancyLabel: { flexGrow: 1, flexBasis: 72, flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  occupancyLabel: { flex: 1, flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   stepper: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 4, flexShrink: 0 },
   stepperButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   stepperButtonDisabled: { opacity: 0.35 },
@@ -269,4 +270,4 @@ const styles = StyleSheet.create({
   clearButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   trustNote: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginHorizontal: Ui.space.page, marginTop: 19 },
   trustText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-});
+}); 

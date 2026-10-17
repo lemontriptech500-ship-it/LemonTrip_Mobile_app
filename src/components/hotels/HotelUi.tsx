@@ -3,6 +3,7 @@
  * (see components/trains/TrainUi) so every booking journey looks and behaves the same.
  * Only the progress bar is hotel-specific because its step names differ.
  */
+import { StepProgress } from '@/components/ui/StepProgress';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
@@ -27,22 +28,7 @@ export const HOTEL_ROUTES = {
 const STEPS = ['Room', 'Guests', 'Review', 'Payment', 'Done'];
 
 export function HotelProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
-  return (
-    <View style={s.progress} accessibilityRole="progressbar" accessibilityLabel={`Step ${current + 1} of ${STEPS.length}: ${STEPS[current]}`}>
-      {STEPS.map((label, i) => {
-        const done = i < current; const active = i === current;
-        return (
-          <View key={label} style={s.progressItem}>
-            {i > 0 ? <View style={[s.progressLine, (done || active) && s.progressLineOn]} /> : null}
-            <View style={[s.dot, done && s.dotDone, active && s.dotActive]}>
-              {done ? <Ionicons name="checkmark" size={13} color={Colors.white} /> : <Text style={[s.dotText, active && s.dotTextActive]}>{i + 1}</Text>}
-            </View>
-            <Text style={[s.stepLabel, (active || done) && s.stepLabelOn]} numberOfLines={1}>{label}</Text>
-          </View>
-        );
-      })}
-    </View>
-  );
+  return <StepProgress steps={STEPS} current={current} />;
 }
 
 const s = StyleSheet.create({

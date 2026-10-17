@@ -1,3 +1,4 @@
+import { StepProgress } from '@/components/ui/StepProgress';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
@@ -5,7 +6,7 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { PriceDisplay } from '@/components/PriceDisplay';
 import { Ionicons } from '@expo/vector-icons';
-import { router, type Href } from 'expo-router';
+import { router, useSegments, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, View, type TextInputProps } from 'react-native';
 import { AppScreen } from '@/components/AppScreen';
@@ -30,22 +31,7 @@ export const TRAIN_ROUTES = {
 
 const STEPS = ['Select', 'Passengers', 'Review', 'Payment', 'Done'];
 export function TrainProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
-  return (
-    <View style={s.progress} accessibilityRole="progressbar" accessibilityLabel={`Step ${current + 1} of ${STEPS.length}: ${STEPS[current]}`}>
-      {STEPS.map((label, i) => {
-        const done = i < current; const active = i === current;
-        return (
-          <View key={label} style={s.progressItem}>
-            {i > 0 ? <View style={[s.progressLine, (done || active) && s.progressLineOn]} /> : null}
-            <View style={[s.dot, done && s.dotDone, active && s.dotActive]}>
-              {done ? <Ionicons name="checkmark" size={13} color={Colors.white} /> : <Text style={[s.dotText, active && s.dotTextActive]}>{i + 1}</Text>}
-            </View>
-            <Text style={[s.stepLabel, (active || done) && s.stepLabelOn]} numberOfLines={1}>{label}</Text>
-          </View>
-        );
-      })}
-    </View>
-  );
+  return <StepProgress steps={STEPS} current={current} />;
 }
 
 /* ---------- layout ---------- */
@@ -53,10 +39,14 @@ export function TrainProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
 /** Screen with scrollable body + optional sticky footer. */
 export function FlowScreen({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   const insets = useSafeAreaInsets();
+  // Inside the tab navigator the tab bar already covers the bottom system inset, so don't add it twice.
+  const segments = useSegments() as string[];
+  const insideTabs = segments.includes('(tabs)');
+  const footerBottom = insideTabs ? 0 : Math.max(insets.bottom, 12);
   return (
     <AppScreen edges={['top']}>
       <View style={s.flex}>{children}</View>
-      {footer ? <View style={[s.footerWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>{footer}</View> : null}
+      {footer ? <View style={[s.footerWrap, { paddingBottom: footerBottom }]}>{footer}</View> : null}
     </AppScreen>
   );
 }
