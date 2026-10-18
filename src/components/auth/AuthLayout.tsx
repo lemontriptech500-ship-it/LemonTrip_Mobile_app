@@ -3,7 +3,6 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { LemonTripBrand } from '@/components/BrandGradientBar';
 import { Ionicons } from '@expo/vector-icons';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
@@ -41,58 +40,44 @@ type AuthFieldProps = {
 
 /* ---------- layout ---------- */
 
-export function AuthLayout({ eyebrow, title, subtitle, onBack, children }: AuthLayoutProps) {
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
+const SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, "Times New Roman", serif' });
+const HERO = require('../../../assets/images/auth-hero.jpg');
+
+export function AuthLayout({ title, subtitle, onBack, children }: AuthLayoutProps) {
+  const { height } = useWindowDimensions();
+  const heroHeight = Math.max(300, Math.min(height * 0.42, 420));
+  const verify = title === 'Verify your number';
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.page} edges={['top', 'bottom']}>
       <KeyboardAvoidingView style={styles.keyboardAvoiding} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={[styles.layout, desktop && styles.layoutDesktop]}>
-          {desktop ? <TravelVisual style={styles.desktopVisual} /> : null}
-          <View style={styles.formPane}>
-            <ScrollView style={styles.formScroll} contentContainerStyle={[styles.formScrollContent, desktop && styles.formScrollContentDesktop]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-              {!desktop ? (
-                <View>
-                  <TravelVisual style={styles.mobileVisual} compact />
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.heroBack}>
-                    <Ionicons name="arrow-back" size={19} color={Colors.white} />
-                  </TouchableOpacity>
-                </View>
-              ) : null}
-              <View style={[styles.formWrap, !desktop && styles.formWrapMobile]}>
-                {desktop ? (
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.backPill}>
-                    <Ionicons name="arrow-back" size={16} color={Colors.primary} />
-                    <Text style={styles.backPillText}>Back</Text>
-                  </TouchableOpacity>
-                ) : null}
-                <Text style={styles.eyebrow}>{eyebrow}</Text>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.subtitle}>{subtitle}</Text>
-                {children}
+        <ScrollView style={styles.formScroll} contentContainerStyle={styles.scrollGrow} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={styles.column}>
+            <ImageBackground source={HERO} resizeMode="cover" style={[styles.hero, { height: heroHeight }]}>
+              <View style={styles.heroShade} />
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.heroBackBtn}>
+                <Ionicons name="arrow-back" size={20} color={Colors.primaryDark} />
+              </TouchableOpacity>
+              <View style={styles.heroCopy}>
+                <View style={styles.goldLine} />
+                {verify ? <Text style={styles.heroTitle}>{title}</Text> : (
+                  <>
+                    <Text style={styles.heroTitle}>Your Next Adventure</Text>
+                    <Text style={[styles.heroTitle, styles.heroTitleGold]}>Starts Here.</Text>
+                  </>
+                )}
+                <Text style={styles.heroSub}>{subtitle}</Text>
+                <View style={styles.goldLine} />
               </View>
-            </ScrollView>
+            </ImageBackground>
+            <View style={styles.sheet}>
+              <View style={styles.handle} />
+              {children}
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-  );
-}
-
-function TravelVisual({ style, compact = false }: { style: object; compact?: boolean }) {
-  return (
-    <ImageBackground source={{ uri: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1600&q=90' }} resizeMode="cover" style={[styles.visual, style]}>
-      <View style={styles.visualShade} />
-      <View style={[styles.visualCopy, compact && styles.visualCopyCompact]}>
-        <View style={styles.brandRow}><LemonTripBrand size={compact ? 44 : 54} /></View>
-        <View style={styles.visualMessage}>
-          <Text style={styles.visualEyebrow}>{compact ? 'YOUR NEXT STORY STARTS HERE' : 'YOUR NEXT STORY IS OUT THERE'}</Text>
-          <Text style={[styles.visualTitle, compact && styles.visualTitleCompact]}>{compact ? 'Welcome to a world of possibilities.' : 'Make room for somewhere new.'}</Text>
-          {!compact ? <Text style={styles.visualSubtitle}>Thoughtful travel starts with a single step.</Text> : null}
-        </View>
-      </View>
-    </ImageBackground>
   );
 }
 
@@ -100,9 +85,10 @@ function TravelVisual({ style, compact = false }: { style: object; compact?: boo
 
 export function AuthField({ label, value, placeholder, onChangeText, error, hint, icon, autoCapitalize = 'sentences', keyboardType = 'default', maxLength, secure = false, onToggleSecure }: AuthFieldProps) {
   const [focused, setFocused] = useState(false);
+  const fieldBg = error ? Colors.errorSoft : focused ? Colors.surface : Colors.background;
+  const autofillFix = Platform.OS === 'web' ? ({ boxShadow: `0 0 0 100px ${fieldBg} inset` } as object) : null;
   return (
     <View style={styles.fieldGroup}>
-      <Text style={styles.fieldLabel}>{label.toUpperCase()}</Text>
       <View style={[styles.inputWrap, focused && styles.inputWrapFocused, !!error && styles.inputWrapError]}>
         {icon ? <Ionicons name={icon} size={17} color={error ? Colors.error : Colors.primary} style={styles.inputIcon} /> : null}
         <TextInput
@@ -118,7 +104,7 @@ export function AuthField({ label, value, placeholder, onChangeText, error, hint
           maxLength={maxLength}
           secureTextEntry={secure}
           autoCorrect={false}
-          style={[styles.input, !icon && { paddingLeft: 14 }]}
+          style={[styles.input, !icon && { paddingLeft: 14 }, autofillFix]}
         />
         {onToggleSecure ? (
           <TouchableOpacity accessibilityRole="button" accessibilityLabel={secure ? 'Show password' : 'Hide password'} onPress={onToggleSecure} style={styles.visibilityButton}>
@@ -166,8 +152,9 @@ export function AuthButton({ label, onPress, loading = false, disabled = false }
   const off = loading || disabled;
   return (
     <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: off, busy: loading }} disabled={off} onPress={onPress} activeOpacity={0.85} style={[styles.primaryButton, off && styles.primaryButtonOff]}>
-      {loading ? <ActivityIndicator color={Colors.primaryDark} /> : null}
+      {loading ? <ActivityIndicator color={Colors.white} /> : null}
       <Text style={styles.primaryButtonText}>{loading ? 'Please wait…' : label}</Text>
+      {!loading ? <View style={styles.arrowCircle}><Ionicons name="arrow-forward" size={18} color={Colors.primaryDark} /></View> : null}
     </TouchableOpacity>
   );
 }
@@ -332,6 +319,20 @@ export function AuthLegalLinks({ onTerms, onPrivacy }: { onTerms: () => void; on
 }
 
 const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: Colors.background },
+  scrollGrow: { flexGrow: 1 },
+  column: { flexGrow: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  hero: { overflow: 'hidden', justifyContent: 'flex-end', paddingHorizontal: 24, paddingBottom: 52, backgroundColor: Colors.primaryDark },
+  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.25)' },
+  heroBackBtn: { position: 'absolute', top: 16, left: 20, width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.white },
+  heroCopy: { gap: 4 },
+  goldLine: { width: 28, height: 2, marginVertical: 8, backgroundColor: Colors.accent },
+  heroTitle: { color: Colors.white, fontFamily: SERIF, fontSize: 32, lineHeight: 38 },
+  heroTitleGold: { color: Colors.accent },
+  heroSub: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 22, marginTop: 6, maxWidth: 340 },
+  sheet: { flexGrow: 1, marginTop: -32, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 28, backgroundColor: Colors.surface },
+  handle: { alignSelf: 'center', width: 54, height: 5, borderRadius: 3, marginBottom: 20, backgroundColor: Colors.border },
+  arrowCircle: { position: 'absolute', right: 8, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.white },
   safeArea: { flex: 1, backgroundColor: Colors.background },
   keyboardAvoiding: { flex: 1 },
   layout: { flex: 1 },
@@ -362,7 +363,7 @@ const styles = StyleSheet.create({
   subtitle: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 5, marginBottom: 22 },
   fieldGroup: { marginBottom: 14 },
   fieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, marginBottom: 6 },
-  inputWrap: { minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.field.borderRadius, backgroundColor: Colors.background },
+  inputWrap: { overflow: 'hidden', minHeight: Ui.field.minHeight, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.field.borderRadius, backgroundColor: Colors.background },
   inputWrapFocused: { borderColor: Colors.primary, backgroundColor: Colors.surface },
   inputWrapError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
   inputIcon: { marginLeft: 13 },
@@ -376,9 +377,9 @@ const styles = StyleSheet.create({
   otpBoxError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
   otpDigit: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
   otpHidden: { position: 'absolute', width: 1, height: 1, opacity: 0 },
-  primaryButton: { minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  primaryButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: Colors.primaryDark },
   primaryButtonOff: { opacity: 0.6 },
-  primaryButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  primaryButtonText: { color: Colors.white, fontFamily: SERIF, fontSize: 19, fontWeight: FontWeight.bold },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 16 },
   divider: { flex: 1, height: 1, backgroundColor: Colors.border },
   dividerText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
