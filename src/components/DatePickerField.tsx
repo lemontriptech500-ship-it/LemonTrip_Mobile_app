@@ -36,10 +36,12 @@ type DateFieldProps = {
   placeholder?: string;
   grid?: boolean;
   compact?: boolean;
+  /** Home-screen tile look: calendar icon, small caption and value stacked. */
+  tile?: boolean;
 };
 
 /** A date field that opens a calendar. Value is always YYYY-MM-DD. */
-export function DateField({ label, value, onChange, minDate, maxDate, placeholder = 'Select date', grid = false, compact = false }: DateFieldProps) {
+export function DateField({ label, value, onChange, minDate, maxDate, placeholder = 'Select date', grid = false, compact = false, tile = false }: DateFieldProps) {
   useAppLanguage();
   const min = minDate || todayISO();
   const [open, setOpen] = useState(false);
@@ -69,9 +71,26 @@ export function DateField({ label, value, onChange, minDate, maxDate, placeholde
   ];
   const today = todayISO();
   const display = formatDisplay(value);
+  const p = parse(value);
+  // Short "28 Oct" form so the day never gets cut off in the narrow home tiles.
+  const shortDisplay = p ? new Intl.DateTimeFormat(getAppLocale(), { day: 'numeric', month: 'short' }).format(new Date(p.y, p.m, p.d)) : '';
 
   return (
-    <View style={[s.field, grid && s.grid, compact && s.compactField, grid && compact && s.compactGrid]}>
+    <View style={[s.field, grid && s.grid, compact && s.compactField, grid && compact && s.compactGrid, tile && { marginBottom: 0 }]}>
+      {tile ? (
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={`${label} date: ${display || 'not selected'}`}
+          onPress={openPicker}
+          style={s.tile}
+        >
+          <Ionicons name="calendar-outline" size={19} color={Colors.textLight} />
+          <View style={s.tileCopy}>
+            <Text style={s.tileLabel} numberOfLines={1}>{label}</Text>
+            <Text style={[s.tileValue, !display && s.tilePlaceholder]} numberOfLines={1}>{shortDisplay || placeholder}</Text>
+          </View>
+        </TouchableOpacity>
+      ) : (<>
       <Text style={[s.label, compact && s.labelCompact]}>{label}</Text>
       <TouchableOpacity
         accessibilityRole="button"
@@ -83,7 +102,7 @@ export function DateField({ label, value, onChange, minDate, maxDate, placeholde
           {display || placeholder}
         </Text>
         <Ionicons name="calendar-outline" size={compact ? 15 : 18} color={Colors.primary} />
-      </TouchableOpacity>
+      </TouchableOpacity></>)}
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <View style={s.overlay}>
@@ -139,6 +158,11 @@ export function DateField({ label, value, onChange, minDate, maxDate, placeholde
 }
 
 const s = StyleSheet.create({
+  tile: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 9, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  tileCopy: { flex: 1, minWidth: 0 },
+  tileLabel: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: TextSize.micro },
+  tileValue: { color: Colors.textDark, fontFamily: 'Inter-Bold', fontSize: TextSize.caption, marginTop: 1 },
+  tilePlaceholder: { color: Colors.textLight, fontFamily: 'Inter-Medium' },
   field: { flex: 1, minWidth: 0, marginBottom: 12 },
   grid: { flexBasis: '46%', flexGrow: 1, flexShrink: 0 },
   compactField: { marginBottom: 7 },
