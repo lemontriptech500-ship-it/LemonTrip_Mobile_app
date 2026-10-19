@@ -4,6 +4,7 @@ import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { getGoogleIdToken, signOutGoogleUser } from '@/utils/googleNativeAuth';
@@ -45,13 +46,13 @@ const HERO = require('../../../assets/images/auth-hero.jpg');
 
 export function AuthLayout({ title, subtitle, onBack, children }: AuthLayoutProps) {
   const { height } = useWindowDimensions();
-  const heroHeight = Math.max(300, Math.min(height * 0.42, 420));
+  const heroHeight = Math.max(260, Math.min(height * 0.32, 320));
   const verify = title === 'Verify your number';
 
   return (
     <SafeAreaView style={styles.page} edges={['top', 'bottom']}>
       <KeyboardAvoidingView style={styles.keyboardAvoiding} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView style={styles.formScroll} contentContainerStyle={styles.scrollGrow} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.formScroll} contentContainerStyle={styles.scrollGrow} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} bounces={false} overScrollMode="never">
           <View style={styles.column}>
             <ImageBackground source={HERO} resizeMode="cover" style={[styles.hero, { height: heroHeight }]}>
               <View style={styles.heroShade} />
@@ -185,6 +186,17 @@ export function AuthNotice({ children, tone = 'info' }: { children: ReactNode; t
   );
 }
 
+function GoogleLogo() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 48 48">
+      <Path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z" />
+      <Path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" />
+      <Path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z" />
+      <Path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" />
+    </Svg>
+  );
+}
+
 export function GoogleAuthButton({ label, onSuccess }: { label: string; onSuccess: (idToken: string) => Promise<void> }) {
   const clientIds = {
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim(),
@@ -200,7 +212,7 @@ export function GoogleAuthButton({ label, onSuccess }: { label: string; onSucces
   if (!configured) {
     return (
       <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: true }} disabled style={[styles.googleButton, styles.googleButtonDisabled]}>
-        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <View style={styles.googleMark}><GoogleLogo /></View>
         <Text style={styles.googleButtonText}>Google sign-in not configured</Text>
       </TouchableOpacity>
     );
@@ -233,7 +245,7 @@ function NativeGoogleAuthButton({ label, onSuccess }: { label: string; onSuccess
   return (
     <View>
       <TouchableOpacity accessibilityRole="button" disabled={loading} onPress={() => void startGoogleAuth()} style={[styles.googleButton, loading && styles.googleButtonDisabled]}>
-        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <View style={styles.googleMark}><GoogleLogo /></View>
         <Text style={styles.googleButtonText}>{loading ? 'Connecting to Google…' : label}</Text>
       </TouchableOpacity>
       {authError ? <Text accessibilityRole="alert" style={styles.googleError}>{authError}</Text> : null}
@@ -298,7 +310,7 @@ function ConfiguredGoogleAuthButton({
   return (
     <View>
       <TouchableOpacity accessibilityRole="button" disabled={!request || loading} onPress={() => void startGoogleAuth()} style={[styles.googleButton, (!request || loading) && styles.googleButtonDisabled]}>
-        <View style={styles.googleMark}><Text style={styles.googleMarkText}>G</Text></View>
+        <View style={styles.googleMark}><GoogleLogo /></View>
         <Text style={styles.googleButtonText}>{!request ? 'Preparing Google sign-in…' : loading ? 'Connecting to Google…' : label}</Text>
       </TouchableOpacity>
       {authError ? <Text accessibilityRole="alert" style={styles.googleError}>{authError}</Text> : null}
@@ -322,16 +334,16 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: Colors.background },
   scrollGrow: { flexGrow: 1 },
   column: { flexGrow: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
-  hero: { overflow: 'hidden', justifyContent: 'flex-end', paddingHorizontal: 24, paddingBottom: 52, backgroundColor: Colors.primaryDark },
+  hero: { overflow: 'hidden', justifyContent: 'flex-end', paddingHorizontal: 24, paddingBottom: 46, backgroundColor: Colors.primaryDark },
   heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.25)' },
   heroBackBtn: { position: 'absolute', top: 16, left: 20, width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.white },
   heroCopy: { gap: 4 },
   goldLine: { width: 28, height: 2, marginVertical: 8, backgroundColor: Colors.accent },
-  heroTitle: { color: Colors.white, fontFamily: SERIF, fontSize: 32, lineHeight: 38 },
+  heroTitle: { color: Colors.white, fontFamily: SERIF, fontSize: 28, lineHeight: 34 },
   heroTitleGold: { color: Colors.accent },
   heroSub: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 22, marginTop: 6, maxWidth: 340 },
-  sheet: { flexGrow: 1, marginTop: -32, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 28, backgroundColor: Colors.surface },
-  handle: { alignSelf: 'center', width: 54, height: 5, borderRadius: 3, marginBottom: 20, backgroundColor: Colors.border },
+  sheet: { flexGrow: 1, marginTop: -32, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 16, backgroundColor: Colors.surface },
+  handle: { alignSelf: 'center', width: 54, height: 5, borderRadius: 3, marginBottom: 28, backgroundColor: Colors.border },
   arrowCircle: { position: 'absolute', right: 8, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.white },
   safeArea: { flex: 1, backgroundColor: Colors.background },
   keyboardAvoiding: { flex: 1 },
@@ -377,7 +389,7 @@ const styles = StyleSheet.create({
   otpBoxError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
   otpDigit: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
   otpHidden: { position: 'absolute', width: 1, height: 1, opacity: 0 },
-  primaryButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: Colors.primaryDark },
+  primaryButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: '#0F5C3A' },
   primaryButtonOff: { opacity: 0.6 },
   primaryButtonText: { color: Colors.white, fontFamily: SERIF, fontSize: 19, fontWeight: FontWeight.bold },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 16 },
