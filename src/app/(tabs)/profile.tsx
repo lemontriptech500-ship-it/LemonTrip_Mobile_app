@@ -1,52 +1,72 @@
 import { useAppLanguage } from '@/utils/intl';
 import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { Ui } from '@/constants/theme';
-import { AccountArtworkIcon } from '@/components/AccountArtworkIcon';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
 import { logout, useAuth } from '@/utils/authStore';
-import { useAccountBookings } from '@/utils/accountBookings';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
-const SOFT_GREEN = Colors.surfaceMuted;
-const SHADOW = Ui.shadow;
+// Inter (static weights, loaded in app/_layout.tsx).
+const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+const BRAND = '#103D30';
 
-// Same circle-icon grid pattern as the Home screen.
-const travelLinks = [
-  { label: 'My trips', icon: 'briefcase-outline' as const, route: '/(tabs)/bookings' },
-  { label: 'Saved places', icon: 'heart-outline' as const, route: '/(tabs)/wishlist' },
-  { label: 'Visa updates', icon: 'document-text-outline' as const, route: '/(tabs)/explore/visa/applications' },
-  { label: 'Offers', icon: 'pricetag-outline' as const, route: '/offers' },
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
+type Item = { title: string; detail?: string; icon: IconName; route: string };
+
+const travelLinks: Item[] = [
+  { title: 'My trips', icon: 'briefcase-outline', route: '/(tabs)/bookings' },
+  { title: 'Saved places', icon: 'heart-outline', route: '/(tabs)/wishlist' },
+  { title: 'Visa updates', icon: 'document-text-outline', route: '/(tabs)/explore/visa/applications' },
+  { title: 'Offers', icon: 'pricetag-outline', route: '/offers' },
 ];
 
-const accountLinks = [
-  { label: 'Personal information', detail: 'Manage your contact details', artwork: 'profile' as const, route: '/manage/personal-information' },
-  { label: 'Wallet', detail: 'Balance and transactions on LemonTrip', artwork: 'payment' as const, route: '/wallet' },
-  { label: 'Help & Support', detail: 'FAQs, contact support, and request updates', artwork: 'help' as const, route: '/help' },
-  { label: 'Travel services', detail: 'Flights, hotels, trains, buses, holidays and visas', artwork: 'booking' as const, route: '/services' },
-  { label: 'Payment methods', detail: 'Choose how to pay', artwork: 'payment' as const, route: '/wallet/payment-methods' },
-  { label: 'Saved travellers', detail: 'Names for your next journey', artwork: 'profile' as const, route: '/manage/travellers' },
-  { label: 'Saved searches', detail: 'Pick up where you left off', artwork: 'booking' as const, route: '/manage/saved-searches' },
-  { label: 'Notifications', detail: 'Updates about your journeys', artwork: 'notifications' as const, route: '/notifications' },
-  { label: 'Travel assistant', detail: 'One assistant for every service', artwork: 'support' as const, route: '/assistant' },
-  { label: 'About LemonTrip', detail: 'Travel smarter. Travel better.', artwork: 'help' as const, route: '/manage/about' },
-  { label: 'Settings', detail: 'Preferences, privacy and notifications', artwork: 'settings' as const, route: '/settings' },
+const accountLinks: Item[] = [
+  { title: 'Personal information', detail: 'Manage your contact details', icon: 'person-outline', route: '/manage/personal-information' },
+  { title: 'Wallet', detail: 'Balance and transactions on LemonTrip', icon: 'wallet-outline', route: '/wallet' },
+  { title: 'Help & Support', detail: 'FAQs, contact support, and request updates', icon: 'help-circle-outline', route: '/help' },
+  { title: 'Travel services', detail: 'Flights, hotels, trains, buses, holidays and visas', icon: 'airplane-outline', route: '/services' },
+  { title: 'Payment methods', detail: 'Choose how to pay', icon: 'card-outline', route: '/wallet/payment-methods' },
+  { title: 'Saved travellers', detail: 'Names for your next journey', icon: 'people-outline', route: '/manage/travellers' },
+  { title: 'Saved searches', detail: 'Pick up where you left off', icon: 'bookmark-outline', route: '/manage/saved-searches' },
+  { title: 'Notifications', detail: 'Updates about your journeys', icon: 'notifications-outline', route: '/notifications' },
+  { title: 'Travel assistant', detail: 'One assistant for every service', icon: 'chatbubble-ellipses-outline', route: '/assistant' },
+  { title: 'About LemonTrip', detail: 'Travel smarter. Travel better.', icon: 'information-circle-outline', route: '/manage/about' },
+  { title: 'Settings', detail: 'Preferences, privacy and notifications', icon: 'options-outline', route: '/settings' },
+  { title: 'Visa services', detail: 'Get help planning your next trip', icon: 'earth-outline', route: '/(tabs)/explore/visa' },
 ];
+
+function Section({ title, items }: { title: string; items: Item[] }) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <View style={styles.card}>
+        {items.map((item, index) => (
+          <TouchableOpacity
+            key={item.title}
+            accessibilityRole="button"
+            onPress={() => router.push(item.route as never)}
+            style={[styles.row, index < items.length - 1 && styles.rowDivider]}
+            activeOpacity={0.75}>
+            <View style={styles.rowIcon}><Ionicons name={item.icon} size={20} color={Colors.white} /></View>
+            <View style={styles.rowCopy}>
+              <Text style={styles.rowTitle}>{item.title}</Text>
+              {item.detail ? <Text style={styles.rowDetail}>{item.detail}</Text> : null}
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 export default function ProfileScreen() {
   useAppLanguage();
   const user = useAuth();
-  const { bookings } = useAccountBookings();
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
-  const firstName = user?.name?.trim()?.split(/\s+/)[0] || 'traveller';
   const initial = user?.name?.trim()?.charAt(0)?.toUpperCase() || 'G';
 
   const confirmLogout = () => {
@@ -56,121 +76,66 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const goBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/(tabs)/home' as never);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <View style={styles.header}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={goBack} style={styles.backButton} activeOpacity={0.8}>
+          <Ionicons name="arrow-back" size={22} color={BRAND} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Your profile</Text>
+      </View>
+
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-        <View style={[styles.content, desktop && styles.contentDesktop]}>
+        <View style={styles.content}>
 
-          {/* Header — same as Home / Explore / My Trips */}
-          <ScreenHeader title="Your profile" subtitle="Your account, trips and preferences." eyebrow="MAKE YOURSELF AT HOME" rightAction={{ label: 'Settings', icon: 'options-outline', onPress: () => router.push('/settings') }} />
-
-          {/* Identity card */}
-          <View style={styles.heroCard}>
-            <View pointerEvents="none" style={styles.heroRing} />
-            <View style={styles.identityRow}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{initial}</Text>
+          {user ? (
+            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/manage/personal-information' as never)} style={styles.userCard} activeOpacity={0.85}>
+              <View style={styles.avatarWrap}>
+                <View style={styles.avatar}><Text style={styles.avatarText}>{initial}</Text></View>
+                <View style={styles.cameraBadge}><Ionicons name="camera" size={12} color={Colors.white} /></View>
               </View>
-              <View style={styles.identityCopy}>
-                {user ? (
-                  <View style={styles.memberPill}>
-                    <Ionicons name="sparkles" size={12} color={Colors.primaryDark} />
-                    <Text style={styles.memberPillText}>LemonTrip member</Text>
-                  </View>
-                ) : null}
-                <Text style={styles.name} numberOfLines={1}>{user?.name ?? `Welcome, ${firstName}`}</Text>
-                <Text style={styles.emailText} numberOfLines={1}>{user?.email ?? 'Sign in to keep your trips together'}</Text>
+              <View style={styles.userCopy}>
+                <Text style={styles.userName} numberOfLines={1}>{(user.name ?? 'Traveller').toUpperCase()}</Text>
+                <Text style={styles.userEmail} numberOfLines={1}>{user.email}</Text>
+                <View style={styles.memberPill}><Text style={styles.memberPillText}>LemonTrip member</Text></View>
               </View>
-            </View>
-
-            {user ? (
-              <View style={styles.statRow}>
-                <View style={styles.stat}>
-                  <Text style={styles.statValue}>{bookings.length}</Text>
-                  <Text style={styles.statLabel}>{bookings.length === 1 ? 'Booking' : 'Bookings'}</Text>
-                </View>
-                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/bookings')} style={styles.heroButton} activeOpacity={0.85}>
-                  <Text style={styles.heroButtonText}>View my trips</Text>
-                  <View style={styles.heroButtonArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.guestBlock}>
-                <Text style={styles.guestText}>Sign in to save places, track bookings and get trip updates.</Text>
-                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/login')} style={styles.heroButton} activeOpacity={0.85}>
-                  <Text style={styles.heroButtonText}>Sign in</Text>
-                  <View style={styles.heroButtonArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-
-          {/* Travel shortcuts */}
-          <View style={styles.gridCard}>
-            <Text style={styles.gridTitle}>Your travel</Text>
-            <View style={styles.gridRow}>
-              {travelLinks.map((item) => (
-                <TouchableOpacity key={item.label} accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.push(item.route as never)}>
-                  <View style={styles.gridIconWrap}>
-                    <Ionicons name={item.icon} size={23} color={Colors.primary} />
-                    {item.label === 'My trips' && bookings.length > 0 ? <View style={styles.gridBadge}><Text style={styles.gridBadgeText}>{bookings.length}</Text></View> : null}
-                  </View>
-                  <Text style={styles.gridLabel}>{item.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <View style={[styles.lowerLayout, desktop && styles.lowerLayoutDesktop]}>
-            {/* Account list */}
-            <View style={styles.menuSection}>
-              <Text style={styles.sectionTitle}>Account</Text>
-              <View style={styles.menuCard}>
-                {accountLinks.map((item) => (
-                  <TouchableOpacity
-                    key={item.label}
-                    accessibilityRole="button"
-                    onPress={() => router.push(item.route as never)}
-                    style={[styles.menuRow, styles.menuDivider]}
-                    activeOpacity={0.75}>
-                    <View style={styles.menuIcon}><AccountArtworkIcon name={item.artwork} size={28} /></View>
-                    <View style={styles.menuCopy}>
-                      <Text style={styles.menuTitle}>{item.label}</Text>
-                      <Text style={styles.menuDetail}>{item.detail}</Text>
-                    </View>
-
-                    <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
-                  </TouchableOpacity>
-                ))}
-                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore/visa')} style={styles.menuRow} activeOpacity={0.75}>
-                  <View style={styles.menuIcon}><TravelArtworkIcon name="visa" size={29} /></View>
-                  <View style={styles.menuCopy}>
-                    <Text style={styles.menuTitle}>Visa services</Text>
-                    <Text style={styles.menuDetail}>Get help planning your next trip</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Discover banner — same treatment as Home banner */}
-            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore')} style={styles.discoverCard} activeOpacity={0.9}>
-              <View pointerEvents="none" style={styles.discoverRing} />
-              <View style={styles.discoverIcon}><TravelArtworkIcon name="explore" size={32} /></View>
-              <Text style={styles.discoverTitle}>Where will you go next?</Text>
-              <Text style={styles.discoverText}>Find a new favourite with handpicked destinations and stays.</Text>
-              <View style={styles.discoverCta}>
-                <Text style={styles.discoverCtaText}>Explore destinations</Text>
-                <View style={styles.discoverCtaArrow}><Ionicons name="arrow-forward" size={16} color={Colors.white} /></View>
-              </View>
+              <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />
             </TouchableOpacity>
-          </View>
+          ) : (
+            <View style={styles.userCard}>
+              <View style={styles.userCopy}>
+                <Text style={styles.userName}>WELCOME</Text>
+                <Text style={styles.userEmail}>Sign in to keep your trips together</Text>
+              </View>
+              <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/login')} style={styles.signInButton} activeOpacity={0.85}>
+                <Text style={styles.exploreButtonText}>Sign in</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-          {/* Log out */}
+          <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore')} style={styles.banner} activeOpacity={0.9}>
+            <View style={styles.bannerCopy}>
+              <Text style={styles.bannerTitle}>Where will you go next?</Text>
+              <Text style={styles.bannerText}>Find a new favourite with handpicked destinations and stays.</Text>
+              <View style={styles.exploreButton}>
+                <Text style={styles.exploreButtonText}>Explore destinations</Text>
+                <View style={styles.exploreArrow}><Ionicons name="arrow-forward" size={15} color={BRAND} /></View>
+              </View>
+            </View>
+            <View style={styles.bannerArt}><Ionicons name="briefcase" size={40} color={BRAND} /></View>
+          </TouchableOpacity>
+
+          <Section title="Your travel" items={travelLinks} />
+          <Section title="Account" items={accountLinks} />
+
           {user ? (
             <TouchableOpacity accessibilityRole="button" onPress={confirmLogout} style={styles.logoutButton} activeOpacity={0.8}>
-              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+              <Ionicons name="log-out-outline" size={20} color={BRAND} />
               <Text style={styles.logoutText}>Log out</Text>
             </TouchableOpacity>
           ) : null}
@@ -183,79 +148,46 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
+  safeArea: { flex: 1, backgroundColor: '#F4F7F5' },
   page: { paddingBottom: 32 },
-  content: { width: '100%', maxWidth: 820, alignSelf: 'center' },
-  contentDesktop: { maxWidth: 1040 },
+  content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: 16 },
 
-  // Header
-  header: { minHeight: 72, paddingHorizontal: 18, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  brandLockup: { minWidth: 150, height: 56, alignItems: 'flex-start', justifyContent: 'center' },
-  headerSpacer: { flex: 1 },
-  settingsButton: { minHeight: 44,  width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.control, backgroundColor: Colors.surface },
+  header: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
+  backButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
+  headerTitle: { color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.heading },
 
-  // Title
-  titleStrip: { paddingHorizontal: 18, paddingVertical: 16, backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  pageTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.display, fontWeight: FontWeight.extraBold },
-  pageSubtitle: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 3 },
+  userCard: { marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  avatarWrap: { width: 64, height: 64 },
+  avatar: { width: 64, height: 64, alignItems: 'center', justifyContent: 'center', borderRadius: 32, backgroundColor: BRAND },
+  avatarText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.display },
+  cameraBadge: { position: 'absolute', right: -3, bottom: -3, width: 24, height: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: BRAND, borderWidth: 2, borderColor: Colors.surface },
+  userCopy: { flex: 1, minWidth: 0 },
+  userName: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge },
+  userEmail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, marginTop: 2 },
+  memberPill: { alignSelf: 'flex-start', marginTop: 8, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: Colors.accent },
+  memberPillText: { color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.micro },
 
-  // Identity card
-  heroCard: { marginTop: 16, marginHorizontal: Ui.space.page, padding: 20, borderRadius: 24, backgroundColor: Colors.primaryDark, overflow: 'hidden' },
-  heroRing: { position: 'absolute', width: 190, height: 190, right: -80, top: -90, borderRadius: 95, borderWidth: 1, borderColor: Colors.onDarkBorder },
-  identityRow: { flexDirection: 'row', alignItems: 'center', gap: 15 },
-  avatar: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.onDarkHighlight },
-  avatarText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.hero, fontWeight: FontWeight.extraBold },
-  identityCopy: { flex: 1, minWidth: 0 },
-  memberPill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 6, borderRadius: Ui.radius.pill, backgroundColor: Colors.accent },
-  memberPillText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  name: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
-  emailText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 3 },
-  statRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.onDarkBorder },
-  stat: { minWidth: 0 },
-  statValue: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.display, lineHeight: 32, fontWeight: FontWeight.extraBold },
-  statLabel: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
-  guestBlock: { gap: 14, marginTop: 18, paddingTop: 16, borderTopWidth: 1, borderTopColor: Colors.onDarkBorder },
-  guestText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20 },
-  heroButton: { alignSelf: 'flex-start', minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 18, paddingRight: 5, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  heroButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  heroButtonArrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.primary },
+  banner: { marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 18, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  bannerCopy: { flex: 1, minWidth: 0 },
+  bannerTitle: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.heading },
+  bannerText: { color: BRAND, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 19, marginTop: 4 },
+  bannerArt: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.surface },
+  exploreButton: { alignSelf: 'flex-start', minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingLeft: 16, paddingRight: 5, paddingVertical: 4, borderRadius: 999, backgroundColor: BRAND },
+  signInButton: { minHeight: 42, justifyContent: 'center', paddingHorizontal: 18, borderRadius: 999, backgroundColor: BRAND },
+  exploreButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.body },
+  exploreArrow: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.white },
 
-  // Circle grid card
-  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 16, paddingBottom: 6, paddingHorizontal: 8, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
-  gridTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, paddingHorizontal: 10, marginBottom: 10 },
-  gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  gridItem: { width: '25%', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 2 },
-  gridIconWrap: { width: 44, height: 40, alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  gridBadge: { position: 'absolute', top: -2, right: -2, minWidth: 20, height: 20, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
-  gridBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  gridLabel: { marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, lineHeight: 13, fontWeight: FontWeight.bold },
+  section: { marginTop: 22 },
+  sectionTitle: { color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.heading, marginBottom: 10, marginHorizontal: 2 },
+  card: { overflow: 'hidden', paddingHorizontal: 14, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  row: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
+  rowIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: BRAND },
+  rowCopy: { flex: 1, minWidth: 0 },
+  rowTitle: { color: Colors.textDark, fontFamily: INTER.semibold, fontSize: TextSize.bodyLarge },
+  rowDetail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 18, marginTop: 2 },
 
-  // Lower layout
-  lowerLayout: { gap: 16, marginTop: 24, paddingHorizontal: 16 },
-  lowerLayoutDesktop: { flexDirection: 'row', alignItems: 'flex-start' },
-  menuSection: { flex: 1, minWidth: 0 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, marginHorizontal: 2, marginBottom: 12 },
-  menuCard: { ...Ui.card, overflow: 'hidden', paddingHorizontal: 14, borderRadius: Ui.radius.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
-  menuRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 10 },
-  menuDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
-  menuIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 23, backgroundColor: SOFT_GREEN, borderWidth: 1, borderColor: Colors.border },
-  menuCopy: { flex: 1, minWidth: 0 },
-  menuTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
-  menuDetail: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 18, marginTop: 2 },
-  soonTag: { overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 4, borderRadius: Ui.radius.pill, backgroundColor: SOFT_GREEN, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-
-  // Discover banner
-  discoverCard: { flexGrow: 1, minWidth: 0, overflow: 'hidden', padding: 20, borderRadius: 24, backgroundColor: Colors.accentSoft },
-  discoverRing: { position: 'absolute', width: 150, height: 150, right: -70, bottom: -80, borderRadius: 75, borderWidth: 1, borderColor: Colors.decorativeGreen },
-  discoverIcon: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 27, backgroundColor: Colors.surface },
-  discoverTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, lineHeight: 28, fontWeight: FontWeight.extraBold, marginTop: 14 },
-  discoverText: { maxWidth: 300, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 6 },
-  discoverCta: { alignSelf: 'flex-start', minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingLeft: 18, paddingRight: 5, borderRadius: 24, backgroundColor: Colors.white },
-  discoverCtaText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  discoverCtaArrow: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
-
-  // Log out + footer
-  logoutButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, marginHorizontal: Ui.space.page, borderRadius: 26, borderWidth: 1, borderColor: Colors.errorBorder, backgroundColor: Colors.errorSoft },
-  logoutText: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
-  footer: { marginTop: 22, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, textAlign: 'center' },
+  logoutButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, borderRadius: 26, borderWidth: 1, borderColor: BRAND, backgroundColor: Colors.surface },
+  logoutText: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge },
+  footer: { marginTop: 22, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, textAlign: 'center' },
 });
