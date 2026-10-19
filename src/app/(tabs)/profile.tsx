@@ -7,7 +7,7 @@ import { Colors } from '@/constants/colors';
 import { logout, useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 // Inter (static weights, loaded in app/_layout.tsx).
@@ -127,7 +127,7 @@ export default function ProfileScreen() {
                 <View style={styles.exploreArrow}><Ionicons name="arrow-forward" size={15} color={BRAND} /></View>
               </View>
             </View>
-            <View style={styles.bannerArt}><Ionicons name="briefcase" size={40} color={BRAND} /></View>
+            <Image source={require('../../../assets/images/profile-banner.png')} style={styles.bannerArt} resizeMode="contain" />
           </TouchableOpacity>
 
           <Section title="Your travel" items={travelLinks} />
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   bannerCopy: { flex: 1, minWidth: 0 },
   bannerTitle: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.heading },
   bannerText: { color: BRAND, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 19, marginTop: 4 },
-  bannerArt: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.surface },
+  bannerArt: { width: 120, height: 80 },
   exploreButton: { alignSelf: 'flex-start', minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingLeft: 16, paddingRight: 5, paddingVertical: 4, borderRadius: 999, backgroundColor: BRAND },
   signInButton: { minHeight: 42, justifyContent: 'center', paddingHorizontal: 18, borderRadius: 999, backgroundColor: BRAND },
   exploreButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.body },
