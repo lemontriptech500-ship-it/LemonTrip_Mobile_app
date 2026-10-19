@@ -1,5 +1,5 @@
 import { Pressable, TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
@@ -41,7 +41,6 @@ type AuthFieldProps = {
 
 /* ---------- layout ---------- */
 
-const SERIF = Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia, "Times New Roman", serif' });
 const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
 const HERO = require('../../../assets/images/auth-hero.jpg');
 
@@ -340,7 +339,7 @@ const styles = StyleSheet.create({
   heroBackBtn: { position: 'absolute', top: 16, left: 20, width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.white },
   heroCopy: { gap: 4 },
   goldLine: { width: 28, height: 2, marginVertical: 8, backgroundColor: Colors.accent },
-  heroTitle: { color: Colors.white, fontFamily: SERIF, fontSize: 28, lineHeight: 34 },
+  heroTitle: { color: Colors.white, fontFamily: INTER.bold, fontSize: 28, lineHeight: 34 },
   heroTitleGold: { color: Colors.accent },
   heroSub: { color: Colors.white, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, lineHeight: 22, marginTop: 6, maxWidth: 340 },
   sheet: { flexGrow: 1, marginTop: -32, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 16, backgroundColor: Colors.surface },
@@ -392,7 +391,7 @@ const styles = StyleSheet.create({
   otpHidden: { position: 'absolute', width: 1, height: 1, opacity: 0 },
   primaryButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: '#103D30' },
   primaryButtonOff: { opacity: 0.6 },
-  primaryButtonText: { color: Colors.white, fontFamily: SERIF, fontSize: 19, fontWeight: FontWeight.bold },
+  primaryButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: 19 },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 16 },
   divider: { flex: 1, height: 1, backgroundColor: Colors.border },
   dividerText: { color: Colors.textLight, fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1 },
