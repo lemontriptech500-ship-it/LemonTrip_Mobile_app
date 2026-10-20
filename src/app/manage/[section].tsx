@@ -262,9 +262,9 @@ export default function ManageScreen() {
         </View>
         <SupportCard>
           <SupportHeading eyebrow="GOOD TO KNOW" title="More about LemonTrip" />
-          <SupportItem icon="compass-outline" title="Explore travel services" onPress={() => goTo('/services')} />
-          <SupportItem icon="headset-outline" title="Contact LemonTrip" onPress={() => goTo('/contact')} />
-          <SupportItem icon="document-text-outline" title="Terms & conditions" onPress={() => goTo('/terms')} last />
+          <SupportItem tone="mint" icon="compass-outline" title="Explore travel services" detail="Flights, hotels, buses, trains and more" onPress={() => goTo('/services')} />
+          <SupportItem tone="mint" icon="headset-outline" title="Contact LemonTrip" detail="Get in touch with our team" onPress={() => goTo('/contact')} />
+          <SupportItem tone="mint" icon="document-text-outline" title="Terms & conditions" detail="Read our terms, policies and guidelines" onPress={() => goTo('/terms')} last />
         </SupportCard>
       </>
     );
@@ -280,7 +280,7 @@ export default function ManageScreen() {
   }
 
   return (
-    <SupportPage title={titles[section] ?? 'Your account'} subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT">
+    <SupportPage title={titles[section] ?? 'Your account'} subtitle="Made for the way you travel." eyebrow={section === 'about' ? 'LEMONTRIP / ABOUT' : 'LEMONTRIP / ACCOUNT'} hero={{ image: require('../../../assets/images/Tropical Travel Essentials in Green.png'), topTitle: titles[section] ?? 'Your account', onSettings: () => goTo('/settings') }}>
       {content}
       {note ? <SupportNotice tone={note.tone}>{note.text}</SupportNotice> : null}
       {preferences.error ? <SupportNotice tone="error">{preferences.error}</SupportNotice> : null}
@@ -327,10 +327,10 @@ const s = StyleSheet.create({
   emptyIcon: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, marginBottom: 12 },
   emptyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginBottom: 6, textAlign: 'center' },
   emptyAction: { alignSelf: 'stretch', marginTop: 16 },
-  hero: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 14, padding: 22, borderRadius: Ui.radius.card, backgroundColor: Colors.accentSoft },
-  heroIcon: { width: 60, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  heroTitle: { fontFamily: 'Manrope', fontSize: 21, fontWeight: '800', color: Colors.primaryDark, marginTop: 14, textAlign: 'center' },
-  heroText: { fontFamily: 'Manrope', fontSize: 14, lineHeight: 22, color: Colors.textDark, marginTop: 6, textAlign: 'center' },
+  hero: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 14, padding: 24, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
+  heroIcon: { width: 60, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
+  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 24, color: Colors.primaryDark, marginTop: 16, textAlign: 'center' },
+  heroText: { fontFamily: 'Inter-Regular', fontSize: 16, lineHeight: 24, color: Colors.textDark, marginTop: 8, textAlign: 'center' },
 });
 
 export function generateStaticParams() { return Object.keys(titles).map((section) => ({ section })); }
