@@ -18,8 +18,7 @@ import { ActivityIndicator, Image, ImageBackground, Linking, ScrollView, StyleSh
 const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
 const BRAND = '#103D30';
 // Banner artwork lives in assets/images (file name as saved in the project).
-const WALLET_BANNER = require('../../assets/images/Emerald Wallet Travel Banner.png');
-const PROMO_ART = require('../../assets/images/profile-banner.png');
+const WALLET_BANNER = require('../../assets/images/Green Wallet, Golden Rupee, Rising Flight.png');
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -56,45 +55,35 @@ export default function WalletScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
         <View style={s.content}>
-          <View style={s.hero}>
-            <ImageBackground source={WALLET_BANNER} style={s.heroTop} resizeMode="cover">
-              <View style={s.heroCopy}>
+          <View style={s.bannerWrap}>
+            <ImageBackground source={WALLET_BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
+              <View style={s.bannerCopy}>
                 <Text style={s.eyebrow}>LEMONTRIP WALLET</Text>
-                <Text style={s.heroTitle} numberOfLines={1} adjustsFontSizeToFit>Your travel wallet</Text>
-                <Text style={s.heroText}>Balance, payments, and a little extra for your next trip.</Text>
+                <Text style={s.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>Your travel wallet</Text>
+                <Text style={s.bannerText}>Balance, payments, and a little extra for your next trip.</Text>
               </View>
             </ImageBackground>
+          </View>
 
-            <View style={s.heroBottom}>
-              <View style={s.balance}>
-                <View style={s.balanceHead}>
-                  <View style={s.flex}>
-                    <View style={s.labelRow}>
-                      <Text style={s.label}>AVAILABLE BALANCE</Text>
-                      <TouchableOpacity accessibilityRole="button" accessibilityLabel={hidden ? 'Show balance' : 'Hide balance'} onPress={() => setHidden((v) => !v)} hitSlop={8}>
-                        <Ionicons name={hidden ? 'eye-off-outline' : 'eye-outline'} size={16} color={Colors.white} />
-                      </TouchableOpacity>
-                    </View>
-                    {loading ? <ActivityIndicator color={Colors.white} style={{ alignSelf: 'flex-start', marginTop: 10 }} /> : <Text style={s.amount} numberOfLines={1}>{hidden && verified ? '••••••' : amount}</Text>}
-                  </View>
-                  <View style={s.balanceIcon}><Ionicons name="wallet-outline" size={22} color={BRAND} /></View>
+          <View style={s.balance}>
+            <View pointerEvents="none" style={s.balanceRing} />
+            <View style={s.balanceHead}>
+              <View style={s.flex}>
+                <View style={s.labelRow}>
+                  <Text style={s.label}>AVAILABLE BALANCE</Text>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel={hidden ? 'Show balance' : 'Hide balance'} onPress={() => setHidden((v) => !v)} hitSlop={8}>
+                    <Ionicons name={hidden ? 'eye-off-outline' : 'eye-outline'} size={16} color={Colors.accent} />
+                  </TouchableOpacity>
                 </View>
-                <Text style={s.note}>{loading ? 'Checking your balance…' : !user ? 'Sign in to access your wallet' : verified ? 'Verified wallet balance' : 'Your balance is unavailable right now.'}</Text>
+                {loading ? <ActivityIndicator color={Colors.white} style={{ alignSelf: 'flex-start', marginTop: 12 }} /> : <Text style={s.amount} numberOfLines={1}>{hidden && verified ? '••••••' : amount}</Text>}
               </View>
-
-              <View style={s.actions}>
-                <TouchableOpacity accessibilityRole="button" onPress={() => (user ? go('/wallet/add-money') : router.push('/login'))} style={[s.action, s.actionPrimary]} activeOpacity={0.85}>
-                  <View style={s.plusCircle}><Ionicons name={user ? 'add' : 'log-in-outline'} size={16} color={Colors.accent} /></View>
-                  <Text style={s.actionPrimaryText} numberOfLines={1}>{user ? 'Add Money' : 'Sign in'}</Text>
-                  <Ionicons name="arrow-forward" size={16} color={BRAND} />
-                </TouchableOpacity>
-                <TouchableOpacity accessibilityRole="button" onPress={() => go('/wallet/transactions')} style={[s.action, s.actionSoft]} activeOpacity={0.85}>
-                  <Ionicons name="document-text-outline" size={18} color={Colors.white} />
-                  <Text style={s.actionSoftText} numberOfLines={1}>Transactions</Text>
-                  <Ionicons name="arrow-forward" size={16} color={Colors.white} />
-                </TouchableOpacity>
-              </View>
+              <View style={s.balanceIcon}><Ionicons name="wallet-outline" size={22} color={BRAND} /></View>
             </View>
+            <Text style={s.note}>{loading ? 'Checking your balance…' : !user ? 'Sign in to access your wallet' : verified ? 'Verified wallet balance' : 'Your balance is unavailable right now.'}</Text>
+            <TouchableOpacity accessibilityRole="button" onPress={() => (user ? go('/wallet/add-money') : router.push('/login'))} style={s.addButton} activeOpacity={0.85}>
+              <Text style={s.addText}>{user ? 'Add money' : 'Sign in'}</Text>
+              <Ionicons name="arrow-forward" size={18} color={BRAND} />
+            </TouchableOpacity>
           </View>
 
           {error ? <View accessibilityRole="alert" style={s.error}><Ionicons name="alert-circle" size={18} color={Colors.error} /><Text style={s.errorText}>{error}</Text></View> : null}
@@ -122,14 +111,14 @@ export default function WalletScreen() {
                 <Ionicons name="arrow-forward" size={16} color={BRAND} />
               </TouchableOpacity>
             </View>
-            <Image source={PROMO_ART} style={s.promoArt} resizeMode="contain" />
+            <View style={s.promoArtBox}><Image source={WALLET_BANNER} style={s.promoArt} resizeMode="cover" /></View>
           </View>
 
           <View style={s.card}>
             <Text style={s.cardTitle}>Need another way to access your wallet?</Text>
             <Text style={s.body}>View your wallet on the LemonTrip website using your website sign-in.</Text>
             <TouchableOpacity accessibilityRole="button" onPress={() => void openWebsite()} style={s.outlineButton} activeOpacity={0.85}>
-              <Text style={s.outlineText}>Open website wallet</Text>
+              <Ionicons name="globe-outline" size={20} color={BRAND} /><Text style={s.outlineText}>Open website wallet</Text>
               <Ionicons name="open-outline" size={17} color={BRAND} />
             </TouchableOpacity>
           </View>
@@ -158,27 +147,24 @@ const s = StyleSheet.create({
   headerTitle: { fontFamily: INTER.bold, flex: 1, color: BRAND, fontSize: TextSize.title },
   gearButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.surfaceMuted },
 
-  hero: { marginHorizontal: 16, marginTop: 14, marginBottom: 14, borderRadius: 22, overflow: 'hidden', backgroundColor: Colors.primaryDark },
-  heroTop: { width: '100%', aspectRatio: 1.9, justifyContent: 'flex-start', paddingTop: 18 },
-  heroCopy: { width: '62%', paddingLeft: 18 },
+  bannerWrap: { paddingHorizontal: 16, marginTop: 14, marginBottom: 14 },
+  banner: { width: '100%', aspectRatio: 2.3, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: BRAND },
+  bannerImage: { borderRadius: 22 },
+  bannerCopy: { width: '62%', paddingLeft: 18 },
   eyebrow: { fontFamily: INTER.extrabold, color: Colors.accent, fontSize: TextSize.micro, letterSpacing: 1.2, marginBottom: 4 },
-  heroTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.displaySmall },
-  heroText: { fontFamily: INTER.regular, color: Colors.onDarkMuted, fontSize: TextSize.body, lineHeight: 18, marginTop: 4 },
-  heroBottom: { paddingHorizontal: 14, paddingBottom: 14, marginTop: -59 },
-  balance: { padding: 16, borderRadius: 18, backgroundColor: 'rgba(12,48,38,0.78)', borderWidth: 1, borderColor: Colors.onDarkBorder },
+  bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.displaySmall },
+  bannerText: { fontFamily: INTER.regular, color: Colors.white, fontSize: TextSize.body, lineHeight: 18, marginTop: 4 },
+
+  balance: { marginHorizontal: 16, marginBottom: 14, padding: 18, borderRadius: 22, overflow: 'hidden', backgroundColor: BRAND },
+  balanceRing: { position: 'absolute', width: 170, height: 170, right: -70, top: -80, borderWidth: 1, borderColor: Colors.onDarkBorder, borderRadius: 85 },
   balanceHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  label: { fontFamily: INTER.semibold, color: Colors.white, fontSize: TextSize.micro, letterSpacing: 1.2 },
-  amount: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.display, marginTop: 6 },
-  balanceIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.white },
-  note: { fontFamily: INTER.regular, color: Colors.onDarkMuted, fontSize: TextSize.caption, marginTop: 4 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  action: { flex: 1, minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, borderRadius: 999 },
-  actionPrimary: { backgroundColor: Colors.accent },
-  actionSoft: { backgroundColor: 'rgba(255,255,255,0.14)' },
-  plusCircle: { width: 26, height: 26, alignItems: 'center', justifyContent: 'center', borderRadius: 13, backgroundColor: BRAND },
-  actionPrimaryText: { flex: 1, fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.caption },
-  actionSoftText: { flex: 1, fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.caption },
+  label: { fontFamily: INTER.semibold, color: Colors.accent, fontSize: TextSize.micro, letterSpacing: 1.4 },
+  amount: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.display, marginTop: 8 },
+  balanceIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.accent },
+  note: { fontFamily: INTER.regular, color: Colors.onDarkMuted, fontSize: TextSize.caption, marginTop: 6 },
+  addButton: { minHeight: 52, marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, borderRadius: 999, backgroundColor: Colors.accent },
+  addText: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
 
   error: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 16, marginBottom: 14, padding: 12, borderRadius: 14, backgroundColor: Colors.errorSoft },
   errorText: { flex: 1, fontFamily: INTER.medium, fontSize: TextSize.caption, lineHeight: 17, color: Colors.error },
@@ -197,9 +183,10 @@ const s = StyleSheet.create({
   promoText: { fontFamily: INTER.regular, color: Colors.textDark, fontSize: TextSize.caption, lineHeight: 17, marginTop: 4 },
   promoButton: { alignSelf: 'flex-start', minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingHorizontal: 18, borderRadius: 999, backgroundColor: Colors.white },
   promoButtonText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.caption },
-  promoArt: { width: 110, height: 90 },
+  promoArtBox: { width: 124, height: 100, borderRadius: 18, overflow: 'hidden' },
+  promoArt: { position: 'absolute', right: 0, top: 0, width: 300, height: 100 },
 
-  outlineButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 10, alignSelf: 'flex-start', marginTop: 12, paddingHorizontal: 20, borderRadius: 999, borderWidth: 1, borderColor: Colors.secondary, backgroundColor: Colors.surface },
+  outlineButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 10, alignSelf: 'flex-start', marginTop: 12, paddingHorizontal: 18, borderRadius: 999, borderWidth: 1, borderColor: Colors.secondary, backgroundColor: Colors.surface },
   outlineText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.caption },
 
   support: { marginHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },

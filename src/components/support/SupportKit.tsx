@@ -37,11 +37,15 @@ export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scrollRef} onContentSizeChange={onContentSizeChange} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={s.page}>
           {hero ? (
-            <View style={s.hero}>
-              <Image source={hero.image} resizeMode="cover" style={s.heroImg} />
-              <View style={s.heroCopy}><Text style={s.heroEyebrow}>{eyebrow}</Text>
-              <Text style={s.heroTitle} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
-              {subtitle ? <Text style={s.heroSub} numberOfLines={2}>{subtitle}</Text> : null}</View>
+            <View style={s.heroWrap}>
+              <View style={s.hero}>
+                <Image source={hero.image} resizeMode="cover" style={s.heroImg} />
+                <View style={s.heroCopy}>
+                  <Text style={s.heroEyebrow}>{eyebrow}</Text>
+                  <Text style={s.heroTitle} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
+                  {subtitle ? <Text style={s.heroSub} numberOfLines={2}>{subtitle}</Text> : null}
+                </View>
+              </View>
             </View>
           ) : (
             <ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={onBack ?? (() => goBackOr('/settings'))} />
@@ -133,16 +137,17 @@ export function SupportNotice({ children, tone = 'info', icon }: { children: Rea
 export const kit = { margin: Ui.space.page };
 
 const s = StyleSheet.create({
-  hero: { marginHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16, aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
-  heroCopy: { width: '66%', paddingLeft: 18 },
+  heroWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
+  hero: { width: '100%', aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
+  heroCopy: { width: '62%', paddingLeft: 18 },
   heroImg: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
   topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
   topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   topBtnTint: { backgroundColor: Colors.successSoft },
-  topTitle: { flex: 1, fontFamily: 'Inter-SemiBold', fontSize: 18, color: Colors.textDark },
-  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 1.5, color: Colors.accent },
-  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 22, lineHeight: 28, color: '#FFFFFF', marginTop: 4 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: TextSize.body, lineHeight: 18, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  topTitle: { flex: 1, fontFamily: 'Inter-Bold', fontSize: TextSize.title, color: '#103D30' },
+  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent, marginBottom: 4 },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.displaySmall, color: '#FFFFFF' },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: TextSize.body, lineHeight: 18, color: Colors.onDarkMuted, marginTop: 4 },
   page: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingBottom: 28 },
   card: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: Ui.space.card },
   heading: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
