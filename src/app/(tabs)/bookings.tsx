@@ -2,11 +2,10 @@ import { useAppLanguage } from '@/utils/intl';
 import { translate } from '@/utils/intl';
 import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { Card, Chip, EmptyState, Notice, Pill, PrimaryButton } from '@/components/trains/TrainUi';
+import { Card, Chip, EmptyState, Pill, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { formatDate, normalizeStatus, serviceIcon, shortId, statusStyles } from '@/utils/bookingFormat';
@@ -14,8 +13,16 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { requestPinWidget } from 'react-native-android-widget';
+
+const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+const QUICK_ACTIONS: { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; route: string }[] = [
+  { label: 'Book Flights', icon: 'airplane-outline', route: '/(tabs)/explore/flights' },
+  { label: 'Book Hotels', icon: 'business-outline', route: '/(tabs)/explore/hotels' },
+  { label: 'Book Trains', icon: 'train-outline', route: '/(tabs)/explore/trains' },
+  { label: 'Book Bus', icon: 'bus-outline', route: '/(tabs)/explore/buses' },
+];
 
 type StatusFilter = 'all' | 'upcoming' | 'completed' | 'cancelled';
 
@@ -83,21 +90,26 @@ export default function BookingsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} colors={[Colors.primary]} />}
       >
         <View style={styles.content}>
-          <ScreenHeader title="My Trips" subtitle="Every detail of your journey, in one place." eyebrow="YOUR JOURNEYS" />
+          <View style={styles.banner}>
+            <Image source={require('../../../assets/images/mytrips-banner.jpg')} resizeMode="contain" style={styles.bannerImg} />
+            <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
+            <Text style={styles.bannerTitle}>My Trips</Text>
+            <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
+          </View>
 
           {/* Widget banner */}
-          <Card style={styles.rowCard}>
-            <View style={styles.iconBox}>
-              <Ionicons name="grid-outline" size={22} color={Colors.primary} />
-            </View>
+          <View style={styles.widgetCard}>
+            <View style={styles.widgetIconBox}><Ionicons name="grid-outline" size={26} color={Colors.primaryDark} /></View>
             <View style={styles.flex}>
-              <Text style={styles.cardTitle}>Upcoming Trip widget</Text>
-              <Text style={styles.cardSub}>See your next trip right on your Android Home Screen.</Text>
-              <View style={styles.widgetBtn}>
-                <PrimaryButton label="Add widget" icon="arrow-forward" onPress={handleAddWidget} loading={addingWidget} />
-              </View>
+              <Text style={styles.widgetTitle}>Upcoming Trip Widget</Text>
+              <Text style={styles.widgetSub}>See your next trip right on your Home Screen.</Text>
+              <TouchableOpacity accessibilityRole="button" disabled={addingWidget} onPress={handleAddWidget} style={styles.addBtn}>
+                <Text style={styles.addBtnText}>{addingWidget ? 'Please wait...' : 'Add widget'}</Text>
+                <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
+              </TouchableOpacity>
             </View>
-          </Card>
+            <Image source={require('../../../assets/images/mytrips-widget.png')} resizeMode="contain" style={styles.widgetImg} />
+          </View>
 
           {bookings.length > 0 ? (
             <>
@@ -188,18 +200,33 @@ export default function BookingsScreen() {
               )}
             </>
           ) : (
-            <EmptyState
-              icon="airplane-outline"
-              title="Your next journey could start here"
-              text="You do not have any bookings yet. Explore flights, hotels and experiences to plan your next adventure."
-              action={<PrimaryButton label="Explore journeys" icon="arrow-forward" onPress={() => router.push('/(tabs)/explore' as never)} />}
-            />
+            <View style={styles.emptyCard}>
+              <View style={styles.emptyIcon}><Ionicons name="airplane-outline" size={30} color={Colors.primaryDark} /></View>
+              <Text style={styles.emptyTitle}>Your next journey could start here</Text>
+              <Text style={styles.emptyText}>You do not have any bookings yet. Explore flights, hotels and experiences to plan your next adventure.</Text>
+              <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/(tabs)/explore' as never)} style={styles.emptyBtn}>
+                <Text style={styles.emptyBtnText}>Explore journeys</Text>
+                <Ionicons name="arrow-forward" size={18} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
           )}
 
-          <View style={styles.noticeGap}>
-            <Notice icon="shield-checkmark-outline" tone="good" title="Travel with confidence">
-              Your LemonTrip travel details stay organized in one place.
-            </Notice>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.quickCard}>
+            {QUICK_ACTIONS.map((a) => (
+              <TouchableOpacity key={a.label} accessibilityRole="button" onPress={() => router.push(a.route as never)} style={styles.quickItem}>
+                <View style={styles.quickIcon}><Ionicons name={a.icon} size={26} color={Colors.primaryDark} /></View>
+                <Text style={styles.quickLabel}>{a.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={styles.sectionTitle}>Helpful for your next trip</Text>
+          <View style={styles.helpCard}>
+            <View style={styles.helpIcon}><Ionicons name="shield-checkmark-outline" size={26} color={Colors.primaryDark} /></View>
+            <View style={styles.flex}>
+              <Text style={styles.helpTitle}>Travel with confidence</Text>
+              <Text style={styles.helpSub}>Your LemonTrip travel details stay organized in one place.</Text>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -208,25 +235,52 @@ export default function BookingsScreen() {
 }
 
 const styles = StyleSheet.create({
+  banner: { marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: Ui.space.section, minHeight: 190, borderRadius: 24, overflow: 'hidden', justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 18, backgroundColor: '#103D30' },
+  bannerImg: { position: 'absolute', right: 0, top: 0, bottom: 0, width: '62%', height: '100%' },
+  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.5, color: Colors.accent },
+  bannerTitle: { fontFamily: INTER.bold, fontSize: 30, color: Colors.white, marginTop: 6 },
+  bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: 'rgba(255,255,255,0.85)', marginTop: 6, maxWidth: 200 },
+  widgetCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, borderRadius: 24, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 14, backgroundColor: '#FFF4C2' },
+  widgetIconBox: { width: 50, height: 50, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFE97A' },
+  widgetTitle: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  widgetSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  addBtn: { alignSelf: 'flex-start', marginTop: 10, minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.accent },
+  addBtnText: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.primaryDark },
+  widgetImg: { width: 110, height: 120 },
+  emptyCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, alignItems: 'center', padding: 18, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  emptyIcon: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1A8' },
+  emptyTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: Colors.primaryDark, textAlign: 'center', marginTop: 12 },
+  emptyText: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: Colors.textLight, textAlign: 'center', marginTop: 6 },
+  emptyBtn: { alignSelf: 'stretch', minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, borderRadius: 25, backgroundColor: '#103D30' },
+  emptyBtnText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.white },
+  sectionTitle: { fontFamily: INTER.bold, fontSize: TextSize.heading, color: Colors.primaryDark, marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: 10 },
+  quickCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, flexDirection: 'row', gap: 8, padding: 10, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  quickItem: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 12, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
+  quickIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  quickLabel: { fontFamily: INTER.medium, fontSize: TextSize.caption, color: Colors.textDark, textAlign: 'center' },
+  helpCard: { marginHorizontal: Ui.space.page, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
+  helpIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  helpTitle: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.primaryDark },
+  helpSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   scroll: { paddingBottom: 32 },
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   flex: { flex: 1, minWidth: 0 },
   rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconBox: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  cardTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  cardSub: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  cardTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  cardSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   widgetBtn: { alignSelf: 'flex-start', marginTop: 10 },
   tabRow: { paddingHorizontal: Ui.space.page, gap: 8, paddingBottom: 14 },
   top: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
-  itemName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
+  itemName: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: Colors.textDark, marginTop: 3 },
   destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  destText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
+  destText: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
   divider: { height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong, marginVertical: 14 },
   bottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
-  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.1, color: Colors.textLight, marginBottom: 4 },
-  value: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark },
+  label: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.1, color: Colors.textLight, marginBottom: 4 },
+  value: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.textDark },
   right: { alignItems: 'flex-end' },
-  price: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  price: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: Colors.primaryDark },
   noticeGap: { marginTop: 4 },
 });
