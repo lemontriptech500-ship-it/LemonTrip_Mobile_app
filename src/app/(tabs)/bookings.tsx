@@ -90,8 +90,19 @@ export default function BookingsScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} colors={[Colors.primary]} />}
       >
         <View style={styles.content}>
+          <View style={styles.topBar}>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/home' as never))} style={styles.topBtn}>
+              <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+            </TouchableOpacity>
+            <Text style={styles.topTitle}>My Trips</Text>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[styles.topBtn, styles.topBtnTint]}>
+              <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.banner}>
-            <Image source={require('../../../assets/images/mytrips-banner.jpg')} resizeMode="contain" style={styles.bannerImg} />
+            <Image source={require('../../../assets/images/mytrips-banner.jpg')} resizeMode="cover" style={styles.bannerImg} />
+            <Fade color="#103D30" style={styles.bannerFade} />
             <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
             <Text style={styles.bannerTitle}>My Trips</Text>
             <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
@@ -108,7 +119,10 @@ export default function BookingsScreen() {
                 <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
               </TouchableOpacity>
             </View>
-            <Image source={require('../../../assets/images/mytrips-widget.png')} resizeMode="contain" style={styles.widgetImg} />
+            <View style={styles.widgetImgWrap}>
+              <Image source={require('../../../assets/images/mytrips-widget.png')} resizeMode="cover" style={styles.widgetImg} />
+              <Fade color="#FFF4C2" style={styles.widgetFade} />
+            </View>
           </View>
 
           {bookings.length > 0 ? (
@@ -234,6 +248,16 @@ export default function BookingsScreen() {
   );
 }
 
+function Fade({ color, style }: { color: string; style: object }) {
+  return (
+    <View pointerEvents="none" style={[{ flexDirection: 'row' }, style]}>
+      {Array.from({ length: 24 }).map((_, i) => (
+        <View key={i} style={{ flex: 1, backgroundColor: color, opacity: 1 - i / 23 }} />
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   banner: { marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: Ui.space.section, minHeight: 190, borderRadius: 24, overflow: 'hidden', justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 18, backgroundColor: '#103D30' },
   bannerImg: { position: 'absolute', right: 0, top: 0, bottom: 0, width: '62%', height: '100%' },
@@ -246,7 +270,14 @@ const styles = StyleSheet.create({
   widgetSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   addBtn: { alignSelf: 'flex-start', marginTop: 10, minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.accent },
   addBtnText: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.primaryDark },
-  widgetImg: { width: 110, height: 120 },
+  widgetImgWrap: { width: 150, height: 135 },
+  widgetImg: { width: '100%', height: '100%' },
+  widgetFade: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 40 },
+  bannerFade: { position: 'absolute', top: 0, bottom: 0, left: '38%', width: 70 },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: INTER.semibold, fontSize: 18, color: Colors.textDark },
   emptyCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, alignItems: 'center', padding: 18, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   emptyIcon: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1A8' },
   emptyTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: Colors.primaryDark, textAlign: 'center', marginTop: 12 },
@@ -256,10 +287,10 @@ const styles = StyleSheet.create({
   sectionTitle: { fontFamily: INTER.bold, fontSize: TextSize.heading, color: Colors.primaryDark, marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: 10 },
   quickCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, flexDirection: 'row', gap: 8, padding: 10, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   quickItem: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 12, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
-  quickIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  quickIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
   quickLabel: { fontFamily: INTER.medium, fontSize: TextSize.caption, color: Colors.textDark, textAlign: 'center' },
   helpCard: { marginHorizontal: Ui.space.page, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
-  helpIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  helpIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
   helpTitle: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.primaryDark },
   helpSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   scroll: { paddingBottom: 32 },
