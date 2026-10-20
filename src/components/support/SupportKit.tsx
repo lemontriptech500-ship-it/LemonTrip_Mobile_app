@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import type { ReactNode, Ref } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type TextInputProps } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type ImageSourcePropType, type TextInputProps } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -17,13 +17,35 @@ export const goTo = (path: string) => router.push(path as Href);
 export const goBackOr = (fallback: string) => (router.canGoBack() ? router.back() : router.replace(fallback as Href));
 
 /** Page shell for help-style screens: brand header, scrollable body, optional sticky footer. */
-export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, scrollRef, onContentSizeChange, children }: { title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; scrollRef?: Ref<ScrollView>; onContentSizeChange?: (width: number, height: number) => void; children: ReactNode }) {
+export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, scrollRef, onContentSizeChange, hero, children }: { hero?: { image: ImageSourcePropType; topTitle?: string; onSettings?: () => void }; title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; scrollRef?: Ref<ScrollView>; onContentSizeChange?: (width: number, height: number) => void; children: ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
     <AppScreen>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scrollRef} onContentSizeChange={onContentSizeChange} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={s.page}>
-          <ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={onBack ?? (() => goBackOr('/settings'))} />
+          {hero ? (
+            <>
+              <View style={s.topBar}>
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack ?? (() => goBackOr('/settings'))} style={s.topBtn}>
+                  <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+                </TouchableOpacity>
+                <Text style={s.topTitle}>{hero.topTitle ?? title}</Text>
+                {hero.onSettings ? (
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={hero.onSettings} style={[s.topBtn, s.topBtnTint]}>
+                    <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+                  </TouchableOpacity>
+                ) : <View style={s.topBtn} />}
+              </View>
+              <View style={s.hero}>
+                <Image source={hero.image} resizeMode="cover" style={s.heroImg} />
+                <Text style={s.heroEyebrow}>{eyebrow}</Text>
+                <Text style={s.heroTitle}>{title}</Text>
+                {subtitle ? <Text style={s.heroSub}>{subtitle}</Text> : null}
+              </View>
+            </>
+          ) : (
+            <ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={onBack ?? (() => goBackOr('/settings'))} />
+          )}
           {children}
         </ScrollView>
         {footer ? <View style={s.footer}><View style={[s.footerInner, { paddingBottom: Math.max(insets.bottom, 12) + 4 }]}>{footer}</View></View> : null}
@@ -49,10 +71,10 @@ export function SupportHeading({ eyebrow, title, right }: { eyebrow?: string; ti
 }
 
 /** Icon tile + title + optional detail + chevron. Put several inside a SupportCard with `last` on the final one. */
-export function SupportItem({ icon, title, detail, onPress, last = false, trailing }: { icon: IconName; title: string; detail?: string; onPress: () => void; last?: boolean; trailing?: ReactNode }) {
+export function SupportItem({ icon, title, detail, onPress, last = false, trailing, tone }: { tone?: 'mint'; icon: IconName; title: string; detail?: string; onPress: () => void; last?: boolean; trailing?: ReactNode }) {
   return (
     <TouchableOpacity accessibilityRole="button" accessibilityLabel={title} onPress={onPress} activeOpacity={0.7} style={[s.item, !last && s.itemDivider]}>
-      <View style={s.itemIcon}><Ionicons name={icon} size={19} color={Colors.primary} /></View>
+      <View style={[s.itemIcon, tone === 'mint' && s.itemIconMint]}><Ionicons name={icon} size={19} color={Colors.primary} /></View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={s.itemTitle}>{title}</Text>
         {detail ? <Text style={s.itemDetail} numberOfLines={2}>{detail}</Text> : null}
@@ -111,6 +133,15 @@ export function SupportNotice({ children, tone = 'info', icon }: { children: Rea
 export const kit = { margin: Ui.space.page };
 
 const s = StyleSheet.create({
+  hero: { marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: Ui.space.section, minHeight: 200, borderRadius: 24, overflow: 'hidden', paddingHorizontal: 20, paddingTop: 22, paddingBottom: 22, backgroundColor: '#103D30' },
+  heroImg: { position: 'absolute', right: 0, bottom: 0, width: '48%', height: '100%' },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: 'Inter-SemiBold', fontSize: 18, color: Colors.textDark },
+  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 1.5, color: Colors.accent },
+  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 26, lineHeight: 32, color: '#FFFFFF', marginTop: 6, maxWidth: '62%' },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: TextSize.body, lineHeight: 20, color: 'rgba(255,255,255,0.85)', marginTop: 6, maxWidth: '58%' },
   page: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingBottom: 28 },
   card: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: Ui.space.card },
   heading: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
@@ -118,6 +149,7 @@ const s = StyleSheet.create({
   headingText: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   item: { minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
   itemDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
+  itemIconMint: { backgroundColor: Colors.successSoft, borderRadius: 20 },
   itemIcon: { width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   itemTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   itemDetail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 17, color: Colors.textLight, marginTop: 2 },
