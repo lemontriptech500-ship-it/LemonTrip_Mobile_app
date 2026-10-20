@@ -54,8 +54,8 @@ export default function SettingsScreen() {
 
           <View style={styles.banner}>
             <Image source={require('../../assets/images/Minimal Mint Leaf Arcs.png')} resizeMode="cover" style={styles.bannerBg} />
-            <Text style={styles.bannerTitle}>Make your experience better</Text>
-            <Text style={styles.bannerText}>Manage your preferences, notifications and account settings.</Text>
+            <View style={styles.bannerCopy}><Text style={styles.bannerTitle}>Make your experience better</Text>
+            <Text style={styles.bannerText}>Manage your preferences, notifications and account settings.</Text></View><Image source={require('../../assets/images/profile-banner.png')} resizeMode="contain" style={styles.bannerArt} />
           </View>
 
           <SettingsSection eyebrow="PREFERENCES" title="Language & currency">
@@ -139,10 +139,12 @@ const styles = StyleSheet.create({
   userEmail: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight, marginTop: 2 },
   badge: { alignSelf: 'flex-start', marginTop: 8, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 999, backgroundColor: Colors.accent },
   badgeText: { fontFamily: INTER.semibold, fontSize: TextSize.caption, color: GREEN },
-  banner: { overflow: 'hidden', marginTop: 14, padding: 18, borderRadius: 18, backgroundColor: Colors.successSoft },
+  banner: { overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 14, padding: 18, borderRadius: 18, backgroundColor: Colors.successSoft },
   bannerBg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  bannerCopy: { flex: 1, minWidth: 0 },
+  bannerArt: { width: 120, height: 80 },
   bannerTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: GREEN },
-  bannerText: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: Colors.textLight, marginTop: 6, maxWidth: '75%' },
+  bannerText: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: Colors.textLight, marginTop: 6 },
   section: { marginTop: 22 },
   card: { overflow: 'hidden', paddingHorizontal: 14, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   sectionEyebrow: { fontFamily: INTER.semibold, fontSize: TextSize.caption, letterSpacing: 1.2, color: '#1B6B4A' },
