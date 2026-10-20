@@ -2,13 +2,15 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
+
+// Banner artwork lives in assets/images.
+const BANNER = require('../../assets/images/Tropical Travel Essentials in Green.png');
 
 type PolicyProps = { title: string; introduction: string; sections: { title: string; paragraphs: string[] }[] };
 
@@ -21,9 +23,27 @@ export function PolicyScreen({ title, introduction, sections }: PolicyProps) {
   const setAll = (value: boolean) => setClosed(Object.fromEntries(sections.map((section) => [section.title, value])));
 
   return (
-    <AppScreen>
+    <AppScreen edges={['top']} headerTone="light">
+      <View style={s.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/settings'))} style={s.topBtn}>
+          <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+        </TouchableOpacity>
+        <Text accessibilityRole="header" style={s.topTitle}>{title}</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as Href)} style={[s.topBtn, s.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={s.page} showsVerticalScrollIndicator={false}>
-        <ScreenHeader title={title} subtitle="Clear information for your journey." eyebrow="LEMONTRIP / LEGAL" onBack={() => router.canGoBack() ? router.back() : router.replace('/settings')} />
+        <View style={s.bannerWrap}>
+          <View style={s.banner}>
+            <Image source={BANNER} resizeMode="cover" style={s.bannerImg} />
+            <View style={s.bannerCopy}>
+              <Text style={s.bannerEyebrow}>LEMONTRIP / LEGAL</Text>
+              <Text style={s.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
+              <Text style={s.bannerSub} numberOfLines={2}>Clear information for your journey.</Text>
+            </View>
+          </View>
+        </View>
 
         <View style={s.intro}>
           <View style={s.introIcon}><Ionicons name={privacy ? 'shield-checkmark-outline' : 'document-text-outline'} size={22} color={Colors.primaryDark} /></View>
@@ -68,9 +88,20 @@ export function PolicyScreen({ title, introduction, sections }: PolicyProps) {
 }
 
 const s = StyleSheet.create({
+  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: 'Inter-SemiBold', fontSize: 18, color: Colors.textDark },
+  bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
+  banner: { width: '100%', aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
+  bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  bannerCopy: { width: '66%', paddingLeft: 18 },
+  bannerEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent, marginBottom: 4 },
+  bannerTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 22, color: Colors.white },
+  bannerSub: { fontFamily: 'Inter-Regular', fontSize: TextSize.body, lineHeight: 18, color: Colors.onDarkMuted, marginTop: 4 },
   page: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingBottom: 28 },
-  intro: { flexDirection: 'row', gap: 14, marginHorizontal: Ui.space.page, marginBottom: 16, padding: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.accentSoft },
-  introIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
+  intro: { flexDirection: 'row', gap: 14, marginHorizontal: Ui.space.page, marginBottom: 16, padding: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
+  introIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
   introLabel: { ...Ui.eyebrow, color: Colors.secondary, marginBottom: 4 },
   introText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 22, color: Colors.textDark },
   toolbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: Ui.space.page + 4, marginBottom: 10 },
