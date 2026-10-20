@@ -13,7 +13,7 @@ import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { requestPinWidget } from 'react-native-android-widget';
 
 const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
@@ -100,19 +100,19 @@ export default function BookingsScreen() {
       >
         <View style={styles.content}>
           <View style={styles.bannerWrap}>
-            <View style={styles.tripBanner}><Image source={require('../../../assets/images/Tropical Travel Essentials in Green.png')} style={styles.tripBannerImage} resizeMode="cover" />
+            <ImageBackground source={require('../../../assets/images/Tropical Travel Essentials in Green.png')} style={styles.tripBanner} imageStyle={styles.tripBannerImage} resizeMode="cover">
               <View style={styles.tripBannerCopy}>
                 <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
                 <Text style={styles.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>My Trips</Text>
                 <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
               </View>
-            </View>
+            </ImageBackground>
           </View>
 
           {/* Widget banner */}
-          <View style={styles.widgetCard}>
-            <View style={styles.widgetIconBox}><Ionicons name="grid-outline" size={26} color={Colors.primaryDark} /></View>
-            <View style={styles.flex}>
+          <View style={styles.widgetWrap}>
+          <ImageBackground source={require('../../../assets/images/Minimal Travel App Phone Mockup.png')} style={styles.widgetCard} imageStyle={styles.widgetCardImage} resizeMode="cover">
+            <View style={styles.widgetCopy}>
               <Text style={styles.widgetTitle}>Upcoming Trip Widget</Text>
               <Text style={styles.widgetSub}>See your next trip right on your Home Screen.</Text>
               <TouchableOpacity accessibilityRole="button" disabled={addingWidget} onPress={handleAddWidget} style={styles.addBtn}>
@@ -120,10 +120,7 @@ export default function BookingsScreen() {
                 <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
               </TouchableOpacity>
             </View>
-            <View style={styles.widgetImgWrap}>
-              <Image source={require('../../../assets/images/mytrips-widget.png')} resizeMode="cover" style={styles.widgetImg} />
-              <Fade color="#FFF4C2" style={styles.widgetFade} />
-            </View>
+          </ImageBackground>
           </View>
 
           {bookings.length > 0 ? (
@@ -249,40 +246,26 @@ export default function BookingsScreen() {
   );
 }
 
-function Fade({ color, style }: { color: string; style: object }) {
-  return (
-    <View pointerEvents="none" style={[{ flexDirection: 'row' }, style]}>
-      {Array.from({ length: 24 }).map((_, i) => (
-        <View key={i} style={{ flex: 1, backgroundColor: color, opacity: 1 - i / 23 }} />
-      ))}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  banner: { marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: Ui.space.section, minHeight: 190, borderRadius: 24, overflow: 'hidden', justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 18, backgroundColor: '#103D30' },
-  bannerImg: { position: 'absolute', right: 0, top: 0, bottom: 0, width: '62%', height: '100%' },
-  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.5, color: Colors.accent },
-  bannerTitle: { fontFamily: INTER.bold, fontSize: 30, color: Colors.white, marginTop: 6 },
-  bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: 'rgba(255,255,255,0.85)', marginTop: 6, maxWidth: 200 },
-  widgetCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, borderRadius: 24, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 14, backgroundColor: '#FFF4C2' },
-  widgetIconBox: { width: 50, height: 50, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFE97A' },
-  widgetTitle: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.textDark },
-  widgetSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
-  addBtn: { alignSelf: 'flex-start', marginTop: 10, minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.accent },
-  addBtnText: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.primaryDark },
-  widgetImgWrap: { width: 150, height: 135 },
-  widgetImg: { width: '100%', height: '100%' },
-  widgetFade: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 40 },
-  bannerFade: { position: 'absolute', top: 0, bottom: 0, left: '38%', width: 70 },
+  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent, marginBottom: 4 },
+  bannerTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall, color: Colors.white },
+  bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 18, color: Colors.onDarkMuted, marginTop: 4 },
   bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
-  tripBanner: { width: '100%', aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
-  tripBannerImage: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
-  tripBannerCopy: { width: '66%', paddingLeft: 18 },
+  tripBanner: { width: '100%', aspectRatio: 2.3, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
+  tripBannerImage: { borderRadius: 22 },
+  tripBannerCopy: { width: '62%', paddingLeft: 18 },
+  widgetWrap: { paddingHorizontal: Ui.space.page, marginBottom: Ui.space.section },
+  widgetCard: { width: '100%', aspectRatio: 2.2, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#FFF4C2' },
+  widgetCardImage: { borderRadius: 22 },
+  widgetCopy: { width: '58%', paddingLeft: 18 },
+  widgetTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, lineHeight: 22, color: Colors.primaryDark },
+  widgetSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, color: Colors.textDark, marginTop: 4 },
+  addBtn: { alignSelf: 'flex-start', marginTop: 12, minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.accent },
+  addBtnText: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: Colors.primaryDark },
   topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
   topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   topBtnTint: { backgroundColor: Colors.successSoft },
-  topTitle: { flex: 1, fontFamily: INTER.semibold, fontSize: 18, color: Colors.textDark },
+  topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: '#103D30' },
   emptyCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, alignItems: 'center', padding: 18, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   emptyIcon: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1A8' },
   emptyTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: Colors.primaryDark, textAlign: 'center', marginTop: 12 },
