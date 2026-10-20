@@ -47,6 +47,7 @@ export function PolicyScreen({ title, introduction, sections }: PolicyProps) {
 
         <View style={s.intro}>
           <View style={s.introIcon}><Ionicons name={privacy ? 'shield-checkmark-outline' : 'document-text-outline'} size={22} color={Colors.primaryDark} /></View>
+          <Image source={require('../../assets/images/Minimal Mint Leaf Arcs.png')} resizeMode="cover" style={s.introBg} />
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text style={s.introLabel}>IN SHORT</Text>
             <Text style={s.introText}>{introduction}</Text>
@@ -92,6 +93,7 @@ const s = StyleSheet.create({
   topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   topBtnTint: { backgroundColor: Colors.successSoft },
   topTitle: { flex: 1, fontFamily: 'Inter-SemiBold', fontSize: 18, color: Colors.textDark },
+  introBg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
   banner: { width: '100%', aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
   bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
@@ -101,7 +103,7 @@ const s = StyleSheet.create({
   bannerSub: { fontFamily: 'Inter-Regular', fontSize: TextSize.body, lineHeight: 18, color: Colors.onDarkMuted, marginTop: 4 },
   page: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingBottom: 28 },
   intro: { flexDirection: 'row', gap: 14, marginHorizontal: Ui.space.page, marginBottom: 16, padding: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
-  introIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
+  introIcon: { overflow: 'hidden', width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
   introLabel: { ...Ui.eyebrow, color: Colors.secondary, marginBottom: 4 },
   introText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 22, color: Colors.textDark },
   toolbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: Ui.space.page + 4, marginBottom: 10 },
