@@ -256,7 +256,7 @@ export default function ManageScreen() {
       <>
         <View style={s.hero}>
           <View style={s.heroIcon}><Ionicons name="compass-outline" size={30} color={Colors.primaryDark} /></View>
-          <Text style={s.heroTitle}>Travel smarter. Travel better.</Text>
+          <Text style={s.heroTitle} numberOfLines={1} adjustsFontSizeToFit>Travel smarter. Travel better.</Text>
           <Text style={s.heroText}>LemonTrip brings flights, hotels, buses, trains, holiday packages, and visa assistance together in one clear travel experience.</Text>
           <Text style={[s.heroText, { marginTop: 8 }]}>Thoughtful escapes, transparent information, and support before and during your journey.</Text>
         </View>
@@ -327,10 +327,10 @@ const s = StyleSheet.create({
   emptyIcon: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, marginBottom: 12 },
   emptyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginBottom: 6, textAlign: 'center' },
   emptyAction: { alignSelf: 'stretch', marginTop: 16 },
-  hero: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 14, padding: 24, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
-  heroIcon: { width: 60, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
-  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 24, color: Colors.primaryDark, marginTop: 16, textAlign: 'center' },
-  heroText: { fontFamily: 'Inter-Regular', fontSize: 16, lineHeight: 24, color: Colors.textDark, marginTop: 8, textAlign: 'center' },
+  hero: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 12, paddingVertical: 16, paddingHorizontal: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
+  heroIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
+  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 20, color: Colors.primaryDark, marginTop: 10, textAlign: 'center' },
+  heroText: { fontFamily: 'Inter-Regular', fontSize: 14, lineHeight: 20, color: Colors.textDark, marginTop: 6, textAlign: 'center' },
 });
 
 export function generateStaticParams() { return Object.keys(titles).map((section) => ({ section })); }
