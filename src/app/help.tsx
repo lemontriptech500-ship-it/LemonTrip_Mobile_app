@@ -28,7 +28,7 @@ export default function HelpScreen() {
       eyebrow="LEMONTRIP SUPPORT"
       title="How can we help?"
       subtitle="Answers, guides and a real team behind them."
-      hero={{ image: require('../../assets/images/help-support.png'), topTitle: 'Help & Support', onSettings: () => goTo('/settings') }}
+      hero={{ image: require('../../assets/images/Emerald Customer Support Headset Banner.png'), topTitle: 'Help & Support', onSettings: () => goTo('/settings') }}
     >
       <View style={s.quick}>
         {QUICK.map((q) => (
