@@ -280,7 +280,7 @@ export default function ManageScreen() {
   }
 
   return (
-    <SupportPage title={titles[section] ?? 'Your account'} subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT">
+    <SupportPage title={titles[section] ?? 'Your account'} subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT" hero={{ image: require('../../../assets/images/Tropical Travel Essentials in Green.png'), topTitle: titles[section] ?? 'Your account', onSettings: () => goTo('/settings') }}>
       {content}
       {note ? <SupportNotice tone={note.tone}>{note.text}</SupportNotice> : null}
       {preferences.error ? <SupportNotice tone="error">{preferences.error}</SupportNotice> : null}
