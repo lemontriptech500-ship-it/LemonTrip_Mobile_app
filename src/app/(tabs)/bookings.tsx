@@ -103,7 +103,7 @@ export default function BookingsScreen() {
             <View style={styles.tripBanner}><Image source={require('../../../assets/images/Tropical Travel Essentials in Green.png')} style={styles.tripBannerImage} resizeMode="cover" />
               <View style={styles.tripBannerCopy}>
                 <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
-                <Text style={styles.bannerTitle}>My Trips</Text>
+                <Text style={styles.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>My Trips</Text>
                 <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
               </View>
             </View>
