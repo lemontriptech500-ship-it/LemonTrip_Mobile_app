@@ -20,29 +20,29 @@ export const goBackOr = (fallback: string) => (router.canGoBack() ? router.back(
 export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, scrollRef, onContentSizeChange, hero, children }: { hero?: { image: ImageSourcePropType; topTitle?: string; onSettings?: () => void }; title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; scrollRef?: Ref<ScrollView>; onContentSizeChange?: (width: number, height: number) => void; children: ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
-    <AppScreen>
+    <AppScreen headerTone={hero ? 'light' : 'brand'}>
+      {hero ? (
+        <View style={s.topBar}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack ?? (() => goBackOr('/settings'))} style={s.topBtn}>
+            <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+          </TouchableOpacity>
+          <Text style={s.topTitle}>{hero.topTitle ?? title}</Text>
+          {hero.onSettings ? (
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={hero.onSettings} style={[s.topBtn, s.topBtnTint]}>
+              <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+            </TouchableOpacity>
+          ) : <View style={s.topBtn} />}
+        </View>
+      ) : null}
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scrollRef} onContentSizeChange={onContentSizeChange} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={s.page}>
           {hero ? (
-            <>
-              <View style={s.topBar}>
-                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack ?? (() => goBackOr('/settings'))} style={s.topBtn}>
-                  <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
-                </TouchableOpacity>
-                <Text style={s.topTitle}>{hero.topTitle ?? title}</Text>
-                {hero.onSettings ? (
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={hero.onSettings} style={[s.topBtn, s.topBtnTint]}>
-                    <Ionicons name="settings-outline" size={20} color={Colors.primary} />
-                  </TouchableOpacity>
-                ) : <View style={s.topBtn} />}
-              </View>
-              <View style={s.hero}>
-                <Image source={hero.image} resizeMode="cover" style={s.heroImg} />
-                <Text style={s.heroEyebrow}>{eyebrow}</Text>
-                <Text style={s.heroTitle}>{title}</Text>
-                {subtitle ? <Text style={s.heroSub}>{subtitle}</Text> : null}
-              </View>
-            </>
+            <View style={s.hero}>
+              <Image source={hero.image} resizeMode="cover" style={s.heroImg} />
+              <Text style={s.heroEyebrow}>{eyebrow}</Text>
+              <Text style={s.heroTitle}>{title}</Text>
+              {subtitle ? <Text style={s.heroSub}>{subtitle}</Text> : null}
+            </View>
           ) : (
             <ScreenHeader title={title} subtitle={subtitle} eyebrow={eyebrow} onBack={onBack ?? (() => goBackOr('/settings'))} />
           )}
@@ -133,14 +133,14 @@ export function SupportNotice({ children, tone = 'info', icon }: { children: Rea
 export const kit = { margin: Ui.space.page };
 
 const s = StyleSheet.create({
-  hero: { marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: Ui.space.section, minHeight: 200, borderRadius: 24, overflow: 'hidden', paddingHorizontal: 20, paddingTop: 22, paddingBottom: 22, backgroundColor: '#103D30' },
-  heroImg: { position: 'absolute', right: 0, bottom: 0, width: '48%', height: '100%' },
-  topBar: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
+  hero: { marginHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16, aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', paddingLeft: 18, backgroundColor: '#103D30' },
+  heroImg: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' },
+  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
   topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   topBtnTint: { backgroundColor: Colors.successSoft },
   topTitle: { flex: 1, fontFamily: 'Inter-SemiBold', fontSize: 18, color: Colors.textDark },
   heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 1.5, color: Colors.accent },
-  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 26, lineHeight: 32, color: '#FFFFFF', marginTop: 6, maxWidth: '62%' },
+  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 22, lineHeight: 28, color: '#FFFFFF', marginTop: 6, maxWidth: '62%' },
   heroSub: { fontFamily: 'Inter-Regular', fontSize: TextSize.body, lineHeight: 20, color: 'rgba(255,255,255,0.85)', marginTop: 6, maxWidth: '58%' },
   page: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingBottom: 28 },
   card: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: Ui.space.card },

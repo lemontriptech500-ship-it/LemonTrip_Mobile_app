@@ -83,29 +83,30 @@ export default function BookingsScreen() {
   };
 
   return (
-    <AppScreen edges={['top']}>
+    <AppScreen edges={['top']} headerTone="light">
+      <View style={styles.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/home' as never))} style={styles.topBtn}>
+          <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+        </TouchableOpacity>
+        <Text style={styles.topTitle}>My Trips</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[styles.topBtn, styles.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} colors={[Colors.primary]} />}
       >
         <View style={styles.content}>
-          <View style={styles.topBar}>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/home' as never))} style={styles.topBtn}>
-              <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
-            </TouchableOpacity>
-            <Text style={styles.topTitle}>My Trips</Text>
-            <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[styles.topBtn, styles.topBtnTint]}>
-              <Ionicons name="settings-outline" size={20} color={Colors.primary} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.banner}>
-            <Image source={require('../../../assets/images/mytrips-banner.jpg')} resizeMode="cover" style={styles.bannerImg} />
-            <Fade color="#103D30" style={styles.bannerFade} />
-            <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
-            <Text style={styles.bannerTitle}>My Trips</Text>
-            <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
+          <View style={styles.bannerWrap}>
+            <View style={styles.tripBanner}><Image source={require('../../../assets/images/Tropical Travel Essentials in Green.png')} style={styles.tripBannerImage} resizeMode="cover" />
+              <View style={styles.tripBannerCopy}>
+                <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
+                <Text style={styles.bannerTitle}>My Trips</Text>
+                <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
+              </View>
+            </View>
           </View>
 
           {/* Widget banner */}
@@ -274,7 +275,11 @@ const styles = StyleSheet.create({
   widgetImg: { width: '100%', height: '100%' },
   widgetFade: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 40 },
   bannerFade: { position: 'absolute', top: 0, bottom: 0, left: '38%', width: 70 },
-  topBar: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
+  bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
+  tripBanner: { width: '100%', aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
+  tripBannerImage: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  tripBannerCopy: { width: '66%', paddingLeft: 18 },
+  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
   topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   topBtnTint: { backgroundColor: Colors.successSoft },
   topTitle: { flex: 1, fontFamily: INTER.semibold, fontSize: 18, color: Colors.textDark },
