@@ -17,7 +17,7 @@ import { usePreferences } from '@/utils/preferencesStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useEffect, useState, type ComponentProps, type ReactNode } from 'react';
-import { StyleSheet, Switch, View } from 'react-native';
+import { Image, StyleSheet, Switch, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 type Note = { text: string; tone: 'good' | 'error' } | null;
@@ -255,6 +255,7 @@ export default function ManageScreen() {
     content = (
       <>
         <View style={s.hero}>
+          <Image source={require('../../../assets/images/Minimal Mint Leaf Arcs.png')} resizeMode="cover" style={s.heroBg} />
           <View style={s.heroIcon}><Ionicons name="compass-outline" size={30} color={Colors.primaryDark} /></View>
           <Text style={s.heroTitle} numberOfLines={1} adjustsFontSizeToFit>Travel smarter. Travel better.</Text>
           <Text style={s.heroText}>LemonTrip brings flights, hotels, buses, trains, holiday packages, and visa assistance together in one clear travel experience.</Text>
@@ -327,9 +328,10 @@ const s = StyleSheet.create({
   emptyIcon: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, marginBottom: 12 },
   emptyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginBottom: 6, textAlign: 'center' },
   emptyAction: { alignSelf: 'stretch', marginTop: 16 },
-  hero: { alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 12, paddingVertical: 16, paddingHorizontal: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
+  hero: { overflow: 'hidden', alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 12, paddingVertical: 16, paddingHorizontal: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
   heroIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
-  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 20, color: Colors.primaryDark, marginTop: 10, textAlign: 'center' },
+  heroBg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  heroTitle: { fontFamily: 'Inter-Bold', fontSize: 18, color: Colors.primaryDark, marginTop: 10, textAlign: 'center' },
   heroText: { fontFamily: 'Inter-Regular', fontSize: 14, lineHeight: 20, color: Colors.textDark, marginTop: 6, textAlign: 'center' },
 });
 
