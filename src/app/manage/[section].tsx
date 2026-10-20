@@ -1,6 +1,9 @@
 import { translate, useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text } from '@/components/ui/Text';
+import { EditProfileScreen } from '@/components/account/EditProfileScreen';
+import { NotificationSettingsScreen, NotificationsScreen } from '@/components/account/NotificationScreens';
+import { PersonalInformationScreen } from '@/components/account/PersonalInformationScreen';
 import { SupportButton, SupportCard, SupportField, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
 import { travelServices } from '@/constants/navigation';
@@ -267,6 +270,13 @@ export default function ManageScreen() {
     );
   } else {
     content = <EmptyCard icon="chatbubbles-outline" title="Your support conversations" copy="Verified support requests will appear here when support tracking is available. Contact our team for help with an existing request." action="Contact support" onPress={() => goTo('/contact')} />;
+  }
+
+  if (section === 'personal-information') return <PersonalInformationScreen />;
+  if (section === 'notifications') return <NotificationsScreen bookings={bookings} loading={accountBookings.loading} error={accountBookings.error} />;
+  if (section === 'notification-settings') return <NotificationSettingsScreen updates={updates} onChange={(key, value) => void preferences.update({ [key]: value })} error={preferences.error} />;
+  if (section === 'edit-profile' || section === 'account-setup') {
+    return <EditProfileScreen title={titles[section]} first={pf.first} last={pf.last} onChangeFirst={(value) => setPf((current) => ({ ...current, first: value }))} onChangeLast={(value) => setPf((current) => ({ ...current, last: value }))} onSave={saveProfile} note={note} />;
   }
 
   return (

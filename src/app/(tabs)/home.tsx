@@ -30,6 +30,8 @@ type QuickAction = { label: string; icon: IconName; tint?: 'lemon'; route: Param
 
 // Copy "Lone Hiker Overlooking a Mountain Lake" from assets/images to this file name.
 const HERO_IMAGE = require('../../../assets/images/hero-hiker.png');
+// How much to dim the hero photo: 0 = original, 0.3 = noticeably darker.
+const HERO_DIM = 0.2;
 // Script font from the design; the file lives in assets/fonts and is loaded in app/_layout.tsx.
 const SCRIPT_FONT = 'Italianno';
 // Inter (static weights, loaded in app/_layout.tsx) for all other text on this screen.
@@ -128,6 +130,7 @@ export default function HomeScreen() {
       <ScrollView ref={mainScrollRef} style={styles.scroll} showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
         {/* Hero */}
         <ImageBackground source={HERO_IMAGE} style={[styles.hero, { paddingTop: insets.top + 10 }]} resizeMode="cover">
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(4,20,15,${HERO_DIM})` }]} />
           <LinearGradient colors={['rgba(8,30,24,0.62)', 'rgba(8,30,24,0.05)', 'rgba(8,30,24,0.28)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Change your departure city" style={styles.locationRow} onPress={() => router.push('/(tabs)/explore/flights')}>
@@ -691,3 +694,5 @@ const styles = StyleSheet.create({
   aiSub: { color: 'rgba(255,255,255,0.75)', fontFamily: INTER.regular, fontSize: 10.5, marginTop: 3 },
   aiArrow: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center', borderRadius: 17, backgroundColor: '#FFFFFF' },
 });
+
+
