@@ -1,18 +1,18 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { Ui } from '@/constants/theme';
-import { VisaHeader } from '@/components/visa/VisaHeader';
 import { Colors } from '@/constants/colors';
 import { getAccessToken, useAuth } from '@/utils/authStore';
 import { getVisaApplications, openVisaApplicationDocument, type VisaApplication } from '@/utils/visaService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
+const INTER = { regular: 'Inter-Regular', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+const GREEN = '#103D30';
 const documentLabels = { passportFront: 'Passport front', passportBack: 'Passport back', applicantPhoto: 'Applicant photo' } as const;
 
 export default function VisaApplicationsScreen() {
@@ -24,6 +24,7 @@ export default function VisaApplicationsScreen() {
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState('');
   const [opening, setOpening] = useState('');
+  const [expanded, setExpanded] = useState('');
 
   const load = useCallback(async () => {
     const token = getAccessToken();
@@ -54,31 +55,107 @@ export default function VisaApplicationsScreen() {
     finally { setOpening(''); }
   };
 
-  return <SafeAreaView headerTone="light" style={styles.safe} edges={['top']}><VisaHeader title="Visa Applications" onBack={() => router.canGoBack() ? router.back() : router.replace('/(tabs)/explore/visa')} /><ScrollView contentContainerStyle={styles.page}>
-    <View style={styles.content}><Text style={styles.heading}>Your visa applications</Text><Text style={styles.copy}>View your requests, documents, and latest updates.</Text>
-      {loading ? <ActivityIndicator accessibilityLabel="Loading visa applications" color={Colors.primary} style={styles.loader} /> : null}
-      {!loading && !user ? <View style={styles.empty}><Ionicons name="lock-closed-outline" size={28} color={Colors.primary}/><Text style={styles.heading}>Sign in required</Text><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => router.push('/login')}><Text style={styles.buttonText}>Sign in</Text></TouchableOpacity></View> : null}
-      {!loading && user && error ? <View style={styles.errorPanel}><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => void load()}><Text style={styles.buttonText}>Try again</Text></TouchableOpacity></View> : null}
-      {!loading && user && !error && items.length === 0 ? <View style={styles.empty}><Ionicons name="document-text-outline" size={28} color={Colors.primary}/><Text style={styles.heading}>No visa applications yet</Text><Text style={styles.copy}>Submitted applications will appear here.</Text><TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.buttonText}>Browse visa services</Text></TouchableOpacity></View> : null}
-      {!loading && !error ? items.map((item) => <View key={item.id} style={styles.card}>
-        <View style={styles.row}><View style={styles.tag}><Text style={styles.tagText}>{item.status}</Text></View><Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text></View>
-        <Text style={styles.heading}>{item.country}</Text><Text style={styles.copy}>{item.visaType}</Text>
-        <Text style={styles.reference}>Reference: {item.referenceId}</Text><TouchableOpacity accessibilityRole="button" style={styles.button} onPress={() => router.push({ pathname: "/visa-application/[id]", params: { id: item.id, view: 'tracking' } })}><Text style={styles.buttonText}>Track status</Text></TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" style={styles.detailButton} onPress={() => router.push({ pathname: '/visa-application/[id]', params: { id: item.id, view: 'details' } })}><Text style={styles.documentText}>Application details</Text><Ionicons name="chevron-forward" size={18} color={Colors.secondary} /></TouchableOpacity><View style={styles.documents}>{(Object.keys(documentLabels) as (keyof typeof documentLabels)[]).filter((key) => item.documents[key]).map((key) => {
-          const busy = opening === `${item.id}:${key}`;
-          return <TouchableOpacity key={key} accessibilityRole="button" accessibilityLabel={`Open ${documentLabels[key]}`} disabled={Boolean(opening)} style={styles.document} onPress={() => void openDocument(item, key)}>
-            {busy ? <ActivityIndicator size="small" color={Colors.primary}/> : <Ionicons name="document-attach-outline" size={17} color={Colors.primary}/>}
-            <Text style={styles.documentText}>{documentLabels[key]}</Text><Ionicons name="open-outline" size={14} color={Colors.textLight}/>
-          </TouchableOpacity>;
-        })}</View>
-      </View>) : null}
-      {!loading && !error && hasMore ? <TouchableOpacity accessibilityRole="button" disabled={loadingMore} style={styles.moreButton} onPress={() => void loadMore()}>{loadingMore ? <ActivityIndicator size="small" color={Colors.primaryDark}/> : <Text style={styles.buttonText}>Load more applications</Text>}</TouchableOpacity> : null}
-    </View>
-  </ScrollView></SafeAreaView>;
+  return (
+    <SafeAreaView headerTone="light" style={styles.safe} edges={['top']}>
+      <View style={styles.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore/visa'))} style={styles.backBtn}>
+          <Ionicons name="arrow-back" size={24} color={GREEN} />
+        </TouchableOpacity>
+        <Text style={styles.topTitle}>Visa Applications</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings')} style={styles.gear}>
+          <Ionicons name="settings-outline" size={22} color={GREEN} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <View style={styles.banner}>
+            <Image source={require('../../../../../assets/images/Visa Travel Documents in Green Landscape.png')} resizeMode="cover" style={styles.bannerImg} />
+            <View style={styles.bannerCopy}>
+              <Text style={styles.bannerEyebrow}>VISA SERVICES</Text>
+              <Text style={styles.bannerTitle} numberOfLines={2}>Your visa applications</Text>
+              <Text style={styles.bannerSub}>View your requests, documents, and latest updates.</Text>
+            </View>
+          </View>
+
+          {loading ? <ActivityIndicator accessibilityLabel="Loading visa applications" color={GREEN} style={styles.loader} /> : null}
+          {!loading && !user ? <View style={styles.empty}><Ionicons name="lock-closed-outline" size={28} color={GREEN} /><Text style={styles.emptyTitle}>Sign in required</Text><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => router.push('/login')}><Text style={styles.buttonText}>Sign in</Text></TouchableOpacity></View> : null}
+          {!loading && user && error ? <View style={styles.empty}><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => void load()}><Text style={styles.buttonText}>Try again</Text></TouchableOpacity></View> : null}
+          {!loading && user && !error && items.length === 0 ? <View style={styles.empty}><Ionicons name="document-text-outline" size={28} color={GREEN} /><Text style={styles.emptyTitle}>No visa applications yet</Text><Text style={styles.copy}>Submitted applications will appear here.</Text><TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/explore/visa')}><Text style={styles.buttonText}>Browse visa services</Text></TouchableOpacity></View> : null}
+
+          {!loading && !error ? items.map((item) => {
+            const open = expanded === item.id;
+            return (
+              <View key={item.id} style={styles.card}>
+                <View style={styles.row}>
+                  <View style={styles.tag}><Text style={styles.tagText}>{item.status}</Text></View>
+                  <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</Text>
+                </View>
+                <Text style={styles.country}>{item.country}</Text>
+                <Text style={styles.visaType}>{item.visaType}</Text>
+                <Text style={styles.reference}>Reference: {item.referenceId}</Text>
+                <TouchableOpacity accessibilityRole="button" style={styles.button} onPress={() => router.push({ pathname: '/visa-application/[id]', params: { id: item.id, view: 'tracking' } })}>
+                  <Text style={styles.buttonText}>Track status</Text>
+                  <Ionicons name="arrow-forward" size={18} color={Colors.white} />
+                </TouchableOpacity>
+                <TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.detailButton} onPress={() => setExpanded(open ? '' : item.id)}>
+                  <Text style={styles.detailText}>Application details</Text>
+                  <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={20} color={GREEN} />
+                </TouchableOpacity>
+                {open ? <View style={styles.documents}>
+                  {(Object.keys(documentLabels) as (keyof typeof documentLabels)[]).filter((key) => item.documents[key]).map((key) => {
+                    const busy = opening === `${item.id}:${key}`;
+                    return (
+                      <TouchableOpacity key={key} accessibilityRole="button" accessibilityLabel={`Open ${documentLabels[key]}`} disabled={Boolean(opening)} style={styles.document} onPress={() => void openDocument(item, key)}>
+                        <View style={styles.docIcon}>{busy ? <ActivityIndicator size="small" color={GREEN} /> : <Ionicons name="document-text-outline" size={20} color={GREEN} />}</View>
+                        <Text style={styles.documentText}>{documentLabels[key]}</Text>
+                        <Ionicons name="open-outline" size={18} color={Colors.textLight} />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View> : null}
+              </View>
+            );
+          }) : null}
+
+          {!loading && !error && hasMore ? <TouchableOpacity accessibilityRole="button" disabled={loadingMore} style={styles.button} onPress={() => void loadMore()}>{loadingMore ? <ActivityIndicator size="small" color={Colors.white} /> : <Text style={styles.buttonText}>Load more applications</Text>}</TouchableOpacity> : null}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-  detailButton: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'space-between', minHeight: 44, marginTop: 8 },
-  safe: { flex: 1, backgroundColor: Colors.background }, page: { paddingBottom: 32 }, content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: Ui.space.page },
-  loader: { marginTop: 48 }, card: { ...Ui.card, padding: Ui.space.card, marginTop: 12, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface }, row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, tag: { paddingHorizontal: 9, paddingVertical: 5, borderRadius: Ui.radius.pill, backgroundColor: Colors.accentSoft }, tagText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, textTransform: 'capitalize' }, date: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption }, heading: { marginTop: 10, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold }, copy: { marginTop: 5, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19 }, reference: { marginTop: 10, color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, documents: { gap: 7, marginTop: 14 }, document: { minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, borderRadius: 9, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border }, documentText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold }, empty: { alignItems: 'center', marginTop: 45, padding: 24, borderRadius: 14, backgroundColor: Colors.surfaceMuted }, errorPanel: { marginTop: 24, padding: 15, borderRadius: 12, backgroundColor: Colors.surfaceMuted }, button: { minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 13, paddingHorizontal: 15, borderRadius: Ui.radius.control, backgroundColor: Colors.secondary }, moreButton: { minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.control, backgroundColor: Colors.secondary }, buttonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  safe: { flex: 1, backgroundColor: Colors.background },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: Colors.surface },
+  backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+  topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: GREEN },
+  gear: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
+  page: { paddingBottom: 32 },
+  content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: 16, paddingTop: 12 },
+  banner: { width: '100%', aspectRatio: 2.993, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: GREEN },
+  bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  bannerCopy: { width: '62%', paddingLeft: 18 },
+  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent },
+  bannerTitle: { fontFamily: INTER.bold, fontSize: 22, lineHeight: 27, color: Colors.white, marginTop: 4 },
+  bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  loader: { marginTop: 48 },
+  card: { marginTop: 14, padding: 16, borderRadius: 22, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  tag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: '#FFF1B8' },
+  tagText: { fontFamily: INTER.semibold, fontSize: TextSize.caption, color: GREEN, textTransform: 'capitalize' },
+  date: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight },
+  country: { fontFamily: INTER.bold, fontSize: TextSize.displaySmall, color: GREEN, marginTop: 10 },
+  visaType: { fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textLight, marginTop: 2 },
+  reference: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: '#1B6B4A', marginTop: 8 },
+  button: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 14, paddingHorizontal: 15, borderRadius: 26, backgroundColor: GREEN },
+  buttonText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.white },
+  detailButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, marginTop: 6 },
+  detailText: { fontFamily: INTER.semibold, fontSize: TextSize.bodyLarge, color: GREEN },
+  documents: { gap: 8, marginTop: 4 },
+  document: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, borderRadius: 14, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: Colors.border },
+  docIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
+  documentText: { flex: 1, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  empty: { alignItems: 'center', marginTop: 24, padding: 24, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  emptyTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: GREEN, marginTop: 10 },
+  copy: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 19, color: Colors.textLight, marginTop: 5, textAlign: 'center' },
 });
