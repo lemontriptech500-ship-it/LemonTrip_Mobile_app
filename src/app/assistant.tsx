@@ -57,6 +57,7 @@ function AssistantChat() {
 
   const composer = (
     <View style={styles.composer}>
+      <Ionicons name="chatbox-outline" size={20} color={Colors.textDark} style={styles.composerIcon} />
       <TextInput
         accessibilityLabel="Message travel assistant"
         placeholder="Type your message…"
@@ -80,6 +81,7 @@ function AssistantChat() {
       subtitle="Ask about trips, bookings and destinations."
       eyebrow="LEMONTRIP / SUPPORT"
       onBack={back}
+      hero={{ image: require('../../assets/images/Emerald Travel Assistant Banner.png'), topTitle: 'Travel assistant', onSettings: () => router.push('/settings' as never) }}
       scrollRef={scroll}
       onContentSizeChange={() => { if (messages.length || busy) scroll.current?.scrollToEnd({ animated: true }); }}
       footer={composer}>
@@ -90,6 +92,7 @@ function AssistantChat() {
             {shortcuts.map((item, index) => (
               <SupportItem
                 key={item.title}
+                tone="mint"
                 icon={item.icon}
                 title={item.title}
                 detail={item.detail}
@@ -141,7 +144,8 @@ const styles = StyleSheet.create({
   typing: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   typingText: { fontFamily: 'Manrope', fontSize: 13, color: Colors.textLight },
   composer: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, borderRadius: 26, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface, paddingLeft: 6, paddingRight: 6, paddingVertical: 6 },
-  input: { flex: 1, minWidth: 0, minHeight: 40, maxHeight: 110, paddingHorizontal: 29, paddingVertical: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
-  send: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.primary },
+  input: { flex: 1, minWidth: 0, minHeight: 40, maxHeight: 110, paddingHorizontal: 10, paddingVertical: 10, color: Colors.textDark, fontFamily: 'Manrope', fontSize: 14 },
+  send: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30' },
   disabled: { opacity: 0.45 },
+  composerIcon: { marginLeft: 12, marginBottom: 10 },
 });

@@ -10,14 +10,14 @@ import { StyleSheet, View } from 'react-native';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-const answers: { title: string; icon: IconName; answer: string }[] = [
-  { title: 'General Booking', icon: 'settings-outline', answer: 'Open My Trips to find your booking ID, dates, payment state, and current status. Select a trip to view its details. Keep the booking reference handy when contacting support.' },
-  { title: 'Payment Options', icon: 'card-outline', answer: 'Available payment options and the final amount appear at checkout. A booking is confirmed after the payment and provider confirmation steps complete. Never share a card PIN, CVV, password, or OTP with support.' },
-  { title: 'Cancellation Policy', icon: 'close-outline', answer: 'Cancellation options depend on the provider and fare rules shown with your booking. Open the trip to check its cancellation options. If online cancellation is unavailable, contact support with your booking reference.' },
-  { title: 'Account & Login', icon: 'person-outline', answer: 'Sign in using the account options on the login screen. Use password recovery if you cannot access your account. Verified contact details help you receive booking updates.' },
-  { title: 'Feedback', icon: 'star-outline', answer: 'Choose Feedback in Contact Support to share your experience or suggest an improvement. Submitted requests can be viewed in My Support Requests.' },
-  { title: 'Tour & Activity Details', icon: 'briefcase-outline', answer: 'Review the itinerary, inclusions, dates, and provider terms on the package or activity page before booking. Contact support for arrangements that are not listed.' },
-  { title: 'Travel Documents', icon: 'document-text-outline', answer: 'Open My Trips and select your booking for its available travel documents. Visa application documents are available in Visa Services → My visa applications. Document requirements vary by destination and traveller.' },
+const answers: { title: string; detail: string; icon: IconName; answer: string }[] = [
+  { title: 'General Booking', detail: 'Flights, hotels, buses and more', icon: 'settings-outline', answer: 'Open My Trips to find your booking ID, dates, payment state, and current status. Select a trip to view its details. Keep the booking reference handy when contacting support.' },
+  { title: 'Payment Options', detail: 'Wallet, cards and other methods', icon: 'card-outline', answer: 'Available payment options and the final amount appear at checkout. A booking is confirmed after the payment and provider confirmation steps complete. Never share a card PIN, CVV, password, or OTP with support.' },
+  { title: 'Cancellation Policy', detail: 'Changes, refunds and cancellations', icon: 'close-outline', answer: 'Cancellation options depend on the provider and fare rules shown with your booking. Open the trip to check its cancellation options. If online cancellation is unavailable, contact support with your booking reference.' },
+  { title: 'Account & Login', detail: 'Profile, login issues and account help', icon: 'person-outline', answer: 'Sign in using the account options on the login screen. Use password recovery if you cannot access your account. Verified contact details help you receive booking updates.' },
+  { title: 'Feedback', detail: 'Share your suggestions with us', icon: 'star-outline', answer: 'Choose Feedback in Contact Support to share your experience or suggest an improvement. Submitted requests can be viewed in My Support Requests.' },
+  { title: 'Tour & Activity Details', detail: 'Day tours, activities and experiences', icon: 'briefcase-outline', answer: 'Review the itinerary, inclusions, dates, and provider terms on the package or activity page before booking. Contact support for arrangements that are not listed.' },
+  { title: 'Travel Documents', detail: 'Visas, IDs and required documents', icon: 'document-text-outline', answer: 'Open My Trips and select your booking for its available travel documents. Visa application documents are available in Visa Services → My visa applications. Document requirements vary by destination and traveller.' },
 ];
 
 export default function FaqScreen() {
@@ -38,11 +38,13 @@ export default function FaqScreen() {
       subtitle="Answers to the questions we hear most."
       eyebrow="LEMONTRIP / SUPPORT"
       onBack={back}
-      footer={<SupportButton label="Contact support" icon="mail-open-outline" onPress={() => goTo('/contact')} />}>
+      hero={{ image: require('../../assets/images/Green Travel Help Banner.png'), topTitle: 'FAQ', onSettings: () => goTo('/settings') }}
+      footer={<SupportButton variant="dark" label="Contact support" icon="mail-open-outline" onPress={() => goTo('/contact')} />}>
       <SupportCard>
         <SupportHeading eyebrow="FIND AN ANSWER" title="Search help topics" />
         <SupportField
           label="Search"
+          leftIcon="search-outline"
           placeholder="Try “refund”, “visa”, “login”…"
           value={search}
           onChangeText={(value) => { setSearch(value); setOpen(''); }}
@@ -69,7 +71,7 @@ export default function FaqScreen() {
                 <View style={[s.icon, expanded && s.iconActive]}>
                   <Ionicons name={item.icon} size={19} color={expanded ? Colors.white : Colors.primary} />
                 </View>
-                <Text style={s.title}>{item.title}</Text>
+                <View style={s.flex}><Text style={s.title}>{item.title}</Text><Text style={s.detail}>{item.detail}</Text></View>
                 <Ionicons name={expanded ? 'chevron-down' : 'chevron-forward'} size={16} color={Colors.textLight} />
               </TouchableOpacity>
               {expanded ? <Text style={s.answer}>{item.answer}</Text> : null}
@@ -88,8 +90,10 @@ const s = StyleSheet.create({
   item: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   itemLast: { borderBottomWidth: 0 },
   row: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
-  icon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  flex: { flex: 1, minWidth: 0 },
+  detail: { fontFamily: 'Inter-Regular', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  icon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
   iconActive: { backgroundColor: Colors.primary },
-  title: { flex: 1, fontFamily: 'Manrope', fontSize: 14, fontWeight: '800', color: Colors.textDark },
-  answer: { fontFamily: 'Manrope', fontSize: 13, lineHeight: 20, color: Colors.textLight, paddingLeft: 50, paddingBottom: 14, paddingRight: 4 },
+  title: { fontFamily: 'Inter-Bold', fontSize: 14, color: Colors.textDark },
+  answer: { fontFamily: 'Inter-Regular', fontSize: 13, lineHeight: 20, color: Colors.textLight, paddingLeft: 50, paddingBottom: 14, paddingRight: 4 },
 });

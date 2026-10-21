@@ -66,7 +66,7 @@ export default function SupportRequestsScreen() {
       eyebrow="LEMONTRIP / SUPPORT"
       onBack={() => goBackOr('/help')}
       hero={{ image: require('../../../assets/images/Emerald Customer Support Headset Banner.png'), topTitle: 'My support requests', onSettings: () => router.push('/settings' as never) }}
-      footer={<SupportButton label="Contact support" icon="mail-open-outline" onPress={() => router.push('/contact')} />}>
+      footer={<SupportButton variant="dark" label="Contact support" icon="mail-open-outline" onPress={() => router.push('/contact')} />}>
       {!user || !token ? (
         <SupportCard style={s.center}>
           <View style={s.bigIcon}><Ionicons name="lock-closed-outline" size={28} color={Colors.primaryDark} /></View>

@@ -88,17 +88,20 @@ export function SupportItem({ icon, title, detail, onPress, last = false, traili
   );
 }
 
-export function SupportField({ label, error, multiline, counter, ...input }: TextInputProps & { label: string; error?: string; counter?: string }) {
+export function SupportField({ label, error, multiline, counter, leftIcon, ...input }: TextInputProps & { label: string; error?: string; counter?: string; leftIcon?: IconName }) {
   return (
     <View style={s.field}>
       <View style={s.fieldHead}><Text style={s.fieldLabel}>{label.toUpperCase()}</Text>{counter ? <Text style={s.counter}>{counter}</Text> : null}</View>
-      <TextInput
-        {...input}
-        multiline={multiline}
-        accessibilityLabel={label}
-        placeholderTextColor={Colors.textLight}
-        style={[s.input, multiline && s.inputMulti, !!error && s.inputError]}
-      />
+      <View>
+        {leftIcon ? <View pointerEvents="none" style={s.fieldIcon}><Ionicons name={leftIcon} size={20} color={Colors.textDark} /></View> : null}
+        <TextInput
+          {...input}
+          multiline={multiline}
+          accessibilityLabel={label}
+          placeholderTextColor={Colors.textLight}
+          style={[s.input, multiline && s.inputMulti, !!error && s.inputError, !!leftIcon && { paddingLeft: 46 }]}
+        />
+      </View>
       {error ? <Text accessibilityRole="alert" style={s.errorText}>{error}</Text> : null}
     </View>
   );
@@ -113,12 +116,12 @@ export function SupportChip({ label, selected, onPress, icon, disabled }: { labe
   );
 }
 
-export function SupportButton({ label, onPress, icon, loading, disabled, variant = 'accent' }: { label: string; onPress: () => void; icon?: IconName; loading?: boolean; disabled?: boolean; variant?: 'accent' | 'outline' | 'soft' }) {
+export function SupportButton({ label, onPress, icon, loading, disabled, variant = 'accent' }: { label: string; onPress: () => void; icon?: IconName; loading?: boolean; disabled?: boolean; variant?: 'accent' | 'outline' | 'soft' | 'dark' }) {
   const off = !!loading || !!disabled;
-  const bg = variant === 'accent' ? Colors.accent : variant === 'soft' ? Colors.surfaceMuted : Colors.surface;
+  const bg = variant === 'dark' ? '#103D30' : variant === 'accent' ? Colors.accent : variant === 'soft' ? Colors.surfaceMuted : Colors.surface;
   return (
     <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: off, busy: !!loading }} disabled={off} onPress={onPress} activeOpacity={0.85} style={[s.button, { backgroundColor: bg }, variant === 'outline' && s.buttonOutline, off && { opacity: 0.55 }]}>
-      {loading ? <ActivityIndicator color={Colors.primaryDark} /> : <><Text style={s.buttonText}>{label}</Text>{icon ? <Ionicons name={icon} size={18} color={Colors.primaryDark} /> : null}</>}
+      {loading ? <ActivityIndicator color={Colors.primaryDark} /> : <><Text style={[s.buttonText, variant === 'dark' && s.buttonTextDark]}>{label}</Text>{icon ? <Ionicons name={icon} size={18} color={variant === 'dark' ? Colors.white : Colors.primaryDark} /> : null}</>}
     </TouchableOpacity>
   );
 }
@@ -172,6 +175,8 @@ const s = StyleSheet.create({
   chipText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark },
   chipTextOn: { color: Colors.white },
   button: { ...Ui.button, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 18 },
+  buttonTextDark: { color: Colors.white },
+  fieldIcon: { position: 'absolute', left: 16, top: 0, bottom: 0, justifyContent: 'center' },
   buttonOutline: { borderWidth: 1, borderColor: Colors.borderStrong },
   buttonText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
   notice: { flexDirection: 'row', gap: 10, padding: 14, borderRadius: 16, marginHorizontal: Ui.space.page, marginBottom: 14 },
