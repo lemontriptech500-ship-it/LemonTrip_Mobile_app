@@ -66,23 +66,22 @@ export default function WalletScreen() {
           </View>
 
           <View style={s.balance}>
-            <View pointerEvents="none" style={s.balanceRing} />
             <View style={s.balanceHead}>
               <View style={s.flex}>
                 <View style={s.labelRow}>
                   <Text style={s.label}>AVAILABLE BALANCE</Text>
                   <TouchableOpacity accessibilityRole="button" accessibilityLabel={hidden ? 'Show balance' : 'Hide balance'} onPress={() => setHidden((v) => !v)} hitSlop={8}>
-                    <Ionicons name={hidden ? 'eye-off-outline' : 'eye-outline'} size={16} color={Colors.accent} />
+                    <Ionicons name={hidden ? 'eye-off-outline' : 'eye-outline'} size={16} color={BRAND} />
                   </TouchableOpacity>
                 </View>
-                {loading ? <ActivityIndicator color={Colors.white} style={{ alignSelf: 'flex-start', marginTop: 12 }} /> : <Text style={s.amount} numberOfLines={1}>{hidden && verified ? '••••••' : amount}</Text>}
+                {loading ? <ActivityIndicator color={BRAND} style={{ alignSelf: 'flex-start', marginTop: 12 }} /> : <Text style={s.amount} numberOfLines={1}>{hidden && verified ? '••••••' : amount}</Text>}
               </View>
-              <View style={s.balanceIcon}><Ionicons name="wallet-outline" size={22} color={BRAND} /></View>
+              <View style={s.balanceIcon}><Ionicons name="wallet-outline" size={26} color={BRAND} /></View>
             </View>
             <Text style={s.note}>{loading ? 'Checking your balance…' : !user ? 'Sign in to access your wallet' : verified ? 'Verified wallet balance' : 'Your balance is unavailable right now.'}</Text>
             <TouchableOpacity accessibilityRole="button" onPress={() => (user ? go('/wallet/add-money') : router.push('/login'))} style={s.addButton} activeOpacity={0.85}>
               <Text style={s.addText}>{user ? 'Add money' : 'Sign in'}</Text>
-              <Ionicons name="arrow-forward" size={18} color={BRAND} />
+              <View style={s.addArrow}><Ionicons name="arrow-forward" size={20} color={BRAND} /></View>
             </TouchableOpacity>
           </View>
 
@@ -155,16 +154,16 @@ const s = StyleSheet.create({
   bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.displaySmall },
   bannerText: { fontFamily: INTER.regular, color: Colors.white, fontSize: TextSize.body, lineHeight: 18, marginTop: 4 },
 
-  balance: { marginHorizontal: 16, marginBottom: 14, padding: 18, borderRadius: 22, overflow: 'hidden', backgroundColor: BRAND },
-  balanceRing: { position: 'absolute', width: 170, height: 170, right: -70, top: -80, borderWidth: 1, borderColor: Colors.onDarkBorder, borderRadius: 85 },
+  balance: { marginHorizontal: 16, marginBottom: 14, padding: 18, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   balanceHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  label: { fontFamily: INTER.semibold, color: Colors.accent, fontSize: TextSize.micro, letterSpacing: 1.4 },
-  amount: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.display, marginTop: 8 },
-  balanceIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.accent },
-  note: { fontFamily: INTER.regular, color: Colors.onDarkMuted, fontSize: TextSize.caption, marginTop: 6 },
-  addButton: { minHeight: 52, marginTop: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, borderRadius: 999, backgroundColor: Colors.accent },
-  addText: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
+  label: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.micro, letterSpacing: 2 },
+  amount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.display, marginTop: 6 },
+  balanceIcon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: '#E8F2EE' },
+  note: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.body, marginTop: 6 },
+  addButton: { minHeight: 52, marginTop: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 56, borderRadius: 999, backgroundColor: BRAND },
+  addText: { fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.bodyLarge, textAlign: 'center' },
+  addArrow: { position: 'absolute', right: 5, top: 5, bottom: 5, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 999, backgroundColor: Colors.white },
 
   error: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 16, marginBottom: 14, padding: 12, borderRadius: 14, backgroundColor: Colors.errorSoft },
   errorText: { flex: 1, fontFamily: INTER.medium, fontSize: TextSize.caption, lineHeight: 17, color: Colors.error },
