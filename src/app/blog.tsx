@@ -5,66 +5,132 @@ import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { SupportPage, goBackOr, goTo } from '@/components/support/SupportKit';
 import type { BlogPost } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Image, ImageBackground, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { AppScreen as SafeAreaView } from '@/components/AppScreen';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
+
+const ALL = 'All stories';
+// Hero banner artwork (the green collage from assets/images).
+const BANNER = require('../../assets/images/Emerald Travel Adventure Collage.png');
 
 export default function BlogScreen() {
   useAppLanguage();
-  const { width } = useWindowDimensions();
-  const desktop = width >= 900;
-  const [activeCategory, setActiveCategory] = useState('All stories');
+  const [activeCategory, setActiveCategory] = useState(ALL);
   const { items: blogPosts, loading, error } = useContentItems<BlogPost>('blog');
-  const categories = useMemo(() => ['All stories', ...new Set(blogPosts.map((post) => post.category))], [blogPosts]);
-  const featured = blogPosts[0];
-  const visiblePosts = useMemo(() => activeCategory === 'All stories' ? blogPosts : blogPosts.filter((post) => post.category === activeCategory), [activeCategory, blogPosts]);
+  const categories = useMemo(() => [ALL, ...new Set(blogPosts.map((post) => post.category))], [blogPosts]);
+  const visiblePosts = useMemo(
+    () => (activeCategory === ALL ? blogPosts : blogPosts.filter((post) => post.category === activeCategory)),
+    [activeCategory, blogPosts],
+  );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
-        <View style={styles.content}>
-          <ScreenHeader title="Travel stories" subtitle="Ideas, guides, and places worth taking the long way to." eyebrow="THE LEMONTRIP JOURNAL" onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))} />
-
-          {featured ? <TouchableOpacity accessibilityRole="button" onPress={() => router.push(`/blog/${featured.id}`)} style={styles.hero} activeOpacity={0.94}>
-            <ImageBackground source={{ uri: featured.image }} style={styles.heroImage} imageStyle={styles.heroImageStyle}>
-              <View style={styles.heroShade} />
-              <View style={styles.heroCopy}>
-                <Text style={styles.heroCategory}>{featured.category.toUpperCase()}</Text>
-                <Text style={styles.heroTitle}>{featured.title}</Text>
-                <Text style={styles.heroDescription}>{featured.excerpt}</Text>
-                <View style={styles.heroFooter}><View style={styles.readButton}><Text style={styles.readButtonText}>Read article</Text><Ionicons name="arrow-forward" size={15} color={Colors.primaryDark} /></View><Text style={styles.heroTime}>{featured.readingTime}</Text></View>
-              </View>
-            </ImageBackground>
-          </TouchableOpacity> : null}
-
-          <View style={styles.categoryHeader}><View><Text style={styles.eyebrow}>BROWSE THE JOURNAL</Text><Text style={styles.sectionTitle}>Stories for wherever you are going</Text></View></View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
-            {categories.map((category) => <TouchableOpacity key={category} onPress={() => setActiveCategory(category)} style={[styles.categoryChip, activeCategory === category && styles.categoryChipActive]}><Text style={[styles.categoryChipText, activeCategory === category && styles.categoryChipTextActive]}>{category}</Text></TouchableOpacity>)}
-          </ScrollView>
-
-          <View style={styles.articleHeader}><View><Text style={styles.eyebrow}>LATEST NOTES</Text><Text style={styles.sectionTitle}>{activeCategory === 'All stories' ? 'More to read' : activeCategory}</Text></View><Text style={styles.articleCount}>{visiblePosts.length} stories</Text></View>
-          <View style={[styles.articleGrid, desktop && styles.articleGridDesktop]}>
-            {visiblePosts.map((post) => <ArticleCard key={post.id} post={post} desktop={desktop} />)}
-          </View>
-          {loading || error || !visiblePosts.length ? <View style={styles.emptyState}><TravelArtworkIcon name="stories" size={40} /><Text style={styles.emptyTitle}>{loading ? 'Loading stories…' : error ?? 'More stories are on the way'}</Text><Text style={styles.emptyText}>{error ? 'Please try again later.' : 'Try another journal category.'}</Text></View> : null}
-        </View>
+    <SupportPage
+      eyebrow="THE LEMONTRIP JOURNAL"
+      title="Travel stories"
+      subtitle="Ideas, guides, and places worth taking the long way to."
+      onBack={() => goBackOr('/home')}
+      hero={{ image: BANNER, topTitle: 'Travel stories', onSettings: () => goTo('/settings') }}
+    >
+      <View style={styles.sectionHeader}>
+        <Text style={styles.eyebrow}>BROWSE THE JOURNAL</Text>
+        <Text style={styles.sectionTitle}>Stories for wherever you are going</Text>
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
+        {categories.map((category) => {
+          const active = activeCategory === category;
+          return (
+            <TouchableOpacity
+              key={category}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+              onPress={() => setActiveCategory(category)}
+              style={[styles.chip, active && styles.chipActive]}
+            >
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>{category}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
-    </SafeAreaView>
+
+      <View style={[styles.sectionHeader, styles.listHeader]}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.eyebrow}>LATEST NOTES</Text>
+          <Text style={styles.sectionTitle}>{activeCategory === ALL ? 'More to read' : activeCategory}</Text>
+        </View>
+        <Text style={styles.count}>{visiblePosts.length} stories</Text>
+      </View>
+
+      <View style={styles.list}>
+        {visiblePosts.map((post) => <ArticleCard key={post.id} post={post} />)}
+      </View>
+
+      {loading || error || !visiblePosts.length ? (
+        <View style={styles.emptyState}>
+          <TravelArtworkIcon name="stories" size={40} />
+          <Text style={styles.emptyTitle}>{loading ? 'Loading stories…' : error ?? 'More stories are on the way'}</Text>
+          <Text style={styles.emptyText}>{error ? 'Please try again later.' : 'Try another journal category.'}</Text>
+        </View>
+      ) : null}
+    </SupportPage>
   );
 }
 
-function ArticleCard({ post, desktop }: { post: BlogPost; desktop: boolean }) {
-  return <TouchableOpacity accessibilityRole="button" onPress={() => router.push(`/blog/${post.id}`)} style={[styles.articleCard, desktop && styles.articleCardDesktop]} activeOpacity={0.9}><Image source={{ uri: post.image }} style={styles.articleImage} /><View style={styles.articleBody}><View style={styles.articleMeta}><Text style={styles.articleCategory}>{post.category}</Text><Text style={styles.articleTime}>{post.readingTime}</Text></View><Text style={styles.articleTitle} numberOfLines={2}>{post.title}</Text><Text style={styles.articleDate}>{post.date}</Text><View style={styles.cardFooter}><Text style={styles.readStory}>Read story</Text><Ionicons name="arrow-forward" size={15} color={Colors.primary} /></View></View></TouchableOpacity>;
+function ArticleCard({ post }: { post: BlogPost }) {
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={post.title}
+      onPress={() => router.push(`/blog/${post.id}`)}
+      style={styles.card}
+      activeOpacity={0.9}
+    >
+      <Image source={{ uri: post.image }} resizeMode="cover" style={styles.cardImage} />
+      <View style={styles.cardBody}>
+        <View style={styles.meta}>
+          <Text style={styles.category} numberOfLines={1}>{post.category}</Text>
+          <Text style={styles.time}>{post.readingTime}</Text>
+        </View>
+        <Text style={styles.title} numberOfLines={3}>{post.title}</Text>
+        <Text style={styles.date}>{post.date}</Text>
+        <View style={styles.footer}>
+          <Text style={styles.readStory}>Read story</Text>
+          <Ionicons name="arrow-forward" size={18} color={Colors.textDark} />
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background }, page: { paddingBottom: 34 }, content: { width: '100%', maxWidth: 1160, alignSelf: 'center' },
-  hero: { marginHorizontal: 15, overflow: 'hidden', borderRadius: 21, backgroundColor: Colors.primaryDark }, heroImage: { minHeight: 370, justifyContent: 'flex-end' }, heroImageStyle: { borderRadius: 21 }, heroShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay }, heroCopy: { maxWidth: 650, padding: 22 }, heroCategory: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.2 }, heroTitle: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.hero, lineHeight: 36, fontWeight: FontWeight.extraBold, marginTop: 8 }, heroDescription: { maxWidth: 570, color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 7 }, heroFooter: { flexDirection: 'row', alignItems: 'center', gap: 13, marginTop: 16 }, readButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 7, paddingHorizontal: 13, borderRadius: Ui.radius.control, backgroundColor: Colors.accent }, readButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, heroTime: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  categoryHeader: { marginTop: 26, marginHorizontal: Ui.space.page, marginBottom: 11 }, eyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.1 }, sectionTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 4 }, categoryRow: { gap: 7, paddingHorizontal: 16 }, categoryChip: { minHeight: 35, justifyContent: 'center', paddingHorizontal: 12, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.pill, backgroundColor: Colors.surface }, categoryChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary }, categoryChipText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold }, categoryChipTextActive: { color: Colors.white },
-  articleHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 28, marginHorizontal: Ui.space.page, marginBottom: 11 }, articleCount: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body }, articleGrid: { gap: 12, paddingHorizontal: 16 }, articleGridDesktop: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 14 }, articleCard: { ...Ui.card, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, backgroundColor: Colors.surface }, articleCardDesktop: { width: '48.8%' }, articleImage: { width: '100%', height: 170, backgroundColor: Colors.surfaceMuted }, articleBody: { padding: 13 }, articleMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }, articleCategory: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold }, articleTime: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body }, articleTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 24, fontWeight: FontWeight.extraBold, marginTop: 8 }, articleDate: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 6 }, cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 13, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border }, readStory: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, emptyState: { alignItems: 'center', justifyContent: 'center', margin: 16, padding: 30, borderRadius: 16, backgroundColor: Colors.surface }, emptyTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 9 }, emptyText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 4 },
+  sectionHeader: { marginHorizontal: Ui.space.page, marginBottom: 12 },
+  listHeader: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 24 },
+  eyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
+  sectionTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, lineHeight: 26, fontWeight: FontWeight.extraBold, marginTop: 3 },
+  count: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginBottom: 2 },
+
+  categoryRow: { gap: 8, paddingHorizontal: Ui.space.page },
+  chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 18, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.pill + 4, backgroundColor: Colors.surface },
+  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  chipText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  chipTextActive: { color: Colors.white },
+
+  list: { gap: 12, paddingHorizontal: Ui.space.page },
+  card: { ...Ui.card, flexDirection: 'row', overflow: 'hidden', minHeight: 124, borderRadius: 20 },
+  cardImage: { width: '42%', alignSelf: 'stretch', backgroundColor: Colors.surfaceMuted },
+  cardBody: { flex: 1, paddingHorizontal: 13, paddingTop: 11, paddingBottom: 9 },
+  meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6 },
+  category: { flexShrink: 1, color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, textTransform: 'uppercase' },
+  time: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
+  title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge - 1, lineHeight: 20, fontWeight: FontWeight.extraBold, marginTop: 5 },
+  date: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 4 },
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 7, borderTopWidth: 1, borderTopColor: Colors.border },
+  readStory: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+
+  emptyState: { alignItems: 'center', justifyContent: 'center', margin: Ui.space.page, padding: 30, borderRadius: 16, backgroundColor: Colors.surface },
+  emptyTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 9 },
+  emptyText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 4 },
 });
