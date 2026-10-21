@@ -73,7 +73,7 @@ export default function VisaApplicationsScreen() {
             <View style={styles.bannerCopy}>
               <Text style={styles.bannerEyebrow}>VISA SERVICES</Text>
               <Text style={styles.bannerTitle} numberOfLines={2}>Your visa applications</Text>
-              <Text style={styles.bannerSub}>View your requests, documents, and latest updates.</Text>
+              <Text style={styles.bannerSub} numberOfLines={2}>View your requests, documents, and latest updates.</Text>
             </View>
           </View>
 
@@ -134,27 +134,27 @@ const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: 16, paddingTop: 12 },
   banner: { width: '100%', aspectRatio: 2.993, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: GREEN },
   bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
-  bannerCopy: { width: '62%', paddingLeft: 18 },
+  bannerCopy: { width: '58%', paddingLeft: 16 },
   bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent },
-  bannerTitle: { fontFamily: INTER.bold, fontSize: 22, lineHeight: 27, color: Colors.white, marginTop: 4 },
-  bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  bannerTitle: { fontFamily: INTER.bold, fontSize: 18, lineHeight: 22, color: Colors.white, marginTop: 4 },
+  bannerSub: { fontFamily: INTER.regular, fontSize: 11, lineHeight: 15, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
   loader: { marginTop: 48 },
   card: { marginTop: 14, padding: 16, borderRadius: 22, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   tag: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: '#FFF1B8' },
   tagText: { fontFamily: INTER.semibold, fontSize: TextSize.caption, color: GREEN, textTransform: 'capitalize' },
-  date: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight },
-  country: { fontFamily: INTER.bold, fontSize: TextSize.displaySmall, color: GREEN, marginTop: 10 },
-  visaType: { fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textLight, marginTop: 2 },
-  reference: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: '#1B6B4A', marginTop: 8 },
-  button: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 14, paddingHorizontal: 15, borderRadius: 26, backgroundColor: GREEN },
-  buttonText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.white },
+  date: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
+  country: { fontFamily: INTER.bold, fontSize: 20, color: GREEN, marginTop: 10 },
+  visaType: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight, marginTop: 2 },
+  reference: { fontFamily: INTER.bold, fontSize: TextSize.body, color: '#1B6B4A', marginTop: 8 },
+  button: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 14, paddingHorizontal: 15, borderRadius: 26, backgroundColor: GREEN },
+  buttonText: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.white },
   detailButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, marginTop: 6 },
-  detailText: { fontFamily: INTER.semibold, fontSize: TextSize.bodyLarge, color: GREEN },
+  detailText: { fontFamily: INTER.semibold, fontSize: TextSize.body, color: GREEN },
   documents: { gap: 8, marginTop: 4 },
   document: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, borderRadius: 14, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: Colors.border },
   docIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
-  documentText: { flex: 1, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  documentText: { flex: 1, fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textDark },
   empty: { alignItems: 'center', marginTop: 24, padding: 24, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
   emptyTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: GREEN, marginTop: 10 },
   copy: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 19, color: Colors.textLight, marginTop: 5, textAlign: 'center' },
