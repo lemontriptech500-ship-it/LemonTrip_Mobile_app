@@ -1,6 +1,6 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { SupportButton, SupportCard, SupportHeading, SupportNotice, SupportPage, goBackOr } from '@/components/support/SupportKit';
+import { SupportButton, SupportCard, SupportHeading, SupportPage, goBackOr } from '@/components/support/SupportKit';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -65,6 +65,7 @@ export default function SupportRequestsScreen() {
       subtitle="Follow every request and its updates."
       eyebrow="LEMONTRIP / SUPPORT"
       onBack={() => goBackOr('/help')}
+      hero={{ image: require('../../../assets/images/Emerald Customer Support Headset Banner.png'), topTitle: 'My support requests', onSettings: () => router.push('/settings' as never) }}
       footer={<SupportButton label="Contact support" icon="mail-open-outline" onPress={() => router.push('/contact')} />}>
       {!user || !token ? (
         <SupportCard style={s.center}>
@@ -79,10 +80,12 @@ export default function SupportRequestsScreen() {
           <Text style={[s.body, { marginTop: 10 }]}>Loading your requests…</Text>
         </SupportCard>
       ) : error ? (
-        <>
-          <SupportNotice tone="error">{error}</SupportNotice>
-          <View style={s.pad}><SupportButton variant="soft" label="Try again" icon="refresh-outline" onPress={() => void load()} /></View>
-        </>
+        <SupportCard style={s.center}>
+          <View style={s.bigIcon}><Ionicons name="search-outline" size={36} color={Colors.primaryDark} /></View>
+          <Text style={s.centerTitle}>Support tracking is not available yet.</Text>
+          <Text style={[s.body, s.centerText]}>Please contact the team by email or WhatsApp for any assistance. We’ll be happy to help.</Text>
+          <View style={s.fullWidth}><SupportButton variant="soft" label="Try again" icon="refresh-outline" onPress={() => void load()} /></View>
+        </SupportCard>
       ) : !items.length ? (
         <SupportCard style={s.center}>
           <View style={s.bigIcon}><Ionicons name="chatbubbles-outline" size={28} color={Colors.primaryDark} /></View>
@@ -156,7 +159,7 @@ const s = StyleSheet.create({
   center: { alignItems: 'center', paddingVertical: 24 },
   centerTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginTop: 12, marginBottom: 6, textAlign: 'center' },
   centerText: { textAlign: 'center' },
-  bigIcon: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
+  bigIcon: { width: 96, height: 96, borderRadius: 48, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
   refresh: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
   request: { paddingVertical: 4 },
   divider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
