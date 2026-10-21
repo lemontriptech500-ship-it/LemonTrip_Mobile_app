@@ -1,24 +1,102 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
 import { travelServices } from '@/constants/navigation';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ImageBackground, ScrollView, StyleSheet, View } from 'react-native';
+
+const INTER = { regular: 'Inter-Regular', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+const GREEN = '#103D30';
 
 export default function ServicesScreen() {
   useAppLanguage();
-  return <AppScreen><ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-    <ScreenHeader title="Travel planning, made simple." subtitle="Everything in one place, from the first search to the final itinerary." eyebrow="TRAVEL SMARTER. TRAVEL BETTER." onBack={() => router.canGoBack() ? router.back() : router.replace('/home')} />
-    <View style={styles.catalog}>{travelServices.map(service => <TouchableOpacity key={service.title} accessibilityRole="button" accessibilityLabel={`Explore ${service.title}`} onPress={() => router.push(service.route)} style={styles.card}><ImageBackground source={{ uri: service.image }} style={styles.image}><View style={styles.shade} /><View style={styles.imageCopy}><Ionicons name={service.icon} size={24} color={Colors.accent} /><Text style={styles.title}>{service.title}</Text></View></ImageBackground><View style={styles.body}><Text style={styles.description}>{service.description}</Text><View style={styles.cta}><Text style={styles.ctaText}>Explore {service.shortTitle}</Text><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></View></View></TouchableOpacity>)}</View>
-    <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/contact')} style={styles.support}><Ionicons name="headset-outline" size={25} color={Colors.primary} /><View style={{ flex: 1 }}><Text style={styles.supportTitle}>A smoother way to plan</Text><Text style={styles.description}>Clear information and support when you need it.</Text></View><Ionicons name="arrow-forward" size={18} color={Colors.primary} /></TouchableOpacity>
-  </ScrollView></AppScreen>;
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/home'));
+  return (
+    <AppScreen headerTone="light">
+      <View style={styles.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={goBack} style={styles.topBtn}>
+          <Ionicons name="arrow-back" size={22} color={GREEN} />
+        </TouchableOpacity>
+        <Text accessibilityRole="header" style={styles.topTitle}>Travel services</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[styles.topBtn, styles.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color={GREEN} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <View style={styles.bannerWrap}>
+            <View style={styles.banner}>
+              <Image source={require('../../assets/images/Tropical Travel Essentials in Green.png')} resizeMode="cover" style={styles.bannerImg} />
+              <View style={styles.bannerCopy}>
+                <Text style={styles.bannerEyebrow} numberOfLines={1}>TRAVEL SMARTER. TRAVEL BETTER.</Text>
+                <Text style={styles.bannerTitle} numberOfLines={2}>Travel planning, made simple.</Text>
+                <Text style={styles.bannerSub} numberOfLines={2}>Everything in one place, from the first search to the final itinerary.</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.catalog}>
+            {travelServices.map((service) => (
+              <TouchableOpacity key={service.title} accessibilityRole="button" accessibilityLabel={`Explore ${service.title}`} onPress={() => router.push(service.route)} activeOpacity={0.9} style={styles.card}>
+                <ImageBackground source={{ uri: service.image }} style={styles.photo} resizeMode="cover" />
+                <View style={styles.iconCircle}><Ionicons name={service.icon} size={22} color={GREEN} /></View>
+                <View style={styles.body}>
+                  <View>
+                    <Text style={styles.title}>{service.title}</Text>
+                    <Text style={styles.description} numberOfLines={4}>{service.description}</Text>
+                  </View>
+                  <View style={styles.cta}>
+                    <Text style={styles.ctaText} numberOfLines={1}>Explore {service.shortTitle}</Text>
+                    <Ionicons name="arrow-forward" size={16} color={Colors.white} />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/contact')} style={styles.support}>
+            <Ionicons name="headset-outline" size={25} color={GREEN} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.supportTitle}>A smoother way to plan</Text>
+              <Text style={styles.supportText}>Clear information and support when you need it.</Text>
+            </View>
+            <Ionicons name="arrow-forward" size={18} color={GREEN} />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </AppScreen>
+  );
 }
+
 const styles = StyleSheet.create({
-  page: { paddingBottom: 24, width: '100%', maxWidth: 760, alignSelf: 'center' }, catalog: { paddingHorizontal: Ui.space.page, gap: 18 }, card: { ...Ui.card, overflow: 'hidden' }, image: { height: 160, justifyContent: 'flex-end' }, shade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.imageOverlay }, imageCopy: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 18 }, title: { fontFamily: FontFamily.sans, color: Colors.white, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold }, body: { padding: 18, gap: 14 }, description: { fontFamily: FontFamily.sans, color: Colors.textLight, fontSize: TextSize.body, lineHeight: 22 }, cta: { ...Ui.button, backgroundColor: Colors.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18 }, ctaText: { fontFamily: FontFamily.sans, color: Colors.primary, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, support: { margin: 18, padding: 18, borderRadius: 24, backgroundColor: Colors.accentSoft, flexDirection: 'row', alignItems: 'center', gap: 12 }, supportTitle: { fontFamily: FontFamily.sans, color: Colors.primary, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginBottom: 4 },
+  topBar: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: GREEN },
+  page: { paddingBottom: 24 },
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
+  banner: { width: '100%', aspectRatio: 2170 / 725, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: GREEN },
+  bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  bannerCopy: { width: '66%', paddingLeft: 16 },
+  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 0.3, color: Colors.accent },
+  bannerTitle: { fontFamily: INTER.bold, fontSize: 18, lineHeight: 22, color: Colors.white, marginTop: 4 },
+  bannerSub: { fontFamily: INTER.regular, fontSize: 11, lineHeight: 15, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  catalog: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: Ui.space.page, rowGap: 14 },
+  card: { width: '48.5%', borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  photo: { height: 92, width: '100%' },
+  iconCircle: { position: 'absolute', left: 12, top: 70, width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, borderWidth: 2, borderColor: Colors.surface },
+  body: { flex: 1, justifyContent: 'space-between', gap: 10, paddingHorizontal: 12, paddingTop: 30, paddingBottom: 12 },
+  title: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: GREEN },
+  description: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 16, color: Colors.textLight, marginTop: 3 },
+  cta: { minHeight: 38, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, paddingHorizontal: 12, borderRadius: 19, backgroundColor: GREEN },
+  ctaText: { flex: 1, fontFamily: INTER.semibold, fontSize: TextSize.caption, color: Colors.white },
+  support: { marginHorizontal: Ui.space.page, marginTop: 18, padding: 16, borderRadius: 22, backgroundColor: Colors.accentSoft, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  supportTitle: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: GREEN, marginBottom: 3 },
+  supportText: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: Colors.textLight },
 });
