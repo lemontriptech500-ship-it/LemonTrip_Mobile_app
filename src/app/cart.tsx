@@ -55,14 +55,14 @@ export default function CartScreen() {
         <View style={styles.flex}>
           {banner}
           <View style={styles.emptyState}>
-            <View style={styles.emptyIcon}><Ionicons name="bag-handle-outline" size={44} color={GREEN} /></View>
+            <View style={styles.emptyIcon}><Ionicons name="bag-handle-outline" size={36} color={GREEN} /></View>
             <Text style={styles.emptyTitle}>Your cart is empty</Text>
             <Text style={styles.emptySubtitle}>
               Browse flights, hotels, and packages to add items to your cart.
             </Text>
             <TouchableOpacity accessibilityRole="button" style={styles.browseButton} onPress={() => router.push('/(tabs)/explore')}>
               <Text style={styles.browseButtonText}>Browse Services</Text>
-              <Ionicons name="arrow-forward" size={20} color={Colors.white} />
+              <Ionicons name="arrow-forward" size={18} color={Colors.white} />
             </TouchableOpacity>
           </View>
         </View>
@@ -113,11 +113,11 @@ const styles = StyleSheet.create({
   bannerTitle: { fontFamily: INTER.bold, fontSize: 24, lineHeight: 30, color: Colors.white, marginTop: 4 },
   bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
   emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, paddingBottom: 40 },
-  emptyIcon: { width: 96, height: 96, borderRadius: 48, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1B8', marginBottom: 20 },
-  emptyTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall, color: GREEN, marginBottom: 8, textAlign: 'center' },
-  emptySubtitle: { fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textLight, textAlign: 'center', lineHeight: 24, marginBottom: 24 },
-  browseButton: { minHeight: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 28, borderRadius: 28, backgroundColor: GREEN },
-  browseButtonText: { color: Colors.white, fontFamily: INTER.bold, fontSize: TextSize.bodyLarge },
+  emptyIcon: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1B8', marginBottom: 16 },
+  emptyTitle: { fontFamily: INTER.extrabold, fontSize: 20, color: GREEN, marginBottom: 8, textAlign: 'center' },
+  emptySubtitle: { fontFamily: INTER.regular, fontSize: 14, color: Colors.textLight, textAlign: 'center', lineHeight: 21, marginBottom: 20 },
+  browseButton: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 24, borderRadius: 24, backgroundColor: GREEN },
+  browseButtonText: { color: Colors.white, fontFamily: INTER.bold, fontSize: 15 },
   list: { paddingHorizontal: 0, paddingBottom: 20, gap: 10 },
   card: { marginHorizontal: 16, paddingHorizontal: 18, paddingVertical: 15, flexDirection: 'row', alignItems: 'center', borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.white },
   serviceTag: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 0.8, color: '#1B6B4A', marginBottom: 4 },
