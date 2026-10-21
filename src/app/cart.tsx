@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent },
   bannerTitle: { fontFamily: INTER.bold, fontSize: 24, lineHeight: 30, color: Colors.white, marginTop: 4 },
   bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
-  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32, paddingBottom: 40 },
+  emptyState: { flex: 1, justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 32, paddingTop: 40 },
   emptyIcon: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1B8', marginBottom: 16 },
   emptyTitle: { fontFamily: INTER.extrabold, fontSize: 20, color: GREEN, marginBottom: 8, textAlign: 'center' },
   emptySubtitle: { fontFamily: INTER.regular, fontSize: 14, color: Colors.textLight, textAlign: 'center', lineHeight: 21, marginBottom: 20 },
