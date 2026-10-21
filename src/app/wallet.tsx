@@ -190,3 +190,4 @@ const s = StyleSheet.create({
 
   support: { marginHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
 });
+
