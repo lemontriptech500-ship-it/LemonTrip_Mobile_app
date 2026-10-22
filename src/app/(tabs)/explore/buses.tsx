@@ -89,7 +89,7 @@ export default function BusesScreen() {
       <ServiceTopBar title="Buses" />
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ServiceBanner eyebrow="LEMONTRIP / BUS" title="Book bus tickets" subtitle="Search routes, compare buses and pick your seat." />
+          <ServiceBanner eyebrow="LEMONTRIP / BUS" title="Book bus tickets" subtitle="Search routes, compare buses and pick your seat." image={require('../../../../assets/images/Emerald Highway Journey.png')} />
 
           <Card>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />
