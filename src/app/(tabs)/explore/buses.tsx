@@ -2,14 +2,16 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { AppScreen } from '@/components/AppScreen';
+import { ServiceBanner, ServiceTopBar } from '@/components/ui/ServiceHeader';
+import { SortBox, SortOptions, type SortChoice } from '@/components/ui/SortBox';
 import { BusCard } from '@/components/buses/BusCards';
 import { CityPicker } from '@/components/buses/CityPicker';
-import { BUS_ROUTES, Card, Chip, EmptyState, FlowScreen, Notice, PrimaryButton, SectionTitle, goBackOr, goTo } from '@/components/buses/BusUi';
+import { BUS_ROUTES, Card, Chip, EmptyState, Notice, PrimaryButton, SectionTitle, goTo } from '@/components/buses/BusUi';
 import { Colors } from '@/constants/colors';
 import { DateField } from '@/components/DatePickerField';
 import { Ui } from '@/constants/theme';
-import { POPULAR_ROUTES, getCity, isRealDate, lowestFare, resolveCity, searchBuses, timeOfDay, upcomingDates, type DeckId } from '@/data/buses';
+import { POPULAR_ROUTES, getCity, isRealDate, lowestFare, resolveCity, searchBuses, timeOfDay, upcomingDates, formatShortDate, type DeckId } from '@/data/buses';
 import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { selectBus, setBusSearch, useBusBooking } from '@/utils/busBookingStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,10 +23,17 @@ type Sort = 'earliest' | 'fastest' | 'cheapest' | 'rated';
 type Slot = 'any' | 'morning' | 'afternoon' | 'evening' | 'night';
 type Kind = 'all' | 'ac' | 'nonac' | 'sleeper' | 'seater';
 const SLOTS: { id: Slot; label: string }[] = [
-  { id: 'any', label: 'Any time' }, { id: 'morning', label: 'Morning' }, { id: 'afternoon', label: 'Afternoon' }, { id: 'evening', label: 'Evening' }, { id: 'night', label: 'Night' },
+  { id: 'any', label: 'All' }, { id: 'morning', label: 'Morning' }, { id: 'afternoon', label: 'Afternoon' }, { id: 'evening', label: 'Evening' }, { id: 'night', label: 'Night' },
 ];
 const KINDS: { id: Kind; label: string }[] = [
   { id: 'all', label: 'All buses' }, { id: 'ac', label: 'AC' }, { id: 'nonac', label: 'Non-AC' }, { id: 'sleeper', label: 'Sleeper' }, { id: 'seater', label: 'Seater' },
+];
+
+const SORTS: SortChoice<Sort>[] = [
+  { id: 'earliest', label: 'Earliest', icon: 'time-outline' },
+  { id: 'fastest', label: 'Fastest', icon: 'flash-outline' },
+  { id: 'cheapest', label: 'Cheapest', icon: 'wallet-outline' },
+  { id: 'rated', label: 'Top rated', icon: 'star-outline' },
 ];
 
 export default function BusesScreen() {
@@ -37,6 +46,7 @@ export default function BusesScreen() {
   const [sort, setSort] = useState<Sort>('earliest');
   const [slot, setSlot] = useState<Slot>('any');
   const [kind, setKind] = useState<Kind>('all');
+  const [sortOpen, setSortOpen] = useState(false);
 
   // Restore a saved/recent search (e.g. from Home → Recent searches or the Home search widget).
   useEffect(() => {
@@ -75,10 +85,11 @@ export default function BusesScreen() {
   const clearFilters = () => { setSlot('any'); setKind('all'); };
 
   return (
-    <FlowScreen>
-      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 32 }}>
+    <AppScreen headerTone="light" edges={['top']}>
+      <ServiceTopBar title="Buses" />
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ScreenHeader title="Book bus tickets" subtitle="Search routes, compare buses and pick your seat." eyebrow="LEMONTRIP / BUS" onBack={() => goBackOr('/(tabs)/explore')} />
+          <ServiceBanner eyebrow="LEMONTRIP / BUS" title="Book bus tickets" subtitle="Search routes, compare buses and pick your seat." />
 
           <Card>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />
@@ -104,21 +115,19 @@ export default function BusesScreen() {
           {searched ? (
             <View style={s.pad}>
               <View style={s.resultHead}>
-                <View>
-                  <Text style={s.eyebrow}>{getCity(search.from)?.code} → {getCity(search.to)?.code}</Text>
-                  <Text style={s.count}>{results.length} {results.length === 1 ? 'bus' : 'buses'} found</Text>
+                <Text style={s.eyebrow} numberOfLines={1}>{`${getCity(search.from)?.code} \u2192 ${getCity(search.to)?.code}  \u00B7  ${formatShortDate(search.date)}`}</Text>
+                <View style={s.headRow}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={s.count}>Available buses</Text>
+                    <Text style={s.found}>{results.length} {results.length === 1 ? 'bus' : 'buses'} found</Text>
+                  </View>
+                  <SortBox currentLabel={SORTS.find((o) => o.id === sort)?.label ?? 'Earliest'} open={sortOpen} onToggle={() => setSortOpen((v) => !v)} />
                 </View>
               </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
-                <Chip icon="time-outline" label="Earliest" selected={sort === 'earliest'} onPress={() => setSort('earliest')} />
-                <Chip icon="flash-outline" label="Fastest" selected={sort === 'fastest'} onPress={() => setSort('fastest')} />
-                <Chip icon="wallet-outline" label="Cheapest" selected={sort === 'cheapest'} onPress={() => setSort('cheapest')} />
-                <Chip icon="star-outline" label="Top rated" selected={sort === 'rated'} onPress={() => setSort('rated')} />
-              </ScrollView>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginTop: 8, marginBottom: 14 }]}>
+              {sortOpen ? <View style={{ marginBottom: 10 }}><SortOptions options={SORTS} selected={sort} onChange={(v) => { setSort(v); setSortOpen(false); }} /></View> : null}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginBottom: 14 }]}>
                 {SLOTS.map((o) => <Chip key={o.id} label={o.label} selected={slot === o.id} onPress={() => setSlot(o.id)} />)}
               </ScrollView>
-
               {results.length ? results.map((b, i) => (
                 <BusCard key={b.id} bus={b} date={search.date} onOpen={() => open(i)} onSelectDeck={(deck) => open(i, deck)} />
               )) : (
@@ -146,7 +155,7 @@ export default function BusesScreen() {
 
       <CityPicker visible={picker !== null} title={picker === 'from' ? 'Departure city' : 'Arrival city'} exclude={picker === 'from' ? search.to : search.from}
         onClose={() => setPicker(null)} onSelect={(code) => { setBusSearch(picker === 'from' ? { from: code } : { to: code }); setPicker(null); setErrorMsg(''); }} />
-    </FlowScreen>
+    </AppScreen>
   );
 }
 
@@ -180,7 +189,9 @@ const s = StyleSheet.create({
   popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
-  resultHead: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12, marginTop: 4 },
+  resultHead: { marginBottom: 12, marginTop: 4 },
+  headRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 },
+  found: { fontFamily: 'Inter-Regular', fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
   count: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
 });
