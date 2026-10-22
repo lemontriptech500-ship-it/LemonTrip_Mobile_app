@@ -1,11 +1,12 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { PriceDisplay } from '@/components/PriceDisplay';
 import { Pill } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 import { formatPrice, formatTime } from './flightFormat';
 import { AirlineBadge, FlightRouteLine, TimeBlock } from './FlightParts';
@@ -19,7 +20,7 @@ type FlightCardProps = {
   dateLabel?: string;
 };
 
-/** Result card — mirrors TrainCard: header, timeline, fare tiles, footer. */
+/** Result card: header, timeline, fare tiles, footer. */
 export default function FlightCard({ offer, onSelect, best = false, dateLabel }: FlightCardProps) {
   useAppLanguage();
   const fares = offer.fareOptions?.length ? offer.fareOptions : null;
@@ -54,8 +55,11 @@ export default function FlightCard({ offer, onSelect, best = false, dateLabel }:
       </View>
 
       <View style={s.foot}>
-        <Text style={s.footText} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}  ·  from <Text style={s.footBold}>{formatPrice(offer.price.amount, offer.price.currency)}</Text></Text>
-        <TouchableOpacity accessibilityRole="button" onPress={open}><Text style={s.link}>View details</Text></TouchableOpacity>
+        <Text style={s.footText} numberOfLines={1}>{offer.baggage ?? 'Baggage details unavailable'}{' · from '}<Text style={s.footBold}>{formatPrice(offer.price.amount, offer.price.currency)}</Text></Text>
+        <TouchableOpacity accessibilityRole="button" onPress={open} style={s.linkRow}>
+          <Text style={s.link}>View details</Text>
+          <Ionicons name="arrow-forward" size={16} color={Colors.textDark} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -65,17 +69,19 @@ const s = StyleSheet.create({
   card: { ...Ui.card, padding: 14, marginBottom: 12 },
   cardBest: { borderColor: Colors.accent, borderWidth: 1.5 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  name: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  number: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  name: { fontFamily: 'Inter-Bold', fontSize: TextSize.bodyLarge, color: Colors.textDark },
+  number: { fontFamily: 'Inter-Regular', fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 16 },
-  classes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: Colors.border },
-  classTile: { flexGrow: 1, flexBasis: '30%', minWidth: 120, padding: 10, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
-  classCode: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
-  classFare: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
-  avail: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, marginTop: 5 },
-  good: { color: Colors.success }, warn: { color: '#8A6500' },
+  classes: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 14 },
+  classTile: { flexGrow: 1, flexBasis: '40%', minWidth: 120, padding: 12, borderRadius: 14, backgroundColor: Colors.background },
+  classCode: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.body, color: Colors.textDark },
+  classFare: { fontFamily: 'Inter-Bold', fontSize: 18, color: Colors.textDark, marginTop: 3 },
+  avail: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.caption, marginTop: 4 },
+  good: { color: Colors.success },
+  warn: { color: '#8A6500' },
   foot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 12 },
-  footText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight },
-  footBold: { fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  link: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
+  footText: { flex: 1, fontFamily: 'Inter-Regular', fontSize: TextSize.caption, color: Colors.textLight },
+  footBold: { fontFamily: 'Inter-Bold', color: Colors.textDark },
+  linkRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  link: { fontFamily: 'Inter-Bold', fontSize: TextSize.body, color: Colors.textDark },
 });

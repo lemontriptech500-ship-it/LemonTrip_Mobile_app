@@ -2,8 +2,8 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { Card, Chip, FlowScreen, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
+import { AppScreen } from '@/components/AppScreen';
+import { Card, Chip, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { addDaysISO, defaultTravelDate, formatShortDate, isRealDate } from '@/data/trains';
@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { DateField, todayISO } from '@/components/DatePickerField';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { AirportPicker } from './AirportPicker';
 import { POPULAR_FLIGHT_ROUTES, airportLabel, getAirport, resolveAirport } from './airports';
 import { searchFlights } from './flightApi';
@@ -20,7 +20,7 @@ import { setFlightSelection } from './flightSelectionStore';
 import FlightResults from './FlightResults';
 import type { FlightOffer, FlightSearchRequest, SpecialFare, TripType } from './types';
 
-const TRIP_TYPES: { id: TripType; label: string }[] = [{ id: 'oneWay', label: 'One way' }, { id: 'roundTrip', label: 'Round trip' }, { id: 'multiCity', label: 'Multi city' }];
+const TRIP_TYPES: { id: TripType; label: string }[] = [{ id: 'roundTrip', label: 'Round trip' }, { id: 'oneWay', label: 'One way' }, { id: 'multiCity', label: 'Multi city' }];
 const CABINS = ['Economy', 'Premium', 'Business', 'First'];
 const FARES: { id: SpecialFare; label: string }[] = [{ id: 'regular', label: 'Regular' }, { id: 'student', label: 'Student' }, { id: 'seniorCitizen', label: 'Senior citizen' }, { id: 'armedForces', label: 'Armed forces' }];
 type PickerTarget = 'from' | 'to' | 'from2' | 'to2' | null;
@@ -33,7 +33,7 @@ export default function FlightSearchScreen() {
   const { search } = useLocalSearchParams<{ search?: string }>();
   const lastSearch = useRef<string | undefined>(undefined);
 
-  const [tripType, setTripType] = useState<TripType>('oneWay');
+  const [tripType, setTripType] = useState<TripType>('roundTrip');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [departureDate, setDepartureDate] = useState(defaultTravelDate());
@@ -46,6 +46,8 @@ export default function FlightSearchScreen() {
   const [specialFare, setSpecialFare] = useState<SpecialFare>('regular');
   const [picker, setPicker] = useState<PickerTarget>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [menu, setMenu] = useState<'travellers' | 'cabin' | null>(null);
+  const [showFares, setShowFares] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -118,14 +120,32 @@ export default function FlightSearchScreen() {
   const pickerExclude = picker === 'from' ? destination : picker === 'to' ? origin : picker === 'from2' ? destination2 : picker === 'to2' ? origin2 : undefined;
   const pickerTitle = picker === 'from' || picker === 'from2' ? 'Departure airport' : 'Arrival airport';
   const swap = () => { setOrigin(destination); setDestination(origin); };
+  const routeLabel = request ? `${request.origin.toUpperCase()} → ${request.destination.toUpperCase()}  ·  ${formatShortDate(request.departureDate)}${request.returnDate ? ` – ${formatShortDate(request.returnDate)}` : ''}  ·  ${request.travellers} ${request.travellers === 1 ? 'traveller' : 'travellers'}` : '';
 
-  const routeEyebrow = request ? `${request.origin.toUpperCase()} → ${request.destination.toUpperCase()}` : 'FLIGHTS';
 
   return (
-    <FlowScreen>
-      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 32 }}>
+    <AppScreen headerTone="light" edges={['top']}>
+      <View style={s.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore'))} style={s.topBtn}>
+          <Ionicons name="arrow-back" size={22} color="#103D30" />
+        </TouchableOpacity>
+        <Text accessibilityRole="header" style={s.topTitle}>Flights</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[s.topBtn, s.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color="#103D30" />
+        </TouchableOpacity>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ScreenHeader title="Book flight tickets" subtitle="Search routes, compare fares and pick the flight that suits you." eyebrow="LEMONTRIP / FLIGHTS" onBack={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/explore'))} rightAction={{ label: 'Cart', icon: 'bag-outline', onPress: () => router.push('/cart') }} />
+          <View style={s.bannerWrap}>
+            <View style={s.banner}>
+              <Image source={require('../../../assets/images/Emerald Skies Travel Banner.png')} resizeMode="cover" style={s.bannerImg} />
+              <View style={s.bannerCopy}>
+                <Text style={s.bannerEyebrow} numberOfLines={1}>LEMONTRIP / FLIGHTS</Text>
+                <Text style={s.bannerTitle} numberOfLines={2}>Book flight tickets</Text>
+                <Text style={s.bannerSub} numberOfLines={2}>Search routes, compare fares and pick the flight that suits you.</Text>
+              </View>
+            </View>
+          </View>
 
           <Card>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you flying?" />
@@ -157,22 +177,31 @@ export default function FlightSearchScreen() {
               </>
             ) : null}
 
-            <Text style={s.label}>TRAVELLERS</Text>
-            <View style={s.counter}>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove traveller" disabled={travellers <= 1} onPress={() => setTravellers((c) => Math.max(1, c - 1))} style={s.counterBtn}><Ionicons name="remove" size={18} color={travellers <= 1 ? Colors.borderStrong : Colors.primary} /></TouchableOpacity>
-              <Text style={s.counterText}>{travellers} {travellers === 1 ? 'traveller' : 'travellers'}</Text>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add traveller" disabled={travellers >= 9} onPress={() => setTravellers((c) => Math.min(9, c + 1))} style={s.counterBtn}><Ionicons name="add" size={18} color={travellers >= 9 ? Colors.borderStrong : Colors.primary} /></TouchableOpacity>
+            <View style={s.pairRow}>
+              <SelectField label="TRAVELLERS" icon="person-outline" value={`${travellers} ${travellers === 1 ? 'traveller' : 'travellers'}`} open={menu === 'travellers'} onPress={() => setMenu((m) => (m === 'travellers' ? null : 'travellers'))} />
+              <SelectField label="CABIN CLASS" icon="ticket-outline" value={cabinClass} open={menu === 'cabin'} onPress={() => setMenu((m) => (m === 'cabin' ? null : 'cabin'))} />
             </View>
+            {menu === 'travellers' ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips} style={s.menuRow}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => <Chip key={n} label={String(n)} selected={travellers === n} onPress={() => { setTravellers(n); setMenu(null); }} />)}
+              </ScrollView>
+            ) : null}
+            {menu === 'cabin' ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips} style={s.menuRow}>
+                {CABINS.map((c) => <Chip key={c} label={c} selected={cabinClass === c} onPress={() => { setCabinClass(c); setMenu(null); }} />)}
+              </ScrollView>
+            ) : null}
 
-            <Text style={s.label}>CABIN CLASS</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
-              {CABINS.map((c) => <Chip key={c} label={c} selected={cabinClass === c} onPress={() => setCabinClass(c)} />)}
-            </ScrollView>
-
-            <Text style={s.label}>SPECIAL FARES (OPTIONAL)</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
-              {FARES.map((f) => <Chip key={f.id} label={f.label} selected={specialFare === f.id} onPress={() => setSpecialFare(f.id)} />)}
-            </ScrollView>
+            <TouchableOpacity accessibilityRole="button" accessibilityState={{ expanded: showFares }} onPress={() => setShowFares((v) => !v)} style={s.faresRow}>
+              <Ionicons name="settings-outline" size={18} color={Colors.primary} />
+              <Text style={s.faresText}>SPECIAL FARES (OPTIONAL)</Text>
+              <Ionicons name={showFares ? 'chevron-up' : 'chevron-down'} size={14} color={Colors.textLight} />
+            </TouchableOpacity>
+            {showFares ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips} style={s.menuRow}>
+                {FARES.map((f) => <Chip key={f.id} label={f.label} selected={specialFare === f.id} onPress={() => setSpecialFare(f.id)} />)}
+              </ScrollView>
+            ) : null}
 
             {errorMsg ? <Text accessibilityRole="alert" style={s.error}>{errorMsg}</Text> : null}
             <View style={{ marginTop: 14 }}><PrimaryButton label="Search flights" icon="search" loading={loading} onPress={submit} /></View>
@@ -180,10 +209,6 @@ export default function FlightSearchScreen() {
 
           {hasSearched ? (
             <View style={s.pad}>
-              <View style={s.resultHead}>
-                <Text style={s.eyebrow}>{routeEyebrow}{request ? `  ·  ${formatShortDate(request.departureDate)}${request.returnDate ? ` – ${formatShortDate(request.returnDate)}` : ''}  ·  ${request.travellers} ${request.travellers === 1 ? 'traveller' : 'travellers'}` : ''}</Text>
-                <Text style={s.resultTitle}>{loading ? 'Searching available flights' : 'Available flights'}</Text>
-              </View>
               {error ? (
                 <View style={s.errorPanel}>
                   <View style={s.errorIcon}><Ionicons name="cloud-offline-outline" size={21} color={Colors.error} /></View>
@@ -191,7 +216,7 @@ export default function FlightSearchScreen() {
                   {request ? <TouchableOpacity accessibilityRole="button" onPress={() => runSearch(request)} style={s.retry}><Ionicons name="refresh" size={15} color={Colors.primaryDark} /><Text style={s.retryText}>Retry</Text></TouchableOpacity> : null}
                 </View>
               ) : (
-                <FlightResults offers={offers} loading={loading} onSelect={selectFlight} dateLabel={request ? formatShortDate(request.departureDate) : undefined} />
+                <FlightResults offers={offers} loading={loading} routeLabel={routeLabel} onSelect={selectFlight} dateLabel={request ? formatShortDate(request.departureDate) : undefined} />
               )}
             </View>
           ) : null}
@@ -214,7 +239,7 @@ export default function FlightSearchScreen() {
       </ScrollView>
 
       <AirportPicker visible={picker !== null} title={pickerTitle} exclude={pickerExclude} onClose={() => setPicker(null)} onSelect={pick} />
-    </FlowScreen>
+    </AppScreen>
   );
 }
 
@@ -233,8 +258,39 @@ function AirportButton({ label, code, placeholder, icon, onPress }: { label: str
   );
 }
 
+function SelectField({ label, icon, value, open, onPress }: { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; value: string; open: boolean; onPress: () => void }) {
+  return (
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel={`${label}: ${value}`} accessibilityState={{ expanded: open }} onPress={onPress} style={s.field}>
+      <Ionicons name={icon} size={18} color={Colors.primary} />
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={s.fieldLabel} numberOfLines={1}>{label}</Text>
+        <Text style={s.fieldValue} numberOfLines={1}>{value}</Text>
+      </View>
+      <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={14} color={Colors.textLight} />
+    </TouchableOpacity>
+  );
+}
+
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  topBar: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: 'Inter-Bold', fontSize: TextSize.title, color: '#103D30' },
+  bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
+  banner: { width: '100%', aspectRatio: 2172 / 724, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
+  bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  bannerCopy: { width: '58%', paddingLeft: 16 },
+  bannerEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 0.8, color: Colors.accent },
+  bannerTitle: { fontFamily: 'Inter-Bold', fontSize: 18, lineHeight: 22, color: Colors.white, marginTop: 4 },
+  bannerSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  pairRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
+  field: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 58, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
+  fieldLabel: { ...Ui.eyebrow, color: Colors.textLight, letterSpacing: 0.4 },
+  fieldValue: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.body, color: Colors.textDark, marginTop: 2 },
+  menuRow: { marginTop: 10 },
+  faresRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, minHeight: 36 },
+  faresText: { ...Ui.eyebrow, color: Colors.primary },
   pad: { paddingHorizontal: Ui.space.page },
   chips: { gap: 8, alignItems: 'center' },
   stations: { gap: 8, position: 'relative' },
@@ -251,9 +307,6 @@ const s = StyleSheet.create({
   popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
-  resultHead: { marginBottom: 12, marginTop: 4 },
-  eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
-  resultTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
   errorPanel: { ...Ui.card, flexDirection: 'row', alignItems: 'center', gap: 10, padding: Ui.space.card, borderColor: Colors.errorBorder },
   errorIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.errorSoft },
   errorTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
