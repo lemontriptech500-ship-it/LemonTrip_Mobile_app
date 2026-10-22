@@ -2,14 +2,16 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { AppScreen } from '@/components/AppScreen';
+import { ServiceBanner, ServiceTopBar } from '@/components/ui/ServiceHeader';
+import { SortBox, SortOptions, type SortChoice } from '@/components/ui/SortBox';
 import { StationPicker } from '@/components/trains/StationPicker';
 import { TrainCard } from '@/components/trains/TrainCards';
-import { Card, Chip, EmptyState, FlowScreen, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, goBackOr, goTo } from '@/components/trains/TrainUi';
+import { Card, Chip, EmptyState, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, goTo } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { DateField } from '@/components/DatePickerField';
 import { Ui } from '@/constants/theme';
-import { CLASS_INFO, POPULAR_ROUTES, getClassOptions, getStation, isRealDate, lowestFare, resolveStation, searchTrains, stationLabel, timeOfDay, upcomingDates, type ClassCode } from '@/data/trains';
+import { CLASS_INFO, POPULAR_ROUTES, getClassOptions, getStation, isRealDate, lowestFare, resolveStation, searchTrains, stationLabel, timeOfDay, upcomingDates, formatShortDate, type ClassCode } from '@/data/trains';
 import { parseSavedQuery, recordRecentSearch } from '@/utils/personalStore';
 import { selectTrain, setTrainSearch, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +22,12 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 type Sort = 'earliest' | 'fastest' | 'cheapest';
 type Slot = 'any' | 'morning' | 'afternoon' | 'evening' | 'night';
 const SLOTS: { id: Slot; label: string }[] = [
-  { id: 'any', label: 'Any time' }, { id: 'morning', label: 'Morning' }, { id: 'afternoon', label: 'Afternoon' }, { id: 'evening', label: 'Evening' }, { id: 'night', label: 'Night' },
+  { id: 'any', label: 'All' }, { id: 'morning', label: 'Morning' }, { id: 'afternoon', label: 'Afternoon' }, { id: 'evening', label: 'Evening' }, { id: 'night', label: 'Night' },
+];
+const SORTS: SortChoice<Sort>[] = [
+  { id: 'earliest', label: 'Earliest', icon: 'time-outline' },
+  { id: 'fastest', label: 'Fastest', icon: 'flash-outline' },
+  { id: 'cheapest', label: 'Cheapest', icon: 'wallet-outline' },
 ];
 const ALL_CLASSES = Object.keys(CLASS_INFO) as ClassCode[];
 
@@ -33,6 +40,7 @@ export default function TrainsScreen() {
   const [errorMsg, setErrorMsg] = useState('');
   const [sort, setSort] = useState<Sort>('earliest');
   const [slot, setSlot] = useState<Slot>('any');
+  const [sortOpen, setSortOpen] = useState(false);
 
   // Restore a saved/recent search (e.g. from Home → Recent searches).
   useEffect(() => {
@@ -67,10 +75,11 @@ export default function TrainsScreen() {
   };
 
   return (
-    <FlowScreen>
-      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 32 }}>
+    <AppScreen headerTone="light" edges={['top']}>
+      <ServiceTopBar title="Trains" />
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ScreenHeader title="Book train tickets" subtitle="Search routes, compare classes and check seat availability." eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr('/(tabs)/explore')} />
+          <ServiceBanner eyebrow="LEMONTRIP / RAIL" title="Book train tickets" subtitle="Search routes, compare classes and check seat availability." />
 
           <Card>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />
@@ -96,20 +105,19 @@ export default function TrainsScreen() {
 
           <View style={s.pad}>
             <View style={s.resultHead}>
-              <View>
-                <Text style={s.eyebrow}>{searched ? `${getStation(search.from)?.code} → ${getStation(search.to)?.code}` : 'ALL ROUTES'}</Text>
-                <Text style={s.count}>{results.length} {results.length === 1 ? 'train' : 'trains'} {searched ? 'found' : 'available'}</Text>
+              {searched ? <Text style={s.eyebrow} numberOfLines={1}>{`${getStation(search.from)?.code} \u2192 ${getStation(search.to)?.code}  \u00B7  ${formatShortDate(search.date)}`}</Text> : null}
+              <View style={s.headRow}>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={s.count}>Available trains</Text>
+                  <Text style={s.found}>{results.length} {results.length === 1 ? 'train' : 'trains'} {searched ? 'found' : 'available'}</Text>
+                </View>
+                <SortBox currentLabel={SORTS.find((o) => o.id === sort)?.label ?? 'Earliest'} open={sortOpen} onToggle={() => setSortOpen((v) => !v)} />
               </View>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
-              <Chip icon="time-outline" label="Earliest" selected={sort === 'earliest'} onPress={() => setSort('earliest')} />
-              <Chip icon="flash-outline" label="Fastest" selected={sort === 'fastest'} onPress={() => setSort('fastest')} />
-              <Chip icon="wallet-outline" label="Cheapest" selected={sort === 'cheapest'} onPress={() => setSort('cheapest')} />
-            </ScrollView>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginTop: 8, marginBottom: 14 }]}>
+            {sortOpen ? <View style={{ marginBottom: 10 }}><SortOptions options={SORTS} selected={sort} onChange={(v) => { setSort(v); setSortOpen(false); }} /></View> : null}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginBottom: 14 }]}>
               {SLOTS.map((o) => <Chip key={o.id} label={o.label} selected={slot === o.id} onPress={() => setSlot(o.id)} />)}
             </ScrollView>
-
             {results.length ? results.map((r, i) => (
               <TrainCard key={r.train.id} result={r} date={search.date} onOpen={() => open(i)} onSelectClass={(code) => open(i, code)} />
             )) : (
@@ -136,7 +144,7 @@ export default function TrainsScreen() {
 
       <StationPicker visible={picker !== null} title={picker === 'from' ? 'Departure station' : 'Arrival station'} exclude={picker === 'from' ? search.to : search.from}
         onClose={() => setPicker(null)} onSelect={(code) => { setTrainSearch(picker === 'from' ? { from: code } : { to: code }); setPicker(null); setErrorMsg(''); }} />
-    </FlowScreen>
+    </AppScreen>
   );
 }
 
@@ -171,7 +179,9 @@ const s = StyleSheet.create({
   popular: { flexDirection: 'row', gap: 8, paddingRight: Ui.space.page },
   route: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 9, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   routeText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
-  resultHead: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12, marginTop: 4 },
+  resultHead: { marginBottom: 12, marginTop: 4 },
+  headRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 },
+  found: { fontFamily: 'Inter-Regular', fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
   count: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
 });
