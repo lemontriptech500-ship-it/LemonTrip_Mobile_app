@@ -1,5 +1,4 @@
 import { useAppLanguage } from '@/utils/intl';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { EmptyState, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
@@ -8,15 +7,16 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import FlightCard from './FlightCard';
 import FlightFilters, { periodFor } from './FlightFilters';
-import FlightSort from './FlightSort';
+import FlightSort, { FlightSortOptions } from './FlightSort';
 import { emptyFlightFilters, type FlightFiltersState, type FlightOffer, type FlightSortOption } from './types';
 
-type FlightResultsProps = { offers: FlightOffer[]; loading: boolean; onSelect: (offer: FlightOffer) => void; dateLabel?: string };
+type FlightResultsProps = { offers: FlightOffer[]; loading: boolean; onSelect: (offer: FlightOffer) => void; dateLabel?: string; routeLabel?: string };
 
-export default function FlightResults({ offers, loading, onSelect, dateLabel }: FlightResultsProps) {
+export default function FlightResults({ offers, loading, onSelect, dateLabel, routeLabel }: FlightResultsProps) {
   useAppLanguage();
   const [filters, setFilters] = useState<FlightFiltersState>(emptyFlightFilters);
   const [sort, setSort] = useState<FlightSortOption>('recommended');
+  const [sortOpen, setSortOpen] = useState(false);
 
   const visibleOffers = useMemo(() => {
     const filtered = offers.filter((offer) => {
@@ -37,22 +37,35 @@ export default function FlightResults({ offers, loading, onSelect, dateLabel }: 
   }, [offers, filters, sort]);
 
   const bestId = visibleOffers.length > 1 ? visibleOffers.reduce((a, b) => (b.price.amount < a.price.amount ? b : a)).id : null;
+  const ready = !loading && offers.length > 0;
+
+  const header = (
+    <View style={s.head}>
+      {routeLabel ? <Text style={s.route} numberOfLines={1}>{routeLabel}</Text> : null}
+      <View style={s.headRow}>
+        <View style={s.headLeft}>
+          <Text style={s.title}>{loading ? 'Searching available flights' : 'Available flights'}</Text>
+          {ready ? <Text style={s.count}>{visibleOffers.length} {visibleOffers.length === 1 ? 'flight' : 'flights'} {visibleOffers.length === offers.length ? 'found' : 'match'}</Text> : null}
+        </View>
+        {ready ? <FlightSort selected={sort} open={sortOpen} onToggle={() => setSortOpen((v) => !v)} /> : null}
+      </View>
+    </View>
+  );
 
   if (loading) {
-    return <View>{[0, 1, 2].map((i) => <View key={i} style={s.skeleton}><View style={s.skLine} /><View style={s.skRoute} /><View style={s.skLineShort} /></View>)}</View>;
+    return <View>{header}{[0, 1, 2].map((i) => <View key={i} style={s.skeleton}><View style={s.skLine} /><View style={s.skRoute} /><View style={s.skLineShort} /></View>)}</View>;
   }
   if (offers.length === 0) {
-    return <EmptyState icon="airplane-outline" title="No flights found" text="Try another date or adjust your search details." />;
+    return <View>{header}<EmptyState icon="airplane-outline" title="No flights found" text="Try another date or adjust your search details." /></View>;
   }
 
   return (
     <View>
-      <View style={s.head}>
-        <Text style={s.count}>{visibleOffers.length} {visibleOffers.length === 1 ? 'flight' : 'flights'} {visibleOffers.length === offers.length ? 'found' : 'match'}</Text>
+      {header}
+      {sortOpen ? <View style={s.sortRow}><FlightSortOptions selected={sort} onChange={(value) => { setSort(value); setSortOpen(false); }} /></View> : null}
+      <View style={s.filters}>
+        <FlightFilters offers={offers} value={filters} onChange={setFilters} />
       </View>
-      <FlightSort selected={sort} onChange={setSort} />
-      <View style={{ height: 12 }} />
-      <FlightFilters offers={offers} value={filters} onChange={setFilters} />
       {visibleOffers.length ? visibleOffers.map((offer) => <FlightCard key={offer.id} offer={offer} onSelect={onSelect} best={offer.id === bestId} dateLabel={dateLabel} />) : (
         <EmptyState icon="airplane-outline" title="No flights match these filters" text="Clear a filter to see more available flights." action={<PrimaryButton variant="soft" label="Clear filters" onPress={() => setFilters(emptyFlightFilters)} />} />
       )}
@@ -61,8 +74,14 @@ export default function FlightResults({ offers, loading, onSelect, dateLabel }: 
 }
 
 const s = StyleSheet.create({
-  head: { marginBottom: 10 },
-  count: { fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  head: { marginTop: 4, marginBottom: 12 },
+  route: { fontFamily: 'Inter-Regular', fontSize: 13, color: '#1B6B4A', marginBottom: 6 },
+  headRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  headLeft: { flex: 1, minWidth: 0 },
+  title: { fontFamily: 'Inter-ExtraBold', fontSize: 20, lineHeight: 26, color: Colors.textDark },
+  count: { fontFamily: 'Inter-Regular', fontSize: 14, color: Colors.secondary, marginTop: 4 },
+  sortRow: { marginBottom: 12 },
+  filters: { marginBottom: 14 },
   skeleton: { ...Ui.card, minHeight: 150, padding: 14, marginBottom: 12, justifyContent: 'space-between' },
   skLine: { width: '42%', height: 11, backgroundColor: Colors.surfaceMuted, borderRadius: 6 },
   skLineShort: { width: '34%', height: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 6 },
