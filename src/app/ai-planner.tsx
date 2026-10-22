@@ -1,14 +1,14 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
-import { Brand, Colors, Radius } from '@/constants/colors';
-import { FontFamily, TextSize } from '@/constants/typography';
+import { Colors } from '@/constants/colors';
+import { TextSize } from '@/constants/typography';
 import type { ChatMessage } from '@/utils/chatApi';
 import { streamChatMessage } from '@/utils/chatStream';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Message = { id: string; role: 'user' | 'assistant'; text: string };
@@ -128,18 +128,14 @@ export default function AiPlannerScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* Green header */}
-        <View style={styles.header}>
-          <TouchableOpacity accessibilityRole="button" style={styles.iconButton} onPress={goBack}>
-            <Ionicons name="arrow-back" size={22} color={Brand.forest} />
+        <View style={styles.topBar}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" style={styles.topBtn} onPress={goBack}>
+            <Ionicons name="arrow-back" size={24} color={GREEN} />
           </TouchableOpacity>
-          <View style={styles.headerCopy}>
-            <Text style={styles.eyebrowLemon}>LEMONTRIP AI</Text>
-            <Text style={styles.pageTitle}>Trip Planner</Text>
-          </View>
-          <View style={styles.sparkle}>
-            <Ionicons name="sparkles" size={20} color={Brand.forest} />
-          </View>
+          <Text accessibilityRole="header" style={styles.topTitle}>Trip Planner</Text>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" style={[styles.topBtn, styles.topBtnTint]} onPress={() => router.push('/settings' as never)}>
+            <Ionicons name="settings-outline" size={22} color={GREEN} />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.body}>
@@ -151,6 +147,14 @@ export default function AiPlannerScreen() {
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={scrollToEnd}
           >
+            <View style={styles.banner}>
+              <Image source={require('../../assets/images/Emerald Travel Assistant Banner.png')} resizeMode="cover" style={styles.bannerImg} />
+              <View style={styles.bannerCopy}>
+                <Text style={styles.bannerEyebrow}>LEMONTRIP AI</Text>
+                <Text style={styles.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>Trip Planner</Text>
+              </View>
+            </View>
+
             {messages.map((message) => {
               const mine = message.role === 'user';
               const waiting = !mine && message.text === '';
@@ -158,14 +162,14 @@ export default function AiPlannerScreen() {
                 <View key={message.id} style={[styles.row, mine && styles.rowMine]}>
                   {!mine ? (
                     <View style={styles.avatar}>
-                      <Ionicons name="sparkles" size={14} color={Brand.forest} />
+                      <Ionicons name="sparkles" size={18} color={GREEN} />
                     </View>
                   ) : null}
                   <View style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleBot]}>
                     {mine ? (
                       <Text style={[styles.bubbleText, styles.bubbleTextMine]}>{message.text}</Text>
                     ) : waiting ? (
-                      <ActivityIndicator size="small" color={Brand.forest} />
+                      <ActivityIndicator size="small" color={GREEN} />
                     ) : (
                       <RichText text={message.text} style={styles.bubbleText} boldStyle={styles.boldText} />
                     )}
@@ -177,10 +181,11 @@ export default function AiPlannerScreen() {
             {showSuggestions ? (
               <View style={styles.suggestions}>
                 <Text style={styles.suggestLabel}>TRY ASKING</Text>
-                {suggestions.map((item) => (
+                {suggestions.map((item, index) => (
                   <TouchableOpacity key={item} accessibilityRole="button" style={styles.chip} onPress={() => send(item)}>
+                    <View style={styles.chipIcon}><Ionicons name={SUGGESTION_ICONS[index] ?? 'sparkles-outline'} size={22} color={Colors.white} /></View>
                     <Text style={styles.chipText}>{item}</Text>
-                    <Ionicons name="arrow-forward" size={14} color={Brand.forest} />
+                    <Ionicons name="arrow-forward" size={20} color={GREEN} />
                   </TouchableOpacity>
                 ))}
               </View>
@@ -189,7 +194,6 @@ export default function AiPlannerScreen() {
 
           <Text style={styles.disclaimer}>AI suggestions are estimates. Check prices and availability in the app.</Text>
 
-          {/* Input bar */}
           <View style={styles.inputBar}>
             <TextInput
               style={styles.input}
@@ -209,7 +213,7 @@ export default function AiPlannerScreen() {
               onPress={() => send(input)}
               disabled={!input.trim() || loading}
             >
-              <Ionicons name="send" size={18} color={Brand.forest} />
+              <Ionicons name="send" size={20} color={GREEN} />
             </TouchableOpacity>
           </View>
         </View>
@@ -218,118 +222,41 @@ export default function AiPlannerScreen() {
   );
 }
 
+const INTER = { regular: 'Inter-Regular', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+const GREEN = '#103D30';
+const SUGGESTION_ICONS: React.ComponentProps<typeof Ionicons>['name'][] = ['umbrella-outline', 'globe-outline', 'briefcase-outline', 'id-card-outline'];
+
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Brand.forest },
+  safeArea: { flex: 1, backgroundColor: Colors.surface },
   flex: { flex: 1 },
-
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 26,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: Brand.forest,
-  },
-  iconButton: {
-    width: 42,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 21,
-    backgroundColor: Brand.lemon,
-  },
-  headerCopy: { flex: 1 },
-  eyebrowLemon: { color: Brand.lemon, fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1.6 },
-  pageTitle: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.display, marginTop: 2 },
-  sparkle: {
-    width: 42,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 21,
-    backgroundColor: Brand.lemon,
-  },
-
-  body: {
-    flex: 1,
-    backgroundColor: Brand.cream,
-    borderTopLeftRadius: Radius.xl,
-    borderTopRightRadius: Radius.xl,
-    width: '100%',
-    maxWidth: 900,
-    alignSelf: 'center',
-  },
-  messages: { padding: 16, gap: 12 },
-  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: Colors.surface },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: GREEN },
+  body: { flex: 1, width: '100%', maxWidth: 900, alignSelf: 'center', backgroundColor: Colors.background },
+  messages: { padding: 16, gap: 14 },
+  banner: { width: '100%', aspectRatio: 2.993, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: GREEN },
+  bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  bannerCopy: { width: '55%', paddingLeft: 18 },
+  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.4, color: Colors.accent },
+  bannerTitle: { fontFamily: INTER.bold, fontSize: 26, lineHeight: 32, color: Colors.white, marginTop: 4 },
+  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
   rowMine: { justifyContent: 'flex-end' },
-  avatar: {
-    width: 28,
-    height: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 14,
-    backgroundColor: Brand.lemon,
-  },
-  bubble: { maxWidth: '80%', paddingHorizontal: 14, paddingVertical: 11, borderRadius: Radius.lg },
-  bubbleBot: { backgroundColor: Colors.white, borderBottomLeftRadius: 4 },
-  bubbleMine: { backgroundColor: Brand.forest, borderBottomRightRadius: 4 },
-  bubbleText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 21 },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1B8' },
+  bubble: { maxWidth: '78%', paddingHorizontal: 16, paddingVertical: 14, borderRadius: 22 },
+  bubbleBot: { backgroundColor: Colors.white },
+  bubbleMine: { backgroundColor: GREEN },
+  bubbleText: { color: Colors.textDark, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, lineHeight: 24 },
   bubbleTextMine: { color: Colors.white },
-  boldText: { fontFamily: FontFamily.sans, fontWeight: '800', color: Brand.forest },
-
-  suggestions: { gap: 8, marginTop: 4 },
-  suggestLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, letterSpacing: 1.4 },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: Radius.pill,
-    borderWidth: 1,
-    borderColor: '#E4E3DA',
-    backgroundColor: Colors.white,
-  },
-  chipText: { flex: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-
-  disclaimer: {
-    textAlign: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    color: Colors.textLight,
-    fontFamily: FontFamily.sans,
-    fontSize: TextSize.micro,
-  },
-  inputBar: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 10,
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#E4E3DA',
-    backgroundColor: Colors.white,
-  },
-  input: {
-    flex: 1,
-    minHeight: 44,
-    maxHeight: 110,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: Radius.lg,
-    backgroundColor: Brand.cream,
-    color: Colors.textDark,
-    fontFamily: FontFamily.sans,
-    fontSize: TextSize.body,
-  },
-  sendButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: Brand.lemon,
-  },
+  boldText: { fontFamily: INTER.bold, color: GREEN },
+  suggestions: { gap: 10, marginTop: 4 },
+  suggestLabel: { color: Colors.textLight, fontFamily: INTER.semibold, fontSize: TextSize.body, letterSpacing: 1.4 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 999, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.white },
+  chipIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: GREEN },
+  chipText: { flex: 1, color: Colors.textDark, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge },
+  disclaimer: { textAlign: 'center', paddingHorizontal: 16, paddingVertical: 8, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption },
+  inputBar: { flexDirection: 'row', alignItems: 'flex-end', gap: 10, margin: 12, padding: 8, borderRadius: 30, backgroundColor: Colors.white },
+  input: { flex: 1, minHeight: 48, maxHeight: 110, paddingHorizontal: 18, paddingVertical: 12, borderRadius: 24, backgroundColor: Colors.background, color: Colors.textDark, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge },
+  sendButton: { width: 52, height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 26, backgroundColor: Colors.accent },
   sendDisabled: { opacity: 0.4 },
 });
