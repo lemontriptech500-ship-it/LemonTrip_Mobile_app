@@ -79,7 +79,7 @@ export default function TrainsScreen() {
       <ServiceTopBar title="Trains" />
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ServiceBanner eyebrow="LEMONTRIP / RAIL" title="Book train tickets" subtitle="Search routes, compare classes and check seat availability." />
+          <ServiceBanner eyebrow="LEMONTRIP / RAIL" title="Book train tickets" subtitle="Search routes, compare classes and check seat availability." image={require('../../../../assets/images/Modern Green High-Speed Train Landscape.png')} />
 
           <Card>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />

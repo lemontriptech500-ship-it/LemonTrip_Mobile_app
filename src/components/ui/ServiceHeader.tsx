@@ -5,7 +5,7 @@ import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, type ImageSourcePropType } from 'react-native';
 
 const GREEN = '#103D30';
 
@@ -24,14 +24,16 @@ export function ServiceTopBar({ title, fallback = '/(tabs)/explore' }: { title: 
   );
 }
 
-type ServiceBannerProps = { eyebrow: string; title: string; subtitle: string };
+type ServiceBannerProps = { eyebrow: string; title: string; subtitle: string; image?: ImageSourcePropType };
+
+const DEFAULT_BANNER = require('../../../assets/images/Emerald Skies Travel Banner.png') as ImageSourcePropType;
 
 /** Banner image with text on the left. Image is the shared travel banner for now. */
-export function ServiceBanner({ eyebrow, title, subtitle }: ServiceBannerProps) {
+export function ServiceBanner({ eyebrow, title, subtitle, image = DEFAULT_BANNER }: ServiceBannerProps) {
   return (
     <View style={s.bannerWrap}>
       <View style={s.banner}>
-        <Image source={require('../../../assets/images/Emerald Skies Travel Banner.png')} resizeMode="cover" style={s.bannerImg} />
+        <Image source={image} resizeMode="cover" style={s.bannerImg} />
         <View style={s.bannerCopy}>
           <Text style={s.bannerEyebrow} numberOfLines={1}>{eyebrow}</Text>
           <Text style={s.bannerTitle} numberOfLines={2}>{title}</Text>
