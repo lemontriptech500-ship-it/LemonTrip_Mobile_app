@@ -143,7 +143,7 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Adventure Banner.png')} aspectRatio={2170 / 725} />
+          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Essentials in Green.png')} aspectRatio={2170 / 725} />
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
             {EXPLORE_TABS.map((tab) => (
