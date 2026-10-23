@@ -3,26 +3,27 @@ import { RazorpayPaymentDetails } from '@/components/RazorpayPaymentDetails';
 import { RazorpayCheckoutHost } from '@/components/RazorpayCheckoutHost';
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
-import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { FLIGHT_ROUTES, FlightProgress, formatPrice, goBackOr, replaceTo } from '@/components/flights/FlightFlowUi';
+import { TextSize } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
+import { BRAND, FLIGHT_ROUTES, FlightBanner, FlightHeading, FlightShell, FlightSteps, INTER, formatPrice, goBackOr, replaceTo } from '@/components/flights/FlightFlowUi';
 import { FLIGHT_COUPONS, computeFlightTotals, confirmFlightBooking, getFlightBookingDraft, updateFlightBookingDraft, validateFlightCoupon } from '@/components/flights/flightBookingStore';
 import { getFlightSelection } from '@/components/flights/flightSelectionStore';
-import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
+import { EmptyState, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
 import { BANKS, WALLET_BALANCE, inr } from '@/data/trains';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type TextInputProps } from 'react-native';
 
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
 type Method = 'razorpay' | 'upi' | 'card' | 'netbanking' | 'wallet';
-const METHODS: { id: Method; label: string; hint: string; icon: React.ComponentProps<typeof Ionicons>['name'] }[] = [
+const METHODS: { id: Method; label: string; hint: string; icon: IconName }[] = [
   { id: 'razorpay', label: 'Razorpay (test mode)', hint: 'UPI, cards and net banking', icon: 'shield-checkmark-outline' },
   { id: 'upi', label: 'UPI', hint: 'Pay with any UPI app', icon: 'phone-portrait-outline' },
   { id: 'card', label: 'Credit / Debit card', hint: 'Visa, Mastercard, RuPay', icon: 'card-outline' },
   { id: 'netbanking', label: 'Net banking', hint: 'All major banks', icon: 'business-outline' },
-  { id: 'wallet', label: 'LemonTrip wallet', hint: `Balance ${inr(WALLET_BALANCE)}`, icon: 'wallet-outline' },
+  { id: 'wallet', label: 'LemonTrip wallet', hint: `Balance: ${inr(WALLET_BALANCE)}`, icon: 'wallet-outline' },
 ];
 
 const formatCard = (v: string) => v.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 ');
@@ -56,9 +57,9 @@ export default function FlightPaymentScreen() {
 
   if (!selection || draft.travellers.length === 0) {
     return (
-      <FlowScreen>
+      <FlightShell onBack={goBack}>
         <ScrollView>
-          <ScreenHeader title="Payment" eyebrow="LEMONTRIP / FLIGHTS" onBack={goBack} />
+          <FlightBanner title="Secure payment" text="Choose how you would like to pay." />
           <EmptyState
             icon="card-outline"
             title="No booking to pay for"
@@ -66,7 +67,7 @@ export default function FlightPaymentScreen() {
             action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
           />
         </ScrollView>
-      </FlowScreen>
+      </FlightShell>
     );
   }
 
@@ -143,24 +144,30 @@ export default function FlightPaymentScreen() {
     }, 1800);
   };
 
+  const payLabel = busy ? 'Processing...' : method === 'razorpay' && razorpay.needsVerification ? 'Retry verification' : `Pay ${formatPrice(total, currency)}`;
+  const footer = (
+    <View style={s.footer}>
+      <View style={s.footerPrice}>
+        <Text style={s.footerCaption}>Amount to pay</Text>
+        <Text style={s.footerAmount} numberOfLines={1}>{formatPrice(total, currency)}</Text>
+      </View>
+      <TouchableOpacity accessibilityRole="button" disabled={busy} onPress={pay} activeOpacity={0.85} style={[s.continue, busy && { opacity: 0.7 }]}>
+        <Text style={s.continueText} numberOfLines={1}>{payLabel}</Text>
+        {busy ? <ActivityIndicator color={BRAND} /> : <Ionicons name="lock-closed" size={19} color={BRAND} />}
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
-    <FlowScreen
-      footer={
-        <FooterBar
-          caption="Amount to pay"
-          amount={formatPrice(total, currency)}
-          action={<PrimaryButton label={busy ? 'Processing...' : method === 'razorpay' && razorpay.needsVerification ? 'Retry verification' : `Pay ${formatPrice(total, currency)}`} icon="lock-closed" loading={busy} onPress={pay} />}
-        />
-      }
-    >
+    <FlightShell onBack={() => !locked && goBack()} footer={footer}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Secure payment" subtitle="Choose how you would like to pay." eyebrow="LEMONTRIP / FLIGHTS" onBack={() => !locked && goBack()} />
-            <FlightProgress current={4} />
+            <FlightBanner title="Secure payment" text="Choose how you would like to pay." />
+            <FlightSteps current={4} />
 
-            <Card>
-              <SectionTitle eyebrow="PAYMENT METHOD" title="Pay using" />
+            <View style={s.card}>
+              <FlightHeading eyebrow="PAYMENT METHOD" title="Pay using" />
               {METHODS.map((m) => {
                 const on = method === m.id;
                 return (
@@ -173,11 +180,12 @@ export default function FlightPaymentScreen() {
                     style={[s.method, on && s.methodOn]}
                   >
                     <View style={[s.radio, on && s.radioOn]}>{on ? <View style={s.radioDot} /> : null}</View>
-                    <View style={s.methodIcon}><Ionicons name={m.icon} size={19} color={Colors.primary} /></View>
+                    <View style={s.methodIcon}><Ionicons name={m.icon} size={24} color={BRAND} /></View>
                     <View style={{ flex: 1 }}>
                       <Text style={s.methodTitle}>{m.label}</Text>
                       <Text style={s.methodHint}>{m.hint}</Text>
                     </View>
+                    {m.id === 'wallet' ? <View style={s.useWallet}><Text style={s.useWalletText}>Use wallet</Text></View> : null}
                   </TouchableOpacity>
                 );
               })}
@@ -185,18 +193,18 @@ export default function FlightPaymentScreen() {
               <View style={s.form}>
                 {method === 'razorpay' ? <RazorpayPaymentDetails error={razorpay.error} /> : null}
                 {method === 'upi' ? (
-                  <Field label="UPI ID" icon="at-outline" autoCapitalize="none" autoCorrect={false} value={upi} onChangeText={setUpi} placeholder="name@bank" error={errors.upi} editable={!processing} />
+                  <Input label="UPI ID" icon="at-outline" autoCapitalize="none" autoCorrect={false} value={upi} onChangeText={setUpi} placeholder="name@bank" error={errors.upi} editable={!processing} />
                 ) : null}
                 {method === 'card' ? (
                   <>
-                    <Field label="NAME ON CARD" icon="person-outline" autoCapitalize="words" value={card.name} onChangeText={(v) => setCard({ ...card, name: v })} placeholder="As printed on the card" error={errors.cardName} editable={!processing} />
-                    <Field label="CARD NUMBER" icon="card-outline" keyboardType="number-pad" value={card.number} onChangeText={(v) => setCard({ ...card, number: formatCard(v) })} placeholder="0000 0000 0000 0000" maxLength={19} error={errors.cardNumber} editable={!processing} />
+                    <Input label="NAME ON CARD" icon="person-outline" autoCapitalize="words" value={card.name} onChangeText={(v) => setCard({ ...card, name: v })} placeholder="As printed on the card" error={errors.cardName} editable={!processing} />
+                    <Input label="CARD NUMBER" icon="card-outline" keyboardType="number-pad" value={card.number} onChangeText={(v) => setCard({ ...card, number: formatCard(v) })} placeholder="0000 0000 0000 0000" maxLength={19} error={errors.cardNumber} editable={!processing} />
                     <View style={s.pair}>
                       <View style={{ flex: 1 }}>
-                        <Field label="EXPIRY" keyboardType="number-pad" value={card.expiry} onChangeText={(v) => setCard({ ...card, expiry: formatExpiry(v) })} placeholder="MM/YY" maxLength={5} error={errors.expiry} editable={!processing} />
+                        <Input label="EXPIRY" keyboardType="number-pad" value={card.expiry} onChangeText={(v) => setCard({ ...card, expiry: formatExpiry(v) })} placeholder="MM/YY" maxLength={5} error={errors.expiry} editable={!processing} />
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Field label="CVV" keyboardType="number-pad" secureTextEntry value={card.cvv} onChangeText={(v) => setCard({ ...card, cvv: v.replace(/\D/g, '').slice(0, 4) })} placeholder="***" maxLength={4} error={errors.cvv} editable={!processing} />
+                        <Input label="CVV" keyboardType="number-pad" secureTextEntry value={card.cvv} onChangeText={(v) => setCard({ ...card, cvv: v.replace(/\D/g, '').slice(0, 4) })} placeholder="***" maxLength={4} error={errors.cvv} editable={!processing} />
                       </View>
                     </View>
                   </>
@@ -205,7 +213,7 @@ export default function FlightPaymentScreen() {
                   <View>
                     <Text style={s.label}>SELECT YOUR BANK</Text>
                     <View style={s.banks}>
-                      {BANKS.map((b) => <Chip key={b} label={b} selected={bank === b} onPress={() => setBank(b)} />)}
+                      {BANKS.map((b) => <TouchableOpacity key={b} accessibilityRole="button" accessibilityState={{ selected: bank === b }} onPress={() => setBank(b)} style={[s.chip, bank === b && s.chipOn]} activeOpacity={0.85}><Text style={[s.chipText, bank === b && s.chipTextOn]}>{b}</Text></TouchableOpacity>)}
                     </View>
                     {errors.bank ? <Text style={s.error}>{errors.bank}</Text> : null}
                   </View>
@@ -228,67 +236,130 @@ export default function FlightPaymentScreen() {
                   <Text style={s.payErrorText}>{payError}</Text>
                 </View>
               ) : null}
-            </Card>
+            </View>
 
             {couponsAvailable ? (
-              <Card>
-                <SectionTitle eyebrow="OFFERS" title="Have a coupon?" />
+              <View style={s.card}>
+                <FlightHeading eyebrow="OFFERS" title="Have a coupon?" />
                 <View style={s.couponRow}>
-                  <View style={{ flex: 1 }}><Field label="COUPON CODE" icon="pricetag-outline" autoCapitalize="characters" autoCorrect={false} value={couponInput} onChangeText={(v) => { setCouponInput(v.toUpperCase()); setCouponMsg(null); }} placeholder="e.g. FLY300" editable={!processing} /></View>
-                  <View style={s.applyWrap}><PrimaryButton variant={appliedCode ? 'soft' : 'dark'} label={appliedCode ? 'Remove' : 'Apply'} onPress={appliedCode ? removeCoupon : applyCoupon} disabled={processing} /></View>
+                  <View style={s.couponInput}>
+                    <Ionicons name="pricetag-outline" size={20} color={Colors.textLight} />
+                    <TextInput value={couponInput} onChangeText={(v) => { setCouponInput(v.toUpperCase()); setCouponMsg(null); }} placeholder="e.g. FLY300" placeholderTextColor={Colors.textLight} autoCapitalize="characters" autoCorrect={false} editable={!processing} style={s.couponText} accessibilityLabel="Coupon code" />
+                  </View>
+                  <TouchableOpacity accessibilityRole="button" disabled={processing} onPress={appliedCode ? removeCoupon : applyCoupon} activeOpacity={0.85} style={s.apply}>
+                    <Text style={s.applyText}>{appliedCode ? 'Remove' : 'Apply'}</Text>
+                  </TouchableOpacity>
                 </View>
                 {couponMsg ? <Text style={[s.couponMsg, { color: couponMsg.ok ? Colors.success : Colors.error }]}>{couponMsg.text}</Text> : null}
-                {!appliedCode ? <View style={s.suggest}>{FLIGHT_COUPONS.map((c) => <TouchableOpacity key={c.code} accessibilityRole="button" onPress={() => setCouponInput(c.code)} style={s.suggestChip}><Text style={s.suggestCode}>{c.code}</Text><Text style={s.suggestLabel}>{c.label}</Text></TouchableOpacity>)}</View> : null}
-              </Card>
+                {!appliedCode ? <View style={s.suggest}>{FLIGHT_COUPONS.map((c) => <TouchableOpacity key={c.code} accessibilityRole="button" onPress={() => setCouponInput(c.code)} style={s.suggestChip} activeOpacity={0.85}><Text style={s.suggestCode}>{c.code}</Text><Text style={s.suggestLabel}>{c.label}</Text></TouchableOpacity>)}</View> : null}
+              </View>
             ) : null}
 
-            <Card>
-              <SectionTitle eyebrow="SUMMARY" title="Price details" />
+            <View style={s.card}>
+              <FlightHeading eyebrow="SUMMARY" title="Price details" />
               <Row label={`${offer.airline.name} ${offer.flightNumber} · ${fare?.name?.replace(/\s*·\s*sample/i, '') ?? 'Fare'}`} value={formatPrice(fareTotal, currency)} />
+              {fare?.price.baseFare !== undefined || fare?.price.taxes !== undefined ? <Text style={s.sub}>Includes {[fare?.price.baseFare !== undefined && `base ${formatPrice(fare.price.baseFare, currency)}`, fare?.price.taxes !== undefined && `taxes ${formatPrice(fare.price.taxes, currency)}`, fare?.price.fees !== undefined && `fees ${formatPrice(fare.price.fees, currency)}`].filter(Boolean).join(', ')}</Text> : null}
               {draft.seatTotal > 0 ? <Row label={`Seats (${draft.seats.join(', ')})`} value={formatPrice(draft.seatTotal, currency)} /> : null}
               {draft.addOnTotal > 0 ? <Row label="Add-ons" value={formatPrice(draft.addOnTotal, currency)} /> : null}
-              {discount > 0 ? <Row label={`Coupon ${appliedCode ?? ''}`.trim()} value={`− ${formatPrice(discount, currency)}`} tone="good" /> : null}
+              {discount > 0 ? <Row label={`Coupon ${appliedCode ?? ''}`.trim()} value={`− ${formatPrice(discount, currency)}`} good /> : null}
+              <View style={s.divider} />
               <Row label="Total payable" value={formatPrice(total, currency)} bold />
-            </Card>
+            </View>
 
-            <Notice icon="lock-closed-outline" title="Secure payment demo">
-              This is a demonstration checkout. No real payment is taken and no card details are stored or sent anywhere. Tip: a card ending in 0002 simulates a declined payment.
-            </Notice>
+            <View style={s.notice}>
+              <Ionicons name="lock-closed-outline" size={26} color={Colors.textLight} />
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={s.noticeTitle}>Secure payment demo</Text>
+                <Text style={s.noticeText}>This is a demonstration checkout. No real payment is taken and no card details are stored or sent anywhere. Tip: a card ending in 0002 simulates a declined payment.</Text>
+              </View>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
       <RazorpayCheckoutHost />
-    </FlowScreen>
+    </FlightShell>
+  );
+}
+
+
+function Input({ label, error, icon, ...input }: TextInputProps & { label: string; error?: string; icon?: IconName }) {
+  return (
+    <View style={s.field}>
+      <Text style={s.label}>{label}</Text>
+      <View style={[s.input, !!error && s.inputError]}>
+        {icon ? <Ionicons name={icon} size={20} color={Colors.textLight} /> : null}
+        <TextInput {...input} placeholderTextColor={Colors.textLight} style={s.inputText} accessibilityLabel={label} />
+      </View>
+      {error ? <Text style={s.error}>{error}</Text> : null}
+    </View>
+  );
+}
+
+function Row({ label, value, bold, good }: { label: string; value: string; bold?: boolean; good?: boolean }) {
+  return (
+    <View style={s.row}>
+      <Text style={[s.rowLabel, bold && s.rowBold]} numberOfLines={2}>{label}</Text>
+      <Text style={[s.rowValue, bold && s.rowBold, good && { color: Colors.secondary }]}>{value}</Text>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  method: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
-  methodOn: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
-  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
-  radioOn: { borderColor: Colors.primary },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
-  methodIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
-  methodTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  methodHint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
-  form: { marginTop: 10 },
+  card: { ...Ui.card, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  method: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surfaceMuted, marginBottom: 10 },
+  methodOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#FDF3C4' },
+  radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.borderStrong, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center' },
+  radioOn: { borderColor: BRAND, borderWidth: 2 },
+  radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: BRAND },
+  methodIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
+  methodTitle: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND },
+  methodHint: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  useWallet: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, backgroundColor: '#E3EFE9' },
+  useWalletText: { fontFamily: INTER.semibold, fontSize: TextSize.caption, color: BRAND },
+  form: { marginTop: 4 },
+  field: { marginBottom: 12 },
   pair: { flexDirection: 'row', gap: 12 },
-  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 8 },
+  label: { fontFamily: INTER.semibold, fontSize: TextSize.caption, letterSpacing: 0.6, color: Colors.secondary, marginBottom: 8 },
+  input: { minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 18, backgroundColor: Colors.surfaceMuted, borderWidth: 1, borderColor: 'transparent' },
+  inputError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
+  inputText: { flex: 1, minWidth: 0, minHeight: 52, fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textDark },
   banks: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 8 },
+  chip: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
+  chipOn: { backgroundColor: BRAND, borderColor: BRAND },
+  chipText: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND },
+  chipTextOn: { color: Colors.white },
+  error: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.error, marginTop: 6 },
   wallet: { padding: 14, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
   walletRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   walletTotal: { borderTopWidth: 1, borderTopColor: Colors.borderStrong, marginTop: 6, paddingTop: 10 },
-  walletLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight },
-  walletValue: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  walletLabel: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight },
+  walletValue: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND },
   payError: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, borderRadius: 14, backgroundColor: Colors.errorSoft, borderWidth: 1, borderColor: Colors.errorBorder },
-  couponRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
-  applyWrap: { width: 104, marginBottom: 12 },
-  couponMsg: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, marginBottom: 8 },
-  suggest: { gap: 8, marginTop: 4 },
-  suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  suggestLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textDark },
-  payErrorText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.error, fontWeight: FontWeight.bold },
+  payErrorText: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.error },
+  couponRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  couponInput: { flex: 1, minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  couponText: { flex: 1, minWidth: 0, minHeight: 52, fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textDark },
+  apply: { minWidth: 96, height: 54, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18, borderRadius: 18, backgroundColor: BRAND },
+  applyText: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.white },
+  couponMsg: { fontFamily: INTER.semibold, fontSize: TextSize.caption, marginTop: 10 },
+  suggest: { gap: 8, marginTop: 12 },
+  suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
+  suggestCode: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, backgroundColor: '#FDF3C4', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  suggestLabel: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 5 },
+  rowLabel: { flex: 1, fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight },
+  rowValue: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND, textAlign: 'right' },
+  rowBold: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: BRAND },
+  sub: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginBottom: 4 },
+  divider: { height: 1, backgroundColor: Colors.border, marginVertical: 10 },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 14, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  noticeTitle: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.body },
+  noticeText: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 18, marginTop: 2 },
+  footer: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 12, width: '100%', maxWidth: 760, alignSelf: 'center' },
+  footerPrice: { minWidth: 110 },
+  footerCaption: { fontFamily: INTER.medium, color: BRAND, fontSize: TextSize.caption },
+  footerAmount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.heading, marginTop: 1 },
+  continue: { flex: 1, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 18, borderRadius: 27, backgroundColor: Colors.accent },
+  continueText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.bodyLarge },
 });
