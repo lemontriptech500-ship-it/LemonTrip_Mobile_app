@@ -49,6 +49,11 @@ const experienceTypes: { name: string; filter: string; icon: IconName }[] = [
   { name: 'Luxury', filter: 'Luxury', icon: 'diamond-outline' },
 ];
 
+const TOP_EXPERIENCES = [
+  { name: 'Beaches', filter: 'Beach', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=900&q=88' },
+  { name: 'Adventure', filter: 'Adventure', image: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=900&q=88' },
+  { name: 'Luxury', filter: 'Luxury', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=88' },
+];
 const popularSearches = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Weekend getaways'];
 const POPULAR_CHIPS = ['Dubai', 'Maldives', 'Bali', 'Singapore', 'Thailand'];
 const EXPLORE_TABS = [
@@ -303,6 +308,28 @@ export default function ExploreScreen() {
             )}
           </View>
 
+          {/* Top experiences */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeading}>
+              <Text style={styles.sectionTitle}>Top experiences</Text>
+              <TouchableOpacity accessibilityRole="button" onPress={() => router.navigate('/(tabs)/explore/packages')} style={styles.popularViewAll}>
+                <Text style={styles.linkText}>See all</Text>
+                <Ionicons name="chevron-forward" size={16} color="#103D30" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.expRow}>
+              {TOP_EXPERIENCES.map((e) => (
+                <TouchableOpacity key={e.name} accessibilityRole="button" activeOpacity={0.9} onPress={() => setSelectedExperience(e.filter)} style={styles.expCard}>
+                  <ImageBackground source={{ uri: e.image }} style={styles.expImg}>
+                    <View style={styles.expPill}>
+                      <Text style={styles.expName}>{e.name}</Text>
+                      <Ionicons name="arrow-forward-circle-outline" size={22} color="#103D30" />
+                    </View>
+                  </ImageBackground>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
           {/* Handpicked journeys */}
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
@@ -459,6 +486,11 @@ const styles = StyleSheet.create({
   popInCard: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 },
   popInLabel: { fontFamily: 'Inter-Bold', fontSize: 14, color: Colors.textDark },
   popRow: { gap: 8, alignItems: 'center', paddingRight: 8 },
+  expRow: { gap: 12, paddingHorizontal: 16 },
+  expCard: { width: 150, height: 130, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
+  expImg: { flex: 1, justifyContent: 'flex-end', padding: 8 },
+  expPill: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 14, backgroundColor: Colors.white },
+  expName: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: Colors.textDark },
   tileGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 6, rowGap: 12, paddingBottom: 10 },
   tileItem: { width: '25%', alignItems: 'center', gap: 6, paddingHorizontal: 4 },
   tileBox: { width: '100%', height: 54, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft, borderWidth: 2, borderColor: 'transparent' },
