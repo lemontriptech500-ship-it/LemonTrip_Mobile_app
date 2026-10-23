@@ -2,8 +2,7 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
-import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
-import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
+import { ServiceBanner } from '@/components/ui/ServiceHeader';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import type { Destination, TravelPackage } from '@/types/content';
@@ -48,6 +47,13 @@ const experienceTypes: { name: string; filter: string; icon: IconName }[] = [
 ];
 
 const popularSearches = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Weekend getaways'];
+const POPULAR_CHIPS = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Goa'];
+const EXPLORE_TABS = [
+  { title: 'Explore', route: '/(tabs)/explore', active: true },
+  { title: 'Packages', route: '/(tabs)/explore/packages', active: false },
+  { title: 'Offers', route: '/(tabs)/explore/offers', active: false },
+  { title: 'Visa Services', route: '/(tabs)/explore/visa', active: false },
+];
 const filterOptions = {
   duration: ['Any', '1-5 nights', '6+ nights'],
   budget: ['Any', 'Under ₹30k', '₹30k+'],
@@ -134,17 +140,15 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <ExploreSectionIntro eyebrow="DESTINATION DISCOVERY" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style.">
-            <View style={styles.quickSearchRow}>
-              <Text style={styles.quickSearchLabel}>POPULAR</Text>
-              {popularSearches.slice(0, 3).map((destination) => (
-                <TouchableOpacity key={destination} accessibilityRole="button" onPress={() => selectSearch(destination)} style={styles.quickSearchChip}>
-                  <Text style={styles.quickSearchText}>{destination}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ExploreSectionIntro>
+          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Adventure Banner.png')} aspectRatio={1672 / 941} />
 
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
+            {EXPLORE_TABS.map((tab) => (
+              <TouchableOpacity key={tab.title} accessibilityRole="button" accessibilityState={{ selected: tab.active }} onPress={() => { if (!tab.active) router.navigate(tab.route as never); }} style={[styles.tabItem, tab.active && styles.tabItemActive]}>
+                <Text style={[styles.tabText, tab.active && styles.tabTextActive]}>{tab.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
           {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
             <View style={styles.searchPill}>
@@ -213,31 +217,61 @@ export default function ExploreScreen() {
             ) : null}
           </View>
 
+          {/* Popular destinations */}
+          <View style={styles.popularHead}>
+            <Text style={styles.popularTitle}>Popular</Text>
+            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/destinations')} style={styles.popularViewAll}>
+              <Text style={styles.linkText}>View all</Text>
+              <Ionicons name="arrow-forward" size={16} color="#103D30" />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.popularRow}>
+            {POPULAR_CHIPS.map((place) => {
+              const on = query.trim() ? query.trim().toLowerCase() === place.toLowerCase() : place === 'Dubai';
+              return (
+                <TouchableOpacity key={place} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => selectSearch(place)} style={[styles.popChip, on && styles.popChipOn]}>
+                  <Text style={[styles.popChipText, on && styles.popChipTextOn]}>{place}</Text>
+                </TouchableOpacity>
+              );
+            })}
+            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/destinations')} style={styles.popChip}>
+              <Text style={styles.popChipText}>More</Text>
+              <Ionicons name="chevron-down" size={14} color="#103D30" />
+            </TouchableOpacity>
+          </ScrollView>
+
           {/* Explore-specific filters */}
           <View style={styles.gridCard}>
             <View style={styles.gridHeader}>
               <Text style={styles.gridTitle}>Travel style</Text>
-              {selectedExperience ? <TouchableOpacity onPress={() => setSelectedExperience(null)}><Text style={styles.linkText}>Clear</Text></TouchableOpacity> : null}
+              <View style={styles.gridHeadRight}>
+                {selectedExperience ? <TouchableOpacity accessibilityRole="button" onPress={() => setSelectedExperience(null)}><Text style={styles.linkText}>Clear</Text></TouchableOpacity> : null}
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.navigate('/(tabs)/explore/packages')} style={styles.popularViewAll}>
+                  <Text style={styles.linkText}>Explore all</Text>
+                  <Ionicons name="arrow-forward" size={16} color="#103D30" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.gridRow}>
-              {experienceTypes.map((experience) => {
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.styleRow}>
+              {experienceTypes.map((experience, index) => {
                 const selected = selectedExperience === experience.filter;
                 return (
-                  <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.gridItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
-                    <Ionicons name={experience.icon} size={22} color={selected ? Colors.primaryDark : Colors.textLight} />
-                    <Text style={[styles.gridLabel, selected && styles.gridLabelSelected]}>{experience.name}</Text>
-                    <View style={[styles.experienceIndicator, selected && styles.experienceIndicatorSelected]} />
+                  <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.styleItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
+                    <View style={[styles.styleCircle, index % 2 === 0 ? styles.styleCircleWarm : styles.styleCircleMint, selected && styles.styleCircleOn]}>
+                      <Ionicons name={experience.icon} size={24} color="#103D30" />
+                    </View>
+                    <Text style={[styles.styleLabel, selected && styles.styleLabelOn]} numberOfLines={1}>{experience.name}</Text>
                   </TouchableOpacity>
                 );
               })}
-              <TouchableOpacity accessibilityRole="button" style={styles.gridItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
-                <Ionicons name="grid-outline" size={22} color={Colors.textLight} />
-                <Text style={styles.gridLabel}>All journeys</Text>
-                <View style={styles.experienceIndicator} />
+              <TouchableOpacity accessibilityRole="button" style={styles.styleItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
+                <View style={[styles.styleCircle, styles.styleCircleMint]}>
+                  <Ionicons name="grid-outline" size={24} color="#103D30" />
+                </View>
+                <Text style={styles.styleLabel} numberOfLines={1}>All journeys</Text>
               </TouchableOpacity>
-            </View>
+            </ScrollView>
           </View>
-
           {/* Trending destinations */}
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
@@ -328,20 +362,26 @@ export default function ExploreScreen() {
 
           {/* Personalised panel */}
           <View style={styles.personalPanel}>
+            <Image source={require('../../../../assets/images/Trips Picked Background.jpeg')} resizeMode="cover" style={styles.personalBg} />
             <Image source={require('../../../../assets/images/App Logo.png')} style={styles.personalLogo} resizeMode="contain" />
             <View style={styles.personalCopy}>
               <Text style={styles.personalTitle}>{user ? 'Trips picked for you' : 'Not sure where to go?'}</Text>
-              <Text style={styles.personalSubtitle}>{user ? `Welcome back, ${user.name.split(' ')[0]}. Your next story is waiting.` : 'Choose a travel mood and we’ll help you find a place to start.'}</Text>
+              <Text style={styles.personalSubtitle}>{user ? `Welcome back, ${user.name.split(' ')[0]}. Your next story is waiting.` : 'Choose a travel mood and we\u2019ll help you find a place to start.'}</Text>
               <View style={styles.preferenceRow}>
-                {(user ? ['Surprise me', 'Save a place'] : ['Relax', 'Explore', 'Reconnect']).map((preference) => (
-                  <TouchableOpacity key={preference} style={[styles.preferenceChip, tripPreference === preference && styles.preferenceChipActive]} onPress={() => {
-                    setTripPreference(preference);
-                    if (preference === 'Save a place') router.push('/(tabs)/wishlist');
-                    if (preference === 'Surprise me') router.navigate('/(tabs)/explore/packages');
-                  }}>
-                    <Text style={[styles.preferenceText, tripPreference === preference && styles.preferenceTextActive]}>{preference}</Text>
-                  </TouchableOpacity>
-                ))}
+                {(user ? ['Surprise me', 'Save a place'] : ['Relax', 'Explore', 'Reconnect']).map((preference, index) => {
+                  const dark = index === 0 || tripPreference === preference;
+                  return (
+                    <TouchableOpacity key={preference} style={[styles.preferenceChip, dark && styles.preferenceChipActive]} onPress={() => {
+                      setTripPreference(preference);
+                      if (preference === 'Save a place') router.push('/(tabs)/wishlist');
+                      if (preference === 'Surprise me') router.navigate('/(tabs)/explore/packages');
+                    }}>
+                      {preference === 'Save a place' ? <Ionicons name="heart-outline" size={18} color="#103D30" /> : null}
+                      <Text style={[styles.preferenceText, dark && styles.preferenceTextActive]}>{preference}</Text>
+                      {preference === 'Surprise me' ? <Ionicons name="arrow-forward" size={16} color={Colors.white} /> : null}
+                    </TouchableOpacity>
+                  );
+                })}
                 {!user ? (
                   <TouchableOpacity onPress={() => router.push('/login')} style={styles.signInLink}>
                     <Text style={styles.signInText}>Sign in for picks</Text>
@@ -354,11 +394,12 @@ export default function ExploreScreen() {
 
           {/* Trust strip */}
           <View style={styles.trustStrip}>
-            <View style={styles.trustItem}><Ionicons name="shield-checkmark" size={26} color={Colors.primary} /><View style={styles.trustCopy}><Text style={styles.trustTitle}>Secure bookings</Text><Text style={styles.trustSubtitle}>Your trip, our priority</Text></View></View>
-            <View style={styles.trustItem}><TravelArtworkIcon name="offer" size={36} /><View style={styles.trustCopy}><Text style={styles.trustTitle}>Transparent pricing</Text><Text style={styles.trustSubtitle}>No hidden charges</Text></View></View>
-            <View style={styles.trustItem}><TravelArtworkIcon name="help" size={36} /><View style={styles.trustCopy}><Text style={styles.trustTitle}>Travel support</Text><Text style={styles.trustSubtitle}>We’re here, 24/7</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={2}>Your trip, our priority</Text></View></View>
+            <View style={styles.trustDivider} />
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={2}>No hidden charges</Text></View></View>
+            <View style={styles.trustDivider} />
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={2}>We’re here, 24/7</Text></View></View>
           </View>
-
           <View style={styles.footer}>
             <Image source={require('../../../../assets/images/App Logo.png')} style={styles.footerLogoImage} resizeMode="cover" />
             <Text style={styles.footerTagline}>Travel, thoughtfully planned.</Text>
@@ -390,7 +431,20 @@ const styles = StyleSheet.create({
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
 
   // Search
-  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: -18, padding: 12, zIndex: 5 },
+  popularHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Ui.space.page, marginTop: 18, marginBottom: 10 },
+  popularTitle: { fontFamily: 'Inter-Bold', fontSize: TextSize.title, color: Colors.textDark },
+  popularViewAll: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  popularRow: { gap: 8, paddingHorizontal: Ui.space.page, alignItems: 'center', paddingBottom: 4 },
+  popChip: { minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 18, borderRadius: 999, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  popChipOn: { backgroundColor: '#103D30', borderColor: '#103D30' },
+  popChipText: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.body, color: Colors.textDark },
+  popChipTextOn: { color: Colors.white },
+  tabsRow: { gap: 26, paddingHorizontal: Ui.space.page, marginTop: 4 },
+  tabItem: { minHeight: 44, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  tabItemActive: { borderBottomColor: Colors.accent },
+  tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.bodyLarge, color: Colors.textLight },
+  tabTextActive: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
+  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 10, padding: 12, zIndex: 5 },
   searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, paddingVertical: 10 },
   clearSearch: { padding: 4 },
@@ -418,6 +472,15 @@ const styles = StyleSheet.create({
 
   // Travel style grid card
   gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 13, paddingBottom: 7, paddingHorizontal: 8, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  gridHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  styleRow: { gap: 14, paddingHorizontal: 10, paddingBottom: 8 },
+  styleItem: { width: 68, alignItems: 'center', gap: 6 },
+  styleCircle: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'transparent' },
+  styleCircleWarm: { backgroundColor: Colors.accentSoft },
+  styleCircleMint: { backgroundColor: Colors.successSoft },
+  styleCircleOn: { borderColor: Colors.accent },
+  styleLabel: { fontFamily: 'Inter-Medium', fontSize: TextSize.micro, color: Colors.textDark, textAlign: 'center' },
+  styleLabelOn: { fontFamily: 'Inter-Bold', color: '#103D30' },
   gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, marginBottom: 10 },
   gridTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
@@ -472,25 +535,28 @@ const styles = StyleSheet.create({
   emptyButton: { minHeight: 44,  paddingHorizontal: 16, paddingVertical: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
 
   // Personal panel
-  personalPanel: { marginTop: 24, marginHorizontal: Ui.space.page, padding: 18, flexDirection: 'row', gap: 14, alignItems: 'flex-start', borderRadius: 22, backgroundColor: Colors.accentSoft },
-  personalLogo: { width: 52, height: 52, borderRadius: 12 },
-  personalCopy: { flex: 1, minWidth: 0 },
-  personalTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, lineHeight: 24, fontWeight: FontWeight.extraBold },
-  personalSubtitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 4 },
-  preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 12 },
-  preferenceChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: Colors.decorativeGreen, backgroundColor: Colors.surface },
-  preferenceChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  preferenceText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  personalPanel: { marginTop: 24, marginHorizontal: Ui.space.page, padding: 16, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, overflow: 'hidden', backgroundColor: Colors.accentSoft },
+  personalBg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  personalLogo: { width: 48, height: 48, borderRadius: 12 },
+  personalCopy: { flex: 1, minWidth: 0, paddingRight: 70 },
+  personalTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 15, lineHeight: 19 },
+  personalSubtitle: { color: Colors.primaryDark, fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, marginTop: 2 },
+  preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 8 },
+  preferenceChip: { minHeight: 32, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: Colors.white },
+  trustIcon: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
+  trustDivider: { width: 1, alignSelf: 'stretch', backgroundColor: Colors.border },
+  preferenceChipActive: { backgroundColor: '#103D30' },
+  preferenceText: { color: Colors.primaryDark, fontFamily: 'Inter-SemiBold', fontSize: 12 },
   preferenceTextActive: { color: Colors.white },
   signInLink: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 6, paddingVertical: 8 },
   signInText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   // Trust + footer
-  trustStrip: { marginTop: 18, marginHorizontal: Ui.space.page, padding: 14, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 18 },
-  trustItem: { flexGrow: 1, flexBasis: 150, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  trustCopy: { flexShrink: 1 },
-  trustTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
-  trustSubtitle: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 2 },
+  trustStrip: { marginTop: 12, marginHorizontal: Ui.space.page, paddingVertical: 12, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.surface, borderRadius: 18 },
+  trustItem: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  trustCopy: { flex: 1, minWidth: 0 },
+  trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 12, lineHeight: 15 },
+  trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 10, lineHeight: 13, marginTop: 1 },
   footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
   footerLogoImage: { width: 118, height: 38 },
   footerTagline: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },

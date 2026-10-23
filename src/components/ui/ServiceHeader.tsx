@@ -24,15 +24,15 @@ export function ServiceTopBar({ title, fallback = '/(tabs)/explore' }: { title: 
   );
 }
 
-type ServiceBannerProps = { eyebrow: string; title: string; subtitle: string; image?: ImageSourcePropType };
+type ServiceBannerProps = { eyebrow: string; title: string; subtitle: string; image?: ImageSourcePropType; aspectRatio?: number };
 
 const DEFAULT_BANNER = require('../../../assets/images/Emerald Skies Travel Banner.png') as ImageSourcePropType;
 
 /** Banner image with text on the left. Image is the shared travel banner for now. */
-export function ServiceBanner({ eyebrow, title, subtitle, image = DEFAULT_BANNER }: ServiceBannerProps) {
+export function ServiceBanner({ eyebrow, title, subtitle, image = DEFAULT_BANNER, aspectRatio }: ServiceBannerProps) {
   return (
     <View style={s.bannerWrap}>
-      <View style={s.banner}>
+      <View style={[s.banner, aspectRatio ? { aspectRatio } : null]}>
         <Image source={image} resizeMode="cover" style={s.bannerImg} />
         <View style={s.bannerCopy}>
           <Text style={s.bannerEyebrow} numberOfLines={1}>{eyebrow}</Text>

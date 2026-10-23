@@ -21,6 +21,22 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
   const user = useAuth(); const wide = useWindowDimensions().width >= 900;
   const navigate = (route: Href) => { blurWebNavigationFocus(); router.navigate(route); };
   const links = sections.map(section => <TouchableOpacity key={section.title} accessibilityRole="button" accessibilityLabel={section.title} accessibilityState={{ selected: pathname === section.path }} onPress={() => { if (pathname !== section.path) navigate(section.route); }} style={[styles.navLink, pathname === section.path && styles.activeLink]}><Text style={[styles.navText, pathname === section.path && styles.activeText]}>{section.title}</Text></TouchableOpacity>);
+  if (pathname === '/explore' && !wide) {
+    return (
+      <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
+        <StatusBar style="dark" />
+        <View testID="explore-shared-header" style={newStyles.topBar}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => navigate('/home')} style={newStyles.topBtn}>
+            <Ionicons name="arrow-back" size={22} color="#103D30" />
+          </TouchableOpacity>
+          <Text accessibilityRole="header" style={newStyles.topTitle}>Explore</Text>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[newStyles.topBtn, newStyles.topBtnTint]}>
+            <Ionicons name="settings-outline" size={20} color="#103D30" />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return <SafeAreaView edges={['top']} style={styles.safe}><StatusBar style="light" /><BrandGradientBar>
     <View testID="explore-shared-header" style={[styles.content, wide && styles.wide]}>
       <View style={styles.mainRow}>
@@ -33,6 +49,12 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
   </BrandGradientBar></SafeAreaView>;
 }
 export const exploreDirectoryPaths = sections.map(section => section.path);
+const newStyles = StyleSheet.create({
+  topBar: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: 'Inter-Bold', fontSize: TextSize.title, color: '#103D30' },
+});
 const styles = StyleSheet.create({
   safe: { backgroundColor: Colors.primaryDark }, content: { width: '100%', maxWidth: 1380, alignSelf: 'center', paddingHorizontal: 18, paddingTop: 9, paddingBottom: 11 }, wide: { minHeight: 72, paddingVertical: 8 }, mainRow: { minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 }, brand: { minWidth: 126, height: 50, alignItems: 'flex-start', justifyContent: 'center' }, spacer: { flex: 1 },
   nav: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 26 }, mobileNav: { gap: 18, alignItems: 'center', paddingTop: 7 }, navLink: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 5, borderBottomWidth: 2, borderBottomColor: 'transparent' }, activeLink: { borderBottomColor: Colors.accent }, navText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold }, activeText: { color: Colors.accent, fontWeight: FontWeight.extraBold },
