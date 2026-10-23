@@ -1,10 +1,9 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { FareSummary, JourneySummary } from '@/components/trains/TrainCards';
-import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
+import { BRAND, INTER, Chip, EmptyState, PrimaryButton, TRAIN_ROUTES, TrainBanner, TrainCardBox, TrainFooter, TrainHeading, TrainInput, TrainNotice, TrainShell, TrainSteps, goBackOr, goTo, replaceTo } from '@/components/trains/TrainFlowUi';
 import { Colors } from '@/constants/colors';
 import { CLASS_INFO, berthOptions, inr } from '@/data/trains';
 import { useAuth } from '@/utils/authStore';
@@ -34,7 +33,7 @@ export default function TrainPassengersScreen() {
 
   const derived = currentFare();
   if (!selection || !derived) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Passengers" eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr(TRAIN_ROUTES.results)} /><EmptyState icon="people-outline" title="No train selected" text="Pick a train and class before adding passengers." action={<PrimaryButton label="Search trains" onPress={() => replaceTo(TRAIN_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <TrainShell onBack={() => goBackOr(TRAIN_ROUTES.results)}><ScrollView><TrainBanner title="Passenger details" text="Names must match a valid government ID." /><EmptyState icon="people-outline" title="No train selected" text="Pick a train and class before adding passengers." action={<PrimaryButton label="Search trains" onPress={() => replaceTo(TRAIN_ROUTES.results)} />} /></ScrollView></TrainShell>;
   }
   const { fare, result } = derived;
   const berths = berthOptions(selection.classCode);
@@ -54,31 +53,31 @@ export default function TrainPassengersScreen() {
     setErrors(next);
     return !Object.keys(next.passengers).length && !next.email && !next.phone;
   };
-  const proceed = () => { if (validate()) { setContact({ phone: normalizePhoneInput(contact.phone) ?? contact.phone }); goTo(TRAIN_ROUTES.review); } };
+  const proceed = () => { if (validate()) { setContact({ phone: normalizePhoneInput(contact.phone) ?? contact.phone }); goTo(TRAIN_ROUTES.seats); } };
   const fillSaved = (index: number, first: string, last: string) => updatePassenger(index, { name: `${first} ${last}`.trim() });
 
   return (
-    <FlowScreen footer={<FooterBar caption={`Total · ${passengers.length} passenger${passengers.length > 1 ? 's' : ''}`} amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Review booking" icon="arrow-forward" onPress={proceed} />} />}>
+    <TrainShell onBack={() => goBackOr(TRAIN_ROUTES.details)} footer={<TrainFooter caption={`Total · ${passengers.length} passenger${passengers.length > 1 ? 's' : ''}`} amount={inr(fare.total)} label="Choose seats" icon="arrow-forward" onPress={proceed} />}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Passenger details" subtitle="Names must match a valid government ID." eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr(TRAIN_ROUTES.details)} />
-            <TrainProgress current={1} />
+            <TrainBanner title="Passenger details" text="Names must match a valid government ID." />
+            <TrainSteps current={1} />
             <JourneySummary result={result} date={selection.date} className={CLASS_INFO[selection.classCode].name} quota={selection.quota} />
 
             {passengers.map((p, i) => {
               const e = errors.passengers[i] ?? {};
               return (
-                <Card key={i}>
-                  <SectionTitle eyebrow={`PASSENGER ${i + 1}`} title={p.name.trim() || 'Add traveller'} right={passengers.length > 1 ? <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Remove passenger ${i + 1}`} onPress={() => removePassenger(i)} hitSlop={8} style={s.remove}><Ionicons name="trash-outline" size={17} color={Colors.error} /></TouchableOpacity> : undefined} />
+                <TrainCardBox key={i}>
+                  <TrainHeading eyebrow={`PASSENGER ${i + 1}`} title={p.name.trim() || 'Add traveller'} right={passengers.length > 1 ? <TouchableOpacity accessibilityRole="button" accessibilityLabel={`Remove passenger ${i + 1}`} onPress={() => removePassenger(i)} hitSlop={8} style={s.remove}><Ionicons name="trash-outline" size={17} color={Colors.error} /></TouchableOpacity> : undefined} />
                   {saved.items.length ? (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.scrollChips} style={{ marginBottom: 12 }}>
                       {saved.items.map((t) => <Chip key={t.id} icon="person-outline" label={`${t.firstName} ${t.lastName}`.trim()} onPress={() => fillSaved(i, t.firstName, t.lastName)} />)}
                     </ScrollView>
                   ) : null}
-                  <Field label="FULL NAME" icon="person-outline" value={p.name} onChangeText={(v) => updatePassenger(i, { name: v })} placeholder="As on ID proof" autoCapitalize="words" error={e.name} />
+                  <TrainInput label="FULL NAME" icon="person-outline" value={p.name} onChangeText={(v) => updatePassenger(i, { name: v })} placeholder="As on ID proof" autoCapitalize="words" error={e.name} />
                   <View style={s.pair}>
-                    <View style={{ flex: 1 }}><Field label="AGE" keyboardType="number-pad" maxLength={3} value={p.age} onChangeText={(v) => updatePassenger(i, { age: v.replace(/\D/g, '') })} placeholder="Years" error={e.age} /></View>
+                    <View style={{ flex: 1 }}><TrainInput label="AGE" keyboardType="number-pad" maxLength={3} value={p.age} onChangeText={(v) => updatePassenger(i, { age: v.replace(/\D/g, '') })} placeholder="Years" error={e.age} /></View>
                     <View style={{ flex: 2 }}>
                       <Text style={s.label}>GENDER</Text>
                       <View style={s.chips}>{GENDERS.map((g) => <Chip key={g.id} label={g.label} selected={p.gender === g.id} onPress={() => updatePassenger(i, { gender: g.id })} />)}</View>
@@ -89,7 +88,7 @@ export default function TrainPassengersScreen() {
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.scrollChips}>
                     {berths.map((b) => <Chip key={b} label={b} selected={p.berth === b} onPress={() => updatePassenger(i, { berth: b })} />)}
                   </ScrollView>
-                </Card>
+                </TrainCardBox>
               );
             })}
 
@@ -97,29 +96,29 @@ export default function TrainPassengersScreen() {
               <PrimaryButton variant="soft" icon="person-add-outline" label={passengers.length >= MAX_PASSENGERS ? `Maximum ${MAX_PASSENGERS} passengers` : 'Add another passenger'} disabled={passengers.length >= MAX_PASSENGERS} onPress={addPassenger} />
             </View>
 
-            <Card>
-              <SectionTitle eyebrow="CONTACT" title="Where should we send your ticket?" />
-              <Field label="EMAIL" icon="mail-outline" keyboardType="email-address" autoCapitalize="none" autoCorrect={false} value={contact.email} onChangeText={(v) => setContact({ email: v })} placeholder="name@example.com" error={errors.email} />
-              <Field label="MOBILE NUMBER" icon="call-outline" keyboardType="phone-pad" maxLength={20} value={contact.phone} onChangeText={(v) => setContact({ phone: v })} placeholder="Include country code, e.g. +1" error={errors.phone} />
+            <TrainCardBox>
+              <TrainHeading eyebrow="CONTACT" title="Where should we send your ticket?" />
+              <TrainInput label="EMAIL" icon="mail-outline" keyboardType="email-address" autoCapitalize="none" autoCorrect={false} value={contact.email} onChangeText={(v) => setContact({ email: v })} placeholder="name@example.com" error={errors.email} />
+              <TrainInput label="MOBILE NUMBER" icon="call-outline" keyboardType="phone-pad" maxLength={20} value={contact.phone} onChangeText={(v) => setContact({ phone: v })} placeholder="Include country code, e.g. +1" error={errors.phone} />
               <Text style={s.hint}>Enter a number for your region; include its country code if needed.</Text>
-            </Card>
+            </TrainCardBox>
 
-            <Card>
-              <SectionTitle eyebrow="PREFERENCES" title="Booking options" />
+            <TrainCardBox>
+              <TrainHeading eyebrow="PREFERENCES" title="Booking options" />
               <ToggleRow title="Auto-upgrade" text="Move to a higher class for free if seats are available." value={options.autoUpgrade} onChange={(v) => setOptions({ autoUpgrade: v })} />
               <View style={s.sep} />
               <ToggleRow title="Book only if confirmed" text="Skip the booking if a confirmed berth is not available for everyone." value={options.confirmedOnly} onChange={(v) => setOptions({ confirmedOnly: v })} />
-            </Card>
+            </TrainCardBox>
 
-            <Card>
-              <SectionTitle eyebrow="FARE" title="Price summary" />
+            <TrainCardBox>
+              <TrainHeading eyebrow="FARE" title="Price summary" />
               <FareSummary fare={fare} />
-            </Card>
-            <Notice icon="information-circle-outline">Children under 5 travel free without a berth. Add them as a passenger if you need a berth of their own.</Notice>
+            </TrainCardBox>
+            <TrainNotice icon="information-circle-outline">Children under 5 travel free without a berth. Add them as a passenger if you need a berth of their own.</TrainNotice>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </FlowScreen>
+    </TrainShell>
   );
 }
 
@@ -137,13 +136,13 @@ const s = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   scrollChips: { flexDirection: 'row', gap: 8 },
   pair: { flexDirection: 'row', gap: 12 },
-  label: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
-  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 4 },
+  label: { fontSize: TextSize.micro, fontFamily: INTER.extrabold, letterSpacing: 0.9, color: Colors.textLight, marginBottom: 6 },
+  error: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.error, marginTop: 4 },
   remove: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.errorSoft },
   addWrap: { marginHorizontal: 20, marginBottom: 14 },
-  hint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, lineHeight: 18 },
+  hint: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, lineHeight: 18 },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  toggleTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  toggleText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  toggleTitle: { fontSize: TextSize.body, fontFamily: INTER.extrabold, color: BRAND },
+  toggleText: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   sep: { height: 1, backgroundColor: Colors.border, marginVertical: 12 },
 });

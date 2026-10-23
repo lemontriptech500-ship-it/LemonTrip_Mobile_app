@@ -1,10 +1,9 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { FareSummary } from '@/components/trains/TrainCards';
-import { Card, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, TrainProgress, goBackOr, replaceTo } from '@/components/trains/TrainUi';
+import { BRAND, INTER, EmptyState, PrimaryButton, TRAIN_ROUTES, TrainBanner, TrainCardBox, TrainFooter, TrainHeading, TrainInput, TrainNotice, TrainShell, TrainSteps, goBackOr, replaceTo } from '@/components/trains/TrainFlowUi';
 import { Colors } from '@/constants/colors';
 import { COUPONS, WALLET_BALANCE, inr, validateCoupon } from '@/data/trains';
 import { confirmTrainBooking, currentFare, setCoupon, useTrainBooking, type TrainPayment } from '@/utils/trainBookingStore';
@@ -38,7 +37,7 @@ export default function TrainPaymentScreen() {
 
   const derived = currentFare();
   if (!selection || !derived || passengers.some((p) => !p.name.trim())) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Payment" eyebrow="LEMONTRIP / RAIL" onBack={() => goBackOr(TRAIN_ROUTES.review)} /><EmptyState icon="card-outline" title="No booking to pay for" text="Select a train and add passenger details first." action={<PrimaryButton label="Search trains" onPress={() => replaceTo(TRAIN_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <TrainShell onBack={() => goBackOr(TRAIN_ROUTES.review)}><ScrollView><TrainBanner title="Secure payment" text="Choose how you would like to pay." /><EmptyState icon="card-outline" title="No booking to pay for" text="Select a train and add passenger details first." action={<PrimaryButton label="Search trains" onPress={() => replaceTo(TRAIN_ROUTES.results)} />} /></ScrollView></TrainShell>;
   }
   const { fare } = derived;
 
@@ -102,15 +101,15 @@ export default function TrainPaymentScreen() {
   };
 
   return (
-    <FlowScreen footer={<FooterBar caption="Amount to pay" amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label={processing ? 'Processing…' : `Pay ${inr(fare.total)}`} icon="lock-closed" loading={processing} onPress={pay} />} />}>
+    <TrainShell onBack={() => !processing && goBackOr(TRAIN_ROUTES.review)} footer={<TrainFooter caption="Amount to pay" amount={inr(fare.total)} label={processing ? 'Processing…' : 'Pay now'} icon="lock-closed" loading={processing} onPress={pay} />}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Secure payment" subtitle="Choose how you would like to pay." eyebrow="LEMONTRIP / RAIL" onBack={() => !processing && goBackOr(TRAIN_ROUTES.review)} />
-            <TrainProgress current={3} />
+            <TrainBanner title="Secure payment" text="Choose how you would like to pay." />
+            <TrainSteps current={4} />
 
-            <Card>
-              <SectionTitle eyebrow="PAYMENT METHOD" title="Pay using" />
+            <TrainCardBox>
+              <TrainHeading eyebrow="PAYMENT METHOD" title="Pay using" />
               {METHODS.map((m) => {
                 const on = method === m.id;
                 return (
@@ -123,7 +122,7 @@ export default function TrainPaymentScreen() {
               })}
 
               <View style={s.form}>
-                {method === 'razorpay' ? <Notice icon="shield-checkmark-outline" title="Razorpay test mode">Razorpay Checkout opens next. Use test credentials only, e.g. card 4111 1111 1111 1111 with any future expiry and CVV, or UPI success@razorpay. No real money is charged.</Notice> : null}
+                {method === 'razorpay' ? <TrainNotice icon="shield-checkmark-outline" title="Razorpay test mode">Razorpay Checkout opens next. Use test credentials only, e.g. card 4111 1111 1111 1111 with any future expiry and CVV, or UPI success@razorpay. No real money is charged.</TrainNotice> : null}
                 {method === 'wallet' ? (
                   <View style={s.wallet}>
                     <View style={s.walletRow}><Text style={s.walletLabel}>Wallet balance</Text><Text style={s.walletValue}>{inr(WALLET_BALANCE)}</Text></View>
@@ -134,56 +133,56 @@ export default function TrainPaymentScreen() {
                 ) : null}
               </View>
               {payError ? <View style={s.payError}><Ionicons name="close-circle" size={18} color={Colors.error} /><Text style={s.payErrorText}>{payError}</Text></View> : null}
-            </Card>
+            </TrainCardBox>
 
-            <Card>
-              <SectionTitle eyebrow="OFFERS" title="Have a coupon?" />
+            <TrainCardBox>
+              <TrainHeading eyebrow="OFFERS" title="Have a coupon?" />
               <View style={s.couponRow}>
-                <View style={{ flex: 1 }}><Field label="COUPON CODE" icon="pricetag-outline" autoCapitalize="characters" autoCorrect={false} value={couponInput} onChangeText={(v) => { setCouponInput(v.toUpperCase()); setCouponMsg(null); }} placeholder="e.g. LEMON10" editable={!processing} /></View>
+                <View style={{ flex: 1 }}><TrainInput label="COUPON CODE" icon="pricetag-outline" autoCapitalize="characters" autoCorrect={false} value={couponInput} onChangeText={(v) => { setCouponInput(v.toUpperCase()); setCouponMsg(null); }} placeholder="e.g. LEMON10" editable={!processing} /></View>
                 <View style={s.applyWrap}><PrimaryButton variant={coupon ? 'soft' : 'dark'} label={coupon ? 'Remove' : 'Apply'} onPress={coupon ? removeCoupon : applyCoupon} disabled={processing} /></View>
               </View>
               {couponMsg ? <Text style={[s.couponMsg, { color: couponMsg.ok ? Colors.success : Colors.error }]}>{couponMsg.text}</Text> : null}
               {!coupon ? <View style={s.suggest}>{COUPONS.map((c) => <TouchableOpacity key={c.code} accessibilityRole="button" onPress={() => setCouponInput(c.code)} style={s.suggestChip}><Text style={s.suggestCode}>{c.code}</Text><Text style={s.suggestLabel}>{c.label}</Text></TouchableOpacity>)}</View> : null}
-            </Card>
+            </TrainCardBox>
 
-            <Card>
-              <SectionTitle eyebrow="SUMMARY" title="Price details" />
+            <TrainCardBox>
+              <TrainHeading eyebrow="SUMMARY" title="Price details" />
               <FareSummary fare={fare} couponCode={coupon?.code} />
-            </Card>
+            </TrainCardBox>
 
-            <Notice icon="lock-closed-outline" title="Test mode">Payments run through Razorpay test mode, so no real money moves. Ticket and PNR details are still sample data until a rail provider is connected.</Notice>
+            <TrainNotice icon="lock-closed-outline" title="Test mode">Payments run through Razorpay test mode, so no real money moves. Ticket and PNR details are still sample data until a rail provider is connected.</TrainNotice>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
       <RazorpayCheckoutHost />
-    </FlowScreen>
+    </TrainShell>
   );
 }
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   method: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
-  methodOn: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
+  methodOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#FDF3C4' },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
-  radioOn: { borderColor: Colors.primary },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
+  radioOn: { borderColor: BRAND },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: BRAND },
   methodIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface },
-  methodTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  methodHint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
+  methodTitle: { fontSize: TextSize.body, fontFamily: INTER.extrabold, color: BRAND },
+  methodHint: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
   form: { marginTop: 10 },
-  error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 8 },
+  error: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.error, marginTop: 8 },
   wallet: { padding: 14, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
   walletRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   walletTotal: { borderTopWidth: 1, borderTopColor: Colors.borderStrong, marginTop: 6, paddingTop: 10 },
-  walletLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight },
-  walletValue: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  walletLabel: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight },
+  walletValue: { fontSize: TextSize.body, fontFamily: INTER.extrabold, color: BRAND },
   payError: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, borderRadius: 14, backgroundColor: Colors.errorSoft, borderWidth: 1, borderColor: Colors.errorBorder },
-  payErrorText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.error, fontWeight: FontWeight.bold },
+  payErrorText: { flex: 1, fontSize: TextSize.body, color: Colors.error, fontFamily: INTER.bold },
   couponRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
   applyWrap: { width: 104, marginBottom: 12 },
-  couponMsg: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, marginBottom: 8 },
+  couponMsg: { fontSize: TextSize.caption, fontFamily: INTER.bold, marginBottom: 8 },
   suggest: { gap: 8, marginTop: 4 },
   suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  suggestLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textDark },
+  suggestCode: { fontSize: TextSize.caption, fontFamily: INTER.extrabold, color: BRAND, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  suggestLabel: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: BRAND },
 });

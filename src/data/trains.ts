@@ -274,6 +274,71 @@ export const berthOptions = (cls: ClassCode): string[] => {
 
 export const COACH_PREFIX: Record<ClassCode, string> = { '1A': 'H', '2A': 'A', '3A': 'B', SL: 'S', CC: 'C', EC: 'E', '2S': 'D' };
 
+/* ---------- coach layout & seat map ---------- */
+
+export interface CoachSeat { id: string; no: number; tier: string }
+export interface CoachBay { id: string; label: string; /** Rows of seats side by side; null = aisle gap. */ rows: (CoachSeat | null)[][]; /** Side berths shown in their own column. */ side: CoachSeat[] }
+export interface CoachLayout { coach: string; kind: 'berth' | 'chair'; hint: string; bays: CoachBay[] }
+
+export const COACHES_PER_CLASS = 2;
+export const coachCodes = (cls: ClassCode): string[] => Array.from({ length: COACHES_PER_CLASS }, (_, i) => `${COACH_PREFIX[cls]}${i + 1}`);
+
+/** Seat ids look like `B1/23` (coach / seat number). */
+export const seatNumber = (id: string) => Number(id.split('/')[1]);
+export const seatCoach = (id: string) => id.split('/')[0];
+
+/** Builds a sample coach: 3-tier (SL/3A) = 8 berths per bay, 2-tier = 6, first AC = 2 per cabin, chair cars = rows of seats. */
+export function getCoachLayout(cls: ClassCode, coach: string): CoachLayout {
+  const seat = (no: number, tier: string): CoachSeat => ({ id: `${coach}/${no}`, no, tier });
+  if (cls === 'SL' || cls === '3A') {
+    const bays: CoachBay[] = Array.from({ length: 9 }, (_, b) => {
+      const n = b * 8;
+      return {
+        id: `bay${b}`, label: `Bay ${b + 1}`,
+        rows: [[seat(n + 1, 'Lower'), seat(n + 4, 'Lower')], [seat(n + 2, 'Middle'), seat(n + 5, 'Middle')], [seat(n + 3, 'Upper'), seat(n + 6, 'Upper')]],
+        side: [seat(n + 7, 'Side Lower'), seat(n + 8, 'Side Upper')],
+      };
+    });
+    return { coach, kind: 'berth', hint: cls === 'SL' ? 'Non-AC sleeper coach · 72 berths' : 'AC 3-tier coach · 72 berths', bays };
+  }
+  if (cls === '2A') {
+    const bays: CoachBay[] = Array.from({ length: 6 }, (_, b) => {
+      const n = b * 6;
+      return { id: `bay${b}`, label: `Bay ${b + 1}`, rows: [[seat(n + 1, 'Lower'), seat(n + 3, 'Lower')], [seat(n + 2, 'Upper'), seat(n + 4, 'Upper')]], side: [seat(n + 5, 'Side Lower'), seat(n + 6, 'Side Upper')] };
+    });
+    return { coach, kind: 'berth', hint: 'AC 2-tier coach · 36 berths', bays };
+  }
+  if (cls === '1A') {
+    const bays: CoachBay[] = Array.from({ length: 6 }, (_, b) => ({ id: `cab${b}`, label: `Cabin ${b + 1}`, rows: [[seat(b * 2 + 1, 'Lower')], [seat(b * 2 + 2, 'Upper')]], side: [] }));
+    return { coach, kind: 'berth', hint: 'First AC · private cabins of 2 berths', bays };
+  }
+  // Chair cars: 3+2 (CC), 2+2 (EC), 3+3 (2S).
+  const [left, right, rows] = cls === 'CC' ? [3, 2, 14] : cls === 'EC' ? [2, 2, 10] : [3, 3, 14];
+  const cols = ['Window', 'Middle', 'Aisle'];
+  const tierFor = (i: number, count: number, mirrored: boolean) => (count === 2 ? (mirrored ? (i === 0 ? 'Aisle' : 'Window') : (i === 0 ? 'Window' : 'Aisle')) : mirrored ? cols[2 - i] : cols[i]);
+  let no = 0;
+  const bays: CoachBay[] = Array.from({ length: rows }, (_, r) => {
+    const l = Array.from({ length: left }, (_, i) => seat((no += 1), tierFor(i, left, false)));
+    const rt = Array.from({ length: right }, (_, i) => seat((no += 1), tierFor(i, right, true)));
+    return { id: `row${r}`, label: `Row ${r + 1}`, rows: [[...l, null, ...rt]], side: [] };
+  });
+  return { coach, kind: 'chair', hint: `${CLASS_INFO[cls].name} · ${left}+${right} seating`, bays };
+}
+
+export function findSeat(cls: ClassCode, id: string): CoachSeat | undefined {
+  const layout = getCoachLayout(cls, seatCoach(id));
+  for (const bay of layout.bays) { for (const row of bay.rows) for (const s of row) if (s?.id === id) return s; const side = bay.side.find((s) => s.id === id); if (side) return side; }
+  return undefined;
+}
+export const describeSeat = (cls: ClassCode, id: string) => { const s = findSeat(cls, id); return s ? `${id} · ${s.tier}` : id; };
+
+/** Deterministic sample of already-booked seats for a coach (about a third of them). */
+export function getBookedSeats(trainId: string, cls: ClassCode, date: string, coach: string): Set<string> {
+  const layout = getCoachLayout(cls, coach);
+  const all = layout.bays.flatMap((b) => [...b.rows.flat(), ...b.side]).filter((s): s is CoachSeat => !!s);
+  return new Set(all.filter((s) => hash(`${trainId}|${cls}|${date}|${s.id}`) % 100 < 34).map((s) => s.id));
+}
+
 /* ---------- coupons & payment ---------- */
 
 export interface Coupon { code: string; label: string; min: number; compute: (amount: number) => number }

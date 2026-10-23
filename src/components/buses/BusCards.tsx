@@ -6,7 +6,7 @@ import { Ui } from '@/constants/theme';
 import { formatDuration, formatShortDate, getCity, getDeckInfo, inr, lowestFare, seatsLeft, type Bus, type DeckId, type FareBreakdown } from '@/data/buses';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
-import { Pill, Row } from './BusUi';
+import { BRAND, BusRow, BusTag, INTER, Pill, busStyles } from './BusUi';
 
 function TimeBlock({ time, code, align = 'left', sub }: { time: string; code: string; align?: 'left' | 'right'; sub?: string }) {
   return (
@@ -74,13 +74,26 @@ export function JourneySummary({ bus, date, seats }: { bus: Bus; date: string; s
   return (
     <View style={s.summary}>
       <View style={s.summaryTop}>
-        <View style={{ flex: 1, minWidth: 0 }}><Text style={s.summaryName} numberOfLines={1}>{bus.operator}</Text><Text style={s.number} numberOfLines={1}>{bus.type}</Text></View>
-        {seats && seats.length ? <Pill label={`${seats.length} seat${seats.length > 1 ? 's' : ''} · ${seats.join(', ')}`} tone="brand" icon="bed-outline" /> : <Pill label={rating(bus)} tone="neutral" />}
+        <View style={s.summaryIcon}><Ionicons name="bus-outline" size={24} color={BRAND} /></View>
+        <View style={{ flex: 1, minWidth: 0 }}><Text style={s.summaryName} numberOfLines={1}>{bus.operator}</Text><Text style={s.summaryMeta} numberOfLines={1}>{bus.type}</Text></View>
+        <BusTag label={seats && seats.length ? `${seats.length} seat${seats.length > 1 ? 's' : ''}` : rating(bus)} />
       </View>
       <View style={s.times}>
-        <TimeBlock time={bus.departure} code={bus.fromCode} sub={`${from?.name ?? ''} · ${formatShortDate(date)}`} />
-        <RouteLine bus={bus} />
-        <TimeBlock time={bus.arrival} code={bus.toCode} align="right" sub={bus.arrivalDayOffset > 0 ? `${to?.name ?? ''} · +${bus.arrivalDayOffset} day` : to?.name} />
+        <View style={s.end}>
+          <Text style={s.sTime}>{bus.departure}</Text>
+          <Text style={s.sCode}>{bus.fromCode}</Text>
+          <Text style={s.sSub} numberOfLines={2}>{from?.name ?? ''} · {formatShortDate(date)}</Text>
+        </View>
+        <View style={s.mid}>
+          <Text style={s.midText}>{formatDuration(bus.durationMin)}</Text>
+          <View style={s.track}><View style={s.sDot} /><View style={s.rule} /><Ionicons name="bus" size={15} color={BRAND} /><View style={s.rule} /><View style={s.sDot} /></View>
+          <Text style={s.midText}>{bus.distanceKm} km</Text>
+        </View>
+        <View style={[s.end, { alignItems: 'flex-end' }]}>
+          <Text style={s.sTime}>{bus.arrival}</Text>
+          <Text style={s.sCode}>{bus.toCode}</Text>
+          <Text style={[s.sSub, { textAlign: 'right' }]} numberOfLines={2}>{bus.arrivalDayOffset > 0 ? `${to?.name ?? ''} · +${bus.arrivalDayOffset} day` : to?.name}</Text>
+        </View>
       </View>
     </View>
   );
@@ -89,13 +102,13 @@ export function JourneySummary({ bus, date, seats }: { bus: Bus; date: string; s
 export function FareSummary({ fare, couponCode }: { fare: FareBreakdown; couponCode?: string | null }) {
   return (
     <View>
-      <Row label={`Base fare × ${fare.seats}`} value={inr(fare.base)} />
-      {fare.gst > 0 ? <Row label="GST (5%)" value={inr(fare.gst)} /> : null}
-      {fare.insurance > 0 ? <Row label="Travel insurance" value={inr(fare.insurance)} /> : null}
-      <Row label="Convenience fee" value={inr(fare.convenience)} />
-      {fare.discount > 0 ? <Row label={`Coupon ${couponCode ?? ''}`.trim()} value={`− ${inr(fare.discount)}`} tone="good" /> : null}
-      <View style={s.divider} />
-      <Row label="Total payable" value={inr(fare.total)} bold />
+      <BusRow label={`Base fare × ${fare.seats}`} value={inr(fare.base)} />
+      {fare.gst > 0 ? <BusRow label="GST (5%)" value={inr(fare.gst)} /> : null}
+      {fare.insurance > 0 ? <BusRow label="Travel insurance" value={inr(fare.insurance)} /> : null}
+      <BusRow label="Convenience fee" value={inr(fare.convenience)} />
+      {fare.discount > 0 ? <BusRow label={`Coupon ${couponCode ?? ''}`.trim()} value={`− ${inr(fare.discount)}`} good /> : null}
+      <View style={busStyles.divider} />
+      <BusRow label="Total payable" value={inr(fare.total)} bold />
     </View>
   );
 }
@@ -126,8 +139,17 @@ const s = StyleSheet.create({
   footText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
   footBold: { fontWeight: FontWeight.extraBold, color: Colors.textDark },
   link: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
-  summary: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: 16 },
-  summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  summaryName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  summary: { ...Ui.card, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  summaryIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted },
+  summaryName: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: BRAND },
+  summaryMeta: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  end: { flex: 1, minWidth: 0 },
+  sTime: { fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall, color: BRAND },
+  sCode: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND, marginTop: 6 },
+  sSub: { fontFamily: INTER.regular, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 3 },
+  mid: { width: 92, alignItems: 'center', gap: 6 },
+  midText: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
+  sDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: BRAND },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 8 },
 });

@@ -22,6 +22,7 @@ export const TRAIN_ROUTES = {
   results: '/(tabs)/explore/trains',
   details: '/(tabs)/explore/train-details',
   passengers: '/(tabs)/explore/train-passengers',
+  seats: '/(tabs)/explore/train-seats',
   review: '/(tabs)/explore/train-review',
   payment: '/(tabs)/explore/train-payment',
   confirmation: '/(tabs)/explore/train-confirmation',
@@ -29,8 +30,8 @@ export const TRAIN_ROUTES = {
 
 /* ---------- progress ---------- */
 
-const STEPS = ['Select', 'Passengers', 'Review', 'Payment', 'Done'];
-export function TrainProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 }) {
+const STEPS = ['Select', 'Passengers', 'Seats', 'Review', 'Payment', 'Done'];
+export function TrainProgress({ current }: { current: 0 | 1 | 2 | 3 | 4 | 5 }) {
   return <StepProgress steps={STEPS} current={current} />;
 }
 
