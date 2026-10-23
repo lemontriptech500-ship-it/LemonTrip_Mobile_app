@@ -40,7 +40,7 @@ const featuredDestinations: Destination[] = [
 
 // Travel styles are shown as icon tiles (same pattern as the Home service grid).
 const experienceTypes: { name: string; filter: string; icon: IconName }[] = [
-  { name: 'Adventure', filter: 'Adventure', icon: 'compass-outline' },
+  { name: 'Adventure', filter: 'Adventure', icon: 'airplane-outline' },
   { name: 'Beach', filter: 'Beach', icon: 'sunny-outline' },
   { name: 'Mountains', filter: 'Mountains', icon: 'trail-sign-outline' },
   { name: 'Family', filter: 'Family', icon: 'people-outline' },
@@ -49,8 +49,13 @@ const experienceTypes: { name: string; filter: string; icon: IconName }[] = [
   { name: 'Luxury', filter: 'Luxury', icon: 'diamond-outline' },
 ];
 
+const TOP_EXPERIENCES = [
+  { name: 'Beaches', filter: 'Beach', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=900&q=88' },
+  { name: 'Adventure', filter: 'Adventure', image: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=900&q=88' },
+  { name: 'Luxury', filter: 'Luxury', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=88' },
+];
 const popularSearches = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Weekend getaways'];
-const POPULAR_CHIPS = ['Dubai', 'Maldives', 'Bali', 'Kashmir', 'Goa'];
+const POPULAR_CHIPS = ['Dubai', 'Maldives', 'Bali', 'Singapore', 'Thailand'];
 const EXPLORE_TABS = [
   { title: 'Explore', route: '/(tabs)/explore', active: true },
   { title: 'Packages', route: '/(tabs)/explore/packages', active: false },
@@ -143,8 +148,6 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Essentials in Green.png')} aspectRatio={2170 / 725} />
-
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
             {EXPLORE_TABS.map((tab) => (
               <TouchableOpacity key={tab.title} accessibilityRole="button" accessibilityState={{ selected: tab.active }} onPress={() => { if (!tab.active) router.navigate(tab.route as never); }} style={[styles.tabItem, tab.active && styles.tabItemActive]}>
@@ -152,6 +155,8 @@ export default function ExploreScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+          <ServiceBanner eyebrow="DESTINATION DISCOVERY" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/explore-hero.png')} aspectRatio={1659 / 948} tone="dark" copyWidth="60%" large />
+
           {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
             <View style={styles.searchPill}>
@@ -180,6 +185,20 @@ export default function ExploreScreen() {
                 <Ionicons name="options-outline" size={22} color={Colors.white} />
                 {activeFilterCount > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeText}>{activeFilterCount}</Text></View> : null}
               </TouchableOpacity>
+            </View>
+
+            <View style={styles.popInCard}>
+              <Text style={styles.popInLabel}>Popular</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.popRow}>
+                {POPULAR_CHIPS.map((place) => {
+                  const on = query.trim() ? query.trim().toLowerCase() === place.toLowerCase() : place === 'Dubai';
+                  return (
+                    <TouchableOpacity key={place} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => selectSearch(place)} style={[styles.popChip, on && styles.popChipOn]}>
+                      <Text style={[styles.popChipText, on && styles.popChipTextOn]}>{place}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
 
             {showSuggestions ? (
@@ -220,29 +239,6 @@ export default function ExploreScreen() {
             ) : null}
           </View>
 
-          {/* Popular destinations */}
-          <View style={styles.popularHead}>
-            <Text style={styles.popularTitle}>Popular</Text>
-            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/destinations')} style={styles.popularViewAll}>
-              <Text style={styles.linkText}>View all</Text>
-              <Ionicons name="arrow-forward" size={16} color="#103D30" />
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.popularRow}>
-            {POPULAR_CHIPS.map((place) => {
-              const on = query.trim() ? query.trim().toLowerCase() === place.toLowerCase() : place === 'Dubai';
-              return (
-                <TouchableOpacity key={place} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => selectSearch(place)} style={[styles.popChip, on && styles.popChipOn]}>
-                  <Text style={[styles.popChipText, on && styles.popChipTextOn]}>{place}</Text>
-                </TouchableOpacity>
-              );
-            })}
-            <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/destinations')} style={styles.popChip}>
-              <Text style={styles.popChipText}>More</Text>
-              <Ionicons name="chevron-down" size={14} color="#103D30" />
-            </TouchableOpacity>
-          </ScrollView>
-
           {/* Explore-specific filters */}
           <View style={styles.gridCard}>
             <View style={styles.gridHeader}>
@@ -250,31 +246,32 @@ export default function ExploreScreen() {
               <View style={styles.gridHeadRight}>
                 {selectedExperience ? <TouchableOpacity accessibilityRole="button" onPress={() => setSelectedExperience(null)}><Text style={styles.linkText}>Clear</Text></TouchableOpacity> : null}
                 <TouchableOpacity accessibilityRole="button" onPress={() => router.navigate('/(tabs)/explore/packages')} style={styles.popularViewAll}>
-                  <Text style={styles.linkText}>Explore all</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#103D30" />
+                  <Text style={styles.linkText}>See all</Text>
+                  <Ionicons name="chevron-forward" size={16} color="#103D30" />
                 </TouchableOpacity>
               </View>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.styleRow}>
-              {experienceTypes.map((experience, index) => {
+            <View style={styles.tileGrid}>
+              {experienceTypes.map((experience) => {
                 const selected = selectedExperience === experience.filter;
                 return (
-                  <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.styleItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
-                    <View style={[styles.styleCircle, index % 2 === 0 ? styles.styleCircleWarm : styles.styleCircleMint, selected && styles.styleCircleOn]}>
-                      <Ionicons name={experience.icon} size={24} color="#103D30" />
+                  <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.tileItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
+                    <View style={[styles.tileBox, selected && styles.tileBoxOn]}>
+                      <Ionicons name={experience.icon} size={26} color="#103D30" />
                     </View>
-                    <Text style={[styles.styleLabel, selected && styles.styleLabelOn]} numberOfLines={1}>{experience.name}</Text>
+                    <Text style={[styles.tileLabel, selected && styles.tileLabelOn]} numberOfLines={1}>{experience.name}</Text>
                   </TouchableOpacity>
                 );
               })}
-              <TouchableOpacity accessibilityRole="button" style={styles.styleItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
-                <View style={[styles.styleCircle, styles.styleCircleMint]}>
-                  <Ionicons name="grid-outline" size={24} color="#103D30" />
+              <TouchableOpacity accessibilityRole="button" style={styles.tileItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
+                <View style={styles.tileBox}>
+                  <Ionicons name="grid-outline" size={26} color="#103D30" />
                 </View>
-                <Text style={styles.styleLabel} numberOfLines={1}>All journeys</Text>
+                <Text style={styles.tileLabel} numberOfLines={1}>All journeys</Text>
               </TouchableOpacity>
-            </ScrollView>
+            </View>
           </View>
+
           {/* Trending destinations */}
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
@@ -311,6 +308,28 @@ export default function ExploreScreen() {
             )}
           </View>
 
+          {/* Top experiences */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeading}>
+              <Text style={styles.sectionTitle}>Top experiences</Text>
+              <TouchableOpacity accessibilityRole="button" onPress={() => router.navigate('/(tabs)/explore/packages')} style={styles.popularViewAll}>
+                <Text style={styles.linkText}>See all</Text>
+                <Ionicons name="chevron-forward" size={16} color="#103D30" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.expRow}>
+              {TOP_EXPERIENCES.map((e) => (
+                <TouchableOpacity key={e.name} accessibilityRole="button" activeOpacity={0.9} onPress={() => setSelectedExperience(e.filter)} style={styles.expCard}>
+                  <ImageBackground source={{ uri: e.image }} style={styles.expImg}>
+                    <View style={styles.expPill}>
+                      <Text style={styles.expName}>{e.name}</Text>
+                      <Ionicons name="arrow-forward-circle-outline" size={22} color="#103D30" />
+                    </View>
+                  </ImageBackground>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
           {/* Handpicked journeys */}
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
@@ -397,11 +416,11 @@ export default function ExploreScreen() {
 
           {/* Trust strip */}
           <View style={styles.trustStrip}>
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Your trip, our priority</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={2}>Your trip, our priority</Text></View></View>
             <View style={styles.trustDivider} />
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>No hidden charges</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={2}>No hidden charges</Text></View></View>
             <View style={styles.trustDivider} />
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>We’re here, 24/7</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={2}>We’re here, 24/7</Text></View></View>
           </View>
         </View>
       </ScrollView>
@@ -464,6 +483,20 @@ const styles = StyleSheet.create({
 
   // Travel style grid card
   gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 13, paddingBottom: 7, paddingHorizontal: 8, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  popInCard: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 },
+  popInLabel: { fontFamily: 'Inter-Bold', fontSize: 14, color: Colors.textDark },
+  popRow: { gap: 8, alignItems: 'center', paddingRight: 8 },
+  expRow: { gap: 12, paddingHorizontal: 16 },
+  expCard: { width: 150, height: 130, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
+  expImg: { flex: 1, justifyContent: 'flex-end', padding: 8 },
+  expPill: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 14, backgroundColor: Colors.white },
+  expName: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: Colors.textDark },
+  tileGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 6, rowGap: 12, paddingBottom: 10 },
+  tileItem: { width: '25%', alignItems: 'center', gap: 6, paddingHorizontal: 4 },
+  tileBox: { width: '100%', height: 54, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft, borderWidth: 2, borderColor: 'transparent' },
+  tileBoxOn: { borderColor: Colors.accent },
+  tileLabel: { fontFamily: 'Inter-Medium', fontSize: 11, color: Colors.textDark, textAlign: 'center' },
+  tileLabelOn: { fontFamily: 'Inter-Bold', color: '#103D30' },
   gridHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   styleRow: { gap: 14, paddingHorizontal: 10, paddingBottom: 8 },
   styleItem: { width: 68, alignItems: 'center', gap: 6 },
@@ -543,16 +576,10 @@ const styles = StyleSheet.create({
   signInLink: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 6, paddingVertical: 8 },
   signInText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
-  // Trust + footer
+  // Trust strip
   trustStrip: { marginTop: 12, marginHorizontal: Ui.space.page, paddingVertical: 12, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.surface, borderRadius: 18 },
   trustItem: { flex: 1, minWidth: 0, flexDirection: 'column', alignItems: 'center', gap: 4 },
   trustCopy: { alignSelf: 'stretch', minWidth: 0, alignItems: 'center' },
   trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 11, textAlign: 'center', lineHeight: 15 },
   trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 9, textAlign: 'center', lineHeight: 13, marginTop: 1 },
-  footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
-  footerLogoImage: { width: 118, height: 38 },
-  footerTagline: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  footerLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 18 },
-  footerLink: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
-  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
 });
