@@ -1,6 +1,6 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { ServiceBanner } from '@/components/ui/ServiceHeader';
 import { Colors } from '@/constants/colors';
@@ -16,6 +16,9 @@ import { useMemo, useState } from 'react';
 import { Image, ImageBackground, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
+
+// Explore uses a slightly smaller type scale than the shared TextSize.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20 } as const;
 
 const destinationCountries: Record<string, string> = {
   dubai: 'United Arab Emirates',
