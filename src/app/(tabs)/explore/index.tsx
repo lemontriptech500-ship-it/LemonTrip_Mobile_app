@@ -543,16 +543,10 @@ const styles = StyleSheet.create({
   signInLink: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 6, paddingVertical: 8 },
   signInText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
-  // Trust + footer
+  // Trust strip
   trustStrip: { marginTop: 12, marginHorizontal: Ui.space.page, paddingVertical: 12, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.surface, borderRadius: 18 },
   trustItem: { flex: 1, minWidth: 0, flexDirection: 'column', alignItems: 'center', gap: 4 },
   trustCopy: { alignSelf: 'stretch', minWidth: 0, alignItems: 'center' },
   trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 11, textAlign: 'center', lineHeight: 15 },
   trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 9, textAlign: 'center', lineHeight: 13, marginTop: 1 },
-  footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
-  footerLogoImage: { width: 118, height: 38 },
-  footerTagline: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  footerLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 18 },
-  footerLink: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
-  footerCopyright: { width: '100%', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
 });
