@@ -21,7 +21,8 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
   const user = useAuth(); const wide = useWindowDimensions().width >= 900;
   const navigate = (route: Href) => { blurWebNavigationFocus(); router.navigate(route); };
   const links = sections.map(section => <TouchableOpacity key={section.title} accessibilityRole="button" accessibilityLabel={section.title} accessibilityState={{ selected: pathname === section.path }} onPress={() => { if (pathname !== section.path) navigate(section.route); }} style={[styles.navLink, pathname === section.path && styles.activeLink]}><Text style={[styles.navText, pathname === section.path && styles.activeText]}>{section.title}</Text></TouchableOpacity>);
-  if (pathname === '/explore' && !wide) {
+  const barTitle = pathname === '/explore/packages' ? 'Packages' : pathname === '/explore' ? 'Explore' : '';
+  if (barTitle && !wide) {
     return (
       <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
         <StatusBar style="dark" />
@@ -29,7 +30,7 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
           <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => navigate('/home')} style={newStyles.topBtn}>
             <Ionicons name="arrow-back" size={22} color="#103D30" />
           </TouchableOpacity>
-          <Text accessibilityRole="header" style={newStyles.topTitle}>Explore</Text>
+          <Text accessibilityRole="header" style={newStyles.topTitle}>{barTitle}</Text>
           <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[newStyles.topBtn, newStyles.topBtnTint]}>
             <Ionicons name="settings-outline" size={20} color="#103D30" />
           </TouchableOpacity>
