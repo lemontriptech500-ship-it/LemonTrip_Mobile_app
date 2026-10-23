@@ -394,22 +394,11 @@ export default function ExploreScreen() {
 
           {/* Trust strip */}
           <View style={styles.trustStrip}>
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={2}>Your trip, our priority</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Your trip, our priority</Text></View></View>
             <View style={styles.trustDivider} />
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={2}>No hidden charges</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>No hidden charges</Text></View></View>
             <View style={styles.trustDivider} />
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={2}>We’re here, 24/7</Text></View></View>
-          </View>
-          <View style={styles.footer}>
-            <Image source={require('../../../../assets/images/App Logo.png')} style={styles.footerLogoImage} resizeMode="cover" />
-            <Text style={styles.footerTagline}>Travel, thoughtfully planned.</Text>
-            <View style={styles.footerLinks}>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}><Text style={styles.footerLink}>Explore</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/packages')}><Text style={styles.footerLink}>Packages</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/offers')}><Text style={styles.footerLink}>Offers</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/contact')}><Text style={styles.footerLink}>Support</Text></TouchableOpacity>
-            </View>
-            <Text style={styles.footerCopyright}>© LemonTrip. Made for the journey.</Text>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>We’re here, 24/7</Text></View></View>
           </View>
         </View>
       </ScrollView>
@@ -522,7 +511,7 @@ const styles = StyleSheet.create({
   packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.strongOverlay, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
   packageRatingText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   packageBody: { padding: 14 },
-  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 21, fontWeight: FontWeight.extraBold },
+  packageTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 21, fontWeight: FontWeight.extraBold },
   packageMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   packageDuration: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   packageBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
@@ -543,7 +532,7 @@ const styles = StyleSheet.create({
   personalSubtitle: { color: Colors.primaryDark, fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, marginTop: 2 },
   preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 8 },
   preferenceChip: { minHeight: 32, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: Colors.white },
-  trustIcon: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
+  trustIcon: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
   trustDivider: { width: 1, alignSelf: 'stretch', backgroundColor: Colors.border },
   preferenceChipActive: { backgroundColor: '#103D30' },
   preferenceText: { color: Colors.primaryDark, fontFamily: 'Inter-SemiBold', fontSize: 12 },
@@ -553,10 +542,10 @@ const styles = StyleSheet.create({
 
   // Trust + footer
   trustStrip: { marginTop: 12, marginHorizontal: Ui.space.page, paddingVertical: 12, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.surface, borderRadius: 18 },
-  trustItem: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  trustCopy: { flex: 1, minWidth: 0 },
-  trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 12, lineHeight: 15 },
-  trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 10, lineHeight: 13, marginTop: 1 },
+  trustItem: { flex: 1, minWidth: 0, flexDirection: 'column', alignItems: 'center', gap: 4 },
+  trustCopy: { alignSelf: 'stretch', minWidth: 0, alignItems: 'center' },
+  trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 11, textAlign: 'center', lineHeight: 15 },
+  trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 9, textAlign: 'center', lineHeight: 13, marginTop: 1 },
   footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
   footerLogoImage: { width: 118, height: 38 },
   footerTagline: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
