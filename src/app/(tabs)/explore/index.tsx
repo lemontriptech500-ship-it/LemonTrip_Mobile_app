@@ -2,7 +2,7 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
-import { ServiceBanner } from '@/components/ui/ServiceHeader';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import type { Destination, TravelPackage } from '@/types/content';
@@ -21,7 +21,7 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20 } as const;
 
 const destinationCountries: Record<string, string> = {
-  dubai: 'United Arab Emirates',
+  dubai: 'UAE',
   maldives: 'Maldives',
   thailand: 'Thailand',
   singapore: 'Singapore',
@@ -32,8 +32,9 @@ const destinationCountries: Record<string, string> = {
 };
 
 const featuredDestinations: Destination[] = [
-  { id: 'kashmir', name: 'Kashmir', image: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=900&q=88', priceFrom: 'Snowy mountains & serene valleys' },
+  { id: 'kashmir', name: 'Kashmir', image: 'https://images.unsplash.com/photo-1595815771614-ade9d652a65d?w=900&q=88', priceFrom: 'Snowy mountains & serene lakes' },
   { id: 'kerala', name: 'Kerala', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=900&q=88', priceFrom: 'God’s own country' },
+  { id: 'dubai', name: 'Dubai', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=88', priceFrom: 'Modern city, endless experiences' },
   { id: 'jaipur', name: 'Jaipur', image: 'https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?w=900&q=88', priceFrom: 'Royal heritage & culture' },
   { id: 'singapore', name: 'Singapore', image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=88', priceFrom: 'Modern & vibrant' },
 ];
@@ -148,14 +149,22 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ backgroundColor: Colors.surface, flexGrow: 0 }} contentContainerStyle={styles.tabsRow}>
             {EXPLORE_TABS.map((tab) => (
               <TouchableOpacity key={tab.title} accessibilityRole="button" accessibilityState={{ selected: tab.active }} onPress={() => { if (!tab.active) router.navigate(tab.route as never); }} style={[styles.tabItem, tab.active && styles.tabItemActive]}>
                 <Text style={[styles.tabText, tab.active && styles.tabTextActive]}>{tab.title}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <ServiceBanner eyebrow="DESTINATION DISCOVERY" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/explore-hero.png')} aspectRatio={1659 / 948} tone="dark" copyWidth="60%" large />
+          <View style={styles.hero}>
+            <Image source={require('../../../../assets/images/explore-hero.webp')} resizeMode="cover" style={styles.heroImg} />
+            <LinearGradient colors={['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.55)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 0.85]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+            <View style={styles.heroCopy}>
+              <Text style={styles.heroEyebrow}>DESTINATION DISCOVERY</Text>
+              <Text style={styles.heroTitle}>Discover somewhere new.</Text>
+              <Text style={styles.heroSub}>Search by place, then narrow your journey by travel style.</Text>
+            </View>
+          </View>
 
           {/* Destination discovery search and filters */}
           <View style={styles.searchStrip}>
@@ -257,7 +266,7 @@ export default function ExploreScreen() {
                 return (
                   <TouchableOpacity key={experience.name} accessibilityRole="button" accessibilityState={{ selected }} style={styles.tileItem} activeOpacity={0.85} onPress={() => setSelectedExperience((current) => current === experience.filter ? null : experience.filter)}>
                     <View style={[styles.tileBox, selected && styles.tileBoxOn]}>
-                      <Ionicons name={experience.icon} size={26} color="#103D30" />
+                      <Ionicons name={experience.icon} size={22} color="#103D30" />
                     </View>
                     <Text style={[styles.tileLabel, selected && styles.tileLabelOn]} numberOfLines={1}>{experience.name}</Text>
                   </TouchableOpacity>
@@ -265,7 +274,7 @@ export default function ExploreScreen() {
               })}
               <TouchableOpacity accessibilityRole="button" style={styles.tileItem} activeOpacity={0.85} onPress={() => router.navigate('/(tabs)/explore/packages')}>
                 <View style={styles.tileBox}>
-                  <Ionicons name="grid-outline" size={26} color="#103D30" />
+                  <Ionicons name="grid-outline" size={22} color="#103D30" />
                 </View>
                 <Text style={styles.tileLabel} numberOfLines={1}>All journeys</Text>
               </TouchableOpacity>
@@ -276,7 +285,7 @@ export default function ExploreScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeading}>
               <Text style={styles.sectionTitle}>Trending destinations</Text>
-              <TouchableOpacity onPress={() => router.push('/destinations')}><Text style={styles.linkText}>Discover all</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/destinations')}><View style={styles.popularViewAll}><Text style={styles.linkText}>See all</Text><Ionicons name="chevron-forward" size={16} color="#103D30" /></View></TouchableOpacity>
             </View>
             {filteredDestinations.length ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.destinationRow}>
@@ -296,7 +305,7 @@ export default function ExploreScreen() {
                         <View>
                           <Text style={styles.destinationCountry}>{destinationCountries[item.id] ?? 'Explore'}</Text>
                           <Text style={styles.destinationName}>{item.name}</Text>
-                          <Text style={styles.destinationPrice} numberOfLines={1}>{destinations.length ? `From ${item.priceFrom}` : item.priceFrom}</Text>
+                          <Text style={styles.destinationPrice} numberOfLines={2}>{item.priceFrom}</Text>
                         </View>
                       </ImageBackground>
                     </TouchableOpacity>
@@ -323,7 +332,7 @@ export default function ExploreScreen() {
                   <ImageBackground source={{ uri: e.image }} style={styles.expImg}>
                     <View style={styles.expPill}>
                       <Text style={styles.expName}>{e.name}</Text>
-                      <Ionicons name="arrow-forward-circle-outline" size={22} color="#103D30" />
+                      <Ionicons name="arrow-forward-circle-outline" size={20} color="#103D30" />
                     </View>
                   </ImageBackground>
                 </TouchableOpacity>
@@ -441,25 +450,33 @@ const styles = StyleSheet.create({
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
 
+  // Hero
+  hero: { width: '100%', aspectRatio: 2.05, backgroundColor: '#DCEBE5', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
+  heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  heroCopy: { width: '62%', paddingLeft: 16 },
+  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: 8, letterSpacing: 0.8, color: '#3C4A45' },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#103D30', marginTop: 4 },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: 10.5, lineHeight: 14, color: '#3C4A45', marginTop: 4 },
+
   // Search
   popularHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Ui.space.page, marginTop: 18, marginBottom: 10 },
   popularTitle: { fontFamily: 'Inter-Bold', fontSize: TextSize.title, color: Colors.textDark },
   popularViewAll: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   popularRow: { gap: 8, paddingHorizontal: Ui.space.page, alignItems: 'center', paddingBottom: 4 },
-  popChip: { minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 18, borderRadius: 999, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  popChip: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, borderRadius: 999, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   popChipOn: { backgroundColor: '#103D30', borderColor: '#103D30' },
-  popChipText: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.body, color: Colors.textDark },
+  popChipText: { fontFamily: 'Inter-Medium', fontSize: TextSize.caption, color: Colors.textDark },
   popChipTextOn: { color: Colors.white },
-  tabsRow: { gap: 26, paddingHorizontal: Ui.space.page, marginTop: 0 },
-  tabItem: { minHeight: 44, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  tabsRow: { gap: 24, paddingHorizontal: 16, marginTop: 0, backgroundColor: Colors.surface },
+  tabItem: { minHeight: 40, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
   tabItemActive: { borderBottomColor: Colors.accent },
-  tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.bodyLarge, color: Colors.textLight },
+  tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.body, color: Colors.textDark },
   tabTextActive: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
-  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 8, padding: 12, zIndex: 5 },
-  searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
-  searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, paddingVertical: 10 },
+  searchStrip: { ...Ui.card, marginHorizontal: 10, marginTop: -26, padding: 10, borderRadius: 18, zIndex: 5, ...SHADOW },
+  searchPill: { minHeight: 46, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 23, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
+  searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, paddingVertical: 8 },
   clearSearch: { padding: 4 },
-  filterCircle: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.primary },
+  filterCircle: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primary },
   filterCircleActive: { backgroundColor: Colors.primaryDark },
   filterBadge: { position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', borderRadius: 9, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
   filterBadgeText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
@@ -482,20 +499,20 @@ const styles = StyleSheet.create({
   applyText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   // Travel style grid card
-  gridCard: { ...Ui.card, marginTop: 16, marginHorizontal: Ui.space.page, paddingTop: 13, paddingBottom: 7, paddingHorizontal: 8, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
-  popInCard: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 },
-  popInLabel: { fontFamily: 'Inter-Bold', fontSize: 14, color: Colors.textDark },
+  gridCard: { ...Ui.card, marginTop: 12, marginHorizontal: 10, paddingTop: 12, paddingBottom: 8, paddingHorizontal: 6, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, ...SHADOW },
+  popInCard: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 },
+  popInLabel: { fontFamily: 'Inter-Bold', fontSize: TextSize.caption, color: Colors.textDark },
   popRow: { gap: 8, alignItems: 'center', paddingRight: 8 },
-  expRow: { gap: 12, paddingHorizontal: 16 },
-  expCard: { width: 150, height: 130, borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
-  expImg: { flex: 1, justifyContent: 'flex-end', padding: 8 },
-  expPill: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 14, backgroundColor: Colors.white },
-  expName: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: Colors.textDark },
-  tileGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 6, rowGap: 12, paddingBottom: 10 },
-  tileItem: { width: '25%', alignItems: 'center', gap: 6, paddingHorizontal: 4 },
-  tileBox: { width: '100%', height: 54, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft, borderWidth: 2, borderColor: 'transparent' },
+  expRow: { gap: 8, paddingHorizontal: 10 },
+  expCard: { width: 120, height: 100, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.surfaceMuted },
+  expImg: { flex: 1, justifyContent: 'flex-end', padding: 6 },
+  expPill: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 11, backgroundColor: Colors.white },
+  expName: { fontFamily: 'Inter-SemiBold', fontSize: 11, color: Colors.textDark },
+  tileGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 2, rowGap: 6 },
+  tileItem: { width: '25%', alignItems: 'center', gap: 4, paddingHorizontal: 4 },
+  tileBox: { width: '100%', height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft, borderWidth: 2, borderColor: 'transparent' },
   tileBoxOn: { borderColor: Colors.accent },
-  tileLabel: { fontFamily: 'Inter-Medium', fontSize: 11, color: Colors.textDark, textAlign: 'center' },
+  tileLabel: { fontFamily: 'Inter-Medium', fontSize: 10, color: Colors.textDark, textAlign: 'center' },
   tileLabelOn: { fontFamily: 'Inter-Bold', color: '#103D30' },
   gridHeadRight: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   styleRow: { gap: 14, paddingHorizontal: 10, paddingBottom: 8 },
@@ -506,8 +523,8 @@ const styles = StyleSheet.create({
   styleCircleOn: { borderColor: Colors.accent },
   styleLabel: { fontFamily: 'Inter-Medium', fontSize: TextSize.micro, color: Colors.textDark, textAlign: 'center' },
   styleLabelOn: { fontFamily: 'Inter-Bold', color: '#103D30' },
-  gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 10, marginBottom: 10 },
-  gridTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
+  gridHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, marginBottom: 8 },
+  gridTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   gridRow: { flexDirection: 'row', flexWrap: 'wrap' },
   gridItem: { width: '25%', minHeight: 66, alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 2, position: 'relative' },
   gridLabel: { minHeight: 22, marginTop: 5, textAlign: 'center', color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, lineHeight: 12, fontWeight: FontWeight.bold },
@@ -516,21 +533,21 @@ const styles = StyleSheet.create({
   experienceIndicatorSelected: { backgroundColor: Colors.accent },
 
   // Sections
-  section: { paddingTop: 24 },
-  sectionHeading: { paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  sectionTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold },
+  section: { paddingTop: 16 },
+  sectionHeading: { paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+  sectionTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   linkText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   // Destinations
-  destinationRow: { paddingHorizontal: 16, gap: 12 },
-  destinationCard: { width: 220, height: 172, borderRadius: 19, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, ...SHADOW },
-  destinationImage: { flex: 1, justifyContent: 'space-between', padding: 14 },
-  destinationImageStyle: { borderRadius: 20 },
-  destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: Colors.heroOverlay },
-  saveButton: { alignSelf: 'flex-end', width: 38, height: 38, borderRadius: 19, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center' },
-  destinationCountry: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
-  destinationName: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, marginTop: 1 },
-  destinationPrice: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.semibold, marginTop: 2 },
+  destinationRow: { paddingHorizontal: 10, gap: 8 },
+  destinationCard: { width: 132, height: 138, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, ...SHADOW },
+  destinationImage: { flex: 1, justifyContent: 'space-between', padding: 8 },
+  destinationImageStyle: { borderRadius: 14 },
+  destinationShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(12,48,38,0.22)' },
+  saveButton: { alignSelf: 'flex-end', width: 26, height: 26, borderRadius: 13, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center' },
+  destinationCountry: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: 10, fontWeight: FontWeight.semibold },
+  destinationName: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 0 },
+  destinationPrice: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: 10, lineHeight: 13, fontWeight: FontWeight.semibold, marginTop: 1 },
 
   // Active filters
   activeFilters: { paddingHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 12 },
@@ -539,7 +556,7 @@ const styles = StyleSheet.create({
   clearAll: { paddingHorizontal: 6, paddingVertical: 6 },
 
   // Packages
-  packageRow: { paddingHorizontal: 16, gap: 12 },
+  packageRow: { paddingHorizontal: 10, gap: 12 },
   packageCard: { ...Ui.card, width: 264, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card, overflow: 'hidden', ...SHADOW },
   packageImage: { height: 130, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start', padding: 10 },
   packageImageStyle: { borderTopLeftRadius: 19, borderTopRightRadius: 19 },
