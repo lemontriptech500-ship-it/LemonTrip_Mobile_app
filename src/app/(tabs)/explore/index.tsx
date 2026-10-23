@@ -140,7 +140,7 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Adventure Banner.png')} aspectRatio={1672 / 941} />
+          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Adventure Banner.png')} aspectRatio={2170 / 725} />
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
             {EXPLORE_TABS.map((tab) => (
@@ -428,12 +428,12 @@ const styles = StyleSheet.create({
   popChipOn: { backgroundColor: '#103D30', borderColor: '#103D30' },
   popChipText: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.body, color: Colors.textDark },
   popChipTextOn: { color: Colors.white },
-  tabsRow: { gap: 26, paddingHorizontal: Ui.space.page, marginTop: 4 },
+  tabsRow: { gap: 26, paddingHorizontal: Ui.space.page, marginTop: 0 },
   tabItem: { minHeight: 44, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
   tabItemActive: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.bodyLarge, color: Colors.textLight },
   tabTextActive: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
-  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 10, padding: 12, zIndex: 5 },
+  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 8, padding: 12, zIndex: 5 },
   searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, paddingVertical: 10 },
   clearSearch: { padding: 4 },
