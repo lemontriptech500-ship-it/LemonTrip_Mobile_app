@@ -24,20 +24,20 @@ export function ServiceTopBar({ title, fallback = '/(tabs)/explore' }: { title: 
   );
 }
 
-type ServiceBannerProps = { eyebrow: string; title: string; subtitle: string; image?: ImageSourcePropType; aspectRatio?: number };
+type ServiceBannerProps = { eyebrow: string; title: string; subtitle: string; image?: ImageSourcePropType; aspectRatio?: number; tone?: 'light' | 'dark'; copyWidth?: `${number}%`; large?: boolean };
 
 const DEFAULT_BANNER = require('../../../assets/images/Emerald Skies Travel Banner.png') as ImageSourcePropType;
 
 /** Banner image with text on the left. Image is the shared travel banner for now. */
-export function ServiceBanner({ eyebrow, title, subtitle, image = DEFAULT_BANNER, aspectRatio }: ServiceBannerProps) {
+export function ServiceBanner({ eyebrow, title, subtitle, image = DEFAULT_BANNER, aspectRatio, tone = 'light', copyWidth, large }: ServiceBannerProps) {
   return (
     <View style={s.bannerWrap}>
       <View style={[s.banner, aspectRatio ? { aspectRatio } : null]}>
         <Image source={image} resizeMode="cover" style={s.bannerImg} />
-        <View style={s.bannerCopy}>
-          <Text style={s.bannerEyebrow} numberOfLines={1}>{eyebrow}</Text>
-          <Text style={s.bannerTitle} numberOfLines={2}>{title}</Text>
-          <Text style={s.bannerSub} numberOfLines={2}>{subtitle}</Text>
+        <View style={[s.bannerCopy, copyWidth ? { width: copyWidth } : null]}>
+          <Text style={[s.bannerEyebrow, tone === 'dark' && s.bannerEyebrowDark, large && s.bannerEyebrowLg]} numberOfLines={1}>{eyebrow}</Text>
+          <Text style={[s.bannerTitle, tone === 'dark' && s.bannerTitleDark, large && s.bannerTitleLg]} numberOfLines={2}>{title}</Text>
+          <Text style={[s.bannerSub, tone === 'dark' && s.bannerSubDark, large && s.bannerSubLg]} numberOfLines={2}>{subtitle}</Text>
         </View>
       </View>
     </View>
@@ -56,4 +56,10 @@ const s = StyleSheet.create({
   bannerEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 0.8, color: Colors.accent },
   bannerTitle: { fontFamily: 'Inter-Bold', fontSize: 18, lineHeight: 22, color: Colors.white, marginTop: 4 },
   bannerSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
+  bannerEyebrowDark: { color: '#3C4A45' },
+  bannerTitleDark: { color: '#103D30' },
+  bannerSubDark: { color: '#3C4A45' },
+  bannerEyebrowLg: { fontSize: 10, letterSpacing: 0.8 },
+  bannerTitleLg: { fontSize: 20, lineHeight: 24 },
+  bannerSubLg: { fontSize: 11, lineHeight: 15 },
 });
