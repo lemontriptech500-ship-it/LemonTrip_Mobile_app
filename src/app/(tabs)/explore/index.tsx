@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   quickSearchChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 11, borderRadius: 16, backgroundColor: Colors.onDarkSurface, borderWidth: 1, borderColor: Colors.onDarkBorder },
   quickSearchText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
-  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
