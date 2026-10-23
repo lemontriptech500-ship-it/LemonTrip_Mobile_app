@@ -140,7 +140,7 @@ export default function ExploreScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.pageWidth}>
 
-          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Adventure Banner.png')} aspectRatio={1672 / 941} />
+          <ServiceBanner eyebrow="LEMONTRIP / EXPLORE" title="Discover somewhere new." subtitle="Search by place, then narrow your journey by travel style." image={require('../../../../assets/images/Tropical Travel Adventure Banner.png')} aspectRatio={2170 / 725} />
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
             {EXPLORE_TABS.map((tab) => (
@@ -394,22 +394,11 @@ export default function ExploreScreen() {
 
           {/* Trust strip */}
           <View style={styles.trustStrip}>
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={2}>Your trip, our priority</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="shield-checkmark" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Secure bookings</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Your trip, our priority</Text></View></View>
             <View style={styles.trustDivider} />
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={2}>No hidden charges</Text></View></View>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="pricetag-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Transparent pricing</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>No hidden charges</Text></View></View>
             <View style={styles.trustDivider} />
-            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={2}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={2}>We’re here, 24/7</Text></View></View>
-          </View>
-          <View style={styles.footer}>
-            <Image source={require('../../../../assets/images/App Logo.png')} style={styles.footerLogoImage} resizeMode="cover" />
-            <Text style={styles.footerTagline}>Travel, thoughtfully planned.</Text>
-            <View style={styles.footerLinks}>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}><Text style={styles.footerLink}>Explore</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/packages')}><Text style={styles.footerLink}>Packages</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.navigate('/(tabs)/explore/offers')}><Text style={styles.footerLink}>Offers</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/contact')}><Text style={styles.footerLink}>Support</Text></TouchableOpacity>
-            </View>
-            <Text style={styles.footerCopyright}>© LemonTrip. Made for the journey.</Text>
+            <View style={styles.trustItem}><View style={styles.trustIcon}><Ionicons name="headset-outline" size={20} color={Colors.primary} /></View><View style={styles.trustCopy}><Text style={styles.trustTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Travel support</Text><Text style={styles.trustSubtitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>We’re here, 24/7</Text></View></View>
           </View>
         </View>
       </ScrollView>
@@ -425,7 +414,7 @@ const styles = StyleSheet.create({
   quickSearchLabel: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   quickSearchChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 11, borderRadius: 16, backgroundColor: Colors.onDarkSurface, borderWidth: 1, borderColor: Colors.onDarkBorder },
   quickSearchText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold },
-  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1 },
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
@@ -439,12 +428,12 @@ const styles = StyleSheet.create({
   popChipOn: { backgroundColor: '#103D30', borderColor: '#103D30' },
   popChipText: { fontFamily: 'Inter-SemiBold', fontSize: TextSize.body, color: Colors.textDark },
   popChipTextOn: { color: Colors.white },
-  tabsRow: { gap: 26, paddingHorizontal: Ui.space.page, marginTop: 4 },
+  tabsRow: { gap: 26, paddingHorizontal: Ui.space.page, marginTop: 0 },
   tabItem: { minHeight: 44, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
   tabItemActive: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.bodyLarge, color: Colors.textLight },
   tabTextActive: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
-  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 10, padding: 12, zIndex: 5 },
+  searchStrip: { ...Ui.card, marginHorizontal: Ui.space.page, marginTop: 8, padding: 12, zIndex: 5 },
   searchPill: { minHeight: 56, paddingLeft: 16, paddingRight: 7, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 28, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, paddingVertical: 10 },
   clearSearch: { padding: 4 },
@@ -522,7 +511,7 @@ const styles = StyleSheet.create({
   packageRating: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.strongOverlay, paddingHorizontal: 9, paddingVertical: 6, borderRadius: 13 },
   packageRatingText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   packageBody: { padding: 14 },
-  packageTitle: { minHeight: 42, color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 21, fontWeight: FontWeight.extraBold },
+  packageTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 21, fontWeight: FontWeight.extraBold },
   packageMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   packageDuration: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
   packageBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Colors.border },
@@ -543,7 +532,7 @@ const styles = StyleSheet.create({
   personalSubtitle: { color: Colors.primaryDark, fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, marginTop: 2 },
   preferenceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 8 },
   preferenceChip: { minHeight: 32, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, borderRadius: 999, backgroundColor: Colors.white },
-  trustIcon: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
+  trustIcon: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
   trustDivider: { width: 1, alignSelf: 'stretch', backgroundColor: Colors.border },
   preferenceChipActive: { backgroundColor: '#103D30' },
   preferenceText: { color: Colors.primaryDark, fontFamily: 'Inter-SemiBold', fontSize: 12 },
@@ -553,10 +542,10 @@ const styles = StyleSheet.create({
 
   // Trust + footer
   trustStrip: { marginTop: 12, marginHorizontal: Ui.space.page, paddingVertical: 12, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.surface, borderRadius: 18 },
-  trustItem: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  trustCopy: { flex: 1, minWidth: 0 },
-  trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 12, lineHeight: 15 },
-  trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 10, lineHeight: 13, marginTop: 1 },
+  trustItem: { flex: 1, minWidth: 0, flexDirection: 'column', alignItems: 'center', gap: 4 },
+  trustCopy: { alignSelf: 'stretch', minWidth: 0, alignItems: 'center' },
+  trustTitle: { color: Colors.primaryDark, fontFamily: 'Inter-Bold', fontSize: 11, textAlign: 'center', lineHeight: 15 },
+  trustSubtitle: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 9, textAlign: 'center', lineHeight: 13, marginTop: 1 },
   footer: { marginTop: 18, paddingTop: 16, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, borderTopWidth: 1, borderTopColor: Colors.border },
   footerLogoImage: { width: 118, height: 38 },
   footerTagline: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
