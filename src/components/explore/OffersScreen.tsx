@@ -2,9 +2,9 @@ import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
-import { Text } from '@/components/ui/Text';
+import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
-import { ExploreSectionIntro } from '@/components/explore/ExploreSectionIntro';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { Offer } from '@/data/mock/offers';
 import {
   getOfferCategory,
@@ -17,6 +17,13 @@ import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Image, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+
+const TABS = [
+  { title: 'Explore', route: '/(tabs)/explore', active: false },
+  { title: 'Packages', route: '/(tabs)/explore/packages', active: false },
+  { title: 'Offers', route: '/(tabs)/explore/offers', active: true },
+  { title: 'Visa Services', route: '/(tabs)/explore/visa', active: false },
+];
 
 const categories = ['Flights', 'Hotels', 'Buses', 'Packages', 'Visa'] as const;
 
@@ -79,6 +86,7 @@ export default function OffersScreen() {
     OfferCategory | 'All'
   >('All');
 
+  const [query, setQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -131,11 +139,13 @@ export default function OffersScreen() {
   const visibleOffers = useMemo(
     () =>
       unexpiredOffers.filter((offer) => {
+        const search = query.trim().toLowerCase();
+        if (search && !`${offer.title} ${offer.description} ${offer.category} ${offer.code ?? ''}`.toLowerCase().includes(search)) return false;
         if (activeCategory === 'All') return true;
 
         return getOfferCategory(offer.category) === activeCategory;
       }),
-    [activeCategory, unexpiredOffers]
+    [activeCategory, unexpiredOffers, query]
   );
 
   const copyCode = async (offer: Offer) => {
@@ -168,37 +178,32 @@ export default function OffersScreen() {
 
           {/* ================= HERO / TITLE ================= */}
 
-          <ExploreSectionIntro
-            eyebrow="TRAVEL MORE, SPEND LESS"
-            title="Offers worth travelling for."
-            subtitle="Find a little extra value for your next journey."
-          />
-
-          {/* ================= DEMO NOTICE ================= */}
-
-          {source === 'demo' ? (
-            <View style={styles.sourceNotice}>
-              <Ionicons
-                name="information-circle-outline"
-                size={15}
-                color={Colors.textLight}
-              />
-
-              <Text style={styles.sourceNoticeText}>
-                Demo offers only. Validity dates have not been
-                supplied, so booking is disabled until verified.
-              </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll} contentContainerStyle={styles.tabsRow}>
+            {TABS.map((tab) => (
+              <TouchableOpacity key={tab.title} accessibilityRole="button" accessibilityState={{ selected: tab.active }} onPress={() => { if (!tab.active) router.navigate(tab.route as never); }} style={[styles.tab, tab.active && styles.tabOn]}>
+                <Text style={[styles.tabText, tab.active && styles.tabTextOn]}>{tab.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <View style={styles.hero}>
+            <Image source={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} resizeMode="cover" style={styles.heroImg} />
+            <LinearGradient colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']} locations={[0, 0.55, 0.9]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+            <View style={styles.heroCopy}>
+              <Text style={styles.heroEyebrow}>EXCLUSIVE TRAVEL DEALS</Text>
+              <Text style={styles.heroTitle}>Travel More Spend Less</Text>
+              <Text style={styles.heroSub}>Best offers on flights, hotels, packages and more. Your next trip is closer than you think.</Text>
             </View>
-          ) : null}
-
-          {/* ================= CATEGORY ================= */}
-
-          <View style={styles.categorySection}>
-            <Text style={styles.filterLabel}>
-              SHOP BY CATEGORY
-            </Text>
-
-            <ScrollView
+          </View>
+          <View style={styles.searchCard}>
+            <View style={styles.searchPill}>
+              <Ionicons name="search-outline" size={20} color={Colors.textLight} />
+              <TextInput value={query} onChangeText={setQuery} placeholder="Search offers or destinations" placeholderTextColor={Colors.textLight} style={styles.searchInput} returnKeyType="search" accessibilityLabel="Search offers" />
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Clear filters" onPress={() => { setQuery(''); setActiveCategory('All'); }} style={styles.filterBtn}>
+                <Ionicons name="options-outline" size={20} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.cardChips}>
+<ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.categoryRow}
@@ -226,26 +231,19 @@ export default function OffersScreen() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
+            </View>
           </View>
 
           {/* ================= RESULTS TITLE ================= */}
 
           <View style={styles.resultsHeading}>
             <View>
-              <Text style={styles.resultsEyebrow}>
-                HANDPICKED FOR YOUR NEXT TRIP
-              </Text>
+         
 
-              <Text style={styles.resultsTitle}>
-                {activeCategory === 'All'
-                  ? 'Current offers'
-                  : `${activeCategory} offers`}
-              </Text>
+           
             </View>
 
-            <Text style={styles.resultsCount}>
-              {visibleOffers.length} deals
-            </Text>
+          
           </View>
 
           {/* ================= OFFERS ================= */}
@@ -529,22 +527,6 @@ function OfferCard({
           </Text>
         ) : null}
 
-        {/* TERMS */}
-
-        <View style={styles.termsArea}>
-          <Text style={styles.termsLabel}>
-            TERMS
-          </Text>
-
-          <Text
-            style={styles.termsText}
-            numberOfLines={2}
-          >
-            {offer.terms ??
-              'Terms not provided by the offer source.'}
-          </Text>
-        </View>
-
         {/* BOOK BUTTON */}
 
         <TouchableOpacity
@@ -601,46 +583,63 @@ function OfferCard({
 ========================================================= */
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.surfaceMuted },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 28 },
   pageContainer: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
   sourceNotice: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginHorizontal: 20, marginTop: 18, padding: 13, borderRadius: 16, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   sourceNoticeText: { flex: 1, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18 },
-  categorySection: { marginTop: 22 },
+  tabsScroll: { backgroundColor: Colors.surface, flexGrow: 0 },
+  tabsRow: { gap: 24, paddingHorizontal: 16 },
+  tab: { minHeight: 40, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
+  tabOn: { borderBottomColor: Colors.accent },
+  tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
+  tabTextOn: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
+  hero: { width: '100%', aspectRatio: 2.05, justifyContent: 'center', paddingTop: 10, paddingBottom: 34, backgroundColor: '#DCEBE5' },
+  heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  heroCopy: { width: '66%', paddingLeft: 16 },
+  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.2, color: Colors.secondary },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#103D30', marginTop: 6 },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#3C4A45', marginTop: 6 },
+  searchCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginHorizontal: 10, marginTop: -28, padding: 8, borderRadius: 22, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 2 },
+  searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
+  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 13, paddingVertical: 10 },
+  filterBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.primary },
+  cardChips: { marginTop: 10 },
+  categorySection: { marginTop: 14 },
   filterLabel: { paddingHorizontal: 20, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.1 },
-  categoryRow: { gap: 8, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 4 },
-  categoryChip: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 15, borderRadius: 20, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  categoryRow: { gap: 8, paddingHorizontal: 2 },
+  categoryChip: { minHeight: 30, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 15, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   categoryChipActive: { borderColor: Colors.primary, backgroundColor: Colors.primary },
-  categoryText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
+  categoryText: { color: Colors.textDark, fontFamily: 'Inter-SemiBold', fontSize: 12 },
   categoryTextActive: { color: Colors.white },
-  resultsHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, paddingHorizontal: 20, marginTop: 22, marginBottom: 12 },
+  resultsHeading: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, paddingHorizontal: 10, marginTop: 18, marginBottom: 12 },
   resultsEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   resultsTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, marginTop: 4 },
   resultsCount: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
-  offerGrid: { gap: 14, paddingHorizontal: 20 },
+  offerGrid: { gap: 14, paddingHorizontal: 10 },
   offerGridDesktop: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  offerCard: { overflow: 'hidden', borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  offerCard: { overflow: 'hidden', borderRadius: 24, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 3 },
   offerCardDesktop: { width: '31.8%', marginBottom: 14 },
-  imageWrap: { height: 190, position: 'relative', backgroundColor: Colors.surfaceMuted },
+  imageWrap: { height: 150, position: 'relative', backgroundColor: Colors.surfaceMuted },
   offerImage: { width: '100%', height: '100%' },
-  discountBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: Colors.accent },
-  discountText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold },
-  offerBody: { padding: 15 },
+  discountBadge: { position: 'absolute', top: 12, left: 12, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, backgroundColor: Colors.white },
+  discountText: { color: '#103D30', fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
+  offerBody: { padding: 14 },
   offerMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  offerCategory: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.5 },
-  validityBadge: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.4 },
+  offerCategory: { color: Colors.primary, fontFamily: 'Inter-Bold', fontSize: 13 },
+  validityBadge: { overflow: 'hidden', color: Colors.secondary, backgroundColor: Colors.successSoft, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, fontFamily: FontFamily.sans, fontSize: 9, fontWeight: FontWeight.extraBold, letterSpacing: 0.4 },
   validityActive: { color: Colors.secondary },
   validityExpired: { color: Colors.error },
-  offerTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, lineHeight: 23, fontWeight: FontWeight.extraBold, marginTop: 7 },
-  offerDescription: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 6 },
-  validityRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 11 },
+  offerTitle: { color: Colors.textDark, fontFamily: 'Inter-ExtraBold', fontSize: 16, lineHeight: 21, marginTop: 4 },
+  offerDescription: { color: Colors.textLight, fontFamily: 'Inter-Regular', fontSize: 12, lineHeight: 17, marginTop: 4 },
+  validityRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
   validityText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
-  couponRow: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 12, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderStyle: 'dashed', borderRadius: 12, backgroundColor: Colors.background },
+  couponRow: { minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: Colors.borderStrong, borderStyle: 'dashed', borderRadius: 14, backgroundColor: '#F3F6F4' },
   couponInfo: { flex: 1 },
-  couponLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.7 },
-  couponCode: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, marginTop: 2 },
+  couponLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: 9, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
+  couponCode: { color: Colors.textDark, fontFamily: 'Inter-ExtraBold', fontSize: 14, marginTop: 1 },
   noCoupon: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
-  copyButton: { minHeight: 36, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 11, borderWidth: 1, borderColor: Colors.border, borderRadius: 10, backgroundColor: Colors.surface },
+  copyButton: { minHeight: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 12, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, backgroundColor: Colors.surface },
   copyButtonDone: { borderColor: Colors.primary, backgroundColor: Colors.primary },
   copyText: { color: Colors.primary, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   copyTextDone: { color: Colors.white },
@@ -648,16 +647,16 @@ const styles = StyleSheet.create({
   termsArea: { marginTop: 12 },
   termsLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.7 },
   termsText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, lineHeight: 16, marginTop: 3 },
-  bookButton: { minHeight: 46, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 13, borderRadius: 15, backgroundColor: Colors.accent },
-  bookButtonDisabled: { backgroundColor: Colors.surfaceMuted },
+  bookButton: { minHeight: 42, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 10, borderRadius: 14, backgroundColor: Colors.accent },
+  bookButtonDisabled: { backgroundColor: '#EBF1EE' },
   bookButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  bookButtonTextDisabled: { color: Colors.textLight },
+  bookButtonTextDisabled: { color: Colors.secondary },
   skeletonCard: { overflow: 'hidden', borderRadius: 20, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface, paddingBottom: 16 },
   skeletonCardDesktop: { width: '31.8%' },
   skeletonImage: { height: 190, backgroundColor: Colors.surfaceMuted },
   skeletonLine: { width: '60%', height: 12, marginTop: 14, marginHorizontal: 15, borderRadius: 6, backgroundColor: Colors.surfaceMuted },
   skeletonLineShort: { width: '38%', height: 9, marginTop: 9, marginHorizontal: 15, borderRadius: 6, backgroundColor: Colors.surfaceMuted },
-  stateCard: { minHeight: 190, alignItems: 'center', justifyContent: 'center', gap: 9, marginHorizontal: 20, padding: 22, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  stateCard: { minHeight: 190, alignItems: 'center', justifyContent: 'center', gap: 9, marginHorizontal: 10, padding: 22, borderRadius: 20, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   stateTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, textAlign: 'center' },
   stateText: { maxWidth: 320, color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, textAlign: 'center' },
   validityNote: { flexDirection: 'row', gap: 7, alignItems: 'center', marginHorizontal: 20, marginTop: 12 },

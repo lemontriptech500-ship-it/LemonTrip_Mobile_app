@@ -21,7 +21,7 @@ export function ExploreHeader({ pathname }: { pathname: string }) {
   const user = useAuth(); const wide = useWindowDimensions().width >= 900;
   const navigate = (route: Href) => { blurWebNavigationFocus(); router.navigate(route); };
   const links = sections.map(section => <TouchableOpacity key={section.title} accessibilityRole="button" accessibilityLabel={section.title} accessibilityState={{ selected: pathname === section.path }} onPress={() => { if (pathname !== section.path) navigate(section.route); }} style={[styles.navLink, pathname === section.path && styles.activeLink]}><Text style={[styles.navText, pathname === section.path && styles.activeText]}>{section.title}</Text></TouchableOpacity>);
-  const barTitle = pathname === '/explore/packages' ? 'Packages' : pathname === '/explore' ? 'Explore' : '';
+  const barTitle = pathname === '/explore/packages' ? 'Packages' : pathname === '/explore' ? 'Explore' : pathname === '/explore/offers' ? 'Offers' : pathname === '/explore/visa' ? 'Visa Services' : '';
   if (barTitle && !wide) {
     return (
       <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
