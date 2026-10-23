@@ -10,7 +10,7 @@ import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useSegments, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ImageBackground, StyleSheet, View } from 'react-native';
+import { ImageBackground, StyleSheet, View, type ImageSourcePropType } from 'react-native';
 import { AppScreen } from '@/components/AppScreen';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,7 +38,7 @@ export const FLIGHT_ROUTES = {
 
 export { goBackOr, goTo, replaceTo } from '@/components/trains/TrainUi';
 
-export function FlightShell({ children, footer, onBack }: { children: ReactNode; footer?: ReactNode; onBack: () => void }) {
+export function FlightShell({ children, footer, onBack, title = 'Flights' }: { children: ReactNode; footer?: ReactNode; onBack: () => void; title?: string }) {
   const insets = useSafeAreaInsets();
   // Inside the tab navigator the tab bar already covers the bottom system inset.
   const insideTabs = (useSegments() as string[]).includes('(tabs)');
@@ -48,7 +48,7 @@ export function FlightShell({ children, footer, onBack }: { children: ReactNode;
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={s.backButton} activeOpacity={0.8}>
           <Ionicons name="arrow-back" size={22} color={BRAND} />
         </TouchableOpacity>
-        <Text accessibilityRole="header" style={s.headerTitle}>Flights</Text>
+        <Text accessibilityRole="header" style={s.headerTitle}>{title}</Text>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as Href)} style={s.gearButton} activeOpacity={0.8}>
           <Ionicons name="settings-outline" size={20} color={BRAND} />
         </TouchableOpacity>
@@ -59,12 +59,12 @@ export function FlightShell({ children, footer, onBack }: { children: ReactNode;
   );
 }
 
-export function FlightBanner({ title = 'Book flight tickets', text = 'Search routes, compare fares and pick the flight that suits you.' }: { title?: string; text?: string }) {
+export function FlightBanner({ title = 'Book flight tickets', text = 'Search routes, compare fares and pick the flight that suits you.', eyebrow = 'LEMONTRIP / FLIGHTS', image = BANNER }: { title?: string; text?: string; eyebrow?: string; image?: ImageSourcePropType }) {
   return (
     <View style={s.bannerWrap}>
-      <ImageBackground source={BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
+      <ImageBackground source={image} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
         <View style={s.bannerCopy}>
-          <Text style={s.eyebrowLight}>LEMONTRIP / FLIGHTS</Text>
+          <Text style={s.eyebrowLight}>{eyebrow}</Text>
           <Text style={s.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
           <Text style={s.bannerText}>{text}</Text>
         </View>
@@ -73,13 +73,13 @@ export function FlightBanner({ title = 'Book flight tickets', text = 'Search rou
   );
 }
 
-export function FlightSteps({ current }: { current: number }) {
-  const inset = `${100 / (STEPS.length * 2)}%` as const;
+export function FlightSteps({ current, steps = STEPS }: { current: number; steps?: readonly string[] }) {
+  const inset = `${100 / (steps.length * 2)}%` as const;
   return (
-    <View style={s.card} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: STEPS.length, now: current + 1 }}>
+    <View style={s.card} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: steps.length, now: current + 1 }}>
       <View style={s.stepsRow}>
-        <View pointerEvents="none" style={[s.track, { left: inset, right: inset }]}><View style={[s.trackFill, { width: `${(current / (STEPS.length - 1)) * 100}%` }]} /></View>
-        {STEPS.map((label, i) => {
+        <View pointerEvents="none" style={[s.track, { left: inset, right: inset }]}><View style={[s.trackFill, { width: `${(current / (steps.length - 1)) * 100}%` }]} /></View>
+        {steps.map((label, i) => {
           const active = i === current;
           const done = i < current;
           return (

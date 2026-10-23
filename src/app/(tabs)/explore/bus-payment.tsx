@@ -3,14 +3,14 @@ import { RazorpayPaymentDetails } from '@/components/RazorpayPaymentDetails';
 import { RazorpayCheckoutHost } from '@/components/RazorpayCheckoutHost';
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
-import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
+import { TextSize } from '@/constants/typography';
+import { Text, TextInput } from '@/components/ui/Text';
 import { FareSummary } from '@/components/buses/BusCards';
-import { BUS_ROUTES, BusProgress, Card, EmptyState, Field, FlowScreen, FooterBar, Notice, PrimaryButton, SectionTitle, goBackOr, replaceTo } from '@/components/buses/BusUi';
+import { BRAND, BUS_ROUTES, BusBanner, BusCardBox, BusFooter, BusHeading, BusNotice, BusShell, BusSteps, EmptyState, INTER, PrimaryButton, goBackOr, replaceTo } from '@/components/buses/BusUi';
 import { Colors } from '@/constants/colors';
 import { COUPONS, inr, validateCoupon } from '@/data/buses';
 import { confirmBusBooking, currentFare, setCoupon, useBusBooking } from '@/utils/busBookingStore';
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -24,7 +24,14 @@ export default function BusPaymentScreen() {
 
   const derived = currentFare();
   if (!selection || !derived || !selection.seats.length || passengers.length !== selection.seats.length || passengers.some((p) => !p.name.trim())) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Payment" eyebrow="LEMONTRIP / BUS" onBack={() => goBackOr(BUS_ROUTES.review)} /><EmptyState icon="card-outline" title="No booking to pay for" text="Select your seats and add passenger details first." action={<PrimaryButton label="Search buses" onPress={() => replaceTo(BUS_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return (
+      <BusShell onBack={() => goBackOr(BUS_ROUTES.review)}>
+        <ScrollView>
+          <BusBanner title="Secure payment" text="Complete your booking with Razorpay test checkout." />
+          <EmptyState icon="card-outline" title="No booking to pay for" text="Select your seats and add passenger details first." action={<PrimaryButton label="Search buses" onPress={() => replaceTo(BUS_ROUTES.results)} />} />
+        </ScrollView>
+      </BusShell>
+    );
   }
   const { fare } = derived;
 
@@ -49,49 +56,57 @@ export default function BusPaymentScreen() {
   });
 
   return (
-    <FlowScreen footer={<FooterBar caption="Amount to pay" amount={inr(fare.total)} action={<PrimaryButton label={processing ? 'Processing…' : payment.needsVerification ? 'Retry verification' : `Pay ${inr(fare.total)}`} icon="lock-closed" loading={processing} onPress={pay} />} />}>
+    <BusShell onBack={() => !processing && goBackOr(BUS_ROUTES.review)} footer={<BusFooter caption="Amount to pay" amount={inr(fare.total)} label={processing ? 'Processing…' : payment.needsVerification ? 'Retry verification' : `Pay ${inr(fare.total)}`} icon="lock-closed" loading={processing} onPress={pay} />}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Secure payment" subtitle="Complete your booking with Razorpay test checkout." eyebrow="LEMONTRIP / BUS" onBack={() => !processing && goBackOr(BUS_ROUTES.review)} />
-            <BusProgress current={3} />
+            <BusBanner title="Secure payment" text="Complete your booking with Razorpay test checkout." />
+            <BusSteps current={3} />
 
-            <Card>
-              <SectionTitle eyebrow="PAYMENT METHOD" title="Secure checkout" />
+            <BusCardBox>
+              <BusHeading eyebrow="PAYMENT METHOD" title="Secure checkout" />
               <RazorpayPaymentDetails error={payment.error} />
-            </Card>
+            </BusCardBox>
 
-            <Card>
-              <SectionTitle eyebrow="OFFERS" title="Have a coupon?" />
+            <BusCardBox>
+              <BusHeading eyebrow="OFFERS" title="Have a coupon?" />
               <View style={s.couponRow}>
-                <View style={{ flex: 1 }}><Field label="COUPON CODE" icon="pricetag-outline" autoCapitalize="characters" autoCorrect={false} value={couponInput} onChangeText={(v) => { setCouponInput(v.toUpperCase()); setCouponMsg(null); }} placeholder="e.g. LEMON10" editable={!locked} /></View>
-                <View style={s.applyWrap}><PrimaryButton variant={coupon ? 'soft' : 'dark'} label={coupon ? 'Remove' : 'Apply'} onPress={coupon ? removeCoupon : applyCoupon} disabled={locked} /></View>
+                <View style={s.couponInput}>
+                  <Ionicons name="pricetag-outline" size={20} color={Colors.textLight} />
+                  <TextInput value={couponInput} onChangeText={(v) => { setCouponInput(v.toUpperCase()); setCouponMsg(null); }} placeholder="e.g. LEMON10" placeholderTextColor={Colors.textLight} autoCapitalize="characters" autoCorrect={false} editable={!locked} style={s.couponText} accessibilityLabel="Coupon code" />
+                </View>
+                <TouchableOpacity accessibilityRole="button" disabled={locked} onPress={coupon ? removeCoupon : applyCoupon} activeOpacity={0.85} style={s.apply}>
+                  <Text style={s.applyText}>{coupon ? 'Remove' : 'Apply'}</Text>
+                </TouchableOpacity>
               </View>
               {couponMsg ? <Text style={[s.couponMsg, { color: couponMsg.ok ? Colors.success : Colors.error }]}>{couponMsg.text}</Text> : null}
-              {!coupon ? <View style={s.suggest}>{COUPONS.map((c) => <TouchableOpacity key={c.code} accessibilityRole="button" disabled={locked} onPress={() => setCouponInput(c.code)} style={s.suggestChip}><Text style={s.suggestCode}>{c.code}</Text><Text style={s.suggestLabel}>{c.label}</Text></TouchableOpacity>)}</View> : null}
-            </Card>
+              {!coupon ? <View style={s.suggest}>{COUPONS.map((c) => <TouchableOpacity key={c.code} accessibilityRole="button" disabled={locked} onPress={() => setCouponInput(c.code)} style={s.suggestChip} activeOpacity={0.85}><Text style={s.suggestCode}>{c.code}</Text><Text style={s.suggestLabel}>{c.label}</Text></TouchableOpacity>)}</View> : null}
+            </BusCardBox>
 
-            <Card>
-              <SectionTitle eyebrow="SUMMARY" title="Price details" />
+            <BusCardBox>
+              <BusHeading eyebrow="SUMMARY" title="Price details" />
               <FareSummary fare={fare} couponCode={coupon?.code} />
-            </Card>
+            </BusCardBox>
 
-            <Notice icon="lock-closed-outline" title="Test booking">Payments use Razorpay test mode. Tickets and vouchers are sample bookings until the travel provider is connected.</Notice>
+            <BusNotice icon="lock-closed-outline" title="Test booking">Payments use Razorpay test mode. Tickets and vouchers are sample bookings until the travel provider is connected.</BusNotice>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
       <RazorpayCheckoutHost />
-    </FlowScreen>
+    </BusShell>
   );
 }
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  couponRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
-  applyWrap: { width: 104, marginBottom: 12 },
-  couponMsg: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, marginBottom: 8 },
-  suggest: { gap: 8, marginTop: 4 },
-  suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  suggestLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textDark },
+  couponRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  couponInput: { flex: 1, minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  couponText: { flex: 1, minWidth: 0, minHeight: 52, fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textDark },
+  apply: { minWidth: 96, height: 54, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18, borderRadius: 18, backgroundColor: BRAND },
+  applyText: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.white },
+  couponMsg: { fontFamily: INTER.semibold, fontSize: TextSize.caption, marginTop: 10 },
+  suggest: { gap: 8, marginTop: 12 },
+  suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
+  suggestCode: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, backgroundColor: '#FDF3C4', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  suggestLabel: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
 });
