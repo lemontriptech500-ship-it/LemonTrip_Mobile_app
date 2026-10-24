@@ -85,7 +85,7 @@ export default function LaunchScreen() {
       entrance.stop();
       transition?.stop();
       spinner.stop();
-      router.replace(getUser() ? '/(tabs)/home' : '/onboarding');
+      router.replace(getUser() ? '/(tabs)/home' : '/login');
     };
 
     const reveal = () => {
