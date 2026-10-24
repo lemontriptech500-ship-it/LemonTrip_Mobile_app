@@ -34,7 +34,7 @@
           "image": "./assets/images/splash-transparent.png",
           "imageWidth": 100,
           "resizeMode": "contain",
-          "backgroundColor": "#0F3D2E"
+          "backgroundColor": "#FFFFFF"
         }
       ],
       [
