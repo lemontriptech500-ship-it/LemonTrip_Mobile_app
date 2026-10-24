@@ -91,7 +91,7 @@ export default function LoginScreen() {
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace('/onboarding');
+    else return;
   };
 
   // Open the sign-up screen. Never leave the user stranded on login if the push is rejected.
