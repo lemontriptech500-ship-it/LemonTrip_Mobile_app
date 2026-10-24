@@ -138,8 +138,8 @@ export default function LaunchScreen() {
   // Reserve the gap and screen margins before sizing either part of the logo.
   const wordmarkWidth = Math.min((width - BRAND_SIDE_PADDING * 2 - BRAND_GAP) / (1 + LEMON_SIZE_RATIO), 200);
   const lemonSize = wordmarkWidth * LEMON_SIZE_RATIO;
-  // Frame the fruit within the original 1024px image, excluding the corner mark.
-  const lemonImageScale = lemonSize / 680;
+  // Cutout is already tightly cropped (805x800), so size it directly.
+  const lemonHeight = lemonSize * (800 / 805);
 
   return (
     <View style={styles.container} onLayout={() => SplashScreen.hide()}>
@@ -148,7 +148,7 @@ export default function LaunchScreen() {
           <Animated.View style={{
             opacity: lemonEntrance,
             width: lemonSize,
-            height: lemonImageScale * 800,
+            height: lemonHeight,
             overflow: 'hidden',
             marginBottom: wordmarkWidth * 0.12,
             transform: [
@@ -158,13 +158,13 @@ export default function LaunchScreen() {
             ],
           }}>
             <Image
-              source={require('../../assets/images/lemonImage.avif')}
+              source={require('../../assets/images/lemon-cutout.png')}
               style={{
                 position: 'absolute',
-                width: lemonImageScale * 1024,
-                height: lemonImageScale * 1024,
-                left: -lemonImageScale * 140,
-                top: -lemonImageScale * 110,
+                width: lemonSize,
+                height: lemonHeight,
+                left: 0,
+                top: 0,
               }}
               contentFit="contain"
               accessibilityLabel="Lemon"
@@ -182,10 +182,10 @@ export default function LaunchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: Brand.forest },
+  container: { flex: 1, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
   centerContent: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: BRAND_GAP },
   loadingRow: { position: 'absolute', left: 20, right: 20, alignItems: 'center', gap: 20 },
   spinner: { width: 32, height: 32, borderWidth: 3, borderColor: 'rgba(255,208,0,0.16)', borderTopColor: Brand.lemon, borderLeftColor: Brand.lemon, borderRightColor: Brand.lemon, borderRadius: 16 },
-  tagline: { color: '#FFFFFF', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'system-ui' }), fontSize: 14, fontWeight: '400', lineHeight: 20, letterSpacing: 0, textAlign: 'center', includeFontPadding: false },
+  tagline: { color: '#0F5A44', fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'system-ui' }), fontSize: 14, fontWeight: '400', lineHeight: 20, letterSpacing: 0, textAlign: 'center', includeFontPadding: false },
 });

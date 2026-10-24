@@ -33,8 +33,8 @@ export function TripWordmark({ progress, width = 240 }: { progress: Animated.Val
         >
           <Path
             d={TRIP_OUTLINE}
-            fill={Brand.lemon}
-            stroke={Brand.lemon}
+            fill="#0F5A44"
+            stroke="#0F5A44"
             strokeWidth={4}
             strokeLinejoin="round"
           />
