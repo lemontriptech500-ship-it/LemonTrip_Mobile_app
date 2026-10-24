@@ -1,4 +1,3 @@
-import { ServiceBanner } from '@/components/ui/ServiceHeader';
 import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
@@ -185,7 +184,15 @@ export default function OffersScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <ServiceBanner eyebrow="EXCLUSIVE TRAVEL DEALS" title="Travel More Spend Less" subtitle="Best offers on flights, hotels, packages and more. Your next trip is closer than you think." image={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} aspectRatio={2} copyWidth="70%" overlay />
+          <View style={styles.hero}>
+            <Image source={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} resizeMode="cover" style={styles.heroImg} />
+            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
+            <View style={styles.heroCopy}>
+              <Text style={styles.heroEyebrow}>EXCLUSIVE TRAVEL DEALS</Text>
+              <Text style={styles.heroTitle}>Travel More Spend Less</Text>
+              <Text style={styles.heroSub}>Best offers on flights, hotels, packages and more. Your next trip is closer than you think.</Text>
+            </View>
+          </View>
           <View style={styles.searchCard}>
             <View style={styles.searchPill}>
               <Ionicons name="search-outline" size={20} color={Colors.textLight} />
@@ -586,13 +593,13 @@ const styles = StyleSheet.create({
   tabOn: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
-  hero: { width: '100%', aspectRatio: 2.05, justifyContent: 'center', paddingTop: 10, paddingBottom: 34, backgroundColor: '#DCEBE5' },
-  heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
-  heroCopy: { width: '66%', paddingLeft: 16 },
+  hero: { width: '100%', aspectRatio: 1.8, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
+  heroImg: { position: 'absolute', left: 0, bottom: 0, width: '100%', height: '135%' },
+  heroCopy: { width: '62%', paddingLeft: 16 },
   heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.2, color: '#FFFFFF' },
   heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 6 },
   heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#FFFFFF', marginTop: 6 },
-  searchCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginHorizontal: 10, marginTop: -28, padding: 8, borderRadius: 22, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 2 },
+  searchCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginHorizontal: 10, marginTop: -52, padding: 8, borderRadius: 22, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 2 },
   searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 13, paddingVertical: 10 },
   filterBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.primary },
