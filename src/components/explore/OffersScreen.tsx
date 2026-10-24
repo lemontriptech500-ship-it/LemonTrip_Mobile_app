@@ -1,3 +1,4 @@
+import { ServiceBanner } from '@/components/ui/ServiceHeader';
 import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
@@ -184,15 +185,7 @@ export default function OffersScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <View style={styles.hero}>
-            <Image source={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} resizeMode="cover" style={styles.heroImg} />
-            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
-            <View style={styles.heroCopy}>
-              <Text style={styles.heroEyebrow}>EXCLUSIVE TRAVEL DEALS</Text>
-              <Text style={styles.heroTitle}>Travel More Spend Less</Text>
-              <Text style={styles.heroSub}>Best offers on flights, hotels, packages and more. Your next trip is closer than you think.</Text>
-            </View>
-          </View>
+          <ServiceBanner eyebrow="EXCLUSIVE TRAVEL DEALS" title="Travel More Spend Less" subtitle="Best offers on flights, hotels, packages and more. Your next trip is closer than you think." image={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} aspectRatio={2} copyWidth="70%" overlay />
           <View style={styles.searchCard}>
             <View style={styles.searchPill}>
               <Ionicons name="search-outline" size={20} color={Colors.textLight} />

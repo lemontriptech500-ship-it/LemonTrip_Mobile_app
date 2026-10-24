@@ -1,3 +1,4 @@
+import { ServiceBanner } from '@/components/ui/ServiceHeader';
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
@@ -45,15 +46,7 @@ export default function PackagesListScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <View style={s.hero}>
-            <Image source={require('../../../assets/images/Tropical Overwater Paradise at Sunset.png')} resizeMode="cover" style={s.heroImg} />
-            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
-            <View style={s.heroCopy}>
-              <Text style={s.heroEyebrow}>HOLIDAY PACKAGES</Text>
-              <Text style={s.heroTitle}>Unforgettable Journeys Await</Text>
-              <Text style={s.heroSub}>Curated holiday packages for every kind of traveller.</Text>
-            </View>
-          </View>
+          <ServiceBanner eyebrow="HOLIDAY PACKAGES" title="Unforgettable Journeys Await" subtitle="Curated holiday packages for every kind of traveller." image={require('../../../assets/images/Tropical Overwater Paradise at Sunset.png')} aspectRatio={2.48} copyWidth="70%" overlay />
           <View style={s.searchCard}>
             <View style={s.searchPill}>
               <Ionicons name="search-outline" size={20} color={Colors.textLight} />

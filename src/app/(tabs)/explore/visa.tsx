@@ -1,3 +1,4 @@
+import { ServiceBanner } from '@/components/ui/ServiceHeader';
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
@@ -87,19 +88,12 @@ export default function VisaScreen() {
             ))}
           </ScrollView>
 
-          <View style={s.hero}>
-            <Image source={require('../../../../assets/images/Passport to Paris Riverside.png')} resizeMode="cover" style={s.heroImg} />
-            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
-            <View style={s.heroCopy}>
-              <Text style={s.heroEyebrow}>TRAVEL WITH CONFIDENCE</Text>
-              <Text style={s.heroTitle}>Visa Services</Text>
-              <Text style={s.heroSub}>Explore visa guidance for your next destination.</Text>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={s.applications}>
-                <Ionicons name="document-text-outline" size={18} color={GREEN} />
-                <Text style={s.applicationsText}>My applications</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ServiceBanner eyebrow="TRAVEL WITH CONFIDENCE" title="Visa Services" subtitle="Explore visa guidance for your next destination." image={require('../../../../assets/images/Passport to Paris Riverside.png')} aspectRatio={2} copyWidth="70%" overlay>
+            <TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={s.applications}>
+              <Ionicons name="document-text-outline" size={18} color={GREEN} />
+              <Text style={s.applicationsText}>My applications</Text>
+            </TouchableOpacity>
+          </ServiceBanner>
 
           <View style={s.searchCard}>
             <View style={s.searchPill}>
