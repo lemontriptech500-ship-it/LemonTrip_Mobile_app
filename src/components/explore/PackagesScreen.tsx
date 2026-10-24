@@ -3,7 +3,6 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { PackageCategory, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { isInWishlist, toggleWishlist, useWishlist } from '@/utils/wishlistStore';
@@ -48,7 +47,7 @@ export default function PackagesListScreen() {
           </ScrollView>
           <View style={s.hero}>
             <Image source={require('../../../assets/images/Tropical Overwater Paradise at Sunset.png')} resizeMode="cover" style={s.heroImg} />
-            <LinearGradient colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 0.85]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
             <View style={s.heroCopy}>
               <Text style={s.heroEyebrow}>HOLIDAY PACKAGES</Text>
               <Text style={s.heroTitle}>Unforgettable Journeys Await</Text>
@@ -147,9 +146,9 @@ const s = StyleSheet.create({
   hero: { width: '100%', aspectRatio: 2.1, justifyContent: 'center', paddingTop: 10, paddingBottom: 34, backgroundColor: '#DCEBE5' },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   heroCopy: { width: '62%', paddingLeft: 16 },
-  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: '#103D30' },
-  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#103D30', marginTop: 6 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#3C4A45', marginTop: 6 },
+  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: '#FFFFFF' },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 6 },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#FFFFFF', marginTop: 6 },
   tabsRow: { gap: 24, paddingHorizontal: 16 },
   tab: { minHeight: 40, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
   tabOn: { borderBottomColor: Colors.accent },
