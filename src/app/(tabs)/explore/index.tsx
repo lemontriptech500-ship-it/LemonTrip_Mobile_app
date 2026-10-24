@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   tabItemActive: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.body, color: Colors.textDark },
   tabTextActive: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
-  searchStrip: { ...Ui.card, marginHorizontal: 10, marginTop: -26, padding: 10, borderRadius: 18, zIndex: 5, ...SHADOW },
+  searchStrip: { ...Ui.card, marginHorizontal: 10, marginTop: -52, padding: 10, borderRadius: 18, zIndex: 5, ...SHADOW },
   searchPill: { minHeight: 46, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 23, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, paddingVertical: 8 },
   clearSearch: { padding: 4 },
