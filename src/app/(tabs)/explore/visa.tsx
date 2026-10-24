@@ -169,7 +169,7 @@ const s = StyleSheet.create({
   tabOn: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: GREEN },
-  hero: { width: '100%', minHeight: 188, aspectRatio: 2, justifyContent: 'flex-start', paddingTop: 14, paddingBottom: 34, backgroundColor: '#DCEBE5', overflow: 'hidden', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  hero: { width: '100%', minHeight: 188, aspectRatio: 2, justifyContent: 'center', paddingTop: 30, paddingBottom: 34, backgroundColor: '#DCEBE5', overflow: 'hidden', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   heroCopy: { width: '62%', paddingLeft: 16 },
   heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: '#FFFFFF' },
