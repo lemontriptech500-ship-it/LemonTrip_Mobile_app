@@ -158,7 +158,7 @@ export default function ExploreScreen() {
           </ScrollView>
           <View style={styles.hero}>
             <Image source={require('../../../../assets/images/explore-hero.webp')} resizeMode="cover" style={styles.heroImg} />
-            <LinearGradient colors={['rgba(255,255,255,0.92)', 'rgba(255,255,255,0.55)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 0.85]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+          <View pointerEvents="none" style={styles.heroShade} />
             <View style={styles.heroCopy}>
               <Text style={styles.heroEyebrow}>DESTINATION DISCOVERY</Text>
               <Text style={styles.heroTitle}>Discover somewhere new.</Text>
@@ -453,10 +453,11 @@ const styles = StyleSheet.create({
   // Hero
   hero: { width: '100%', aspectRatio: 2.05, backgroundColor: '#DCEBE5', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  heroShade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' },
   heroCopy: { width: '62%', paddingLeft: 16 },
-  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: 8, letterSpacing: 0.8, color: '#3C4A45' },
-  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#103D30', marginTop: 4 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: 10.5, lineHeight: 14, color: '#3C4A45', marginTop: 4 },
+  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: 8, letterSpacing: 0.8, color: '#FFFFFF' },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 4 },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: 10.5, lineHeight: 14, color: '#FFFFFF', marginTop: 4 },
 
   // Search
   popularHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Ui.space.page, marginTop: 18, marginBottom: 10 },
