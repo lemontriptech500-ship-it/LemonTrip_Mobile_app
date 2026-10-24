@@ -1,7 +1,6 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
-import { visaCountryFlag } from '@/components/visa/VisaHeader';
 import { Ui } from '@/constants/theme';
 import { APP_API_URL } from '@/utils/apiConfig';
 import { Colors } from '@/constants/colors';
@@ -136,7 +135,6 @@ export default function VisaScreen() {
                 return (
                   <TouchableOpacity key={country.id} accessibilityRole="radio" accessibilityLabel={`${country.name}, ${country.visaType}`} accessibilityState={{ selected: on, checked: on }} activeOpacity={0.9} onPress={() => setSelected(country.id)} style={[s.card, on && s.cardOn]}>
                     <VisaThumb country={country} />
-                    <Text style={s.flag}>{visaCountryFlag(country.name)}</Text>
                     <View style={s.copy}>
                       <Text style={s.name} numberOfLines={1}>{country.name}</Text>
                       <Text style={s.type} numberOfLines={1}>{country.visaType}</Text>
