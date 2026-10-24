@@ -15,7 +15,7 @@ const WRITE_DELAY = 400;
 const REVEAL_DURATION = 2450;
 const EXIT_DURATION = 520;
 const MAX_SPLASH_DURATION = 4000;
-const BRAND_GAP = 32;
+const BRAND_GAP = 4;
 const BRAND_SIDE_PADDING = 24;
 const LEMON_SIZE_RATIO = 0.92;
 
@@ -136,7 +136,7 @@ export default function LaunchScreen() {
 
   const spinRotation = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   // Reserve the gap and screen margins before sizing either part of the logo.
-  const wordmarkWidth = Math.min((width - BRAND_SIDE_PADDING * 2 - BRAND_GAP) / (1 + LEMON_SIZE_RATIO), 200);
+  const wordmarkWidth = Math.min((width - BRAND_SIDE_PADDING * 2 - BRAND_GAP) / (1 + LEMON_SIZE_RATIO), 70);
   const lemonSize = wordmarkWidth * LEMON_SIZE_RATIO;
   // Cutout is already tightly cropped (805x800), so size it directly.
   const lemonHeight = lemonSize * (800 / 805);
