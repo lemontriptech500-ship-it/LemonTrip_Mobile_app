@@ -9,7 +9,6 @@ import type { VisaCountry } from '@/types/content';
 import { getVisaServices } from '@/utils/visaService';
 import { blurWebNavigationFocus } from '@/utils/webNavigationFocus';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from 'react-native';
@@ -91,7 +90,7 @@ export default function VisaScreen() {
 
           <View style={s.hero}>
             <Image source={require('../../../../assets/images/Passport to Paris Riverside.png')} resizeMode="cover" style={s.heroImg} />
-            <LinearGradient colors={['rgba(255,255,255,0.88)', 'rgba(255,255,255,0.45)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 0.85]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
             <View style={s.heroCopy}>
               <Text style={s.heroEyebrow}>TRAVEL WITH CONFIDENCE</Text>
               <Text style={s.heroTitle}>Visa Services</Text>
@@ -175,9 +174,9 @@ const s = StyleSheet.create({
   hero: { width: '100%', minHeight: 188, aspectRatio: 2, justifyContent: 'flex-start', paddingTop: 14, paddingBottom: 34, backgroundColor: '#DCEBE5', overflow: 'hidden', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   heroCopy: { width: '62%', paddingLeft: 16 },
-  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: GREEN },
-  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: GREEN, marginTop: 4 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#3C4A45', marginTop: 4 },
+  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: '#FFFFFF' },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 4 },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#FFFFFF', marginTop: 4 },
   applications: { minHeight: 38, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.white, shadowColor: GREEN, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 3 },
   applicationsText: { fontFamily: 'Inter-ExtraBold', fontSize: 13, color: GREEN },
   searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -28, padding: 8, borderRadius: 22 },

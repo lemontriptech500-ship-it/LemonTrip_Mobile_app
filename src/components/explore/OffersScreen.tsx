@@ -4,7 +4,6 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { Offer } from '@/data/mock/offers';
 import {
   getOfferCategory,
@@ -187,7 +186,7 @@ export default function OffersScreen() {
           </ScrollView>
           <View style={styles.hero}>
             <Image source={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} resizeMode="cover" style={styles.heroImg} />
-            <LinearGradient colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']} locations={[0, 0.55, 0.9]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
+            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
             <View style={styles.heroCopy}>
               <Text style={styles.heroEyebrow}>EXCLUSIVE TRAVEL DEALS</Text>
               <Text style={styles.heroTitle}>Travel More Spend Less</Text>
@@ -597,9 +596,9 @@ const styles = StyleSheet.create({
   hero: { width: '100%', aspectRatio: 2.05, justifyContent: 'center', paddingTop: 10, paddingBottom: 34, backgroundColor: '#DCEBE5' },
   heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   heroCopy: { width: '66%', paddingLeft: 16 },
-  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.2, color: Colors.secondary },
-  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#103D30', marginTop: 6 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#3C4A45', marginTop: 6 },
+  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.2, color: '#FFFFFF' },
+  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 6 },
+  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#FFFFFF', marginTop: 6 },
   searchCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginHorizontal: 10, marginTop: -28, padding: 8, borderRadius: 22, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 2 },
   searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 13, paddingVertical: 10 },

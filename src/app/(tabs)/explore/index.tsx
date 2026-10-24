@@ -2,7 +2,6 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import type { Destination, TravelPackage } from '@/types/content';
@@ -451,8 +450,8 @@ const styles = StyleSheet.create({
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
 
   // Hero
-  hero: { width: '100%', aspectRatio: 2.05, backgroundColor: '#DCEBE5', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
-  heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  hero: { width: '100%', aspectRatio: 2.05, backgroundColor: '#103D30', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
+  heroImg: { position: 'absolute', top: 0, left: 0, width: '100%', bottom: -40 },
   heroShade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' },
   heroCopy: { width: '62%', paddingLeft: 16 },
   heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: 8, letterSpacing: 0.8, color: '#FFFFFF' },
