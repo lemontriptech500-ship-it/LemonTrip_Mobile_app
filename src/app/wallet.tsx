@@ -2,7 +2,6 @@ import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { Colors } from '@/constants/colors';
@@ -17,6 +16,8 @@ import { ActivityIndicator, Image, ImageBackground, Linking, ScrollView, StyleSh
 // Inter (static weights, loaded in app/_layout.tsx).
 const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
 const BRAND = '#103D30';
+// Wallet uses the same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 // Banner artwork lives in assets/images (file name as saved in the project).
 const WALLET_BANNER = require('../../assets/images/Green Wallet, Golden Rupee, Rising Flight.png');
 
@@ -55,6 +56,7 @@ export default function WalletScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
         <View style={s.content}>
+          {/* Wallet banner hidden (commented, not deleted)
           <View style={s.bannerWrap}>
             <ImageBackground source={WALLET_BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
               <View style={s.bannerCopy}>
@@ -64,6 +66,7 @@ export default function WalletScreen() {
               </View>
             </ImageBackground>
           </View>
+          */}
 
           <View style={s.balance}>
             <View style={s.balanceHead}>
