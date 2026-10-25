@@ -179,7 +179,7 @@ const s = StyleSheet.create({
   rowDetail: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
   body: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 18 },
 
-  promo: { marginHorizontal: 16, marginBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 8, padding: 18, borderRadius: 22, backgroundColor: Colors.accentSoft, overflow: 'hidden' },
+  promo: { marginHorizontal: 16, marginBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 8, padding: 18, borderRadius: 22, backgroundColor: Colors.successSoft, overflow: 'hidden' },
   promoCopy: { flex: 1, minWidth: 0 },
   promoTitle: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.bodyLarge },
   promoText: { fontFamily: INTER.regular, color: Colors.textDark, fontSize: TextSize.caption, lineHeight: 17, marginTop: 4 },
