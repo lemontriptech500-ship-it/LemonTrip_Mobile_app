@@ -22,6 +22,7 @@ import { Image, StyleSheet, Switch, View } from 'react-native';
 type IconName = ComponentProps<typeof Ionicons>['name'];
 type Note = { text: string; tone: 'good' | 'error' } | null;
 
+const promos: Record<string, { title: string; text: string }> = { travellers: { title: 'Travelling with someone?', text: 'Save traveller details once and book faster.' }, 'saved-searches': { title: 'Pick up where you left off', text: 'Your saved searches are always one tap away.' }, default: { title: 'Made for the way you travel', text: 'Manage your LemonTrip account in one place.' } };
 const titles: Record<string, string> = { travellers: 'Saved travellers', 'saved-searches': 'Saved searches', 'recent-searches': 'Recent searches', notifications: 'Notifications', 'notification-settings': 'Notification settings', security: 'Security', language: 'Language', currency: 'Currency', 'edit-profile': 'Edit profile', 'personal-information': 'Personal information', about: 'About LemonTrip', search: 'Find your next journey', 'account-setup': 'Complete your profile', 'reset-password': 'Reset password', 'otp-verification': 'Verify your phone' };
 
 const updateLabels = {
@@ -281,7 +282,7 @@ export default function ManageScreen() {
   }
 
   return (
-    <SupportPage title={titles[section] ?? 'Your account'} subtitle="Made for the way you travel." eyebrow={section === 'about' ? 'LEMONTRIP / ABOUT' : 'LEMONTRIP / ACCOUNT'} hero={{ image: require('../../../assets/images/Tropical Travel Essentials in Green.png'), topTitle: titles[section] ?? 'Your account', onSettings: () => goTo('/settings') }}>
+    <SupportPage promo={section === 'about' ? undefined : (promos[section] ?? promos.default)} title={titles[section] ?? 'Your account'} subtitle="Made for the way you travel." eyebrow={section === 'about' ? 'LEMONTRIP / ABOUT' : 'LEMONTRIP / ACCOUNT'} hero={{ image: require('../../../assets/images/Tropical Travel Essentials in Green.png'), topTitle: titles[section] ?? 'Your account', onSettings: () => goTo('/settings') }}>
       {content}
       {note ? <SupportNotice tone={note.tone}>{note.text}</SupportNotice> : null}
       {preferences.error ? <SupportNotice tone="error">{preferences.error}</SupportNotice> : null}
