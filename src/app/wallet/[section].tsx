@@ -30,6 +30,18 @@ const waysToPay: { title: string; detail: string; icon: IconName; highlight?: bo
   { title: 'LemonTrip wallet', detail: 'Use a verified balance', icon: 'wallet-outline', highlight: true },
 ];
 
+function PromoBanner({ title, text }: { title: string; text: string }) {
+  return (
+    <View style={pm.promo}>
+      <View style={pm.flex}>
+        <Text style={pm.promoTitle}>{title}</Text>
+        <Text style={pm.promoText}>{text}</Text>
+      </View>
+      <View style={pm.promoArtBox}><Image source={PAYMENT_BANNER} style={pm.promoArt} resizeMode="cover" /></View>
+    </View>
+  );
+}
+
 function PaymentMethodsView() {
   return (
     <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Payment methods" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
@@ -70,6 +82,7 @@ function AddMoneyView({ amount, onChangeAmount, note, busy, onContinue }: { amou
   const good = note.startsWith('Payment verified');
   return (
     <BrandedPage hideBanner banner={WALLET_BANNER} title="Add money" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+      <PromoBanner title="Top up in a few taps" text="Add money to your wallet securely and book faster." />
       <View style={pm.card}>
         <Text style={pm.addTitle}>How much would you like to add?</Text>
         <Text style={pm.fieldLabel}>Amount (INR)</Text>
@@ -102,6 +115,7 @@ function CouponsView({ code, onChangeCode, note, busy, onCheck }: { code: string
   const good = /is valid for/.test(note);
   return (
     <BrandedPage hideBanner banner={COUPON_BANNER} title="Coupons & promo codes" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+      <PromoBanner title="Save more on every trip" text="Apply coupons and promo codes for extra savings." />
       <View style={pm.card}>
         <Text style={pm.addTitle}>Have a promo code?</Text>
         <Text style={pm.fieldLabel}>Promo code</Text>
@@ -132,6 +146,7 @@ function CouponsView({ code, onChangeCode, note, busy, onCheck }: { code: string
 function PaymentStatusView({ reference, onChangeReference }: { reference: string; onChangeReference: (value: string) => void }) {
   return (
     <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Payment status" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+      <PromoBanner title="Know where your payment stands" text="Check the status of your payments anytime." />
       <View style={pm.card}>
         <Text style={pm.addTitle}>Check a payment</Text>
         <Text style={pm.fieldLabel}>Payment reference</Text>
@@ -154,6 +169,7 @@ type TransactionItem = { id: string; description: string; amount: number; status
 function TransactionsView({ signedIn, items, error }: { signedIn: boolean; items: TransactionItem[]; error: string }) {
   return (
     <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Wallet transactions" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+      <PromoBanner title="Every payment, in one place" text="Track top-ups, bookings and refunds at a glance." />
       {items.length ? (
         <View style={pm.card}>
           <Text style={pm.cardTitle}>Recent activity</Text>
