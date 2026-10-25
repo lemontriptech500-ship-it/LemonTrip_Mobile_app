@@ -9,13 +9,15 @@ import { RazorpayCheckoutHost } from '@/components/RazorpayCheckoutHost';
 import { BrandedPage, BRAND, INTER } from '@/components/account/BrandedPage';
 import { Text, TextInput } from '@/components/ui/Text';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
+// Wallet pages use the same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 // Banner artwork lives in assets/images (file name as saved in the project).
 const PAYMENT_BANNER = require('../../../assets/images/Secure Travel Payment Illustration.png');
 const COUPON_BANNER = require('../../../assets/images/Tropical Travel Essentials in Green.png');
@@ -30,7 +32,7 @@ const waysToPay: { title: string; detail: string; icon: IconName; highlight?: bo
 
 function PaymentMethodsView() {
   return (
-    <BrandedPage banner={PAYMENT_BANNER} title="Payment methods" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+    <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Payment methods" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
       <View style={pm.card}>
         <Text style={pm.cardTitle}>Ways to pay</Text>
         <Text style={pm.cardSub}>Options you can use at checkout.</Text>
@@ -67,7 +69,7 @@ function AddMoneyView({ amount, onChangeAmount, note, busy, onContinue }: { amou
   const off = busy || !amount.trim();
   const good = note.startsWith('Payment verified');
   return (
-    <BrandedPage banner={WALLET_BANNER} title="Add money" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+    <BrandedPage hideBanner banner={WALLET_BANNER} title="Add money" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
       <View style={pm.card}>
         <Text style={pm.addTitle}>How much would you like to add?</Text>
         <Text style={pm.fieldLabel}>Amount (INR)</Text>
@@ -99,7 +101,7 @@ function CouponsView({ code, onChangeCode, note, busy, onCheck }: { code: string
   const off = busy || !code.trim();
   const good = /is valid for/.test(note);
   return (
-    <BrandedPage banner={COUPON_BANNER} title="Coupons & promo codes" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+    <BrandedPage hideBanner banner={COUPON_BANNER} title="Coupons & promo codes" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
       <View style={pm.card}>
         <Text style={pm.addTitle}>Have a promo code?</Text>
         <Text style={pm.fieldLabel}>Promo code</Text>
@@ -129,7 +131,7 @@ function CouponsView({ code, onChangeCode, note, busy, onCheck }: { code: string
 
 function PaymentStatusView({ reference, onChangeReference }: { reference: string; onChangeReference: (value: string) => void }) {
   return (
-    <BrandedPage banner={PAYMENT_BANNER} title="Payment status" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+    <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Payment status" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
       <View style={pm.card}>
         <Text style={pm.addTitle}>Check a payment</Text>
         <Text style={pm.fieldLabel}>Payment reference</Text>
@@ -151,7 +153,7 @@ type TransactionItem = { id: string; description: string; amount: number; status
 
 function TransactionsView({ signedIn, items, error }: { signedIn: boolean; items: TransactionItem[]; error: string }) {
   return (
-    <BrandedPage banner={PAYMENT_BANNER} title="Wallet transactions" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+    <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Wallet transactions" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
       {items.length ? (
         <View style={pm.card}>
           <Text style={pm.cardTitle}>Recent activity</Text>
