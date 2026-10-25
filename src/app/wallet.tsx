@@ -157,7 +157,7 @@ const s = StyleSheet.create({
   bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.displaySmall },
   bannerText: { fontFamily: INTER.regular, color: Colors.white, fontSize: TextSize.body, lineHeight: 18, marginTop: 4 },
 
-  balance: { marginHorizontal: 16, marginBottom: 14, padding: 18, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  balance: { marginHorizontal: 16, marginBottom: 22, padding: 18, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   balanceHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   label: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.micro, letterSpacing: 2 },
