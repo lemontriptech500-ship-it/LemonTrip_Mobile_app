@@ -33,6 +33,14 @@ const waysToPay: { title: string; detail: string; icon: IconName; highlight?: bo
 function PaymentMethodsView() {
   return (
     <BrandedPage hideBanner banner={PAYMENT_BANNER} title="Payment methods" subtitle="Keep every payment clear and easy to follow." eyebrow="LEMONTRIP WALLET">
+      <View style={pm.promo}>
+        <View style={pm.flex}>
+          <Text style={pm.promoTitle}>Fast, secure and hassle-free payments</Text>
+          <Text style={pm.promoText}>Enjoy a smoother travel experience with multiple payment options.</Text>
+        </View>
+        <View style={pm.promoArtBox}><Image source={PAYMENT_BANNER} style={pm.promoArt} resizeMode="cover" /></View>
+      </View>
+
       <View style={pm.card}>
         <Text style={pm.cardTitle}>Ways to pay</Text>
         <Text style={pm.cardSub}>Options you can use at checkout.</Text>
@@ -52,14 +60,6 @@ function PaymentMethodsView() {
             <Text style={pm.noticeBody}>Payment methods will become selectable when a secure payment provider is available.</Text>
           </View>
         </View>
-      </View>
-
-      <View style={pm.promo}>
-        <View style={pm.flex}>
-          <Text style={pm.promoTitle}>Fast, secure and hassle-free payments</Text>
-          <Text style={pm.promoText}>Enjoy a smoother travel experience with multiple payment options.</Text>
-        </View>
-        <View style={pm.promoArtBox}><Image source={PAYMENT_BANNER} style={pm.promoArt} resizeMode="cover" /></View>
       </View>
     </BrandedPage>
   );
@@ -191,14 +191,14 @@ const pm = StyleSheet.create({
   row: { minHeight: 70, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   divider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   iconCircle: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: Colors.surfaceMuted },
-  iconHighlight: { backgroundColor: Colors.accentSoft },
+  iconHighlight: { backgroundColor: Colors.surfaceMuted },
   rowTitle: { fontFamily: INTER.bold, color: Colors.textDark, fontSize: TextSize.body },
   rowDetail: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
   notice: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10, padding: 12, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
   noticeIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.white },
   noticeTitle: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.caption, lineHeight: 17 },
   noticeBody: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
-  promo: { marginHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 18, borderRadius: 22, backgroundColor: Colors.accentSoft, overflow: 'hidden' },
+  promo: { marginHorizontal: 16, marginTop: 14, marginBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 18, borderRadius: 22, backgroundColor: Colors.successSoft, overflow: 'hidden' },
   promoTitle: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.bodyLarge, lineHeight: 22 },
   promoText: { fontFamily: INTER.regular, color: Colors.textDark, fontSize: TextSize.caption, lineHeight: 17, marginTop: 4 },
   promoArtBox: { width: 110, height: 92, borderRadius: 18, overflow: 'hidden' },
