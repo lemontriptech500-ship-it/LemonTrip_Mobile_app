@@ -1,6 +1,8 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+import { InfoBanner } from '@/components/account/InfoBanner';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { Chip, EmptyState, Pill, PrimaryButton } from '@/components/trains/TrainUi';
@@ -60,6 +62,8 @@ export default function WishlistScreen() {
       </View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
         <View style={s.content}>
+          <InfoBanner title="Saved places" text={wishlist.length ? `${wishlist.length} saved ${wishlist.length === 1 ? 'place' : 'places'} waiting for your next trip.` : 'Save places you love for your next trip.'} />
+          {/* Banner hidden (commented, not deleted)
           <View style={s.bannerWrap}>
           <ImageBackground source={BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
             <View style={s.bannerCopy}>
@@ -69,6 +73,7 @@ export default function WishlistScreen() {
             </View>
           </ImageBackground>
           </View>
+          */}
 
           {wishlist.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filters} style={s.filterWrap}>

@@ -1,6 +1,7 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text } from '@/components/ui/Text';
 import { BrandedPage, BRAND, INTER } from '@/components/account/BrandedPage';
 import { Colors } from '@/constants/colors';
@@ -32,7 +33,7 @@ export function NotificationsScreen({ bookings, loading, error }: { bookings: Ac
   useAppLanguage();
   const go = (href: Href) => router.push(href);
   return (
-    <BrandedPage banner={BELL_BANNER} title="Notifications" subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT">
+    <BrandedPage promo={{ title: 'Stay in the loop', text: 'Updates about your journeys, all in one place.' }} banner={BELL_BANNER} title="Notifications" subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT">
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Notification settings" onPress={() => go('/manage/notification-settings' as Href)} activeOpacity={0.85} style={s.settingsCard}>
         <View style={s.squareIcon}><Ionicons name="options-outline" size={24} color={BRAND} /></View>
         <View style={s.flex}>
@@ -75,7 +76,7 @@ export function NotificationSettingsScreen({ updates, onChange, error }: { updat
   useAppLanguage();
   const keys = Object.keys(updateLabels) as UpdateKey[];
   return (
-    <BrandedPage banner={BELL_BANNER} title="Notification settings" subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT">
+    <BrandedPage promo={{ title: 'Make it yours', text: 'Choose which updates you want to receive.' }} banner={BELL_BANNER} title="Notification settings" subtitle="Made for the way you travel." eyebrow="LEMONTRIP / ACCOUNT">
       <View style={s.card}>
         <Text style={s.cardEyebrow}>STAY INFORMED</Text>
         <Text style={s.cardTitle}>Choose your updates</Text>

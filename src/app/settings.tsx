@@ -1,7 +1,8 @@
 import { useAppLanguage } from '@/utils/intl';
 import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text } from '@/components/ui/Text';
 import { usePreferences } from '@/utils/preferencesStore';
 import { Colors } from '@/constants/colors';
