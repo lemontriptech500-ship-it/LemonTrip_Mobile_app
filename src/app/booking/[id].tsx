@@ -1,9 +1,9 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, Row, SectionTitle } from '@/components/trains/TrainUi';
+import { AppScreen } from '@/components/AppScreen';
+import { Card, EmptyState, Notice, Pill, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { SUPPORT_PHONE, SUPPORT_WHATSAPP } from '@/constants/support';
 import { Ui } from '@/constants/theme';
@@ -15,6 +15,18 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+
+const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+
+/** Label / value row, same type scale as the My Trips cards. */
+function InfoRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+  return (
+    <View style={s.infoRow}>
+      <Text style={[s.infoLabel, bold && s.infoBold]}>{label}</Text>
+      <Text style={[s.infoValue, bold && s.infoBold]}>{value}</Text>
+    </View>
+  );
+}
 
 /** Decorative barcode derived from the booking id (demo only). */
 function Barcode({ value }: { value: string }) {
@@ -46,17 +58,25 @@ export default function BookingDetailScreen() {
 
   if (!booking) {
     return (
-      <FlowScreen>
+      <AppScreen edges={['top']} headerTone="light">
+        <View style={s.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={goBack} style={s.topBtn}>
+          <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+        </TouchableOpacity>
+        <Text style={s.topTitle}>Booking voucher</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[s.topBtn, s.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <ScreenHeader title="Booking voucher" eyebrow="MY TRIPS" onBack={goBack} />
           <EmptyState
             icon="alert-circle-outline"
             title="Booking not found"
             text="We could not find this booking."
-            action={<PrimaryButton label="Go back" onPress={goBack} />}
+            action={<PrimaryButton label="Go back" onPress={goBack} variant="dark" />}
           />
         </ScrollView>
-      </FlowScreen>
+      </AppScreen>
     );
   }
 
@@ -114,20 +134,23 @@ export default function BookingDetailScreen() {
   const cancel = () => router.push({ pathname: '/booking/cancel', params: { id: String(booking.id) } } as never);
 
   return (
-    <FlowScreen>
+    <AppScreen edges={['top']} headerTone="light">
+      <View style={s.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={goBack} style={s.topBtn}>
+          <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+        </TouchableOpacity>
+        <Text style={s.topTitle}>Booking voucher</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[s.topBtn, s.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
-        <View style={s.content}>
-          <ScreenHeader
-            eyebrow="BOOKING VOUCHER"
-            title={bookingId}
-            subtitle="Show this voucher at check-in."
-            onBack={goBack}
-          />
+        <View style={[s.content, { marginTop: 14 }]}>
 
           <View style={s.ticket}>
             <View style={s.ticketTop}>
               <View style={s.ticketIcon}>
-                <Ionicons name={serviceIcon(booking.serviceName)} size={24} color={Colors.primary} />
+                <Ionicons name={serviceIcon(booking.serviceName)} size={22} color={Colors.primary} />
               </View>
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={s.service} numberOfLines={1}>{(booking.serviceName ?? '').toUpperCase()}</Text>
@@ -157,18 +180,20 @@ export default function BookingDetailScreen() {
             </View>
           </View>
 
-          <Card>
-            <SectionTitle eyebrow="DETAILS" title="Booking summary" />
-            <Row label="Service" value={booking.serviceName} />
-            <Row label="Booking ID" value={bookingId} />
-            <Row label={booking.tripDate ? 'Trip date' : 'Booked on'} value={formatDate(booking.tripDate ?? booking.bookedAt)} />
-            {booking.tripDate ? <Row label="Booked on" value={formatDate(booking.bookedAt)} /> : null}
-            <Row label="Status" value={status.label} />
+          <Card style={s.cardBase}>
+            <Text style={s.eyebrow}>DETAILS</Text>
+            <Text style={s.cardTitle}>Booking summary</Text>
+            <InfoRow label="Service" value={booking.serviceName} />
+            <InfoRow label="Booking ID" value={bookingId} />
+            <InfoRow label={booking.tripDate ? 'Trip date' : 'Booked on'} value={formatDate(booking.tripDate ?? booking.bookedAt)} />
+            {booking.tripDate ? <InfoRow label="Booked on" value={formatDate(booking.bookedAt)} /> : null}
+            <InfoRow label="Status" value={status.label} />
           </Card>
 
-          <Card>
-            <SectionTitle eyebrow="PAYMENT" title="Receipt" />
-            <Row label="Total paid" value={booking.price} bold />
+          <Card style={s.cardBase}>
+            <Text style={s.eyebrow}>PAYMENT</Text>
+            <Text style={s.cardTitle}>Receipt</Text>
+            <InfoRow label="Total paid" value={booking.price} bold />
           </Card>
 
           <View style={s.actions}>
@@ -187,11 +212,12 @@ export default function BookingDetailScreen() {
             </Notice>
           ) : null}
 
-          <Card>
-            <SectionTitle eyebrow="24/7 ASSIST" title="Need help with this trip?" />
+          <Card style={s.cardBase}>
+            <Text style={s.eyebrow}>24/7 ASSIST</Text>
+            <Text style={s.cardTitle}>Need help with this trip?</Text>
             <View style={s.assistRow}>
               <View style={[s.assistBtn, !hasPhone && { opacity: 0.4 }]}>
-                <PrimaryButton label="Call" icon="call-outline" onPress={call} disabled={!hasPhone} />
+                <PrimaryButton label="Call" icon="call-outline" onPress={call} disabled={!hasPhone} variant="dark" />
               </View>
               <View style={[s.assistBtn, !hasWhatsapp && { opacity: 0.4 }]}>
                 <PrimaryButton label="WhatsApp" icon="logo-whatsapp" onPress={whatsapp} disabled={!hasWhatsapp} variant="soft" />
@@ -207,7 +233,7 @@ export default function BookingDetailScreen() {
           ) : null}
         </View>
       </ScrollView>
-    </FlowScreen>
+    </AppScreen>
   );
 }
 
@@ -215,7 +241,7 @@ function Action({ icon, label, onPress }: { icon: React.ComponentProps<typeof Io
   return (
     <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={s.action}>
       <View style={s.actionIcon}>
-        <Ionicons name={icon} size={19} color={Colors.primary} />
+        <Ionicons name={icon} size={20} color={Colors.primary} />
       </View>
       <Text style={s.actionLabel}>{label}</Text>
     </TouchableOpacity>
@@ -223,38 +249,38 @@ function Action({ icon, label, onPress }: { icon: React.ComponentProps<typeof Io
 }
 
 const s = StyleSheet.create({
+  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 16 },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: '#103D30' },
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  ticket: { ...Ui.card, marginHorizontal: 20, marginBottom: 14, padding: 18, overflow: 'visible' },
+  cardBase: { marginHorizontal: 10, borderRadius: 22 },
+  eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
+  cardTitle: { fontFamily: INTER.extrabold, fontSize: 14, color: Colors.textDark, marginTop: 3, marginBottom: 6 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingVertical: 8 },
+  infoLabel: { fontFamily: INTER.regular, fontSize: 12, color: Colors.textLight },
+  infoValue: { fontFamily: INTER.bold, fontSize: 12, color: Colors.textDark, flexShrink: 1, textAlign: 'right' },
+  infoBold: { fontFamily: INTER.extrabold, fontSize: 15, color: Colors.primaryDark },
+  ticket: { ...Ui.card, marginHorizontal: 10, marginBottom: 14, padding: 16, borderRadius: 22, overflow: 'visible' },
   ticketTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
-  ticketIcon: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  ticketIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   service: { ...Ui.eyebrow, color: Colors.secondary },
-  itemName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 3 },
+  itemName: { fontFamily: INTER.extrabold, fontSize: 14, color: Colors.textDark, marginTop: 3 },
   destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  destText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
+  destText: { fontFamily: INTER.regular, fontSize: 11, color: Colors.textLight, flexShrink: 1 },
   perforation: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, height: 20 },
   dash: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
   notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   ticketBottom: { alignItems: 'center', gap: 12 },
   qrWrap: { padding: 10, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: Colors.border },
   barcode: { flexDirection: 'row', alignItems: 'center', height: 40, overflow: 'hidden', maxWidth: '100%' },
-  bookingIdText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, letterSpacing: 0.5 },
-  actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 14 },
-  action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  actionLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  assistRow: { flexDirection: 'row', gap: 10 },
+  bookingIdText: { fontFamily: INTER.bold, fontSize: 11, color: Colors.textLight, letterSpacing: 0.5 },
+  actions: { flexDirection: 'row', gap: 10, marginHorizontal: 10, marginBottom: 14 },
+  action: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 12, borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  actionIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
+  actionLabel: { fontFamily: INTER.bold, fontSize: 12, color: Colors.textDark },
+  assistRow: { flexDirection: 'row', gap: 10, marginTop: 6 },
   assistBtn: { flex: 1 },
-  cancelButton: {
-    minHeight: 52,
-    marginHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: 999,
-    borderWidth: 1.5,
-    borderColor: Colors.error,
-    backgroundColor: Colors.surface,
-  },
-  cancelText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.error },
+  cancelButton: { minHeight: 52, marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, borderWidth: 1.5, borderColor: Colors.error, backgroundColor: Colors.surface },
+  cancelText: { fontFamily: INTER.extrabold, fontSize: 14, color: Colors.error },
 });

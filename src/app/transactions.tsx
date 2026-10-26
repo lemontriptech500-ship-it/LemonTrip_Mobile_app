@@ -1,18 +1,19 @@
 import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
-import { Card, Chip, EmptyState, FlowScreen, PrimaryButton } from '@/components/trains/TrainUi';
+import { AppScreen } from '@/components/AppScreen';
+import { Card, EmptyState, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
-import { Ui } from '@/constants/theme';
 import { formatDate, serviceIcon, shortId } from '@/utils/bookingFormat';
 import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+
+const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
 
 // Same as CANCELLATION_FEE_PERCENT in booking/cancel.tsx
 const CANCELLATION_FEE_PERCENT = 10;
@@ -102,10 +103,17 @@ export default function TransactionsScreen() {
   const visible = transactions.filter((t) => filter === 'all' || t.kind === filter);
 
   return (
-    <FlowScreen>
+    <AppScreen edges={['top']} headerTone="light">
+      <View style={styles.topBar}>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={goBack} style={styles.topBtn}>
+          <Ionicons name="arrow-back" size={22} color={Colors.textDark} />
+        </TouchableOpacity>
+        <Text style={styles.topTitle}>Transactions</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as never)} style={[styles.topBtn, styles.topBtnTint]}>
+          <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <ScreenHeader eyebrow="MY TRIPS" title="Transactions" subtitle="Payments and refunds for your bookings." onBack={goBack} />
-
         <Card style={styles.summary}>
           <View style={styles.summaryItem}>
             <Text style={styles.summaryLabel}>TOTAL SPENT</Text>
@@ -118,11 +126,19 @@ export default function TransactionsScreen() {
           </View>
         </Card>
 
-        <View style={styles.filters}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
           {FILTERS.map((f) => (
-            <Chip key={f.key} label={f.label} selected={filter === f.key} onPress={() => setFilter(f.key)} />
+            <TouchableOpacity
+              key={f.key}
+              accessibilityRole="button"
+              accessibilityState={{ selected: filter === f.key }}
+              onPress={() => setFilter(f.key)}
+              style={[styles.tabChip, filter === f.key && styles.tabChipOn]}
+            >
+              <Text style={[styles.tabChipText, filter === f.key && styles.tabChipTextOn]}>{f.label}</Text>
+            </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
 
         {visible.length === 0 ? (
           <EmptyState
@@ -163,24 +179,32 @@ export default function TransactionsScreen() {
           })
         )}
       </ScrollView>
-    </FlowScreen>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { paddingBottom: 24 },
-  summary: { flexDirection: 'row', alignItems: 'center' },
+  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 16 },
+  topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  topBtnTint: { backgroundColor: Colors.successSoft },
+  topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: '#103D30' },
+  scroll: { paddingTop: 14, paddingBottom: 32 },
+  summary: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 10, borderRadius: 22 },
   summaryItem: { flex: 1, alignItems: 'center' },
   summaryDivider: { width: 1, height: 36, backgroundColor: Colors.border },
-  summaryLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1.1, marginBottom: 6 },
-  summaryValue: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold },
-  filters: { flexDirection: 'row', gap: 8, marginHorizontal: Ui.space.page, marginBottom: 14 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  rowIcon: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.surfaceMuted },
+  summaryLabel: { color: Colors.textLight, fontFamily: INTER.extrabold, fontSize: 10, letterSpacing: 1.1, marginBottom: 6 },
+  summaryValue: { color: Colors.primaryDark, fontFamily: INTER.extrabold, fontSize: TextSize.title },
+  filters: { paddingHorizontal: 10, gap: 8, paddingBottom: 14 },
+  tabChip: { minHeight: 34, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
+  tabChipOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  tabChipText: { fontFamily: INTER.semibold, fontSize: 12, color: Colors.textDark },
+  tabChipTextOn: { color: Colors.white },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 10, borderRadius: 22 },
+  rowIcon: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: '#E3F0EA' },
   rowIconRefund: { backgroundColor: Colors.successSoft },
   rowInfo: { flex: 1, minWidth: 0 },
-  rowTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
-  rowSub: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 2 },
-  rowDate: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 2 },
-  rowAmount: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
+  rowTitle: { color: Colors.textDark, fontFamily: INTER.extrabold, fontSize: 14 },
+  rowSub: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: 11, marginTop: 2 },
+  rowDate: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: 11, marginTop: 2 },
+  rowAmount: { color: Colors.primaryDark, fontFamily: INTER.extrabold, fontSize: 15 },
 });
