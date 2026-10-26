@@ -36,7 +36,7 @@ const AI_ASSET = Image.resolveAssetSource(AI_IMAGE);
 const AI_ASPECT = AI_ASSET?.width && AI_ASSET?.height ? AI_ASSET.width / AI_ASSET.height : 3;
 const AI_CARD_HEIGHT = 128;
 // How much to dim the hero photo: 0 = original, 0.3 = noticeably darker.
-const HERO_DIM = 0.1;
+const HERO_DIM = 0.3;
 // The photo is drawn at its natural proportions at the height of the visible hero area (no heavy zoom),
 // anchored to the right so the hiker stays in view. The search card overlaps the bottom HERO_OVERLAP px.
 // Smaller HERO_HEIGHT = more zoomed out (more of the panorama visible). Larger HERO_OVERLAP = search card sits higher.
@@ -45,6 +45,8 @@ const HERO_OVERLAP = 70;
 const HERO_ASSET = Image.resolveAssetSource(HERO_IMAGE);
 const HERO_ASPECT = HERO_ASSET?.width && HERO_ASSET?.height ? HERO_ASSET.width / HERO_ASSET.height : 16 / 9;
 const HERO_IMAGE_HEIGHT = HERO_HEIGHT; // photo runs the full hero height so nothing shows beside the search card
+// App logo shown at the top-left of the hero, before the location.
+const APP_LOGO = require('../../../assets/images/Glossy Lemon Trip Logo.png');
 // Script font from the design; the file lives in assets/fonts and is loaded in app/_layout.tsx.
 const SCRIPT_FONT = 'Italianno';
 // Inter (static weights, loaded in app/_layout.tsx) for all other text on this screen.
@@ -180,6 +182,7 @@ export default function HomeScreen() {
           <View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(4,20,15,${HERO_DIM})` }]} />
           <LinearGradient colors={['rgba(8,30,24,0.62)', 'rgba(8,30,24,0.05)', 'rgba(8,30,24,0.28)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
+            <Image source={APP_LOGO} style={styles.heroLogoMark} resizeMode="contain" accessibilityLabel="LemonTrip" />
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Change your departure city" style={styles.locationRow} onPress={() => router.push('/(tabs)/explore/flights')}>
               <Ionicons name="location-sharp" size={20} color="#FFFFFF" />
               <Text style={styles.locationText}>New Delhi, IN</Text>
@@ -624,6 +627,7 @@ const styles = StyleSheet.create({
   locationText: { color: '#FFFFFF', fontFamily: INTER.bold, fontSize: TextSize.body },
   heroBrand: { flex: 1, alignItems: 'flex-end' },
   heroLogo: { width: 102, height: 38 },
+  heroLogoMark: { width: 66, height: 36, marginRight: 10 },
   bellButton: { width: 40, height: 40, marginLeft: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(8,30,24,0.55)' },
   bellDot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF3B30' },
   heroCopy: { marginTop: 18, maxWidth: '80%' },
