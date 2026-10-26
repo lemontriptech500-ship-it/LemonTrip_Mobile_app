@@ -1,4 +1,5 @@
 import { useAppLanguage } from '@/utils/intl';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text } from '@/components/ui/Text';
@@ -50,12 +51,14 @@ export default function PackageDetailScreen() {
     catch { Alert.alert('Enquire about this journey', 'Contact lemontripindia@gmail.com to ask about this package.'); }
   };
 
-  if (loading || !pkg) {
+  if (loading) return <LoadingScreen />;
+
+  if (!pkg) {
     return (
       <FlowScreen>
         {topBar}
         <ScrollView>
-          <EmptyState icon="umbrella-outline" title={loading ? 'Loading package…' : 'Package not found'} text={loading ? 'Fetching the latest details.' : 'This journey is no longer available.'} action={loading ? undefined : <PrimaryButton variant="dark" label="Browse packages" onPress={() => replaceTo(PACKAGE_ROUTES.list)} />} />
+          <EmptyState icon="umbrella-outline" title="Package not found" text="This journey is no longer available." action={<PrimaryButton variant="dark" label="Browse packages" onPress={() => replaceTo(PACKAGE_ROUTES.list)} />} />
         </ScrollView>
       </FlowScreen>
     );
