@@ -150,7 +150,7 @@ const s = StyleSheet.create({
   bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.displaySmall },
   bannerText: { color: Colors.onDarkMuted, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 18, marginTop: 4 },
   empty: { marginHorizontal: 16, alignItems: 'center', padding: 22, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  emptyIcon: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.accentSoft },
+  emptyIcon: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center', borderRadius: 36, backgroundColor: Colors.surfaceMuted },
   emptyTitle: { fontFamily: INTER.extrabold, marginTop: 14, color: BRAND, fontSize: TextSize.bodyLarge, textAlign: 'center' },
   emptyText: { marginTop: 6, marginBottom: 18, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, textAlign: 'center' },
   exploreButton: { alignSelf: 'stretch', minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 24, paddingRight: 6, borderRadius: 999, backgroundColor: BRAND },
