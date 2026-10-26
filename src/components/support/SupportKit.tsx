@@ -1,6 +1,7 @@
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { Text, TextInput } from '@/components/ui/Text';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { FontWeight, FontFamily } from '@/constants/typography';
+import { InfoBanner } from '@/components/account/InfoBanner';
 import { AppScreen } from '@/components/AppScreen';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Colors } from '@/constants/colors';
@@ -14,10 +15,13 @@ import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, S
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 export const goTo = (path: string) => router.push(path as Href);
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
+
 export const goBackOr = (fallback: string) => (router.canGoBack() ? router.back() : router.replace(fallback as Href));
 
 /** Page shell for help-style screens: brand header, scrollable body, optional sticky footer. */
-export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, scrollRef, onContentSizeChange, hero, children }: { hero?: { image: ImageSourcePropType; topTitle?: string; onSettings?: () => void }; title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; scrollRef?: Ref<ScrollView>; onContentSizeChange?: (width: number, height: number) => void; children: ReactNode }) {
+export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', onBack, footer, scrollRef, onContentSizeChange, hero, promo, children }: { promo?: { title: string; text: string }; hero?: { image: ImageSourcePropType; topTitle?: string; onSettings?: () => void }; title: string; subtitle?: string; eyebrow?: string; onBack?: () => void; footer?: ReactNode; scrollRef?: Ref<ScrollView>; onContentSizeChange?: (width: number, height: number) => void; children: ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
     <AppScreen headerTone={hero ? 'light' : 'brand'}>
@@ -36,7 +40,7 @@ export function SupportPage({ title, subtitle, eyebrow = 'LEMONTRIP / SUPPORT', 
       ) : null}
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scrollRef} onContentSizeChange={onContentSizeChange} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={s.page}>
-          {hero ? (
+          {promo ? <InfoBanner title={promo.title} text={promo.text} /> : hero ? (
             <View style={s.heroWrap}>
               <View style={s.hero}>
                 <Image source={hero.image} resizeMode="cover" style={s.heroImg} />

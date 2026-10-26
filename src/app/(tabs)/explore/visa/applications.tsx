@@ -1,6 +1,8 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+import { InfoBanner } from '@/components/account/InfoBanner';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { getAccessToken, useAuth } from '@/utils/authStore';
@@ -68,6 +70,8 @@ export default function VisaApplicationsScreen() {
       </View>
       <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
+          <InfoBanner flush title="Your visa applications" text="View your requests, documents and latest updates." />
+          {/* Banner hidden (commented, not deleted)
           <View style={styles.banner}>
             <Image source={require('../../../../../assets/images/Visa Travel Documents in Green Landscape.png')} resizeMode="cover" style={styles.bannerImg} />
             <View style={styles.bannerCopy}>
@@ -76,6 +80,7 @@ export default function VisaApplicationsScreen() {
               <Text style={styles.bannerSub} numberOfLines={2}>View your requests, documents, and latest updates.</Text>
             </View>
           </View>
+          */}
 
           {loading ? <ActivityIndicator accessibilityLabel="Loading visa applications" color={GREEN} style={styles.loader} /> : null}
           {!loading && !user ? <View style={styles.empty}><Ionicons name="lock-closed-outline" size={28} color={GREEN} /><Text style={styles.emptyTitle}>Sign in required</Text><Text style={styles.copy}>{error}</Text><TouchableOpacity style={styles.button} onPress={() => router.push('/login')}><Text style={styles.buttonText}>Sign in</Text></TouchableOpacity></View> : null}

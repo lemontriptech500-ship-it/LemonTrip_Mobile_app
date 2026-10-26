@@ -2,6 +2,7 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
+import { InfoBanner } from '@/components/account/InfoBanner';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router, type Href } from 'expo-router';
@@ -15,10 +16,10 @@ export const BRAND = '#103D30';
 // Banner artwork lives in assets/images (file name as saved in the project).
 const BANNER = require('../../../assets/images/Tropical Travel Essentials in Green.png');
 
-type Props = { banner?: ImageSourcePropType; title: string; subtitle: string; eyebrow: string; onBack?: () => void; footer?: ReactNode; hideBanner?: boolean; children: ReactNode };
+type Props = { banner?: ImageSourcePropType; title: string; subtitle: string; eyebrow: string; onBack?: () => void; footer?: ReactNode; hideBanner?: boolean; promo?: { title: string; text: string }; children: ReactNode };
 
 /** Light header (back, title, settings) + green banner + scrolling body + optional sticky footer. */
-export function BrandedPage({ banner, title, subtitle, eyebrow, onBack, footer, hideBanner, children }: Props) {
+export function BrandedPage({ banner, title, subtitle, eyebrow, onBack, footer, hideBanner, promo, children }: Props) {
   const insets = useSafeAreaInsets();
   const goBack = onBack ?? (() => { if (router.canGoBack()) router.back(); else router.replace('/(tabs)/profile' as Href); });
   return (
@@ -35,7 +36,8 @@ export function BrandedPage({ banner, title, subtitle, eyebrow, onBack, footer, 
       <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 28 }}>
           <View style={s.content}>
-            {!hideBanner ? (
+            {promo ? <InfoBanner title={promo.title} text={promo.text} /> : null}
+            {!hideBanner && !promo ? (
             <View style={s.bannerWrap}>
               <ImageBackground source={banner ?? BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
                 <View style={s.bannerCopy}>
