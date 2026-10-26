@@ -1,8 +1,10 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
+import { InfoBanner } from '@/components/account/InfoBanner';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -87,6 +89,8 @@ export function EditProfileScreen({ title = 'Edit profile', first, last, onChang
       <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 28 }}>
           <View style={s.content}>
+            <InfoBanner title="Edit your profile" text="Keep your name and contact details up to date." />
+            {/* Banner hidden (commented, not deleted)
             <View style={s.bannerWrap}>
               <ImageBackground source={BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
                 <View style={s.bannerCopy}>
@@ -96,6 +100,7 @@ export function EditProfileScreen({ title = 'Edit profile', first, last, onChang
                 </View>
               </ImageBackground>
             </View>
+            */}
 
             <View style={s.card}>
               <Text style={s.cardEyebrow}>YOUR DETAILS</Text>
@@ -172,8 +177,8 @@ const s = StyleSheet.create({
   field: { marginBottom: 12 },
   fieldLabel: { fontFamily: INTER.semibold, color: Colors.textLight, fontSize: TextSize.micro, letterSpacing: 1, marginBottom: 6 },
   input: { minHeight: 52, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textDark },
-  saveButton: { minHeight: 52, marginTop: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, backgroundColor: Colors.accent },
-  saveText: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
+  saveButton: { minHeight: 52, marginTop: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, backgroundColor: BRAND },
+  saveText: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.body },
   note: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 14, marginBottom: 6 },
   noteGood: { backgroundColor: Colors.successSoft },
   noteError: { backgroundColor: Colors.errorSoft },
@@ -191,7 +196,7 @@ const s = StyleSheet.create({
   noticeBody: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
 
   link: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
-  linkIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.accentSoft },
+  linkIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surfaceMuted },
   linkTitle: { fontFamily: INTER.bold, color: Colors.textDark, fontSize: TextSize.body },
   linkDetail: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
 });
