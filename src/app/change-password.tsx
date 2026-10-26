@@ -1,6 +1,7 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text, TextInput } from '@/components/ui/Text';
 import { BrandedPage, BRAND, INTER } from '@/components/account/BrandedPage';
 import { Colors } from '@/constants/colors';
@@ -63,7 +64,7 @@ export default function ChangePasswordScreen() {
   const off = !user || busy || !next || !confirm;
 
   return (
-    <BrandedPage title="Change password" subtitle="Keep your account secure." eyebrow="LEMONTRIP / ACCOUNT">
+    <BrandedPage promo={{ title: 'Keep your account secure', text: 'Update your password to protect your trips.' }} title="Change password" subtitle="Keep your account secure." eyebrow="LEMONTRIP / ACCOUNT">
       <View style={s.card}>
         <Text style={s.cardEyebrow}>SECURITY</Text>
         <Text style={s.cardTitle}>Update your password</Text>
@@ -77,7 +78,7 @@ export default function ChangePasswordScreen() {
           </View>
         ) : null}
         <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: off, busy }} disabled={off} onPress={() => void submit()} activeOpacity={0.85} style={[s.button, off && { opacity: 0.55 }]}>
-          {busy ? <ActivityIndicator color={BRAND} /> : <><Text style={s.buttonText}>Change password</Text><Ionicons name="arrow-forward" size={18} color={BRAND} /></>}
+          {busy ? <ActivityIndicator color={Colors.white} /> : <><Text style={s.buttonText}>Change password</Text><Ionicons name="arrow-forward" size={18} color={Colors.white} /></>}
         </TouchableOpacity>
       </View>
 
@@ -105,8 +106,8 @@ const s = StyleSheet.create({
   noteGood: { backgroundColor: Colors.successSoft },
   noteError: { backgroundColor: Colors.errorSoft },
   noteText: { flex: 1, fontFamily: INTER.medium, color: Colors.textDark, fontSize: TextSize.caption, lineHeight: 17 },
-  button: { minHeight: 52, marginTop: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, backgroundColor: Colors.accent },
-  buttonText: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
+  button: { minHeight: 52, marginTop: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, backgroundColor: BRAND },
+  buttonText: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.body },
   notice: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, padding: 14, borderRadius: 22, backgroundColor: Colors.surfaceMuted },
   noticeIcon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.white },
   noticeTitle: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.body },
