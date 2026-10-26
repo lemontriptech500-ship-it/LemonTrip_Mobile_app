@@ -72,6 +72,7 @@ export default function ContactScreen() {
 
   return (
     <BrandedPage
+      hideBanner
       title="Contact support"
       subtitle="Tell us what’s going on and we’ll help."
       eyebrow="LEMONTRIP / SUPPORT"
@@ -115,7 +116,7 @@ export default function ContactScreen() {
 
       <View style={s.direct}>
         <View style={s.directHead}>
-          <View style={s.directIcon}><Ionicons name="headset-outline" size={24} color={BRAND} /></View>
+          <View style={s.directIcon}><Ionicons name="headset-outline" size={24} color="#FFFFFF" /></View>
           <View style={s.flex}>
             <Text style={s.directTitle}>Prefer to reach us directly?</Text>
             <Text style={s.directText}>Get in touch through your preferred channel.</Text>
@@ -147,7 +148,7 @@ function Field({ label, counter, multiline, ...input }: TextInputProps & { label
 function PrimaryButton({ label, onPress, loading }: { label: string; onPress: () => void; loading?: boolean }) {
   return (
     <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: !!loading, busy: !!loading }} disabled={!!loading} onPress={onPress} activeOpacity={0.85} style={[s.primary, !!loading && { opacity: 0.55 }]}>
-      {loading ? <ActivityIndicator color={BRAND} /> : <><Text style={s.primaryText}>{label}</Text><Ionicons name="arrow-forward" size={18} color={BRAND} /></>}
+      {loading ? <ActivityIndicator color="#FFFFFF" /> : <><Text style={s.primaryText}>{label}</Text><Ionicons name="arrow-forward" size={18} color="#FFFFFF" /></>}
     </TouchableOpacity>
   );
 }
@@ -184,8 +185,8 @@ const s = StyleSheet.create({
   inlineLink: { fontFamily: INTER.extrabold, color: BRAND, textDecorationLine: 'underline' },
 
   direct: { marginHorizontal: 16, padding: 12, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  directHead: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, backgroundColor: Colors.accentSoft },
-  directIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: Colors.accent },
+  directHead: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, backgroundColor: Colors.successSoft },
+  directIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: '#103D30' },
   directTitle: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
   directText: { fontFamily: INTER.regular, color: Colors.textDark, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
   channelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
@@ -193,13 +194,13 @@ const s = StyleSheet.create({
   channelText: { flex: 1, fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.body },
   divider: { width: 1, height: 28, backgroundColor: Colors.borderStrong },
 
-  primary: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, backgroundColor: Colors.accent },
-  primaryText: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
+  primary: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 999, backgroundColor: '#103D30' },
+  primaryText: { fontFamily: INTER.extrabold, color: '#FFFFFF', fontSize: TextSize.body },
   soft: { minHeight: 52, alignItems: 'center', justifyContent: 'center', borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   softText: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
 
   done: { alignItems: 'center', marginHorizontal: 16, marginBottom: 14, padding: 24, borderRadius: 22, backgroundColor: BRAND },
-  doneIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
+  doneIcon: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
   doneTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.heading, color: Colors.white, marginTop: 14 },
   doneText: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: Colors.onDarkMuted, marginTop: 5, textAlign: 'center' },
   refBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
