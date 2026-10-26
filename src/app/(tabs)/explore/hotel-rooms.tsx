@@ -2,9 +2,8 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { StaySummary } from '@/components/hotels/HotelBookingCards';
-import { Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
+import { HotelHeader, Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { CHECK_IN_TIME, CHECK_OUT_TIME, MAX_GUESTS, MAX_ROOMS, cancellationInfo, getRoomOptions, inr, parsePrice } from '@/data/hotelBooking';
 import { getHotelSearch, getSelectedHotel } from '@/utils/hotelSearchStore';
@@ -31,7 +30,7 @@ export default function HotelRoomsScreen() {
   if (!sel || !derived) {
     return (
       <FlowScreen>
-        <ScrollView><ScreenHeader title="Choose your room" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.results)} />
+        <ScrollView><HotelHeader title="Choose your room" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.results)} />
           <EmptyState icon="bed-outline" title={sel ? 'Price unavailable' : 'Choose a stay to continue'} text="Open a hotel from the search results, then pick your room." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView>
       </FlowScreen>
     );
@@ -48,7 +47,7 @@ export default function HotelRoomsScreen() {
     }>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
-          <ScreenHeader title={hotel.name} subtitle={hotel.address ?? hotel.location} eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} />
+          <HotelHeader title={hotel.name} subtitle={hotel.address ?? hotel.location} eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} />
           <HotelProgress current={0} />
           <StaySummary hotel={hotel} roomName={room.name} checkIn={sel.checkIn} checkOut={sel.checkOut} nights={nights} guests={sel.guests} rooms={sel.rooms} />
 
@@ -122,7 +121,7 @@ function Stepper({ icon, label, hint, value, min, max, onChange }: { icon: React
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   option: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
-  optionOn: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
+  optionOn: { borderColor: Colors.primary, backgroundColor: '#E3F0EA' },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: Colors.primary },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
@@ -135,7 +134,7 @@ const s = StyleSheet.create({
   hint: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 12 },
   sep: { height: 1, backgroundColor: Colors.border, marginVertical: 12 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  stepIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  stepIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   hint2: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 1 },
   stepBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },

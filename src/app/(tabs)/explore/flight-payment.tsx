@@ -153,7 +153,7 @@ export default function FlightPaymentScreen() {
       </View>
       <TouchableOpacity accessibilityRole="button" disabled={busy} onPress={pay} activeOpacity={0.85} style={[s.continue, busy && { opacity: 0.7 }]}>
         <Text style={s.continueText} numberOfLines={1}>{payLabel}</Text>
-        {busy ? <ActivityIndicator color={BRAND} /> : <Ionicons name="lock-closed" size={19} color={BRAND} />}
+        {busy ? <ActivityIndicator color={Colors.white} /> : <Ionicons name="lock-closed" size={19} color={Colors.white} />}
       </TouchableOpacity>
     </View>
   );
@@ -308,7 +308,7 @@ const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   card: { ...Ui.card, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   method: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surfaceMuted, marginBottom: 10 },
-  methodOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#FDF3C4' },
+  methodOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#E3F0EA' },
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.borderStrong, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: BRAND, borderWidth: 2 },
   radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: BRAND },
@@ -345,7 +345,7 @@ const s = StyleSheet.create({
   couponMsg: { fontFamily: INTER.semibold, fontSize: TextSize.caption, marginTop: 10 },
   suggest: { gap: 8, marginTop: 12 },
   suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, backgroundColor: '#FDF3C4', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  suggestCode: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, backgroundColor: '#E3F0EA', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   suggestLabel: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 5 },
   rowLabel: { flex: 1, fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight },
@@ -360,6 +360,6 @@ const s = StyleSheet.create({
   footerPrice: { minWidth: 110 },
   footerCaption: { fontFamily: INTER.medium, color: BRAND, fontSize: TextSize.caption },
   footerAmount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.heading, marginTop: 1 },
-  continue: { flex: 1, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 18, borderRadius: 27, backgroundColor: Colors.accent },
-  continueText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.bodyLarge },
+  continue: { flex: 1, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 18, borderRadius: 27, backgroundColor: '#103D30' },
+  continueText: { fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.bodyLarge },
 });

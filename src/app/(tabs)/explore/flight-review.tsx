@@ -53,7 +53,7 @@ export default function FlightReviewScreen() {
       </View>
       <TouchableOpacity accessibilityRole="button" onPress={proceed} activeOpacity={0.85} style={s.continue}>
         <Text style={s.continueText}>Proceed to payment</Text>
-        <Ionicons name="lock-closed-outline" size={19} color={BRAND} />
+        <Ionicons name="lock-closed-outline" size={19} color={Colors.white} />
       </TouchableOpacity>
     </View>
   );
@@ -181,13 +181,13 @@ const s = StyleSheet.create({
   statusLabel: { fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, color: Colors.textLight },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999 },
   badgeGood: { backgroundColor: '#E3EFE9' },
-  badgeWarn: { backgroundColor: '#FDF3C4' },
+  badgeWarn: { backgroundColor: '#E3F0EA' },
   badgeText: { fontFamily: INTER.bold, fontSize: TextSize.caption },
   opts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  avatar: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  avatarText: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: BRAND },
+  avatar: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30' },
+  avatarText: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: Colors.white },
   paxName: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: BRAND },
   paxMeta: { fontFamily: INTER.regular, fontSize: TextSize.body, color: Colors.textLight, marginTop: 2 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 5 },
@@ -198,7 +198,7 @@ const s = StyleSheet.create({
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 10 },
   notice: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 18 },
   noticeGood: { backgroundColor: '#E3EFE9' },
-  noticeWarn: { backgroundColor: '#FBF1C7' },
+  noticeWarn: { backgroundColor: '#E8F2EE' },
   noticeTitle: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.body },
   noticeText: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 18, marginTop: 2 },
   info: { marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
@@ -214,6 +214,6 @@ const s = StyleSheet.create({
   footerPrice: { flex: 1, minWidth: 0 },
   footerCaption: { fontFamily: INTER.medium, color: BRAND, fontSize: TextSize.caption },
   footerAmount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.heading, marginTop: 1 },
-  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: Colors.accent },
-  continueText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.bodyLarge },
+  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: '#103D30' },
+  continueText: { fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.bodyLarge },
 });

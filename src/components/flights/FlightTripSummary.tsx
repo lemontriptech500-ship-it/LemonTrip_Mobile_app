@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   totalLabel: { color: Colors.textDark, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
   totalAmount: { color: Colors.primaryDark, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   disclaimer: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 1 },
-  continueButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  continueButton: { minHeight: Ui.button.minHeight, alignItems: 'center', justifyContent: 'center', marginTop: 14, borderRadius: Ui.radius.button, backgroundColor: '#103D30' },
   continueDisabled: { opacity: 0.5 },
-  continueText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  continueText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });

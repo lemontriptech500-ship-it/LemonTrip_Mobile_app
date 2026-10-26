@@ -10,7 +10,9 @@ import { Ui } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useSegments, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ImageBackground, StyleSheet, View, type ImageSourcePropType } from 'react-native';
+import { StyleSheet, View, type ImageSourcePropType } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { HeroBox } from '@/components/packages/PackageUi';
 import { AppScreen } from '@/components/AppScreen';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,7 +23,7 @@ export { formatDuration, formatPrice, formatTime } from './flightFormat';
 export const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
 export const BRAND = '#103D30';
 // Banner artwork lives in assets/images (file name as saved in the project).
-const BANNER = require('../../../assets/images/Emerald Skies Travel Banner.png');
+const BANNER = require('../../../assets/images/herolatestnew.png');
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 const STEPS = ['Select', 'Details', 'Seats', 'Review', 'Payment', 'Done'];
@@ -61,22 +63,21 @@ export function FlightShell({ children, footer, onBack, title = 'Flights' }: { c
 
 export function FlightBanner({ title = 'Book flight tickets', text = 'Search routes, compare fares and pick the flight that suits you.', eyebrow = 'LEMONTRIP / FLIGHTS', image = BANNER }: { title?: string; text?: string; eyebrow?: string; image?: ImageSourcePropType }) {
   return (
-    <View style={s.bannerWrap}>
-      <ImageBackground source={image} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
-        <View style={s.bannerCopy}>
-          <Text style={s.eyebrowLight}>{eyebrow}</Text>
-          <Text style={s.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>{title}</Text>
-          <Text style={s.bannerText}>{text}</Text>
-        </View>
-      </ImageBackground>
-    </View>
+    <HeroBox image={image} style={s.hero}>
+      <LinearGradient pointerEvents="none" colors={['rgba(8,34,52,0.78)', 'rgba(8,34,52,0.45)', 'rgba(8,34,52,0.05)']} locations={[0, 0.55, 1]} start={{ x: 0, y: 0.4 }} end={{ x: 1, y: 0.6 }} style={StyleSheet.absoluteFill} />
+      <View style={s.heroCopy}>
+        <Text style={s.eyebrowLight}>{eyebrow}</Text>
+        <Text style={s.bannerTitle} numberOfLines={2}>{title}</Text>
+        <Text style={s.bannerText} numberOfLines={2}>{text}</Text>
+      </View>
+    </HeroBox>
   );
 }
 
-export function FlightSteps({ current, steps = STEPS }: { current: number; steps?: readonly string[] }) {
+export function FlightSteps({ current, steps = STEPS, overlap = true }: { current: number; steps?: readonly string[]; overlap?: boolean }) {
   const inset = `${100 / (steps.length * 2)}%` as const;
   return (
-    <View style={s.card} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: steps.length, now: current + 1 }}>
+    <View style={[s.card, s.pgCard, overlap && s.pgOverlap]} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: steps.length, now: current + 1 }}>
       <View style={s.stepsRow}>
         <View pointerEvents="none" style={[s.track, { left: inset, right: inset }]}><View style={[s.trackFill, { width: `${(current / (steps.length - 1)) * 100}%` }]} /></View>
         {steps.map((label, i) => {
@@ -84,12 +85,10 @@ export function FlightSteps({ current, steps = STEPS }: { current: number; steps
           const done = i < current;
           return (
             <View key={label} style={s.stepItem}>
-              <View style={[s.halo, active && s.haloOn]}>
-                <View style={[s.dot, done && s.dotDone, active && s.dotOn]}>
-                  {done ? <Ionicons name="checkmark" size={14} color={Colors.white} /> : <Text style={[s.dotText, active && s.dotTextOn]}>{i + 1}</Text>}
-                </View>
+              <View style={[s.dot, (done || active) && s.dotDone]}>
+                {done ? <Ionicons name="checkmark" size={14} color={Colors.white} /> : <Text style={[s.dotText, active && s.dotTextOn]}>{i + 1}</Text>}
               </View>
-              <Text style={[s.stepLabel, active && s.stepLabelOn]} numberOfLines={1}>{label}</Text>
+              <Text style={[s.stepLabel, (done || active) && s.stepLabelOn]} numberOfLines={1}>{label}</Text>
             </View>
           );
         })}
@@ -200,35 +199,34 @@ const s = StyleSheet.create({
   header: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
   backButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
   headerTitle: { fontFamily: INTER.bold, flex: 1, color: BRAND, fontSize: TextSize.title },
-  gearButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 14, backgroundColor: Colors.surfaceMuted },
-  bannerWrap: { paddingHorizontal: 16, marginTop: 14, marginBottom: 14 },
-  banner: { width: '100%', aspectRatio: 2.9, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: BRAND },
-  bannerImage: { borderRadius: 22 },
-  bannerCopy: { width: '62%', paddingLeft: 18 },
-  eyebrowLight: { fontFamily: INTER.extrabold, color: Colors.accent, fontSize: TextSize.micro, letterSpacing: 1.2, marginBottom: 4 },
-  bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.heading },
-  bannerText: { color: Colors.onDarkMuted, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 16, marginTop: 4 },
-  card: { ...Ui.card, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  gearButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.successSoft },
+  hero: { alignSelf: 'stretch', width: '100%', overflow: 'hidden', minHeight: 190, paddingTop: 14, paddingBottom: 48, paddingHorizontal: 16, backgroundColor: '#0E3B52', justifyContent: 'flex-end' },
+  heroCopy: { width: '78%', paddingTop: 30 },
+  pgCard: { marginBottom: 12, paddingVertical: 12, paddingHorizontal: 4 },
+  pgOverlap: { marginTop: -34 },
+  eyebrowLight: { fontFamily: INTER.semibold, color: Colors.white, fontSize: 11, letterSpacing: 1.2 },
+  bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: 24, lineHeight: 28, marginTop: 6 },
+  bannerText: { color: Colors.white, fontFamily: INTER.regular, fontSize: 11, lineHeight: 16, marginTop: 10 },
+  card: { ...Ui.card, marginHorizontal: 10, marginBottom: 12, padding: 14, borderRadius: 22, backgroundColor: Colors.surface },
   heading: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 12 },
-  eyebrow: { fontFamily: INTER.semibold, color: Colors.secondary, fontSize: TextSize.caption, letterSpacing: 0.6 },
-  headingText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.title, marginTop: 2 },
+  eyebrow: { fontFamily: INTER.extrabold, color: BRAND, fontSize: 11, letterSpacing: 1.2 },
+  headingText: { fontFamily: INTER.extrabold, color: Colors.textDark, fontSize: 16, marginTop: 2 },
   stepsRow: { flexDirection: 'row' },
-  track: { position: 'absolute', top: 17, height: 2, backgroundColor: Colors.border },
+  track: { position: 'absolute', top: 14, height: 2, borderRadius: 1, backgroundColor: Colors.border },
   stepItem: { flex: 1, minWidth: 0, alignItems: 'center' },
   halo: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   haloOn: { backgroundColor: Colors.accentSoft },
-  dot: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.borderStrong },
+  dot: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.borderStrong },
   dotDone: { backgroundColor: BRAND, borderColor: BRAND },
-  dotOn: { backgroundColor: Colors.accent, borderColor: BRAND, borderWidth: 2 },
-  dotText: { fontFamily: INTER.medium, fontSize: TextSize.caption, color: Colors.textLight },
-  dotTextOn: { fontFamily: INTER.bold, color: BRAND },
-  stepLabel: { marginTop: 4, maxWidth: '100%', fontFamily: INTER.regular, fontSize: TextSize.micro, color: Colors.textLight },
-  stepLabelOn: { fontFamily: INTER.bold, color: BRAND },
+  dotText: { fontFamily: INTER.semibold, fontSize: 12, color: Colors.textLight },
+  dotTextOn: { color: Colors.white },
+  stepLabel: { marginTop: 5, maxWidth: '100%', fontFamily: INTER.regular, fontSize: 11, color: Colors.textLight },
+  stepLabelOn: { fontFamily: INTER.semibold, color: BRAND },
   tag: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 11, paddingVertical: 6, borderRadius: 999, backgroundColor: '#E3EFE9' },
   tagText: { fontFamily: INTER.semibold, color: BRAND, fontSize: TextSize.caption },
   footerWrap: { backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border },
   trackFill: { height: 2, backgroundColor: BRAND },
-  summary: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: 16 },
+  summary: { ...Ui.card, marginHorizontal: 10, marginBottom: 12, padding: 14, borderRadius: 22 },
   summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   summaryName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   summaryMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },

@@ -179,7 +179,7 @@ export default function FlightSearchForm({ compact = false, hideTripTypeSelector
 
       {validationError ? <Text accessibilityRole="alert" style={styles.validationError}>{validationError}</Text> : null}
       <TouchableOpacity accessibilityRole="button" disabled={loading} onPress={submit} style={[styles.searchButton, loading && styles.searchButtonDisabled]}>
-        <Ionicons name={loading ? 'hourglass-outline' : 'search-outline'} size={17} color={Colors.primaryDark} />
+        <Ionicons name={loading ? 'hourglass-outline' : 'search-outline'} size={17} color={Colors.white} />
         <Text style={styles.searchButtonText}>{loading ? 'Searching flights…' : searchButtonLabel}</Text>
       </TouchableOpacity>
     </View>
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   field: { flex: 1, minWidth: 0, marginBottom: 12 },
   fieldLabel: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 0.8, marginBottom: 6 },
   input: { minHeight: Ui.field.minHeight, paddingHorizontal: 10, paddingVertical: 9, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.control, backgroundColor: Colors.surfaceMuted, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-  swapButton: { width: 36, height: 36, marginBottom: 17, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: Colors.accentSoft },
+  swapButton: { width: 36, height: 36, marginBottom: 17, alignItems: 'center', justifyContent: 'center', borderRadius: 18, backgroundColor: '#E3F0EA' },
   compactSwapButton: { backgroundColor: '#E7F1EC' },
   gridField: { flexBasis: '46%', flexGrow: 1, flexShrink: 0 },
   fieldGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 5 },
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   counterText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   classOptions: { minHeight: 46, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 4 },
   classButton: { paddingHorizontal: 7, paddingVertical: 7, borderRadius: 8, backgroundColor: Colors.background },
-  classButtonSelected: { backgroundColor: Colors.accentSoft },
+  classButtonSelected: { backgroundColor: '#E3F0EA' },
   classText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold },
   classTextSelected: { color: Colors.primaryDark },
   multiCityBlock: { padding: 12, marginVertical: 4, borderRadius: 12, backgroundColor: Colors.background },
@@ -220,11 +220,11 @@ const styles = StyleSheet.create({
   fareHint: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption },
   fareOptions: { gap: 7, paddingTop: 8, paddingBottom: 14 },
   fareOption: { paddingHorizontal: 10, paddingVertical: 8, borderWidth: 1, borderColor: Colors.border, borderRadius: 15 },
-  fareOptionSelected: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
+  fareOptionSelected: { borderColor: Colors.primary, backgroundColor: '#E3F0EA' },
   fareOptionText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold },
   fareOptionTextSelected: { color: Colors.primaryDark },
   validationError: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginBottom: 10 },
-  searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
+  searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: '#103D30' },
   searchButtonDisabled: { opacity: 0.65 },
-  searchButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  searchButtonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });

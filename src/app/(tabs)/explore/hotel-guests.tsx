@@ -1,9 +1,8 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { HotelFareSummary, StaySummary } from '@/components/hotels/HotelBookingCards';
-import { Card, Chip, EmptyState, Field, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
+import { HotelHeader, Card, Chip, EmptyState, Field, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { ARRIVAL_SLOTS, BED_PREFERENCES, TITLES, inr } from '@/data/hotelBooking';
 import { useAuth } from '@/utils/authStore';
@@ -33,7 +32,7 @@ export default function HotelGuestsScreen() {
 
   const derived = currentFare();
   if (!selection || !derived) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Guest details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} /><EmptyState icon="people-outline" title="No room selected" text="Pick a hotel and room before adding guest details." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <FlowScreen><ScrollView><HotelHeader title="Guest details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} /><EmptyState icon="people-outline" title="No room selected" text="Pick a hotel and room before adding guest details." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
   }
   const { fare, room, nights } = derived;
   const { hotel } = selection;
@@ -54,7 +53,7 @@ export default function HotelGuestsScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Guest details" subtitle="The lead guest must show a valid photo ID at check-in." eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} />
+            <HotelHeader title="Guest details" subtitle="The lead guest must show a valid photo ID at check-in." eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.details)} />
             <HotelProgress current={1} />
             <StaySummary hotel={hotel} roomName={room.name} checkIn={selection.checkIn} checkOut={selection.checkOut} nights={nights} guests={selection.guests} rooms={selection.rooms} />
 
@@ -123,7 +122,7 @@ function ToggleRow({ title, text, value, onChange }: { title: string; text: stri
   return (
     <View style={[s.toggle, { marginTop: 14 }]}>
       <View style={{ flex: 1 }}><Text style={s.toggleTitle}>{title}</Text><Text style={s.toggleText}>{text}</Text></View>
-      <Switch accessibilityLabel={title} value={value} onValueChange={onChange} trackColor={{ true: Colors.secondary, false: Colors.borderStrong }} thumbColor={value ? Colors.accent : Colors.white} />
+      <Switch accessibilityLabel={title} value={value} onValueChange={onChange} trackColor={{ true: Colors.secondary, false: Colors.borderStrong }} thumbColor={value ? '#103D30' : Colors.white} />
     </View>
   );
 }

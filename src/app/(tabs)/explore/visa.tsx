@@ -169,7 +169,7 @@ const s = StyleSheet.create({
   tabOn: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: GREEN },
-  hero: { width: '100%', aspectRatio: 1.8, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
+  hero: { width: '100%', aspectRatio: 1.8, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'center', paddingTop: 14, paddingBottom: 42},
   heroImg: { position: 'absolute', left: 0, bottom: 0, width: '100%', height: '135%' },
   heroCopy: { width: '62%', paddingLeft: 16 },
   heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: '#FFFFFF' },
@@ -208,3 +208,4 @@ const s = StyleSheet.create({
   buttonOff: { backgroundColor: '#A3BDB3' },
   buttonText: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.white },
 });
+

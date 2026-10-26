@@ -3,7 +3,7 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { JourneySummary } from '@/components/trains/TrainCards';
-import { BRAND, INTER, Chip, EmptyState, Pill, PrimaryButton, TRAIN_ROUTES, TrainBanner, TrainCardBox, TrainFooter, TrainHeading, TrainNotice, TrainShell, TrainSteps, goBackOr, goTo, replaceTo } from '@/components/trains/TrainFlowUi';
+import { BRAND, INTER, Chip, EmptyState, Pill, PrimaryButton, TRAIN_ROUTES, TrainBanner, TrainCardBox, TrainFooter, TrainHeading, TrainNotice, TrainShell, TrainSteps, TrainTag, goBackOr, goTo, replaceTo } from '@/components/trains/TrainFlowUi';
 import { Colors } from '@/constants/colors';
 import { CLASS_INFO, computeFare, formatDuration, formatLongDate, getAvailability, getClassOptions, getStation, getTrain, inr, type ClassCode, type TrainResult } from '@/data/trains';
 import { currentFare, selectTrain, updateSelection, useTrainBooking } from '@/utils/trainBookingStore';
@@ -90,7 +90,7 @@ export default function TrainDetailsScreen() {
           </TrainCardBox>
 
           <TrainCardBox>
-            <TrainHeading eyebrow="ROUTE" title="Journey timeline" right={<Pill icon="time-outline" label={formatDuration(result.durationMin)} />} />
+            <TrainHeading eyebrow="ROUTE" title="Journey timeline" right={<TrainTag icon="time-outline" label={formatDuration(result.durationMin)} />} />
             {train.route.map((stop, i) => {
               const inJourney = i >= start && i <= end; const isEnd = i === start || i === end;
               return (
@@ -112,10 +112,12 @@ export default function TrainDetailsScreen() {
             <TrainHeading eyebrow="SCHEDULE" title="Runs on" />
             <View style={s.days}>{DAYS.map((d, i) => { const on = train.runsOn.includes(i); return <View key={i} style={[s.day, on && s.dayOn]}><Text style={[s.dayText, on && s.dayTextOn]}>{d}</Text></View>; })}</View>
             <View style={s.amenities}>
-              <Pill icon={train.pantry ? 'restaurant-outline' : 'close-circle-outline'} label={train.pantry ? 'Meals on board' : 'No pantry car'} tone={train.pantry ? 'good' : 'neutral'} />
-              <Pill icon="shield-checkmark-outline" label="Cancellation charges apply" />
+              <TrainTag icon={train.pantry ? 'restaurant-outline' : 'close-circle-outline'} label={train.pantry ? 'Meals on board' : 'No pantry car'} />
+              <TrainTag icon="shield-checkmark-outline" label="Cancellation charges apply" />
             </View>
           </TrainCardBox>
+
+          <TrainNotice>Travelling on {formatLongDate(sel.date)}. Seat availability is confirmed at payment; you pick your berth or seat in a later step.</TrainNotice>
         </View>
       </ScrollView>
     </TrainShell>
@@ -124,12 +126,12 @@ export default function TrainDetailsScreen() {
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  option: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
-  optionOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#FDF3C4' },
-  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
-  radioOn: { borderColor: BRAND },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: BRAND },
-  optionTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: BRAND },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surfaceMuted, marginBottom: 10 },
+  optionOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#E8F2EE' },
+  radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.borderStrong, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center' },
+  radioOn: { borderColor: BRAND, borderWidth: 2 },
+  radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: BRAND },
+  optionTitle: { fontFamily: INTER.semibold, fontSize: TextSize.bodyLarge, color: BRAND },
   optionCode: { color: Colors.textLight, fontFamily: INTER.bold },
   optionFare: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: BRAND },
   avail: { fontFamily: INTER.extrabold, fontSize: TextSize.caption, marginTop: 3 },
@@ -141,7 +143,7 @@ const s = StyleSheet.create({
   rail: { alignItems: 'center', width: 16 },
   node: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.borderStrong, marginTop: 3 },
   nodeOn: { backgroundColor: Colors.secondary },
-  nodeEnd: { width: 16, height: 16, borderRadius: 8, backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.primary, marginTop: 1 },
+  nodeEnd: { width: 16, height: 16, borderRadius: 8, backgroundColor: BRAND, borderWidth: 3, borderColor: '#BFDDD0', marginTop: 1 },
   link: { flex: 1, width: 2, backgroundColor: Colors.border, marginTop: 2 },
   linkOn: { backgroundColor: Colors.secondary },
   stopName: { fontFamily: INTER.extrabold, fontSize: TextSize.body, color: BRAND },

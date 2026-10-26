@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   card: { ...Ui.card, padding: Ui.space.card, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, borderRadius: Ui.radius.card },
   heading: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: Colors.border },
   logo: { width: 38, height: 38, borderRadius: 10, backgroundColor: Colors.background },
-  logoFallback: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: Colors.accentSoft },
+  logoFallback: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: '#E3F0EA' },
   airlineDetails: { flex: 1 },
   airlineName: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   flightNumber: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.micro, marginTop: 3 },

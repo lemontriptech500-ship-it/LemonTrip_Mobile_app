@@ -19,7 +19,7 @@ export {
 };
 
 // Banner artwork lives in assets/images (file names as saved in the project).
-const TRAIN_BANNER: ImageSourcePropType = require('../../../assets/images/Modern Green High-Speed Train Landscape.png');
+const TRAIN_BANNER: ImageSourcePropType = require('../../../assets/images/Daylight High-Speed Train and Mosque Skyline.png');
 export const TRAIN_DONE_BANNER: ImageSourcePropType = require('../../../assets/images/Celebratory Green Payment Confirmation Banner.png');
 
 export const TRAIN_STEPS = ['Select', 'Passengers', 'Seats', 'Review', 'Payment', 'Done'] as const;
