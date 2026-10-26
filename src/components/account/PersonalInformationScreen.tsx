@@ -112,7 +112,7 @@ export function PersonalInformationScreen() {
           </View>
 
           <TouchableOpacity accessibilityRole="button" onPress={() => go('/manage/security')} style={s.secure} activeOpacity={0.85}>
-            <View style={s.secureIcon}><Ionicons name="shield-checkmark-outline" size={24} color={BRAND} /></View>
+            <View style={s.secureIcon}><Ionicons name="shield-checkmark-outline" size={24} color="#FFFFFF" /></View>
             <View style={s.flex}>
               <Text style={s.secureTitle}>Keep your account secure</Text>
               <Text style={s.secureText}>Keep your information up to date for a safer and smoother travel experience.</Text>
@@ -146,24 +146,24 @@ const s = StyleSheet.create({
   bannerImage: { borderRadius: 22 },
   bannerCopy: { width: '66%', paddingLeft: 18, paddingRight: 0 },
   eyebrow: { fontFamily: INTER.extrabold, color: Colors.accent, fontSize: TextSize.micro, letterSpacing: 1.2, marginBottom: 4 },
-  bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.displaySmall },
+  bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.title },
   bannerText: { fontFamily: INTER.regular, color: Colors.onDarkMuted, fontSize: TextSize.body, lineHeight: 18, marginTop: 4 },
 
   card: { marginHorizontal: 16, padding: 18, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
   cardEyebrow: { fontFamily: INTER.extrabold, color: Colors.secondary, fontSize: TextSize.micro, letterSpacing: 1.2 },
-  cardTitle: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.title, marginTop: 4, marginBottom: 8 },
+  cardTitle: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.bodyLarge, marginTop: 4, marginBottom: 8 },
   info: { minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 9 },
   iconCircle: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.surfaceMuted },
   infoLabel: { fontFamily: INTER.semibold, color: Colors.textLight, fontSize: TextSize.micro, letterSpacing: 1 },
-  infoValue: { fontFamily: INTER.bold, color: Colors.textDark, fontSize: TextSize.bodyLarge, marginTop: 2 },
+  infoValue: { fontFamily: INTER.bold, color: Colors.textDark, fontSize: TextSize.body, marginTop: 2 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 32, paddingHorizontal: 12, borderRadius: 999, backgroundColor: Colors.surfaceMuted },
   chipText: { fontFamily: INTER.semibold, color: BRAND, fontSize: TextSize.caption },
   primaryButton: { minHeight: 52, marginTop: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 24, paddingRight: 6, borderRadius: 999, backgroundColor: BRAND },
   primaryText: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.body },
   primaryArrow: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: Colors.white },
 
-  secure: { marginHorizontal: 16, marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 22, backgroundColor: Colors.accentSoft },
-  secureIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: Colors.accent },
+  secure: { marginHorizontal: 16, marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 22, backgroundColor: Colors.successSoft },
+  secureIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: '#103D30' },
   secureTitle: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.body },
   secureText: { fontFamily: INTER.regular, color: Colors.textDark, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
 
