@@ -116,7 +116,7 @@ export function FareSummary({ fare, couponCode }: { fare: FareBreakdown; couponC
 const s = StyleSheet.create({
   card: { ...Ui.card, padding: 14, marginBottom: 12 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  iconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  iconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   name: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   number: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 16 },

@@ -3,9 +3,8 @@ import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { HotelFareSummary } from '@/components/hotels/HotelBookingCards';
-import { Card, EmptyState, FlowScreen, HOTEL_ROUTES, HotelProgress, Notice, Pill, PrimaryButton, SectionTitle, goTo, replaceTo } from '@/components/hotels/HotelUi';
+import { HotelHeader, Card, EmptyState, FlowScreen, HOTEL_ROUTES, HotelProgress, Notice, Pill, PrimaryButton, SectionTitle, goTo, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { formatLongDate, formatShortDate, inr } from '@/data/hotelBooking';
@@ -25,7 +24,7 @@ export default function HotelConfirmationScreen() {
   const done = (path: string) => { resetHotelBooking(); replaceTo(path); };
 
   if (!voucher) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Confirmation" eyebrow="LEMONTRIP / HOTELS" onBack={() => replaceTo(HOTEL_ROUTES.results)} /><EmptyState icon="ticket-outline" title="No confirmed stay yet" text="Complete a booking to see your hotel voucher here." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <FlowScreen><ScrollView><HotelHeader title="Confirmation" eyebrow="LEMONTRIP / HOTELS" onBack={() => replaceTo(HOTEL_ROUTES.results)} /><EmptyState icon="ticket-outline" title="No confirmed stay yet" text="Complete a booking to see your hotel voucher here." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
   }
 
   const summary = `LemonTrip hotel voucher\nConfirmation ${voucher.confirmationNo}\n${voucher.hotelName} · ${voucher.roomName}\n${voucher.address}\n${formatLongDate(voucher.checkIn)} → ${formatLongDate(voucher.checkOut)} (${voucher.nights} night${voucher.nights > 1 ? 's' : ''})\n${voucher.guests.length} guest(s) · ${voucher.rooms} room(s)`;
@@ -39,11 +38,11 @@ export default function HotelConfirmationScreen() {
     <FlowScreen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ScreenHeader title="Booking confirmed" subtitle="Your stay is booked. Enjoy your trip!" eyebrow="LEMONTRIP / HOTELS" />
+          <HotelHeader title="Booking confirmed" subtitle="Your stay is booked. Enjoy your trip!" eyebrow="LEMONTRIP / HOTELS" />
           <HotelProgress current={4} />
 
           <View style={s.hero}>
-            <View style={s.check}><Ionicons name="checkmark" size={32} color={Colors.primaryDark} /></View>
+            <View style={s.check}><Ionicons name="checkmark" size={32} color={Colors.white} /></View>
             <Text style={s.heroTitle}>Payment successful</Text>
             <Text style={s.heroText}>{inr(voucher.fare.total)} paid via {voucher.payment.label}</Text>
             <View style={s.pnrBox}><Text style={s.pnrLabel}>CONFIRMATION NO.</Text><Text style={s.pnr} selectable>{voucher.confirmationNo}</Text></View>
@@ -121,7 +120,7 @@ function Action({ icon, label, onPress }: { icon: React.ComponentProps<typeof Io
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   hero: { alignItems: 'center', marginHorizontal: 20, marginBottom: 14, padding: 22, borderRadius: 24, backgroundColor: Colors.primaryDark },
-  check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
+  check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1FA463' },
   heroTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, marginTop: 12 },
   heroText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.onDarkMuted, marginTop: 4, textAlign: 'center' },
   pnrBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 22, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
@@ -157,7 +156,7 @@ const s = StyleSheet.create({
   txnText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
   actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 16 },
   action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   actionLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   cta: { marginHorizontal: 20 },
 });

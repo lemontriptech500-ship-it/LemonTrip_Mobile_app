@@ -104,7 +104,7 @@ export default function FlightTravellersScreen() {
       </View>
       <TouchableOpacity accessibilityRole="button" onPress={proceed} activeOpacity={0.85} style={s.continue}>
         <Text style={s.continueText}>Continue</Text>
-        <Ionicons name="arrow-forward" size={20} color={BRAND} />
+        <Ionicons name="arrow-forward" size={20} color={Colors.white} />
       </TouchableOpacity>
     </View>
   );
@@ -263,6 +263,6 @@ const s = StyleSheet.create({
   footerPrice: { flex: 1, minWidth: 0 },
   footerCaption: { fontFamily: INTER.medium, color: BRAND, fontSize: TextSize.caption },
   footerAmount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.heading, marginTop: 1 },
-  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: Colors.accent },
-  continueText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.bodyLarge },
+  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: '#103D30' },
+  continueText: { fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.bodyLarge },
 });

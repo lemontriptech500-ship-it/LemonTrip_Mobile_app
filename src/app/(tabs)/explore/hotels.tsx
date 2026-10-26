@@ -1,3 +1,4 @@
+import { HotelHeader } from '@/components/hotels/HotelUi';
 import { useAppLanguage } from '@/utils/intl';
 import { Alert } from '@/components/ui/Alert';
 import { DateField } from '@/components/DatePickerField';
@@ -6,7 +7,6 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text, TextInput } from '@/components/ui/Text';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 import HotelCard from '@/components/hotels/HotelCard';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { TravelArtworkIcon } from '@/components/TravelArtworkIcon';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -127,7 +127,7 @@ export default function HotelsScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
-          <ScreenHeader title="Find your stay" subtitle="Distinctive stays, chosen for your journey." eyebrow="LEMONTRIP / HOTELS" onBack={handleBack} />
+          <HotelHeader title="Find your stay" subtitle="Distinctive stays, chosen for your journey." eyebrow="LEMONTRIP / HOTELS" onBack={handleBack} />
 
           <View style={styles.searchPanel}>
             <View style={styles.searchTitleRow}><TravelArtworkIcon name="hotel" size={34} /><Text style={styles.searchTitle}>Where are you staying?</Text></View>
@@ -171,7 +171,7 @@ export default function HotelsScreen() {
               </View>
             </View>
             <TouchableOpacity accessibilityRole="button" onPress={handleSearch} style={styles.searchButton}>
-              <Ionicons name="search-outline" size={17} color={Colors.primaryDark} /><Text style={styles.searchButtonText}>Search hotels</Text>
+              <Ionicons name="search-outline" size={17} color={Colors.white} /><Text style={styles.searchButtonText}>Search hotels</Text>
             </TouchableOpacity>
           </View>
 
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 30 },
   content: { width: '100%', maxWidth: 1120, alignSelf: 'center' },
-  searchPanel: { ...Ui.card, marginHorizontal: Ui.space.page, padding: Ui.space.card, borderRadius: Ui.radius.card, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  searchPanel: { ...Ui.card, marginHorizontal: 10, marginTop: -34, padding: 14, borderRadius: 22, backgroundColor: Colors.surface },
   searchTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 13 },
   searchTitle: { flexShrink: 1, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   searchFields: { width: '100%', gap: 8 },
@@ -239,8 +239,8 @@ const styles = StyleSheet.create({
   stepperButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: Ui.radius.control, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   stepperButtonDisabled: { opacity: 0.35 },
   occupancyCount: { flexShrink: 0, minWidth: 28, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, textAlign: 'center' },
-  searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 7, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  searchButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  searchButton: { minHeight: Ui.button.minHeight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, marginTop: 7, borderRadius: Ui.radius.button, backgroundColor: '#103D30' },
+  searchButtonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   resultsHeader: { marginTop: 23, paddingHorizontal: 16, gap: 12 },
   resultsEyebrow: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.extraBold, letterSpacing: 1 },
   resultsTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, marginTop: 3 },
@@ -266,8 +266,8 @@ const styles = StyleSheet.create({
   emptyState: { minHeight: 180, alignItems: 'center', justifyContent: 'center', marginHorizontal: Ui.space.page, marginTop: 14, padding: 20, borderRadius: 15, backgroundColor: Colors.surface },
   emptyTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 9 },
   emptyText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 4 },
-  clearButton: { minHeight: 44,  marginTop: 11, paddingHorizontal: 12, paddingVertical: 8, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  clearButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  clearButton: { minHeight: 44,  marginTop: 11, paddingHorizontal: 12, paddingVertical: 8, borderRadius: Ui.radius.control, backgroundColor: '#103D30' },
+  clearButtonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   trustNote: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginHorizontal: Ui.space.page, marginTop: 19 },
   trustText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body },
-}); 
+});

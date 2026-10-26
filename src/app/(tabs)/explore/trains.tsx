@@ -3,11 +3,11 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
-import { ServiceBanner, ServiceTopBar } from '@/components/ui/ServiceHeader';
+import { ServiceTopBar } from '@/components/ui/ServiceHeader';
 import { SortBox, SortOptions, type SortChoice } from '@/components/ui/SortBox';
 import { StationPicker } from '@/components/trains/StationPicker';
 import { TrainCard } from '@/components/trains/TrainCards';
-import { Card, Chip, EmptyState, Notice, PrimaryButton, SectionTitle, TRAIN_ROUTES, goTo } from '@/components/trains/TrainUi';
+import { Chip, EmptyState, PrimaryButton, TRAIN_ROUTES, TrainBanner, TrainCardBox as Card, TrainHeading as SectionTitle, TrainNotice as Notice, goTo } from '@/components/trains/TrainFlowUi';
 import { Colors } from '@/constants/colors';
 import { DateField } from '@/components/DatePickerField';
 import { Ui } from '@/constants/theme';
@@ -53,8 +53,9 @@ export default function TrainsScreen() {
   }, [query]);
 
   const results = useMemo(() => {
-    let list = searchTrains(searched ? { from: search.from, to: search.to, date: search.date } : {});
-    if (searched && search.classCode !== 'ANY') list = list.filter((r) => r.train.classes.includes(search.classCode as ClassCode));
+    if (!searched) return [];
+    let list = searchTrains({ from: search.from, to: search.to, date: search.date });
+    if (search.classCode !== 'ANY') list = list.filter((r) => r.train.classes.includes(search.classCode as ClassCode));
     if (slot !== 'any') list = list.filter((r) => timeOfDay(r.departure) === slot);
     return [...list].sort((a, b) => sort === 'fastest' ? a.durationMin - b.durationMin : sort === 'cheapest' ? lowest(a, search.date) - lowest(b, search.date) : a.departure.localeCompare(b.departure));
   }, [search, searched, slot, sort]);
@@ -79,13 +80,13 @@ export default function TrainsScreen() {
       <ServiceTopBar title="Trains" />
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ServiceBanner eyebrow="LEMONTRIP / RAIL" title="Book train tickets" subtitle="Search routes, compare classes and check seat availability." image={require('../../../../assets/images/Modern Green High-Speed Train Landscape.png')} />
+          <TrainBanner title="Book train tickets" text="Search routes, compare classes and check seat availability." />
 
-          <Card>
+          <Card style={{ marginTop: -34 }}>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />
             <View style={s.stations}>
               <StationButton label="FROM" code={search.from} placeholder="Select departure" icon="radio-button-on-outline" onPress={() => setPicker('from')} />
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap stations" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.primaryDark} /></TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap stations" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.white} /></TouchableOpacity>
               <StationButton label="TO" code={search.to} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to')} />
             </View>
 
@@ -100,30 +101,32 @@ export default function TrainsScreen() {
             </ScrollView>
 
             {errorMsg ? <Text style={s.error}>{errorMsg}</Text> : null}
-            <View style={{ marginTop: 14 }}><PrimaryButton label="Search trains" icon="search" onPress={runSearch} /></View>
+            <View style={{ marginTop: 14 }}><PrimaryButton variant="dark" label="Search trains" icon="search" onPress={runSearch} /></View>
           </Card>
 
-          <View style={s.pad}>
-            <View style={s.resultHead}>
-              {searched ? <Text style={s.eyebrow} numberOfLines={1}>{`${getStation(search.from)?.code} \u2192 ${getStation(search.to)?.code}  \u00B7  ${formatShortDate(search.date)}`}</Text> : null}
-              <View style={s.headRow}>
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={s.count}>Available trains</Text>
-                  <Text style={s.found}>{results.length} {results.length === 1 ? 'train' : 'trains'} {searched ? 'found' : 'available'}</Text>
+          {searched ? (
+            <View style={s.pad}>
+              <View style={s.resultHead}>
+                <Text style={s.eyebrow} numberOfLines={1}>{`${getStation(search.from)?.code} \u2192 ${getStation(search.to)?.code}  \u00B7  ${formatShortDate(search.date)}`}</Text>
+                <View style={s.headRow}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={s.count}>Available trains</Text>
+                    <Text style={s.found}>{results.length} {results.length === 1 ? 'train' : 'trains'} found</Text>
+                  </View>
+                  <SortBox currentLabel={SORTS.find((o) => o.id === sort)?.label ?? 'Earliest'} open={sortOpen} onToggle={() => setSortOpen((v) => !v)} />
                 </View>
-                <SortBox currentLabel={SORTS.find((o) => o.id === sort)?.label ?? 'Earliest'} open={sortOpen} onToggle={() => setSortOpen((v) => !v)} />
               </View>
+              {sortOpen ? <View style={{ marginBottom: 10 }}><SortOptions options={SORTS} selected={sort} onChange={(v) => { setSort(v); setSortOpen(false); }} /></View> : null}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginBottom: 14 }]}>
+                {SLOTS.map((o) => <Chip key={o.id} label={o.label} selected={slot === o.id} onPress={() => setSlot(o.id)} />)}
+              </ScrollView>
+              {results.length ? results.map((r, i) => (
+                <TrainCard key={r.train.id} result={r} date={search.date} onOpen={() => open(i)} onSelectClass={(code) => open(i, code)} />
+              )) : (
+                <EmptyState icon="train-outline" title="No trains match" text="No trains run on this route for the selected date, class or time. Try another date or clear the filters." action={<PrimaryButton variant="soft" label="Clear filters" onPress={() => { setSlot('any'); setTrainSearch({ classCode: 'ANY' }); }} />} />
+              )}
             </View>
-            {sortOpen ? <View style={{ marginBottom: 10 }}><SortOptions options={SORTS} selected={sort} onChange={(v) => { setSort(v); setSortOpen(false); }} /></View> : null}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.chips, { marginBottom: 14 }]}>
-              {SLOTS.map((o) => <Chip key={o.id} label={o.label} selected={slot === o.id} onPress={() => setSlot(o.id)} />)}
-            </ScrollView>
-            {results.length ? results.map((r, i) => (
-              <TrainCard key={r.train.id} result={r} date={search.date} onOpen={() => open(i)} onSelectClass={(code) => open(i, code)} />
-            )) : (
-              <EmptyState icon="train-outline" title="No trains match" text={searched ? 'No trains run on this route for the selected date, class or time. Try another date or clear the filters.' : 'No trains available.'} action={<PrimaryButton variant="soft" label="Clear filters" onPress={() => { setSlot('any'); setTrainSearch({ classCode: 'ANY' }); }} />} />
-            )}
-          </View>
+          ) : null}
 
           {!searched ? (
             <Card>
@@ -166,13 +169,13 @@ function StationButton({ label, code, placeholder, icon, onPress }: { label: str
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  pad: { paddingHorizontal: Ui.space.page },
+  pad: { paddingHorizontal: 10 },
   stations: { gap: 8, position: 'relative' },
   station: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 66, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   stationLabel: { ...Ui.eyebrow, color: Colors.textLight, letterSpacing: 1 },
   stationValue: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
   stationCode: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
-  swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
+  swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.primary, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginTop: 16, marginBottom: 8 },
   chips: { gap: 8, alignItems: 'center' },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },

@@ -1,13 +1,13 @@
 import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { PACKAGE_ROUTES, PackageFareSummary, PackageProgress, TypePill } from '@/components/packages/PackageUi';
-import { Card, EmptyState, FlowScreen, Notice, Pill, PrimaryButton, SectionTitle, goTo, replaceTo } from '@/components/trains/TrainUi';
+import { PACKAGE_ROUTES, PackageFareSummary, PackageHero, PackageProgress, PackageTopBar } from '@/components/packages/PackageUi';
+import { EmptyState, FlowScreen, PrimaryButton, goTo, replaceTo } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
+import { getPackageGallery } from '@/data/packageImages';
 import { addDaysISO, countsLabel, formatLongDate, formatShortDate, inr } from '@/data/packages';
 import { resetPackageBooking, usePackageBooking } from '@/utils/packageBookingStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,8 +16,11 @@ import { Image, Linking, ScrollView, Share, StyleSheet, View } from 'react-nativ
 /** Decorative barcode derived from the voucher number (demo only, not scannable). */
 function Barcode({ value }: { value: string }) {
   const bars = (value + value).split('').map((ch, i) => ({ w: 1 + ((ch.charCodeAt(0) + i) % 3), gap: 1 + ((ch.charCodeAt(0) * 7 + i) % 2) }));
-  return <View style={s.barcode} accessible={false}>{bars.map((b, i) => <View key={i} style={{ width: b.w, height: 44, marginRight: b.gap, backgroundColor: Colors.primaryDark }} />)}</View>;
+  return <View style={s.barcode} accessible={false}>{bars.map((b, i) => <View key={i} style={{ width: b.w, height: 50, marginRight: b.gap, backgroundColor: Colors.primaryDark }} />)}</View>;
 }
+
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
+const GREEN = '#103D30';
 
 export default function PackageConfirmationScreen() {
   useAppLanguage();
@@ -34,76 +37,130 @@ export default function PackageConfirmationScreen() {
   const compact = (iso: string) => iso.replace(/-/g, '');
   const calendar = () => void Linking.openURL(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(ticket.title)}&dates=${compact(ticket.startDate)}/${compact(addDaysISO(ticket.endDate, 1))}&details=${encodeURIComponent(`Booking ${ticket.bookingId} · Voucher ${ticket.voucher}`)}&location=${encodeURIComponent(ticket.destination)}`);
 
+  const cover = getPackageGallery(ticket.packageId, ticket.title, ticket.destination, ticket.image)[0] ?? ticket.image;
+  const day = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString(getAppLocale(), { weekday: 'long' });
+  const gender = (g: string) => (g === 'M' ? 'Male' : g === 'F' ? 'Female' : g === 'O' ? 'Other' : g);
+  const copyId = () => void Share.share({ message: ticket.bookingId });
+  const included: { icon: IconName; lines: [string, string] }[] = [
+    { icon: 'bed-outline', lines: ['Hotel & room', 'as confirmed'] },
+    { icon: 'restaurant-outline', lines: ['Breakfast', 'as stated'] },
+    { icon: 'car-outline', lines: ['Selected transfers', 'and sightseeing'] },
+    { icon: 'document-text-outline', lines: ['As per', 'final itinerary'] },
+  ];
+
   return (
     <FlowScreen>
+      <PackageTopBar onBack={() => replaceTo(PACKAGE_ROUTES.list)} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ScreenHeader title="Booking confirmed" subtitle="Your holiday is booked. Pack your bags!" eyebrow="LEMONTRIP / HOLIDAYS" />
-          <PackageProgress current={5} />
+          <PackageHero title="Booking confirmed" subtitle="Your holiday is booked. Pack your bags!" image={cover} />
+          <PackageProgress current={5} overlap />
 
-          <View style={s.hero}>
-            <View style={s.check}><Ionicons name="checkmark" size={32} color={Colors.primaryDark} /></View>
-            <Text style={s.heroTitle}>Payment successful</Text>
-            <Text style={s.heroText}>{inr(ticket.fare.total)} paid via {ticket.payment.label}</Text>
-            <View style={s.refBox}><Text style={s.refLabel}>BOOKING ID</Text><Text style={s.ref} selectable>{ticket.bookingId}</Text></View>
+          <View style={s.card}>
+            <View style={s.row}>
+              <View style={s.check}><Ionicons name="checkmark" size={34} color={Colors.white} /></View>
+              <View style={s.flex}>
+                <Text style={s.title}>Payment successful</Text>
+                <Text style={s.text}>Your booking has been confirmed. A confirmation voucher has been sent to your email.</Text>
+              </View>
+            </View>
+            <View style={s.refBox}>
+              <View style={s.flex}><Text style={s.refLabel}>BOOKING ID</Text><Text style={s.ref} selectable numberOfLines={1} adjustsFontSizeToFit>{ticket.bookingId}</Text></View>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Copy booking ID" onPress={copyId} hitSlop={10}><Ionicons name="copy-outline" size={22} color={GREEN} /></TouchableOpacity>
+            </View>
           </View>
 
-          <View style={s.ticket}>
-            {ticket.image ? <Image source={{ uri: ticket.image }} style={s.cover} /> : null}
-            <View style={s.ticketTop}>
-              <View style={{ flex: 1, minWidth: 0 }}><Text style={s.title} numberOfLines={2}>{ticket.title}</Text><Text style={s.meta}>{ticket.destination} · {ticket.duration}</Text></View>
-              <Pill label="CONFIRMED" tone="good" icon="checkmark-circle" />
+          <View style={s.card}>
+            <View style={s.row}>
+              {ticket.image ? <Image source={{ uri: ticket.image }} style={s.thumb} /> : null}
+              <View style={s.flex}>
+                <View style={s.row}>
+                  <View style={[s.row, s.flex, { gap: 4 }]}><Ionicons name="location-outline" size={13} color={GREEN} /><Text style={s.place} numberOfLines={1}>{ticket.destination}</Text></View>
+                  <View style={s.confirmed}><Ionicons name="checkmark-circle" size={14} color={GREEN} /><Text style={s.confirmedText}>CONFIRMED</Text></View>
+                </View>
+                <Text style={s.pkgTitle} numberOfLines={2}>{ticket.title}</Text>
+                <View style={s.metaRow}><Ionicons name="calendar-outline" size={13} color={Colors.textLight} /><Text style={s.meta} numberOfLines={1}>{ticket.duration}</Text></View>
+                <View style={s.metaRow}><Ionicons name="people-outline" size={13} color={Colors.textLight} /><Text style={s.meta} numberOfLines={1}>{countsLabel(ticket.counts).replace(/\b\w/g, (c) => c.toUpperCase())} · {ticket.rooms} Room{ticket.rooms > 1 ? 's' : ''}</Text></View>
+              </View>
             </View>
             <View style={s.dates}>
-              <View><Text style={s.dateLabel}>STARTS</Text><Text style={s.dateValue}>{formatShortDate(ticket.startDate)}</Text><Text style={s.dateSub}>{new Date(`${ticket.startDate}T00:00:00`).toLocaleDateString(getAppLocale(), { weekday: 'long' })}</Text></View>
-              <View style={s.mid}><Ionicons name="umbrella-outline" size={18} color={Colors.primary} /><View style={s.rule} /></View>
-              <View style={{ alignItems: 'flex-end' }}><Text style={s.dateLabel}>ENDS</Text><Text style={s.dateValue}>{formatShortDate(ticket.endDate)}</Text><Text style={s.dateSub}>{new Date(`${ticket.endDate}T00:00:00`).toLocaleDateString(getAppLocale(), { weekday: 'long' })}</Text></View>
-            </View>
-            <Text style={s.who}>{countsLabel(ticket.counts)} · {ticket.rooms} room{ticket.rooms > 1 ? 's' : ''}</Text>
-            <View style={s.perforation}><View style={[s.notch, { left: -10 }]} /><View style={s.dash} /><View style={[s.notch, { right: -10 }]} /></View>
-            <View style={s.ticketBottom}>
-              <Barcode value={ticket.voucher} />
-              <Text style={s.voucher} selectable>Voucher {ticket.voucher}</Text>
+              <View><Text style={s.dateLabel}>STARTS</Text><Text style={s.dateValue}>{formatShortDate(ticket.startDate)}</Text><Text style={s.dateSub}>{day(ticket.startDate)}</Text></View>
+              <View style={s.mid}><View style={s.rule} /><Ionicons name="airplane-outline" size={20} color={GREEN} /><View style={s.rule} /></View>
+              <View style={{ alignItems: 'flex-end' }}><Text style={s.dateLabel}>ENDS</Text><Text style={s.dateValue}>{formatShortDate(ticket.endDate)}</Text><Text style={s.dateSub}>{day(ticket.endDate)}</Text></View>
             </View>
           </View>
 
-          <Card>
-            <SectionTitle eyebrow="TRAVELLERS" title="Who is travelling" />
-            {ticket.travellers.map((t, i) => (
-              <View key={i} style={[s.pax, i > 0 && s.paxBorder]}>
-                <View style={{ flex: 1, minWidth: 0 }}><Text style={s.paxName} numberOfLines={1}>{i + 1}. {t.name}</Text><Text style={s.paxMeta}>{t.age} yrs · {t.gender}{i === 0 ? ' · Lead traveller' : ''}</Text></View>
-                <TypePill type={t.type} />
+          <View style={s.card}>
+            <View style={s.row}>
+              <Ionicons name="ticket-outline" size={26} color={GREEN} />
+              <Text style={[s.cardTitle, s.flex]}>Your voucher</Text>
+            </View>
+            <View style={[s.row, { marginTop: 10, justifyContent: 'space-between' }]}>
+              <View style={[s.flex, { alignItems: 'center', gap: 6 }]}>
+                <Barcode value={ticket.voucher} />
+                <Text style={s.voucher} selectable>Voucher {ticket.voucher}</Text>
               </View>
-            ))}
-          </Card>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download voucher" onPress={share} style={s.download}>
+                <Ionicons name="download-outline" size={20} color={GREEN} /><Text style={s.downloadText}>Download{'\n'}Voucher</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          {ticket.inclusions.length || ticket.hotels.length ? (
-            <Card>
-              <SectionTitle eyebrow="YOUR TRIP" title="What is included" />
-              {ticket.hotels.map((h) => <View key={h} style={s.bullet}><Ionicons name="bed-outline" size={16} color={Colors.primary} /><Text style={s.bulletText}>{h}</Text></View>)}
-              {ticket.inclusions.map((x) => <View key={x} style={s.bullet}><Ionicons name="checkmark-circle" size={16} color={Colors.success} /><Text style={s.bulletText}>{x}</Text></View>)}
-            </Card>
-          ) : null}
+          <View style={s.card}>
+            <View style={s.row}>
+              <Ionicons name="person-outline" size={26} color={GREEN} />
+              <Text style={[s.cardTitle, s.flex]}>Travellers ({ticket.travellers.length})</Text>
+              <TouchableOpacity accessibilityRole="button" onPress={share} style={s.pill}><Text style={s.pillText}>View details</Text></TouchableOpacity>
+            </View>
+            <View style={s.paxList}>
+              {ticket.travellers.map((tr, i) => (
+                <View key={i} style={[s.pax, i > 0 && s.paxBorder]}>
+                  <View style={s.avatar}><Text style={s.avatarText}>{tr.name.trim().charAt(0).toUpperCase()}</Text></View>
+                  <View style={s.flex}><Text style={s.paxName} numberOfLines={1}>{tr.name}</Text><Text style={s.paxMeta}>{tr.age} yrs · {gender(tr.gender)}{i === 0 ? ' · Lead traveller' : ''}</Text></View>
+                </View>
+              ))}
+            </View>
+          </View>
 
-          <Card>
-            <SectionTitle eyebrow="PAYMENT" title="Receipt" />
-            <PackageFareSummary fare={ticket.fare} couponCode={ticket.couponCode} />
-            <View style={s.txn}><Text style={s.txnText}>Txn {ticket.txnId}</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text></View>
-          </Card>
+          <View style={s.card}>
+            <View style={s.row}>
+              <Ionicons name="list-outline" size={26} color={GREEN} />
+              <Text style={[s.cardTitle, s.flex]}>What is included</Text>
+              <TouchableOpacity accessibilityRole="button" onPress={share} style={s.pill}><Text style={s.pillText}>View itinerary</Text></TouchableOpacity>
+            </View>
+            <View style={s.included}>
+              {included.map((x, i) => (
+                <View key={x.icon} style={[s.inc, i > 0 && s.incBorder]}>
+                  <Ionicons name={x.icon} size={22} color={Colors.textDark} />
+                  <Text style={s.incText}>{x.lines[0]}{'\n'}{x.lines[1]}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
 
-          <Notice icon="mail-outline" title="Voucher sent">A confirmation was sent to {ticket.contact.email}. Our team will share final hotel and pick-up details before departure. This is a demo voucher and is not valid for travel.</Notice>
+          <View style={s.card}>
+            <View style={s.row}>
+              <Ionicons name="receipt-outline" size={26} color={GREEN} />
+              <Text style={[s.cardTitle, s.flex]}>Payment receipt</Text>
+              <TouchableOpacity accessibilityRole="button" onPress={share} style={s.pill}><Text style={s.pillText}>View invoice</Text></TouchableOpacity>
+            </View>
+            <View style={{ marginTop: 8 }}><PackageFareSummary fare={ticket.fare} couponCode={ticket.couponCode} /></View>
+            <View style={s.txn}>
+              <View><Text style={s.txnLabel}>Transaction ID</Text><Text style={s.txnText}>Txn {ticket.txnId}</Text></View>
+              <View><Text style={s.txnLabel}>Paid on</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</Text></View>
+            </View>
+          </View>
 
           <View style={s.actions}>
             <Action icon="share-social-outline" label="Share" onPress={share} />
             <Action icon="mail-outline" label="Email" onPress={email} />
-            <Action icon="calendar-outline" label="Calendar" onPress={calendar} />
-            <Action icon="ticket-outline" label="My trips" onPress={() => done('/(tabs)/bookings')} />
+            <Action icon="calendar-outline" label="Add to calendar" onPress={calendar} />
+            <Action icon="bookmarks-outline" label="My trips" onPress={() => done('/(tabs)/bookings')} />
           </View>
 
           <View style={s.cta}>
-            <PrimaryButton label="Back to home" icon="home-outline" onPress={() => done('/home')} />
-            <View style={{ height: 10 }} />
-            <PrimaryButton variant="soft" label="Explore more packages" icon="umbrella-outline" onPress={() => { resetPackageBooking(); goTo(PACKAGE_ROUTES.list); }} />
+            <TouchableOpacity accessibilityRole="button" onPress={() => done('/home')} style={[s.ctaBtn, s.ctaOutline]}><Ionicons name="home-outline" size={20} color={GREEN} /><Text style={s.ctaOutlineText}>Back to home</Text></TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" onPress={() => { resetPackageBooking(); goTo(PACKAGE_ROUTES.list); }} style={[s.ctaBtn, s.ctaSolid, { flex: 1.25 }]}><Text style={s.ctaSolidText}>Explore more packages</Text><Ionicons name="umbrella-outline" size={20} color={Colors.white} /></TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -112,47 +169,62 @@ export default function PackageConfirmationScreen() {
 }
 
 function Action({ icon, label, onPress }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; onPress: () => void }) {
-  return <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={s.action}><View style={s.actionIcon}><Ionicons name={icon} size={19} color={Colors.primary} /></View><Text style={s.actionLabel}>{label}</Text></TouchableOpacity>;
+  return <TouchableOpacity accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={s.action}><View style={s.actionIcon}><Ionicons name={icon} size={20} color={GREEN} /></View><Text style={s.actionLabel}>{label}</Text></TouchableOpacity>;
 }
 
 const s = StyleSheet.create({
+  flex: { flex: 1, minWidth: 0 },
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  hero: { alignItems: 'center', marginHorizontal: 20, marginBottom: 14, padding: 22, borderRadius: 24, backgroundColor: Colors.primaryDark },
-  check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  heroTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, marginTop: 12 },
-  heroText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.onDarkMuted, marginTop: 4, textAlign: 'center' },
-  refBox: { alignItems: 'center', marginTop: 16, paddingHorizontal: 22, paddingVertical: 10, borderRadius: 14, backgroundColor: Colors.onDarkSubtle },
-  refLabel: { ...Ui.eyebrow, color: Colors.onDarkMuted },
-  ref: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.white, letterSpacing: 2, marginTop: 3 },
-  ticket: { ...Ui.card, marginHorizontal: 20, marginBottom: 14, padding: 18, overflow: 'visible' },
-  cover: { width: '100%', height: 130, borderRadius: 14, marginBottom: 14, backgroundColor: Colors.surfaceMuted },
-  ticketTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 22, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  meta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
-  dates: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 18 },
-  dateLabel: { ...Ui.eyebrow, color: Colors.secondary },
-  dateValue: { fontFamily: FontFamily.sans, fontSize: TextSize.displaySmall, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
-  dateSub: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
-  mid: { flex: 1, alignItems: 'center', gap: 4 },
-  rule: { alignSelf: 'stretch', height: 1, backgroundColor: Colors.borderStrong },
-  who: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, marginTop: 14 },
-  perforation: { flexDirection: 'row', alignItems: 'center', marginVertical: 18, height: 20 },
-  dash: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
-  ticketBottom: { alignItems: 'center', gap: 8 },
-  barcode: { flexDirection: 'row', alignItems: 'center', height: 44, overflow: 'hidden', maxWidth: '100%' },
-  voucher: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, fontWeight: FontWeight.bold, color: Colors.textLight, letterSpacing: 0.5 },
-  pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  card: { ...Ui.card, marginHorizontal: 10, marginBottom: 12, padding: 14, borderRadius: 22 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1FA463' },
+  title: { fontFamily: 'Inter-ExtraBold', fontSize: 18, color: Colors.textDark },
+  text: { fontFamily: 'Inter-Regular', fontSize: 12, lineHeight: 17, color: Colors.textLight, marginTop: 4 },
+  refBox: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14, backgroundColor: '#E8F2EE' },
+  refLabel: { fontFamily: 'Inter-ExtraBold', fontSize: 11, letterSpacing: 1.2, color: GREEN },
+  ref: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.textDark, marginTop: 2 },
+  thumb: { width: 88, height: 96, borderRadius: 14, backgroundColor: Colors.surfaceMuted },
+  place: { flexShrink: 1, fontFamily: 'Inter-Regular', fontSize: 12, color: GREEN },
+  confirmed: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, backgroundColor: '#E3F0EA' },
+  confirmedText: { fontFamily: 'Inter-ExtraBold', fontSize: 10, color: GREEN },
+  pkgTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 17, lineHeight: 21, color: Colors.textDark, marginTop: 4 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  meta: { fontFamily: 'Inter-Regular', fontSize: 12, color: Colors.textLight },
+  dates: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 14, padding: 12, borderRadius: 14, backgroundColor: '#F1F6F3' },
+  dateLabel: { fontFamily: 'Inter-ExtraBold', fontSize: 11, letterSpacing: 1.2, color: GREEN },
+  dateValue: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.textDark, marginTop: 2 },
+  dateSub: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textLight, marginTop: 1 },
+  mid: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  rule: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
+  cardTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.textDark },
+  barcode: { flexDirection: 'row', alignItems: 'center', height: 50, overflow: 'hidden', maxWidth: '100%' },
+  voucher: { fontFamily: 'Inter-SemiBold', fontSize: 12, color: Colors.textDark },
+  download: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 16, backgroundColor: '#E3F0EA' },
+  downloadText: { fontFamily: 'Inter-ExtraBold', fontSize: 12, lineHeight: 16, color: GREEN },
+  pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 16, backgroundColor: '#E3F0EA' },
+  pillText: { fontFamily: 'Inter-SemiBold', fontSize: 11, color: GREEN },
+  paxList: { marginTop: 8, marginLeft: 38 },
+  pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  paxName: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  paxMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
-  bullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingVertical: 5 },
-  bulletText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, color: Colors.textDark },
-  txn: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  txnText: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight },
-  actions: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 16 },
-  action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  actionIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  actionLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.textDark },
-  cta: { marginHorizontal: 20 },
+  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#4E8F78' },
+  avatarText: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: Colors.white },
+  paxName: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: Colors.textDark },
+  paxMeta: { fontFamily: 'Inter-Regular', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  included: { flexDirection: 'row', marginTop: 12 },
+  inc: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 4 },
+  incBorder: { borderLeftWidth: 1, borderLeftColor: Colors.border },
+  incText: { flex: 1, fontFamily: 'Inter-Regular', fontSize: 10, lineHeight: 14, color: Colors.textDark },
+  txn: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, marginTop: 12 },
+  txnLabel: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textLight },
+  txnText: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textDark, marginTop: 2 },
+  actions: { flexDirection: 'row', gap: 8, marginHorizontal: 10, marginBottom: 14 },
+  action: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, paddingHorizontal: 4, borderRadius: 16, backgroundColor: '#E8F2EE' },
+  actionIcon: { alignItems: 'center', justifyContent: 'center' },
+  actionLabel: { fontFamily: 'Inter-ExtraBold', fontSize: 11, color: Colors.textDark, textAlign: 'center' },
+  cta: { flexDirection: 'row', gap: 10, marginHorizontal: 10 },
+  ctaBtn: { flex: 1, minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 12, borderRadius: 25 },
+  ctaOutline: { borderWidth: 1.5, borderColor: GREEN, backgroundColor: Colors.surface },
+  ctaOutlineText: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: GREEN },
+  ctaSolid: { backgroundColor: GREEN },
+  ctaSolidText: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: Colors.white },
 });

@@ -3,11 +3,11 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
-import { ServiceBanner, ServiceTopBar } from '@/components/ui/ServiceHeader';
+import { ServiceTopBar } from '@/components/ui/ServiceHeader';
 import { SortBox, SortOptions, type SortChoice } from '@/components/ui/SortBox';
 import { BusCard } from '@/components/buses/BusCards';
 import { CityPicker } from '@/components/buses/CityPicker';
-import { BUS_ROUTES, Card, Chip, EmptyState, Notice, PrimaryButton, SectionTitle, goTo } from '@/components/buses/BusUi';
+import { BUS_ROUTES, BusBanner, BusCardBox as Card, BusHeading as SectionTitle, Chip, EmptyState, Notice, PrimaryButton, goTo } from '@/components/buses/BusUi';
 import { Colors } from '@/constants/colors';
 import { DateField } from '@/components/DatePickerField';
 import { Ui } from '@/constants/theme';
@@ -89,13 +89,13 @@ export default function BusesScreen() {
       <ServiceTopBar title="Buses" />
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <ServiceBanner eyebrow="LEMONTRIP / BUS" title="Book bus tickets" subtitle="Search routes, compare buses and pick your seat." image={require('../../../../assets/images/Emerald Highway Journey.png')} />
+          <BusBanner title="Book bus tickets" text="Search routes, compare buses and pick your seat." />
 
-          <Card>
+          <Card style={{ marginTop: -34 }}>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you headed?" />
             <View style={s.stations}>
               <CityButton label="FROM" code={search.from} placeholder="Select departure" icon="radio-button-on-outline" onPress={() => setPicker('from')} />
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap cities" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.primaryDark} /></TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap cities" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.white} /></TouchableOpacity>
               <CityButton label="TO" code={search.to} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to')} />
             </View>
 
@@ -109,7 +109,7 @@ export default function BusesScreen() {
             </ScrollView>
 
             {errorMsg ? <Text style={s.error}>{errorMsg}</Text> : null}
-            <View style={{ marginTop: 14 }}><PrimaryButton label="Search buses" icon="search" onPress={runSearch} /></View>
+            <View style={{ marginTop: 14 }}><PrimaryButton variant="dark" label="Search buses" icon="search" onPress={runSearch} /></View>
           </Card>
 
           {searched ? (
@@ -176,13 +176,13 @@ function CityButton({ label, code, placeholder, icon, onPress }: { label: string
 
 const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
-  pad: { paddingHorizontal: Ui.space.page },
+  pad: { paddingHorizontal: 10 },
   stations: { gap: 8, position: 'relative' },
   station: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 66, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   stationLabel: { ...Ui.eyebrow, color: Colors.textLight, letterSpacing: 1 },
   stationValue: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
   stationCode: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
-  swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
+  swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30', borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginTop: 16, marginBottom: 8 },
   chips: { gap: 8, alignItems: 'center' },
   error: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.error, marginTop: 10 },

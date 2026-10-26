@@ -141,7 +141,7 @@ function ToggleRow({ title, text, value, onChange }: { title: string; text: stri
   return (
     <View style={s.toggle}>
       <View style={{ flex: 1 }}><Text style={s.toggleTitle}>{title}</Text><Text style={s.toggleText}>{text}</Text></View>
-      <Switch accessibilityLabel={title} value={value} onValueChange={onChange} trackColor={{ true: Colors.secondary, false: Colors.borderStrong }} thumbColor={value ? Colors.accent : Colors.white} />
+      <Switch accessibilityLabel={title} value={value} onValueChange={onChange} trackColor={{ true: Colors.secondary, false: Colors.borderStrong }} thumbColor={value ? '#103D30' : Colors.white} />
     </View>
   );
 }

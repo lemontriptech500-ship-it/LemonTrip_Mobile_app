@@ -84,7 +84,7 @@ export default function FlightDetailsScreen() {
       </View>
       <TouchableOpacity accessibilityRole="button" accessibilityState={{ disabled: !canContinue }} disabled={!canContinue} onPress={handleContinue} activeOpacity={0.85} style={[s.continue, !canContinue && { opacity: 0.6 }]}>
         <Text style={s.continueText}>Continue</Text>
-        <Ionicons name="arrow-forward" size={20} color={BRAND} />
+        <Ionicons name="arrow-forward" size={20} color={Colors.white} />
       </TouchableOpacity>
     </View>
   );
@@ -231,7 +231,7 @@ const s = StyleSheet.create({
   routeRule: { flex: 1, height: 1.5, backgroundColor: Colors.borderStrong },
 
   option: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surfaceMuted, marginBottom: 10 },
-  optionOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#FDF3C4' },
+  optionOn: { borderColor: BRAND, borderWidth: 1.5, backgroundColor: '#E3F0EA' },
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.borderStrong, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: BRAND, borderWidth: 2 },
   radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: BRAND },
@@ -249,7 +249,7 @@ const s = StyleSheet.create({
 
   stop: { flexDirection: 'row', gap: 12 },
   rail: { alignItems: 'center', width: 18 },
-  node: { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.accent, borderWidth: 3, borderColor: BRAND, marginTop: 1 },
+  node: { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.white, borderWidth: 3, borderColor: BRAND, marginTop: 1 },
   link: { flex: 1, width: 2, backgroundColor: BRAND },
   stopName: { fontFamily: INTER.semibold, fontSize: TextSize.bodyLarge, color: BRAND },
   stopCode: { fontFamily: INTER.regular, color: Colors.textLight },
@@ -262,7 +262,7 @@ const s = StyleSheet.create({
   lineBold: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.bodyLarge },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 8 },
 
-  notice: { flexDirection: 'row', alignItems: 'center', gap: 14, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 18, backgroundColor: '#FBF1C7' },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 14, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 18, backgroundColor: '#E8F2EE' },
   noticeInfo: { backgroundColor: Colors.surfaceMuted },
   noticeTitle: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.body },
   noticeText: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 18, marginTop: 2 },
@@ -271,6 +271,6 @@ const s = StyleSheet.create({
   footerPrice: { flex: 1, minWidth: 0 },
   footerCaption: { fontFamily: INTER.medium, color: BRAND, fontSize: TextSize.caption },
   footerAmount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.heading, marginTop: 1 },
-  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: Colors.accent },
-  continueText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.bodyLarge },
+  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: '#103D30' },
+  continueText: { fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.bodyLarge },
 });

@@ -2,9 +2,8 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { HotelFareSummary, StaySummary } from '@/components/hotels/HotelBookingCards';
-import { Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
+import { HotelHeader, Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { CHECK_IN_TIME, CHECK_OUT_TIME, cancellationInfo, formatLongDate, inr } from '@/data/hotelBooking';
 import { currentFare, useHotelBooking } from '@/utils/hotelBookingStore';
@@ -19,7 +18,7 @@ export default function HotelReviewScreen() {
   const [showError, setShowError] = useState(false);
   const derived = currentFare();
   if (!selection || !derived || !derived.nights || !guestNames[0]?.trim()) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Review booking" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.guests)} /><EmptyState icon="document-text-outline" title="Nothing to review yet" text="Select a room and add guest details first." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <FlowScreen><ScrollView><HotelHeader title="Review booking" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.guests)} /><EmptyState icon="document-text-outline" title="Nothing to review yet" text="Select a room and add guest details first." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
   }
   const { fare, room, nights } = derived;
   const { hotel } = selection;
@@ -32,7 +31,7 @@ export default function HotelReviewScreen() {
     <FlowScreen footer={<FooterBar caption="Total payable" amount={inr(fare.total)} estimateAmount={fare.total} action={<PrimaryButton label="Proceed to payment" icon="lock-closed-outline" onPress={proceed} />} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
-          <ScreenHeader title="Review your booking" subtitle="Check every detail before you pay." eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.guests)} />
+          <HotelHeader title="Review your booking" subtitle="Check every detail before you pay." eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.guests)} />
           <HotelProgress current={2} />
           <StaySummary hotel={hotel} roomName={room.name} checkIn={selection.checkIn} checkOut={selection.checkOut} nights={nights} guests={selection.guests} rooms={selection.rooms} />
 
@@ -124,15 +123,15 @@ const s = StyleSheet.create({
   statusLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  avatarText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30' },
+  avatarText: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.white },
   paxName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   paxMeta: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   opts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   note: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textDark, marginTop: 10 },
   info: { marginHorizontal: 20, marginBottom: 14, padding: 16, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
   infoHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  infoTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  infoTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.white },
   bullet: { flexDirection: 'row', gap: 8, marginTop: 5 },
   dot: { color: Colors.primary, fontSize: TextSize.body, lineHeight: 19 },
   infoText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 19, color: Colors.textDark },

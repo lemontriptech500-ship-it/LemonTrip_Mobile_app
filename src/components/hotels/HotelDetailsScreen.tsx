@@ -3,9 +3,8 @@ import { Alert } from '@/components/ui/Alert';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { StaySummary } from '@/components/hotels/HotelBookingCards';
-import { Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
+import { HotelHeader, Card, EmptyState, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Pill, PrimaryButton, SectionTitle, goBackOr, goTo, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { MAX_GUESTS, MAX_ROOMS, cancellationInfo, computeHotelFare, getRoomOptions, inr, nightsBetween, parsePrice } from '@/data/hotelBooking';
@@ -33,7 +32,7 @@ export default function HotelDetailsScreen() {
     return (
       <FlowScreen>
         <ScrollView>
-          <ScreenHeader title="Hotel details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.results)} />
+          <HotelHeader title="Hotel details" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.results)} />
           <EmptyState icon="bed-outline" title="Choose a stay to continue" text="Return to hotel search and open a property to see its details." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} />
         </ScrollView>
       </FlowScreen>
@@ -74,7 +73,7 @@ export default function HotelDetailsScreen() {
     }>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={s.content}>
-          <ScreenHeader
+          <HotelHeader
             title={hotel.name}
             subtitle={hotel.address ?? hotel.location}
             eyebrow="LEMONTRIP / HOTELS"
@@ -199,7 +198,7 @@ const s = StyleSheet.create({
   amenity: { width: '50%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingRight: 8 },
   amenityText: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textDark },
   option: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background, marginBottom: 8 },
-  optionOn: { borderColor: Colors.primary, backgroundColor: Colors.accentSoft },
+  optionOn: { borderColor: Colors.primary, backgroundColor: '#E3F0EA' },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.borderStrong, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: Colors.primary },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
@@ -209,7 +208,7 @@ const s = StyleSheet.create({
   perNight: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
   sep: { height: 1, backgroundColor: Colors.border, marginVertical: 12 },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  stepIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  stepIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   stepLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   stepBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
   stepValue: { minWidth: 24, textAlign: 'center', fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
@@ -217,7 +216,7 @@ const s = StyleSheet.create({
   lineLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.body, color: Colors.textLight, width: 90 },
   lineValue: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.bold, color: Colors.textDark, textAlign: 'right' },
   location: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  locationIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  locationIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   locationAddress: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   review: { paddingVertical: 10 },
   reviewBorder: { borderTopWidth: 1, borderTopColor: Colors.border },

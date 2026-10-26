@@ -2,6 +2,7 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
+import { FlightBanner } from '@/components/flights/FlightFlowUi';
 import { AppScreen } from '@/components/AppScreen';
 import { Card, Chip, Notice, PrimaryButton, SectionTitle } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
@@ -136,18 +137,9 @@ export default function FlightSearchScreen() {
       </View>
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
-          <View style={s.bannerWrap}>
-            <View style={s.banner}>
-              <Image source={require('../../../assets/images/Emerald Skies Travel Banner.png')} resizeMode="cover" style={s.bannerImg} />
-              <View style={s.bannerCopy}>
-                <Text style={s.bannerEyebrow} numberOfLines={1}>LEMONTRIP / FLIGHTS</Text>
-                <Text style={s.bannerTitle} numberOfLines={2}>Book flight tickets</Text>
-                <Text style={s.bannerSub} numberOfLines={2}>Search routes, compare fares and pick the flight that suits you.</Text>
-              </View>
-            </View>
-          </View>
+          <FlightBanner />
 
-          <Card>
+          <Card style={{ marginTop: -34, marginHorizontal: 10, padding: 14, borderRadius: 22 }}>
             <SectionTitle eyebrow="PLAN YOUR JOURNEY" title="Where are you flying?" />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips} style={{ marginBottom: 14 }}>
               {TRIP_TYPES.map((t) => <Chip key={t.id} label={t.label} selected={tripType === t.id} onPress={() => { setTripType(t.id); setErrorMsg(''); }} />)}
@@ -155,7 +147,7 @@ export default function FlightSearchScreen() {
 
             <View style={s.stations}>
               <AirportButton label="FROM" code={origin} placeholder="Select departure" icon="radio-button-on-outline" onPress={() => setPicker('from')} />
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap airports" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.primaryDark} /></TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Swap airports" onPress={swap} style={s.swap}><Ionicons name="swap-vertical" size={18} color={Colors.white} /></TouchableOpacity>
               <AirportButton label="TO" code={destination} placeholder="Select arrival" icon="location-outline" onPress={() => setPicker('to')} />
             </View>
 
@@ -213,7 +205,7 @@ export default function FlightSearchScreen() {
                 <View style={s.errorPanel}>
                   <View style={s.errorIcon}><Ionicons name="cloud-offline-outline" size={21} color={Colors.error} /></View>
                   <View style={{ flex: 1, minWidth: 0 }}><Text style={s.errorTitle}>Unable to load flights</Text><Text style={s.errorMessage}>{error}</Text></View>
-                  {request ? <TouchableOpacity accessibilityRole="button" onPress={() => runSearch(request)} style={s.retry}><Ionicons name="refresh" size={15} color={Colors.primaryDark} /><Text style={s.retryText}>Retry</Text></TouchableOpacity> : null}
+                  {request ? <TouchableOpacity accessibilityRole="button" onPress={() => runSearch(request)} style={s.retry}><Ionicons name="refresh" size={15} color={Colors.white} /><Text style={s.retryText}>Retry</Text></TouchableOpacity> : null}
                 </View>
               ) : (
                 <FlightResults offers={offers} loading={loading} routeLabel={routeLabel} onSelect={selectFlight} dateLabel={request ? formatShortDate(request.departureDate) : undefined} />
@@ -281,7 +273,7 @@ const s = StyleSheet.create({
   banner: { width: '100%', aspectRatio: 2172 / 724, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
   bannerImg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   bannerCopy: { width: '58%', paddingLeft: 16 },
-  bannerEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 0.8, color: Colors.accent },
+  bannerEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: TextSize.micro, letterSpacing: 0.8, color: Colors.white },
   bannerTitle: { fontFamily: 'Inter-Bold', fontSize: 18, lineHeight: 22, color: Colors.white, marginTop: 4 },
   bannerSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: 'rgba(255,255,255,0.85)', marginTop: 4 },
   pairRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
@@ -298,7 +290,7 @@ const s = StyleSheet.create({
   stationLabel: { ...Ui.eyebrow, color: Colors.textLight, letterSpacing: 1 },
   stationValue: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark, marginTop: 2 },
   stationCode: { fontFamily: FontFamily.sans, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 1 },
-  swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
+  swap: { position: 'absolute', right: 44, top: '50%', marginTop: -19, width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30', borderWidth: 3, borderColor: Colors.surface, zIndex: 2 },
   label: { ...Ui.eyebrow, color: Colors.textLight, marginTop: 16, marginBottom: 8 },
   counter: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.background },
   counterBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
@@ -311,6 +303,6 @@ const s = StyleSheet.create({
   errorIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: Colors.errorSoft },
   errorTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold },
   errorMessage: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 19, marginTop: 3 },
-  retry: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  retryText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  retry: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, borderRadius: Ui.radius.control, backgroundColor: '#103D30' },
+  retryText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });
