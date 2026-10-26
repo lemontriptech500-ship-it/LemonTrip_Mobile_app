@@ -53,7 +53,7 @@ export default function HotelCard({ hotel, search, onPress }: HotelCardProps) {
             <View style={styles.locationRow}><Ionicons name="location-outline" size={13} color={Colors.textLight} /><Text style={styles.location} numberOfLines={1}>{hotel.location}</Text></View>
           </View>
           {hotel.reviewScore !== undefined ? (
-            <View style={styles.reviewScore}><Ionicons name="star" size={13} color={Colors.accent} /><Text style={styles.score}>{hotel.reviewScore.toFixed(1)}</Text></View>
+            <View style={styles.reviewScore}><Ionicons name="star" size={13} color="#103D30" /><Text style={styles.score}>{hotel.reviewScore.toFixed(1)}</Text></View>
           ) : null}
         </View>
 
@@ -81,7 +81,7 @@ export default function HotelCard({ hotel, search, onPress }: HotelCardProps) {
               <Text style={styles.total}>Per night · dates to calculate total</Text>
             )}
           </View>
-          <View style={styles.viewButton}><Text style={styles.viewButtonText}>View stay</Text><Ionicons name="arrow-forward" size={14} color={Colors.primaryDark} /></View>
+          <View style={styles.viewButton}><Text style={styles.viewButtonText}>View stay</Text><Ionicons name="arrow-forward" size={14} color={Colors.white} /></View>
         </View>
       </View>
     </TouchableOpacity>
@@ -116,6 +116,6 @@ const styles = StyleSheet.create({
   priceBlock: { flex: 1, minWidth: 0 },
   price: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold },
   total: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 3 },
-  viewButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.accent },
-  viewButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  viewButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 10, borderRadius: Ui.radius.control, backgroundColor: '#103D30' },
+  viewButtonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 });

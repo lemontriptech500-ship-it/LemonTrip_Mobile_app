@@ -5,9 +5,8 @@ import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
-import { ScreenHeader } from '@/components/ScreenHeader';
 import { HotelFareSummary } from '@/components/hotels/HotelBookingCards';
-import { Card, EmptyState, Field, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, PrimaryButton, SectionTitle, goBackOr, replaceTo } from '@/components/hotels/HotelUi';
+import { HotelHeader, Card, EmptyState, Field, FlowScreen, FooterBar, HOTEL_ROUTES, HotelProgress, Notice, PrimaryButton, SectionTitle, goBackOr, replaceTo } from '@/components/hotels/HotelUi';
 import { Colors } from '@/constants/colors';
 import { HOTEL_COUPONS, inr, validateHotelCoupon } from '@/data/hotelBooking';
 import { confirmHotelBooking, currentFare, setCoupon, useHotelBooking } from '@/utils/hotelBookingStore';
@@ -24,7 +23,7 @@ export default function HotelPaymentScreen() {
 
   const derived = currentFare();
   if (!selection || !derived || !derived.nights || !guestNames[0]?.trim()) {
-    return <FlowScreen><ScrollView><ScreenHeader title="Payment" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.review)} /><EmptyState icon="card-outline" title="No booking to pay for" text="Select a room and add guest details first." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
+    return <FlowScreen><ScrollView><HotelHeader title="Payment" eyebrow="LEMONTRIP / HOTELS" onBack={() => goBackOr(HOTEL_ROUTES.review)} /><EmptyState icon="card-outline" title="No booking to pay for" text="Select a room and add guest details first." action={<PrimaryButton label="Search hotels" onPress={() => replaceTo(HOTEL_ROUTES.results)} />} /></ScrollView></FlowScreen>;
   }
   const { fare } = derived;
 
@@ -53,7 +52,7 @@ export default function HotelPaymentScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={s.content}>
-            <ScreenHeader title="Secure payment" subtitle="Complete your booking with Razorpay test checkout." eyebrow="LEMONTRIP / HOTELS" onBack={() => !processing && goBackOr(HOTEL_ROUTES.review)} />
+            <HotelHeader title="Secure payment" subtitle="Complete your booking with Razorpay test checkout." eyebrow="LEMONTRIP / HOTELS" onBack={() => !processing && goBackOr(HOTEL_ROUTES.review)} />
             <HotelProgress current={3} />
 
             <Card>
@@ -92,6 +91,6 @@ const s = StyleSheet.create({
   couponMsg: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.bold, marginBottom: 8 },
   suggest: { gap: 8, marginTop: 4 },
   suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary, backgroundColor: Colors.accentSoft, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  suggestCode: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, color: Colors.primary, backgroundColor: '#E3F0EA', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
   suggestLabel: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textDark },
 });

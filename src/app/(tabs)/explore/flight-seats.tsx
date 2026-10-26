@@ -108,7 +108,7 @@ export default function SeatsAddOnsScreen() {
       </View>
       <TouchableOpacity accessibilityRole="button" onPress={handleContinue} activeOpacity={0.85} style={s.continue}>
         <Text style={s.continueText}>Review booking</Text>
-        <Ionicons name="arrow-forward" size={20} color={BRAND} />
+        <Ionicons name="arrow-forward" size={20} color={Colors.white} />
       </TouchableOpacity>
     </View>
   );
@@ -196,16 +196,16 @@ const s = StyleSheet.create({
   colLabel: { flex: 1, textAlign: 'center', fontFamily: INTER.bold, fontSize: TextSize.micro, color: BRAND },
   rowNumber: { width: 34, textAlign: 'center', fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
   seat: { flex: 1, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
-  seatFront: { backgroundColor: '#FDF3C4', borderColor: Colors.accent },
+  seatFront: { backgroundColor: '#E3F0EA', borderColor: '#103D30' },
   seatTaken: { backgroundColor: Colors.surfaceMuted, borderColor: Colors.surfaceMuted },
   seatSelected: { backgroundColor: BRAND, borderColor: BRAND },
   seatText: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND },
   seatTextTaken: { color: Colors.textLight, fontFamily: INTER.regular },
-  seatTextSelected: { color: Colors.accent },
+  seatTextSelected: { color: Colors.white },
   note: { marginTop: 14, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight },
   addOn: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
   addOnOn: { borderColor: BRAND, backgroundColor: Colors.surfaceMuted },
-  addOnIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: '#FDF3C4' },
+  addOnIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: '#E3F0EA' },
   addOnTitle: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND },
   addOnDetail: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   addOnPrice: { fontFamily: INTER.extrabold, fontSize: TextSize.body, color: BRAND, marginRight: 2 },
@@ -215,6 +215,6 @@ const s = StyleSheet.create({
   footerPrice: { flex: 1, minWidth: 0 },
   footerCaption: { fontFamily: INTER.medium, color: BRAND, fontSize: TextSize.caption },
   footerAmount: { fontFamily: INTER.extrabold, color: BRAND, fontSize: TextSize.heading, marginTop: 1 },
-  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: Colors.accent },
-  continueText: { fontFamily: INTER.bold, color: BRAND, fontSize: TextSize.bodyLarge },
+  continue: { minWidth: 168, height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, borderRadius: 27, backgroundColor: '#103D30' },
+  continueText: { fontFamily: INTER.bold, color: Colors.white, fontSize: TextSize.bodyLarge },
 });

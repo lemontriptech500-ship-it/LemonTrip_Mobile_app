@@ -29,9 +29,9 @@ type ServiceItem = {
 type QuickAction = { label: string; icon: IconName; tint?: 'lemon'; route: Parameters<typeof router.push>[0] };
 
 // Copy "Lone Hiker Overlooking a Mountain Lake" from assets/images to this file name.
-const HERO_IMAGE = require('../../../assets/images/hero-hiker.png');
+const HERO_IMAGE = require('../../../assets/images/Hiker Over a Golden Mountain Lake.png');
 // How much to dim the hero photo: 0 = original, 0.3 = noticeably darker.
-const HERO_DIM = 0.2;
+const HERO_DIM = 0;
 // Script font from the design; the file lives in assets/fonts and is loaded in app/_layout.tsx.
 const SCRIPT_FONT = 'Italianno';
 // Inter (static weights, loaded in app/_layout.tsx) for all other text on this screen.

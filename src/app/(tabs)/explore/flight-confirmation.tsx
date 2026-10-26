@@ -214,7 +214,7 @@ export default function FlightConfirmationScreen() {
           <View style={s.cta}>
             <TouchableOpacity accessibilityRole="button" onPress={() => done('/(tabs)/bookings')} activeOpacity={0.85} style={s.primary}>
               <Text style={s.primaryText}>View my trips</Text>
-              <Ionicons name="ticket-outline" size={20} color={BRAND} />
+              <Ionicons name="ticket-outline" size={20} color={Colors.white} />
             </TouchableOpacity>
             <View style={s.secondaryRow}>
               <TouchableOpacity accessibilityRole="button" onPress={() => done('/home')} activeOpacity={0.85} style={s.secondary}>
@@ -289,8 +289,8 @@ const s = StyleSheet.create({
   bookingId: { fontFamily: INTER.semibold, fontSize: TextSize.micro, color: Colors.textLight, flexShrink: 1 },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  avatarText: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: BRAND },
+  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30' },
+  avatarText: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: Colors.white },
   paxName: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND },
   paxMeta: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   paxCol: { alignItems: 'flex-start', minWidth: 52 },
@@ -311,10 +311,10 @@ const s = StyleSheet.create({
   noticeText: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 18, marginTop: 2 },
   actions: { flexDirection: 'row', gap: 10, marginHorizontal: 16, marginBottom: 14 },
   action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  actionIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF3C4' },
+  actionIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   actionLabel: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND },
   cta: { marginHorizontal: 16, gap: 10 },
-  primary: { height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: 27, backgroundColor: Colors.accent },
+  primary: { height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: 27, backgroundColor: '#103D30' },
   primaryText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: BRAND },
   secondaryRow: { flexDirection: 'row', gap: 10 },
   secondary: { flex: 1, height: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 10, borderRadius: 24, backgroundColor: Colors.surfaceMuted },

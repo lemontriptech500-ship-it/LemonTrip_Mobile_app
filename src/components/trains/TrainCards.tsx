@@ -3,10 +3,10 @@ import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
-import { formatDuration, formatShortDate, getClassOptions, inr, lowestFare, type FareBreakdown, type Quota, type TrainResult } from '@/data/trains';
+import { formatDuration, formatShortDate, getClassOptions, getStation, inr, lowestFare, type FareBreakdown, type Quota, type TrainResult } from '@/data/trains';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
-import { Pill, Row } from './TrainUi';
+import { BRAND, INTER, Pill, TrainRow, TrainTag } from './TrainFlowUi';
 
 const TYPE_TONE = { Rajdhani: 'brand', Shatabdi: 'brand', Superfast: 'neutral', Express: 'neutral' } as const;
 
@@ -74,18 +74,32 @@ export function TrainCard({ result, date, quota = 'GN', onOpen, onSelectClass, w
   );
 }
 
-/** Compact journey recap used on passengers / review / payment screens. */
+/** Compact journey recap used on class / passengers / seats / review / payment screens (same layout as the bus and flight recaps). */
 export function JourneySummary({ result, date, className, quota }: { result: TrainResult; date: string; className: string; quota: Quota }) {
+  const from = getStation(result.from.code); const to = getStation(result.to.code);
   return (
     <View style={s.summary}>
       <View style={s.summaryTop}>
-        <View style={{ flex: 1, minWidth: 0 }}><Text style={s.summaryName} numberOfLines={1}>{result.train.name}</Text><Text style={s.number}>#{result.train.number}  ·  {className}</Text></View>
-        <Pill label={quota === 'TQ' ? 'Tatkal' : 'General'} tone={quota === 'TQ' ? 'warn' : 'neutral'} />
+        <View style={s.summaryIcon}><Ionicons name="train-outline" size={24} color={BRAND} /></View>
+        <View style={{ flex: 1, minWidth: 0 }}><Text style={s.summaryName} numberOfLines={1}>{result.train.name}</Text><Text style={s.summaryMeta} numberOfLines={1}>#{result.train.number}  ·  {className}</Text></View>
+        <TrainTag label={quota === 'TQ' ? 'Tatkal' : 'General'} />
       </View>
       <View style={s.times}>
-        <TimeBlock time={result.departure} code={result.from.code} sub={formatShortDate(date)} />
-        <RouteLine result={result} />
-        <TimeBlock time={result.arrival} code={result.to.code} align="right" sub={result.arrivalDayOffset > 0 ? `+${result.arrivalDayOffset} day` : undefined} />
+        <View style={s.end}>
+          <Text style={s.sTime}>{result.departure}</Text>
+          <Text style={s.sCode}>{result.from.code}</Text>
+          <Text style={s.sSub} numberOfLines={2}>{from?.city ?? ''} · {formatShortDate(date)}</Text>
+        </View>
+        <View style={s.mid}>
+          <Text style={s.midText}>{formatDuration(result.durationMin)}</Text>
+          <View style={s.track}><View style={s.sDot} /><View style={s.rule} /><Ionicons name="train" size={15} color={BRAND} /><View style={s.rule} /><View style={s.sDot} /></View>
+          <Text style={s.midText}>{result.distanceKm} km</Text>
+        </View>
+        <View style={[s.end, { alignItems: 'flex-end' }]}>
+          <Text style={s.sTime}>{result.arrival}</Text>
+          <Text style={s.sCode}>{result.to.code}</Text>
+          <Text style={[s.sSub, { textAlign: 'right' }]} numberOfLines={2}>{result.arrivalDayOffset > 0 ? `${to?.city ?? ''} · +${result.arrivalDayOffset} day` : to?.city}</Text>
+        </View>
       </View>
     </View>
   );
@@ -94,14 +108,14 @@ export function JourneySummary({ result, date, className, quota }: { result: Tra
 export function FareSummary({ fare, couponCode }: { fare: FareBreakdown; couponCode?: string | null }) {
   return (
     <View>
-      <Row label={`Base fare × ${fare.passengers}`} value={inr(fare.base)} />
-      <Row label="Reservation & superfast" value={inr(fare.reservation)} />
-      {fare.tatkal > 0 ? <Row label="Tatkal charge" value={inr(fare.tatkal)} /> : null}
-      {fare.gst > 0 ? <Row label="GST (5%)" value={inr(fare.gst)} /> : null}
-      <Row label="Convenience fee" value={inr(fare.convenience)} />
-      {fare.discount > 0 ? <Row label={`Coupon ${couponCode ?? ''}`.trim()} value={`− ${inr(fare.discount)}`} tone="good" /> : null}
+      <TrainRow label={`Base fare × ${fare.passengers}`} value={inr(fare.base)} />
+      <TrainRow label="Reservation & superfast" value={inr(fare.reservation)} />
+      {fare.tatkal > 0 ? <TrainRow label="Tatkal charge" value={inr(fare.tatkal)} /> : null}
+      {fare.gst > 0 ? <TrainRow label="GST (5%)" value={inr(fare.gst)} /> : null}
+      <TrainRow label="Convenience fee" value={inr(fare.convenience)} />
+      {fare.discount > 0 ? <TrainRow label={`Coupon ${couponCode ?? ''}`.trim()} value={`− ${inr(fare.discount)}`} good /> : null}
       <View style={s.divider} />
-      <Row label="Total payable" value={inr(fare.total)} bold />
+      <TrainRow label="Total payable" value={inr(fare.total)} bold />
     </View>
   );
 }
@@ -109,7 +123,7 @@ export function FareSummary({ fare, couponCode }: { fare: FareBreakdown; couponC
 const s = StyleSheet.create({
   card: { ...Ui.card, padding: 14, marginBottom: 12 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  iconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
+  iconBox: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
   name: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   number: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
   heart: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
@@ -133,8 +147,17 @@ const s = StyleSheet.create({
   footText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, color: Colors.textLight },
   footBold: { fontWeight: FontWeight.extraBold, color: Colors.textDark },
   link: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primary },
-  summary: { ...Ui.card, marginHorizontal: Ui.space.page, marginBottom: 14, padding: 16 },
-  summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  summaryName: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
+  summary: { ...Ui.card, marginHorizontal: 10, marginBottom: 14, padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  summaryTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  summaryIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted },
+  summaryName: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: BRAND },
+  summaryMeta: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
+  end: { flex: 1, minWidth: 0 },
+  sTime: { fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall, color: BRAND },
+  sCode: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND, marginTop: 6 },
+  sSub: { fontFamily: INTER.regular, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 3 },
+  mid: { width: 92, alignItems: 'center', gap: 6 },
+  midText: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
+  sDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: BRAND },
   divider: { height: 1, backgroundColor: Colors.border, marginVertical: 8 },
 });

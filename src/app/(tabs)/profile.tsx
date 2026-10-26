@@ -4,6 +4,7 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
+import { Ui } from '@/constants/theme';
 import { logout, useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -51,12 +52,12 @@ function Section({ title, items }: { title: string; items: Item[] }) {
             onPress={() => router.push(item.route as never)}
             style={[styles.row, index < items.length - 1 && styles.rowDivider]}
             activeOpacity={0.75}>
-            <View style={styles.rowIcon}><Ionicons name={item.icon} size={20} color={Colors.white} /></View>
+            <View style={styles.rowIcon}><Ionicons name={item.icon} size={19} color={BRAND} /></View>
             <View style={styles.rowCopy}>
               <Text style={styles.rowTitle}>{item.title}</Text>
               {item.detail ? <Text style={styles.rowDetail}>{item.detail}</Text> : null}
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
+            <Ionicons name="chevron-forward" size={17} color={Colors.textLight} />
           </TouchableOpacity>
         ))}
       </View>
@@ -148,46 +149,46 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F4F7F5' },
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   page: { paddingBottom: 32 },
-  content: { width: '100%', maxWidth: 820, alignSelf: 'center', paddingHorizontal: 16 },
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingHorizontal: 10 },
 
-  header: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
+  header: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 8, backgroundColor: Colors.surface },
   backButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20 },
-  headerTitle: { color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.heading },
+  headerTitle: { flex: 1, color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.title },
 
-  userCard: { marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  avatarWrap: { width: 64, height: 64 },
-  avatar: { width: 64, height: 64, alignItems: 'center', justifyContent: 'center', borderRadius: 32, backgroundColor: BRAND },
-  avatarText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.display },
+  userCard: { ...Ui.card, marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 22 },
+  avatarWrap: { width: 60, height: 60 },
+  avatar: { width: 60, height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 30, backgroundColor: BRAND },
+  avatarText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall },
   cameraBadge: { position: 'absolute', right: -3, bottom: -3, width: 24, height: 24, alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: BRAND, borderWidth: 2, borderColor: Colors.surface },
   userCopy: { flex: 1, minWidth: 0 },
-  userName: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge },
-  userEmail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, marginTop: 2 },
+  userName: { color: BRAND, fontFamily: INTER.extrabold, fontSize: 15 },
+  userEmail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, marginTop: 2 },
   memberPill: { alignSelf: 'flex-start', marginTop: 8, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: Colors.accent },
   memberPillText: { color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.micro },
 
-  banner: { marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 18, borderRadius: 18, backgroundColor: Colors.surfaceMuted },
+  banner: { marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 8, padding: 16, borderRadius: 24, backgroundColor: '#DCEBE5', overflow: 'hidden', shadowColor: BRAND, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 3 },
   bannerCopy: { flex: 1, minWidth: 0 },
-  bannerTitle: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.heading },
-  bannerText: { color: BRAND, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 19, marginTop: 4 },
-  bannerArt: { width: 120, height: 80 },
-  exploreButton: { alignSelf: 'flex-start', minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingLeft: 16, paddingRight: 5, paddingVertical: 4, borderRadius: 999, backgroundColor: BRAND },
-  signInButton: { minHeight: 42, justifyContent: 'center', paddingHorizontal: 18, borderRadius: 999, backgroundColor: BRAND },
-  exploreButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.body },
-  exploreArrow: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.white },
+  bannerTitle: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.title },
+  bannerText: { color: '#3C4A45', fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, marginTop: 4 },
+  bannerArt: { width: 110, height: 80 },
+  exploreButton: { alignSelf: 'flex-start', minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingLeft: 16, paddingRight: 4, paddingVertical: 3, borderRadius: 999, backgroundColor: BRAND },
+  signInButton: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 18, borderRadius: 999, backgroundColor: BRAND },
+  exploreButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: 13 },
+  exploreArrow: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: Colors.white },
 
-  section: { marginTop: 22 },
-  sectionTitle: { color: BRAND, fontFamily: INTER.bold, fontSize: TextSize.heading, marginBottom: 10, marginHorizontal: 2 },
-  card: { overflow: 'hidden', paddingHorizontal: 14, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  row: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
-  rowDivider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
-  rowIcon: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: BRAND },
+  section: { marginTop: 20 },
+  sectionTitle: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.title, marginBottom: 10, marginHorizontal: 4 },
+  card: { ...Ui.card, overflow: 'hidden', paddingHorizontal: 12, borderRadius: 22 },
+  row: { minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: '#EDF1EF' },
+  rowIcon: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: '#E3F0EA' },
   rowCopy: { flex: 1, minWidth: 0 },
-  rowTitle: { color: Colors.textDark, fontFamily: INTER.semibold, fontSize: TextSize.bodyLarge },
-  rowDetail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 18, marginTop: 2 },
+  rowTitle: { color: Colors.textDark, fontFamily: INTER.semibold, fontSize: 15 },
+  rowDetail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 16, marginTop: 2 },
 
-  logoutButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, borderRadius: 26, borderWidth: 1, borderColor: BRAND, backgroundColor: Colors.surface },
-  logoutText: { color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge },
-  footer: { marginTop: 22, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, textAlign: 'center' },
+  logoutButton: { minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 20, borderRadius: 16, borderWidth: 1.5, borderColor: BRAND, backgroundColor: Colors.surface },
+  logoutText: { color: BRAND, fontFamily: INTER.extrabold, fontSize: 14 },
+  footer: { marginTop: 20, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, textAlign: 'center' },
 });

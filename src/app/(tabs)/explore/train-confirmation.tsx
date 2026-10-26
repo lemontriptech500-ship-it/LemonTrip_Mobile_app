@@ -1,17 +1,16 @@
 import { useAppLanguage } from '@/utils/intl';
 import { getAppLocale } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { FareSummary } from '@/components/trains/TrainCards';
-import { BRAND, INTER, TRAIN_DONE_BANNER, TRAIN_ROUTES, EmptyState, Pill, PrimaryButton, TrainCardBox, TrainHeading, TrainNotice, TrainShell, TrainSteps, goTo, replaceTo } from '@/components/trains/TrainFlowUi';
+import { BRAND, TRAIN_ROUTES, EmptyState, Pill, PrimaryButton, TrainBanner, TrainNotice, TrainShell, TrainSteps, goTo, replaceTo } from '@/components/trains/TrainFlowUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { formatLongDate, formatShortDate, inr } from '@/data/trains';
 import { resetTrainBooking, useTrainBooking } from '@/utils/trainBookingStore';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
-import { ImageBackground, Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -50,87 +49,85 @@ export default function TrainConfirmationScreen() {
     <TrainShell onBack={() => replaceTo(TRAIN_ROUTES.results)}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={s.content}>
+          <TrainBanner title={waitlisted ? 'Booking received' : 'Booking confirmed'} text={waitlisted ? 'Your request is on the waiting list. We will update your PNR status.' : 'Your train ticket is booked. Have a safe journey!'} />
           <TrainSteps current={5} />
 
-          <View style={s.bannerWrap}>
-            <ImageBackground source={TRAIN_DONE_BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
-              <View style={s.bannerCopy}>
-                <Text style={s.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>{waitlisted ? 'Booking received' : 'Payment successful'}</Text>
-                <Text style={s.bannerText} numberOfLines={2}>{inr(ticket.fare.total)} paid via {ticket.payment.label}</Text>
-                <View style={s.pnrBox}>
-                  <View>
-                    <Text style={s.pnrLabel}>PNR NUMBER</Text>
-                    <Text style={s.pnr} selectable>{ticket.pnr}</Text>
-                  </View>
-                  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Copy PNR" onPress={() => copy(ticket.pnr)} hitSlop={8}>
-                    <Ionicons name="copy-outline" size={18} color={Colors.onDarkMuted} />
-                  </TouchableOpacity>
-                </View>
+          <View style={s.card}>
+            <View style={s.row}>
+              <View style={s.check}><Ionicons name="checkmark" size={34} color={Colors.white} /></View>
+              <View style={s.flex}>
+                <Text style={s.title}>Payment successful</Text>
+                <Text style={s.text}>{inr(ticket.fare.total)} paid via {ticket.payment.label}. Your e-ticket has been sent to your email.</Text>
               </View>
-            </ImageBackground>
+            </View>
+            <View style={s.refBox}>
+              <View style={s.flex}><Text style={s.refLabel}>PNR NUMBER</Text><Text style={s.ref} selectable numberOfLines={1} adjustsFontSizeToFit>{ticket.pnr}</Text></View>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Copy PNR" onPress={() => copy(ticket.pnr)} hitSlop={10}><Ionicons name="copy-outline" size={22} color={BRAND} /></TouchableOpacity>
+            </View>
           </View>
 
-          <View style={s.ticket}>
-            <View style={s.ticketTop}>
+          <View style={s.card}>
+            <View style={s.row}>
               <View style={s.logo}><Ionicons name="train-outline" size={24} color={BRAND} /></View>
-              <View style={{ flex: 1, minWidth: 0 }}><Text style={s.opName} numberOfLines={1}>{ticket.trainName}</Text><Text style={s.opMeta} numberOfLines={1}>#{ticket.trainNumber} · {ticket.className} · {ticket.quota === 'TQ' ? 'Tatkal' : 'General'}</Text></View>
-              <Pill label={waitlisted ? 'WAITLISTED' : 'CONFIRMED'} tone={waitlisted ? 'warn' : 'good'} icon={waitlisted ? 'time-outline' : 'checkmark-circle'} />
+              <View style={s.flex}><Text style={s.opName} numberOfLines={1}>{ticket.trainName}</Text><Text style={s.opMeta} numberOfLines={1}>#{ticket.trainNumber} · {ticket.className} · {ticket.quota === 'TQ' ? 'Tatkal' : 'General'}</Text></View>
+              {waitlisted
+                ? <Pill label="WAITLISTED" tone="warn" icon="time-outline" />
+                : <View style={s.confirmed}><Ionicons name="checkmark-circle" size={14} color={BRAND} /><Text style={s.confirmedText}>CONFIRMED</Text></View>}
             </View>
             <View style={s.times}>
-              <View style={s.endpoint}><Text style={s.time}>{ticket.departure}</Text><Text style={s.code}>{ticket.fromCode}</Text><Text style={s.station} numberOfLines={2}>{ticket.fromName}</Text><Text style={s.date}>{formatShortDate(ticket.date)}</Text></View>
-              <View style={s.mid}><Text style={s.dur}>{ticket.duration}</Text><View style={s.midLine}><View style={s.dotEnd} /><View style={s.rule} /><Ionicons name="train" size={15} color={BRAND} /><View style={s.rule} /><View style={s.dotEnd} /></View></View>
-              <View style={[s.endpoint, { alignItems: 'flex-end' }]}><Text style={s.time}>{ticket.arrival}</Text><Text style={s.code}>{ticket.toCode}</Text><Text style={[s.station, { textAlign: 'right' }]} numberOfLines={2}>{ticket.toName}</Text><Text style={s.date}>{formatShortDate(ticket.arrivalDate)}</Text></View>
+              <View style={s.endpoint}><Text style={s.dateLabel}>{ticket.fromCode}</Text><Text style={s.time}>{ticket.departure}</Text><Text style={s.station} numberOfLines={2}>{ticket.fromName}</Text><Text style={s.dateSub}>{formatShortDate(ticket.date)}</Text></View>
+              <View style={s.mid}><Text style={s.dur}>{ticket.duration}</Text><View style={s.midLine}><View style={s.rule} /><Ionicons name="train-outline" size={20} color={BRAND} /><View style={s.rule} /></View></View>
+              <View style={[s.endpoint, { alignItems: 'flex-end' }]}><Text style={s.dateLabel}>{ticket.toCode}</Text><Text style={s.time}>{ticket.arrival}</Text><Text style={[s.station, { textAlign: 'right' }]} numberOfLines={2}>{ticket.toName}</Text><Text style={s.dateSub}>{formatShortDate(ticket.arrivalDate)}</Text></View>
             </View>
-            <View style={s.perforation}><View style={[s.notch, { left: -27 }]} /><View style={s.dash} /><View style={[s.notch, { right: -27 }]} /></View>
-            <View style={s.ticketBottom}>
-              <Barcode value={ticket.pnr} />
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Copy booking ID" onPress={() => copy(ticket.bookingId)} style={s.bookingRow} activeOpacity={0.8}>
-                <Text style={s.bookingId} numberOfLines={1}>Booking ID {ticket.bookingId}</Text>
-                <Ionicons name="copy-outline" size={14} color={Colors.textLight} />
+          </View>
+
+          <View style={s.card}>
+            <View style={s.row}><Ionicons name="ticket-outline" size={26} color={BRAND} /><Text style={[s.cardTitle, s.flex]}>Your e-ticket</Text></View>
+            <View style={[s.row, { marginTop: 10, justifyContent: 'space-between' }]}>
+              <View style={[s.flex, { alignItems: 'center', gap: 6 }]}>
+                <Barcode value={ticket.pnr} />
+                <TouchableOpacity accessibilityRole="button" accessibilityLabel="Copy booking ID" onPress={() => copy(ticket.bookingId)} activeOpacity={0.8}><Text style={s.bookingId} numberOfLines={1}>Booking ID {ticket.bookingId}</Text></TouchableOpacity>
+              </View>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download ticket" onPress={share} style={s.download}>
+                <Ionicons name="download-outline" size={20} color={BRAND} /><Text style={s.downloadText}>Download{'\n'}Ticket</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <TrainCardBox>
-            <TrainHeading eyebrow="TRAVELLERS" title="Passengers and berths" />
-            {ticket.passengers.map((p, i) => (
-              <View key={i} style={[s.pax, i > 0 && s.paxBorder]}>
-                <View style={s.avatar}><Text style={s.avatarText}>{p.name.trim().charAt(0).toUpperCase()}</Text></View>
-                <View style={{ flex: 1, minWidth: 0 }}><Text style={s.paxName} numberOfLines={1}>{i + 1}. {p.name}</Text><Text style={s.paxMeta} numberOfLines={2}>{p.age} yrs · {p.gender} · {p.seat}</Text></View>
-                <Pill label={p.status} tone={statusTone(p.status)} />
-              </View>
-            ))}
-          </TrainCardBox>
+          <View style={s.card}>
+            <View style={s.row}><Ionicons name="person-outline" size={26} color={BRAND} /><Text style={[s.cardTitle, s.flex]}>Passengers ({ticket.passengers.length})</Text></View>
+            <View style={s.list}>
+              {ticket.passengers.map((p, i) => (
+                <View key={i} style={[s.pax, i > 0 && s.paxBorder]}>
+                  <View style={s.avatar}><Text style={s.avatarText}>{p.name.trim().charAt(0).toUpperCase()}</Text></View>
+                  <View style={s.flex}><Text style={s.paxName} numberOfLines={1}>{p.name}</Text><Text style={s.paxMeta} numberOfLines={2}>{p.age} yrs · {p.gender} · {p.seat}</Text></View>
+                  <Pill label={p.status} tone={statusTone(p.status)} />
+                </View>
+              ))}
+            </View>
+          </View>
 
-          <TrainCardBox>
-            <TrainHeading eyebrow="PAYMENT" title="Receipt" />
-            <FareSummary fare={ticket.fare} couponCode={ticket.couponCode} />
-            <View style={s.txn}><Text style={s.txnText} numberOfLines={1}>Txn {ticket.txnId}</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</Text></View>
-          </TrainCardBox>
+          <View style={s.card}>
+            <View style={s.row}><Ionicons name="receipt-outline" size={26} color={BRAND} /><Text style={[s.cardTitle, s.flex]}>Payment receipt</Text></View>
+            <View style={{ marginTop: 8 }}><FareSummary fare={ticket.fare} couponCode={ticket.couponCode} /></View>
+            <View style={s.txn}>
+              <View style={s.flex}><Text style={s.txnLabel}>Transaction ID</Text><Text style={s.txnText} numberOfLines={1}>Txn {ticket.txnId}</Text></View>
+              <View><Text style={s.txnLabel}>Paid on</Text><Text style={s.txnText}>{new Date(ticket.bookedAt).toLocaleString(getAppLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })}</Text></View>
+            </View>
+          </View>
 
           <TrainNotice icon="mail-outline" title="E-ticket sent">A confirmation was sent to {ticket.contact.email}. Carry a valid photo ID that matches the passenger names. This is a demo ticket and is not valid for travel.</TrainNotice>
 
           <View style={s.actions}>
             <Action icon="share-social-outline" label="Share" onPress={share} />
             <Action icon="mail-outline" label="Email" onPress={email} />
-            <Action icon="calendar-outline" label="Calendar" onPress={calendar} />
+            <Action icon="calendar-outline" label="Add to calendar" onPress={calendar} />
+            <Action icon="bookmarks-outline" label="My trips" onPress={() => done('/(tabs)/bookings')} />
           </View>
 
           <View style={s.cta}>
-            <TouchableOpacity accessibilityRole="button" onPress={() => done('/(tabs)/bookings')} activeOpacity={0.85} style={s.primary}>
-              <Text style={s.primaryText}>View my trips</Text>
-              <Ionicons name="ticket-outline" size={20} color={BRAND} />
-            </TouchableOpacity>
-            <View style={s.secondaryRow}>
-              <TouchableOpacity accessibilityRole="button" onPress={() => done('/home')} activeOpacity={0.85} style={s.secondary}>
-                <Text style={s.secondaryText} numberOfLines={1}>Back to home</Text>
-                <Ionicons name="home-outline" size={18} color={BRAND} />
-              </TouchableOpacity>
-              <TouchableOpacity accessibilityRole="button" onPress={() => { resetTrainBooking(); goTo(TRAIN_ROUTES.results); }} activeOpacity={0.85} style={s.secondary}>
-                <Text style={s.secondaryText} numberOfLines={1}>Book another train</Text>
-                <Ionicons name="train-outline" size={18} color={BRAND} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity accessibilityRole="button" onPress={() => done('/home')} style={[s.ctaBtn, s.ctaOutline]}><Ionicons name="home-outline" size={20} color={BRAND} /><Text style={s.ctaOutlineText} numberOfLines={1}>Back to home</Text></TouchableOpacity>
+            <TouchableOpacity accessibilityRole="button" onPress={() => { resetTrainBooking(); goTo(TRAIN_ROUTES.results); }} style={[s.ctaBtn, s.ctaSolid, { flex: 1.25 }]}><Text style={s.ctaSolidText} numberOfLines={1}>Book another train</Text><Ionicons name="train-outline" size={20} color={Colors.white} /></TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -148,62 +145,54 @@ function Action({ icon, label, onPress }: { icon: IconName; label: string; onPre
 }
 
 const s = StyleSheet.create({
-  content: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingTop: 14 },
-  bannerWrap: { paddingHorizontal: 16, marginBottom: 14 },
-  banner: { width: '100%', aspectRatio: 2.55, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: BRAND },
-  bannerImage: { borderRadius: 22 },
-  bannerCopy: { marginLeft: '29%', width: '44%' },
-  bannerTitle: { fontFamily: INTER.extrabold, color: Colors.white, fontSize: TextSize.bodyLarge },
-  bannerText: { fontFamily: INTER.regular, color: Colors.onDarkMuted, fontSize: TextSize.micro, marginTop: 2 },
-  pnrBox: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginTop: 8, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, backgroundColor: Colors.onDarkSubtle },
-  pnrLabel: { fontFamily: INTER.semibold, fontSize: 8, letterSpacing: 0.5, color: Colors.onDarkMuted },
-  pnr: { fontFamily: INTER.extrabold, fontSize: TextSize.body, color: Colors.white, letterSpacing: 1.5, marginTop: 1 },
-  ticket: { ...Ui.card, marginHorizontal: 16, marginBottom: 14, padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, overflow: 'visible' },
-  ticketTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  logo: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted },
-  opName: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: BRAND },
-  opMeta: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
-  confirmed: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: '#E3EFE9' },
-  confirmedText: { fontFamily: INTER.bold, fontSize: TextSize.micro, color: Colors.secondary },
-  times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 18 },
-  endpoint: { flex: 1, minWidth: 0 },
-  time: { fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall, color: BRAND },
-  code: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, marginTop: 4 },
-  station: { fontFamily: INTER.regular, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 2 },
-  date: { fontFamily: INTER.regular, fontSize: TextSize.micro, color: Colors.textLight, marginTop: 2 },
-  mid: { width: 84, alignItems: 'center', gap: 5 },
-  dur: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
-  midLine: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'stretch' },
-  rule: { flex: 1, height: 1.5, backgroundColor: Colors.borderStrong },
-  dotEnd: { width: 7, height: 7, borderRadius: 4, backgroundColor: BRAND },
-  perforation: { flexDirection: 'row', alignItems: 'center', marginVertical: 16, height: 20 },
-  dash: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  notch: { position: 'absolute', top: 0, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
-  ticketBottom: { alignItems: 'center', gap: 8 },
-  barcode: { flexDirection: 'row', alignItems: 'center', height: 44, overflow: 'hidden', maxWidth: '100%' },
-  bookingRow: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
-  bookingId: { fontFamily: INTER.semibold, fontSize: TextSize.micro, color: Colors.textLight, flexShrink: 1 },
+  flex: { flex: 1, minWidth: 0 },
+  content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
+  card: { ...Ui.card, marginHorizontal: 10, marginBottom: 12, padding: 14, borderRadius: 22 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  check: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1FA463' },
+  title: { fontFamily: 'Inter-ExtraBold', fontSize: 18, color: Colors.textDark },
+  text: { fontFamily: 'Inter-Regular', fontSize: 12, lineHeight: 17, color: Colors.textLight, marginTop: 4 },
+  refBox: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14, backgroundColor: '#E8F2EE' },
+  refLabel: { fontFamily: 'Inter-ExtraBold', fontSize: 11, letterSpacing: 1.2, color: BRAND },
+  ref: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.textDark, marginTop: 2 },
+  logo: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
+  opName: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.textDark },
+  opMeta: { fontFamily: 'Inter-Regular', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  confirmed: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, backgroundColor: '#E3F0EA' },
+  confirmedText: { fontFamily: 'Inter-ExtraBold', fontSize: 10, color: BRAND },
+  times: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginTop: 14, padding: 12, borderRadius: 14, backgroundColor: '#F1F6F3' },
+  endpoint: { maxWidth: '36%' },
+  dateLabel: { fontFamily: 'Inter-ExtraBold', fontSize: 11, letterSpacing: 1.2, color: BRAND },
+  time: { fontFamily: 'Inter-ExtraBold', fontSize: 18, color: Colors.textDark, marginTop: 2 },
+  station: { fontFamily: 'Inter-SemiBold', fontSize: 12, color: Colors.textDark, marginTop: 2 },
+  dateSub: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textLight, marginTop: 1 },
+  mid: { flex: 1, alignItems: 'center', gap: 4 },
+  dur: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textLight },
+  midLine: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'stretch' },
+  rule: { flex: 1, height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong },
+  cardTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 16, color: Colors.textDark },
+  barcode: { flexDirection: 'row', alignItems: 'center', height: 50, overflow: 'hidden', maxWidth: '100%' },
+  bookingId: { fontFamily: 'Inter-SemiBold', fontSize: 11, color: Colors.textDark },
+  download: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 16, backgroundColor: '#E3F0EA' },
+  downloadText: { fontFamily: 'Inter-ExtraBold', fontSize: 12, lineHeight: 16, color: BRAND },
+  list: { marginTop: 8, marginLeft: 38 },
   pax: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
-  point: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
-  pointIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted },
-  pointTime: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: BRAND },
   paxBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent },
-  avatarText: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: BRAND },
-  paxName: { fontFamily: INTER.bold, fontSize: TextSize.body, color: BRAND },
-  paxMeta: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },
-  txn: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, marginTop: 10 },
-  txnText: { fontFamily: INTER.regular, fontSize: TextSize.micro, color: Colors.textLight, flexShrink: 1 },
-  actions: { flexDirection: 'row', gap: 10, marginHorizontal: 16, marginBottom: 14 },
-  action: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: 12, borderRadius: 18, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  actionIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FDF3C4' },
-  actionLabel: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND },
-  cta: { marginHorizontal: 16, gap: 10 },
-  primary: { height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: 27, backgroundColor: Colors.accent },
-  primaryText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: BRAND },
-  secondaryRow: { flexDirection: 'row', gap: 10 },
-  secondary: { flex: 1, height: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 10, borderRadius: 24, backgroundColor: Colors.surfaceMuted },
-  secondaryText: { fontFamily: INTER.semibold, fontSize: TextSize.caption, color: BRAND, flexShrink: 1 },
+  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#4E8F78' },
+  avatarText: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: Colors.white },
+  paxName: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: Colors.textDark },
+  paxMeta: { fontFamily: 'Inter-Regular', fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  txn: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, marginTop: 12 },
+  txnLabel: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textLight },
+  txnText: { fontFamily: 'Inter-Regular', fontSize: 11, color: Colors.textDark, marginTop: 2 },
+  actions: { flexDirection: 'row', gap: 8, marginHorizontal: 10, marginBottom: 14 },
+  action: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, paddingHorizontal: 4, borderRadius: 16, backgroundColor: '#E8F2EE' },
+  actionIcon: { alignItems: 'center', justifyContent: 'center' },
+  actionLabel: { fontFamily: 'Inter-ExtraBold', fontSize: 11, color: Colors.textDark, textAlign: 'center' },
+  cta: { flexDirection: 'row', gap: 10, marginHorizontal: 10 },
+  ctaBtn: { flex: 1, minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 12, borderRadius: 25 },
+  ctaOutline: { borderWidth: 1.5, borderColor: BRAND, backgroundColor: Colors.surface },
+  ctaOutlineText: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: BRAND },
+  ctaSolid: { backgroundColor: BRAND },
+  ctaSolidText: { fontFamily: 'Inter-ExtraBold', fontSize: 14, color: Colors.white },
 });
-
-

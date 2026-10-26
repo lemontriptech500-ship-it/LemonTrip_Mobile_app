@@ -67,7 +67,7 @@ export default function FlightCard({ offer, onSelect, best = false, dateLabel }:
 
 const s = StyleSheet.create({
   card: { ...Ui.card, padding: 14, marginBottom: 12 },
-  cardBest: { borderColor: Colors.accent, borderWidth: 1.5 },
+  cardBest: { borderColor: '#103D30', borderWidth: 1.5 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   name: { fontFamily: 'Inter-Bold', fontSize: TextSize.bodyLarge, color: Colors.textDark },
   number: { fontFamily: 'Inter-Regular', fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2 },

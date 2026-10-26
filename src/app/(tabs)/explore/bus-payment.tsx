@@ -107,6 +107,6 @@ const s = StyleSheet.create({
   couponMsg: { fontFamily: INTER.semibold, fontSize: TextSize.caption, marginTop: 10 },
   suggest: { gap: 8, marginTop: 12 },
   suggestChip: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: Colors.borderStrong },
-  suggestCode: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, backgroundColor: '#FDF3C4', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  suggestCode: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: BRAND, backgroundColor: '#E3F0EA', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   suggestLabel: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight },
 });

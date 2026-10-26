@@ -5,12 +5,13 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
-import { Card, Chip, EmptyState, Pill, PrimaryButton } from '@/components/trains/TrainUi';
+import { Card, Pill, PrimaryButton } from '@/components/trains/TrainUi';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
 import { formatDate, normalizeStatus, serviceIcon, shortId, statusStyles } from '@/utils/bookingFormat';
 import { useBookings } from '@/utils/bookingStore';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
@@ -100,34 +101,23 @@ export default function BookingsScreen() {
       >
         <View style={styles.content}>
           <View style={styles.bannerWrap}>
-            <ImageBackground source={require('../../../assets/images/Tropical Travel Essentials in Green.png')} style={styles.tripBanner} imageStyle={styles.tripBannerImage} resizeMode="cover">
+            {/* <ImageBackground source={require('../../../assets/images/image1.png')} style={styles.tripBanner} imageStyle={styles.tripBannerImage} resizeMode="cover">
+              <LinearGradient pointerEvents="none" colors={['rgba(12,48,38,0.34)', 'rgba(12,48,38,0.18)', 'rgba(12,48,38,0.04)']} locations={[0, 0.55, 1]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} />
               <View style={styles.tripBannerCopy}>
                 <Text style={styles.bannerEyebrow}>YOUR JOURNEYS</Text>
                 <Text style={styles.bannerTitle} numberOfLines={1} adjustsFontSizeToFit>My Trips</Text>
                 <Text style={styles.bannerSub}>Every detail of your journey, in one place.</Text>
               </View>
-            </ImageBackground>
+            </ImageBackground> */}
           </View>
 
-          {/* Widget banner */}
-          <View style={styles.widgetWrap}>
-          <ImageBackground source={require('../../../assets/images/Minimal Travel App Phone Mockup.png')} style={styles.widgetCard} imageStyle={styles.widgetCardImage} resizeMode="cover">
-            <View style={styles.widgetCopy}>
-              <Text style={styles.widgetTitle}>Upcoming Trip Widget</Text>
-              <Text style={styles.widgetSub}>See your next trip right on your Home Screen.</Text>
-              <TouchableOpacity accessibilityRole="button" disabled={addingWidget} onPress={handleAddWidget} style={styles.addBtn}>
-                <Text style={styles.addBtnText}>{addingWidget ? 'Please wait...' : 'Add widget'}</Text>
-                <Ionicons name="arrow-forward" size={16} color={Colors.primaryDark} />
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-          </View>
+    
 
           {bookings.length > 0 ? (
             <>
               {/* Transactions entry */}
               <TouchableOpacity accessibilityRole="button" activeOpacity={0.9} onPress={() => router.push('/transactions' as never)}>
-                <Card style={styles.rowCard}>
+                <Card style={[styles.cardBase, styles.rowCard]}>
                   <View style={styles.iconBox}>
                     <Ionicons name="receipt-outline" size={22} color={Colors.primary} />
                   </View>
@@ -139,15 +129,20 @@ export default function BookingsScreen() {
                 </Card>
               </TouchableOpacity>
 
+              
+
               {/* Status tabs */}
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRow}>
                 {statusTabs.map((tab) => (
-                  <Chip
+                  <TouchableOpacity
                     key={tab.key}
-                    label={tab.label + ' (' + counts[tab.key] + ')'}
-                    selected={activeTab === tab.key}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: activeTab === tab.key }}
                     onPress={() => setActiveTab(tab.key)}
-                  />
+                    style={[styles.tabChip, activeTab === tab.key && styles.tabChipOn]}
+                  >
+                    <Text style={[styles.tabChipText, activeTab === tab.key && styles.tabChipTextOn]}>{tab.label + ' (' + counts[tab.key] + ')'}</Text>
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
 
@@ -164,7 +159,7 @@ export default function BookingsScreen() {
                       activeOpacity={0.9}
                       onPress={() => router.push(('/booking/' + booking.id) as never)}
                     >
-                      <Card>
+                      <Card style={styles.cardBase}>
                         <View style={styles.top}>
                           <View style={styles.iconBox}>
                             <Ionicons name={serviceIcon(booking.serviceName)} size={22} color={Colors.primary} />
@@ -203,12 +198,12 @@ export default function BookingsScreen() {
                   );
                 })
               ) : (
-                <EmptyState
-                  icon="filter-outline"
-                  title={'No ' + activeTab + ' bookings'}
-                  text="Try another tab to see your other trips."
-                  action={<PrimaryButton label="Show all" variant="soft" onPress={() => setActiveTab('all')} />}
-                />
+                <View style={styles.filterEmpty}>
+                  <View style={styles.emptyIcon}><Ionicons name="filter-outline" size={26} color={Colors.primaryDark} /></View>
+                  <Text style={styles.emptyTitle}>{'No ' + activeTab + ' bookings'}</Text>
+                  <Text style={styles.emptyText}>Try another tab to see your other trips.</Text>
+                  <PrimaryButton label="Show all" variant="soft" onPress={() => setActiveTab('all')} />
+                </View>
               )}
             </>
           ) : (
@@ -223,6 +218,19 @@ export default function BookingsScreen() {
             </View>
           )}
 
+    {/* Widget banner */}
+    <View style={styles.widgetWrap}>
+          <ImageBackground source={require('../../../assets/images/Mediterranean Travel App Escape.png')} style={styles.widgetCard} imageStyle={styles.widgetCardImage} resizeMode="cover">
+            <View style={styles.widgetCopy}>
+              <Text style={styles.widgetTitle}>Upcoming Trip Widget</Text>
+              <Text style={styles.widgetSub}>See your next trip right on your Home Screen.</Text>
+              <TouchableOpacity accessibilityRole="button" disabled={addingWidget} onPress={handleAddWidget} style={styles.addBtn}>
+                <Text style={styles.addBtnText}>{addingWidget ? 'Please wait...' : 'Add widget'}</Text>
+                <Ionicons name="arrow-forward" size={16} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
+          </ImageBackground>
+          </View>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickCard}>
             {QUICK_ACTIONS.map((a) => (
@@ -247,59 +255,65 @@ export default function BookingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.2, color: Colors.accent, marginBottom: 4 },
-  bannerTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.displaySmall, color: Colors.white },
-  bannerSub: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 18, color: Colors.onDarkMuted, marginTop: 4 },
-  bannerWrap: { paddingHorizontal: Ui.space.page, marginTop: 14, marginBottom: 16 },
-  tripBanner: { width: '100%', aspectRatio: 2.3, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
-  tripBannerImage: { borderRadius: 22 },
+  bannerEyebrow: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.2, color: 'white', marginBottom: 4 },
+  bannerTitle: { fontFamily: INTER.extrabold, fontSize: 22, color: Colors.white },
+  bannerSub: { fontFamily: INTER.regular, fontSize: 11, lineHeight: 16, color: Colors.white, marginTop: 4 },
+  bannerWrap: { paddingHorizontal: 10, marginTop: 14, marginBottom: 16 },
+  tripBanner: { width: '100%', aspectRatio: 2.3, borderRadius: 24, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#103D30' },
+  tripBannerImage: { borderRadius: 24 },
   tripBannerCopy: { width: '62%', paddingLeft: 18 },
-  widgetWrap: { paddingHorizontal: Ui.space.page, marginBottom: Ui.space.section },
-  widgetCard: { width: '100%', aspectRatio: 2.2, borderRadius: 22, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#FFF4C2' },
-  widgetCardImage: { borderRadius: 22 },
+  widgetWrap: { paddingHorizontal: 10, marginBottom: Ui.space.section },
+  widgetCard: { width: '100%', aspectRatio: 2.2, borderRadius: 24, overflow: 'hidden', justifyContent: 'center', backgroundColor: '#DCEBE5' },
+  widgetCardImage: { borderRadius: 24 },
   widgetCopy: { width: '58%', paddingLeft: 18 },
-  widgetTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, lineHeight: 22, color: Colors.primaryDark },
-  widgetSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, color: Colors.textDark, marginTop: 4 },
-  addBtn: { alignSelf: 'flex-start', marginTop: 12, minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.accent },
-  addBtnText: { fontFamily: INTER.bold, fontSize: TextSize.caption, color: Colors.primaryDark },
-  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingHorizontal: Ui.space.page },
+  widgetTitle: { fontFamily: INTER.extrabold, fontSize: 14, lineHeight: 19, color: Colors.primaryDark },
+  widgetSub: { fontFamily: INTER.regular, fontSize: 11, lineHeight: 16, color: Colors.textDark, marginTop: 4 },
+  addBtn: { alignSelf: 'flex-start', marginTop: 12, minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.primary },
+  addBtnText: { fontFamily: INTER.bold, fontSize: 12, color: Colors.white },
+  topBar: { backgroundColor: Colors.surface, paddingVertical: 8, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 16 },
   topBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   topBtnTint: { backgroundColor: Colors.successSoft },
   topTitle: { flex: 1, fontFamily: INTER.bold, fontSize: TextSize.title, color: '#103D30' },
-  emptyCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, alignItems: 'center', padding: 18, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  emptyIcon: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF1A8' },
-  emptyTitle: { fontFamily: INTER.bold, fontSize: TextSize.title, color: Colors.primaryDark, textAlign: 'center', marginTop: 12 },
-  emptyText: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, color: Colors.textLight, textAlign: 'center', marginTop: 6 },
-  emptyBtn: { alignSelf: 'stretch', minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, borderRadius: 25, backgroundColor: '#103D30' },
-  emptyBtnText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.white },
-  sectionTitle: { fontFamily: INTER.bold, fontSize: TextSize.heading, color: Colors.primaryDark, marginHorizontal: Ui.space.page, marginTop: 8, marginBottom: 10 },
-  quickCard: { marginHorizontal: Ui.space.page, marginBottom: Ui.space.section, flexDirection: 'row', gap: 8, padding: 10, borderRadius: 24, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
+  emptyCard: { ...Ui.card, marginHorizontal: 10, marginBottom: Ui.space.section, alignItems: 'center', padding: 18, borderRadius: 24 },
+  filterEmpty: { ...Ui.card, marginHorizontal: 10, alignItems: 'center', gap: 6, padding: 18, borderRadius: 24 },
+  cardBase: { marginHorizontal: 10, borderRadius: 22 },
+  emptyIcon: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
+  emptyTitle: { fontFamily: INTER.bold, fontSize: 16, color: Colors.primaryDark, textAlign: 'center', marginTop: 12 },
+  emptyText: { fontFamily: INTER.regular, fontSize: 12, lineHeight: 17, color: Colors.textLight, textAlign: 'center', marginTop: 6 },
+  emptyBtn: { alignSelf: 'stretch', minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, borderRadius: 16, backgroundColor: '#103D30' },
+  emptyBtnText: { fontFamily: INTER.bold, fontSize: 13, color: Colors.white },
+  sectionTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: Colors.primaryDark, marginHorizontal: 14, marginTop: 8, marginBottom: 10 },
+  quickCard: { ...Ui.card, marginHorizontal: 10, marginBottom: Ui.space.section, flexDirection: 'row', gap: 8, padding: 10, borderRadius: 22 },
   quickItem: { flex: 1, alignItems: 'center', gap: 8, paddingVertical: 12, borderRadius: 16, backgroundColor: Colors.surfaceMuted },
-  quickIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
-  quickLabel: { fontFamily: INTER.medium, fontSize: TextSize.caption, color: Colors.textDark, textAlign: 'center' },
-  helpCard: { marginHorizontal: Ui.space.page, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
+  quickIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
+  quickLabel: { fontFamily: INTER.medium, fontSize: 11, color: Colors.textDark, textAlign: 'center' },
+  helpCard: { marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
   helpIcon: { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.successSoft },
-  helpTitle: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.primaryDark },
-  helpSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  helpTitle: { fontFamily: INTER.bold, fontSize: 14, color: Colors.primaryDark },
+  helpSub: { fontFamily: INTER.regular, fontSize: 11, lineHeight: 16, color: Colors.textLight, marginTop: 2 },
   scroll: { paddingBottom: 32 },
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   flex: { flex: 1, minWidth: 0 },
   rowCard: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBox: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft },
-  cardTitle: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: Colors.textDark },
-  cardSub: { fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
+  iconBox: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E3F0EA' },
+  cardTitle: { fontFamily: INTER.extrabold, fontSize: 14, color: Colors.textDark },
+  cardSub: { fontFamily: INTER.regular, fontSize: 11, lineHeight: 16, color: Colors.textLight, marginTop: 2 },
   widgetBtn: { alignSelf: 'flex-start', marginTop: 10 },
-  tabRow: { paddingHorizontal: Ui.space.page, gap: 8, paddingBottom: 14 },
+  tabChip: { minHeight: 34, justifyContent: 'center', paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: Colors.borderStrong, backgroundColor: Colors.surface },
+  tabChipOn: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  tabChipText: { fontFamily: INTER.semibold, fontSize: 12, color: Colors.textDark },
+  tabChipTextOn: { color: Colors.white },
+  tabRow: { paddingHorizontal: 10, gap: 8, paddingBottom: 14 },
   top: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   eyebrow: { ...Ui.eyebrow, color: Colors.secondary },
-  itemName: { fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, color: Colors.textDark, marginTop: 3 },
+  itemName: { fontFamily: INTER.extrabold, fontSize: 14, color: Colors.textDark, marginTop: 3 },
   destRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  destText: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, flexShrink: 1 },
+  destText: { fontFamily: INTER.regular, fontSize: 11, color: Colors.textLight, flexShrink: 1 },
   divider: { height: 0, borderTopWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.borderStrong, marginVertical: 14 },
   bottom: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 10 },
-  label: { fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1.1, color: Colors.textLight, marginBottom: 4 },
-  value: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.textDark },
+  label: { fontFamily: INTER.extrabold, fontSize: 10, letterSpacing: 1.1, color: Colors.textLight, marginBottom: 4 },
+  value: { fontFamily: INTER.bold, fontSize: 12, color: Colors.textDark },
   right: { alignItems: 'flex-end' },
-  price: { fontFamily: INTER.extrabold, fontSize: TextSize.title, color: Colors.primaryDark },
+  price: { fontFamily: INTER.extrabold, fontSize: 15, color: Colors.primaryDark },
   noticeGap: { marginTop: 4 },
 });
