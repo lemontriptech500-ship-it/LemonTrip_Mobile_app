@@ -113,7 +113,7 @@ const s = StyleSheet.create({
   flex: { flex: 1, minWidth: 0 },
   divider: { borderBottomWidth: 1, borderBottomColor: Colors.border },
   settingsCard: { marginHorizontal: 16, marginBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  squareIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.accentSoft },
+  squareIcon: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 16, backgroundColor: Colors.surfaceMuted },
   rowTitle: { fontFamily: INTER.bold, color: Colors.textDark, fontSize: TextSize.body },
   rowDetail: { fontFamily: INTER.regular, color: Colors.textLight, fontSize: TextSize.caption, lineHeight: 17, marginTop: 2 },
 
@@ -123,7 +123,7 @@ const s = StyleSheet.create({
   trip: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
 
   empty: { marginHorizontal: 16, alignItems: 'center', padding: 24, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  emptyIcon: { width: 76, height: 76, alignItems: 'center', justifyContent: 'center', borderRadius: 38, backgroundColor: Colors.accentSoft },
+  emptyIcon: { width: 76, height: 76, alignItems: 'center', justifyContent: 'center', borderRadius: 38, backgroundColor: Colors.surfaceMuted },
   emptyTitle: { marginTop: 14, color: BRAND, fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge, textAlign: 'center' },
   emptyText: { marginTop: 6, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 18, textAlign: 'center' },
 
