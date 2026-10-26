@@ -155,14 +155,15 @@ export default function ExploreScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+          <View style={styles.heroWrap}>
           <View style={styles.hero}>
             <Image source={require('../../../../assets/images/explore-hero.webp')} resizeMode="cover" style={styles.heroImg} />
           <View pointerEvents="none" style={styles.heroShade} />
             <View style={styles.heroCopy}>
-              <Text style={styles.heroEyebrow}>DESTINATION DISCOVERY</Text>
-              <Text style={styles.heroTitle}>Discover somewhere new.</Text>
-              <Text style={styles.heroSub}>Search by place, then narrow your journey by travel style.</Text>
+              <Text style={styles.heroScript}>Explore</Text>
+              <Text style={styles.heroTagline}>the world your way</Text>
             </View>
+          </View>
           </View>
 
           {/* Destination discovery search and filters */}
@@ -449,14 +450,14 @@ const styles = StyleSheet.create({
   pageContent: { paddingBottom: 28 },
   pageWidth: { width: '100%', maxWidth: 1380, alignSelf: 'center' },
 
-  // Hero
-  hero: { width: '100%', aspectRatio: 1.8, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
-  heroImg: { position: 'absolute', left: 0, bottom: 0, width: '100%', height: '135%' },
-  heroShade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' },
-  heroCopy: { width: '62%', paddingLeft: 16 },
-  heroEyebrow: { fontFamily: 'Inter-ExtraBold', fontSize: 8, letterSpacing: 0.8, color: '#FFFFFF' },
-  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 4 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: 10.5, lineHeight: 14, color: '#FFFFFF', marginTop: 4 },
+  // Hero: rounded photo card, script title top-left, search card overlapping the bottom edge
+  heroWrap: { paddingHorizontal: 10, paddingTop: 10 },
+  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 14 },
+  heroImg: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' },
+  heroShade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.10)' },
+  heroCopy: { paddingLeft: 18 },
+  heroScript: { fontFamily: 'Italianno', fontSize: 58, lineHeight: 60, color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 8, textShadowOffset: { width: 0, height: 2 } },
+  heroTagline: { fontFamily: 'Inter-SemiBold', fontSize: 16, lineHeight: 20, color: '#FFFFFF', marginLeft: 38, marginTop: -6, textShadowColor: 'rgba(0,0,0,0.4)', textShadowRadius: 6, textShadowOffset: { width: 0, height: 1 } },
 
   // Search
   popularHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Ui.space.page, marginTop: 18, marginBottom: 10 },
@@ -472,7 +473,7 @@ const styles = StyleSheet.create({
   tabItemActive: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: TextSize.body, color: Colors.textDark },
   tabTextActive: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
-  searchStrip: { ...Ui.card, marginHorizontal: 10, marginTop: -52, padding: 10, borderRadius: 18, zIndex: 5, ...SHADOW },
+  searchStrip: { ...Ui.card, marginHorizontal: 10, marginTop: -98, padding: 10, borderRadius: 18, zIndex: 5, ...SHADOW },
   searchPill: { minHeight: 46, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 23, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchText: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, paddingVertical: 8 },
   clearSearch: { padding: 4 },

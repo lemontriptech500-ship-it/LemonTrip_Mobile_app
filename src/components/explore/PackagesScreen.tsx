@@ -45,14 +45,15 @@ export default function PackagesListScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+          <View style={s.heroWrap}>
           <View style={s.hero}>
             <Image source={require('../../../assets/images/Tropical Overwater Paradise at Sunset.png')} resizeMode="cover" style={s.heroImg} />
-            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' }} />
+            <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.10)' }} />
             <View style={s.heroCopy}>
-              <Text style={s.heroEyebrow}>HOLIDAY PACKAGES</Text>
-              <Text style={s.heroTitle}>Unforgettable Journeys Await</Text>
-              <Text style={s.heroSub}>Curated holiday packages for every kind of traveller.</Text>
+              <Text style={s.heroScript}>Packages</Text>
+              <Text style={s.heroTagline}>unforgettable journeys await</Text>
             </View>
+          </View>
           </View>
           <View style={s.searchCard}>
             <View style={s.searchPill}>
@@ -143,18 +144,18 @@ const s = StyleSheet.create({
   content: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   pad: { paddingHorizontal: 10, marginTop: 18 },
   tabsScroll: { backgroundColor: Colors.surface, flexGrow: 0 },
-  hero: { width: '100%', aspectRatio: 1.8, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'center', paddingTop: 14, paddingBottom: 30 },
-  heroImg: { position: 'absolute', left: 0, bottom: 0, width: '100%', height: '135%' },
-  heroCopy: { width: '62%', paddingLeft: 16 },
-  heroEyebrow: { fontFamily: 'Inter-SemiBold', fontSize: 9, letterSpacing: 1.6, color: '#FFFFFF' },
-  heroTitle: { fontFamily: 'Inter-ExtraBold', fontSize: 24, lineHeight: 27, color: '#FFFFFF', marginTop: 6 },
-  heroSub: { fontFamily: 'Inter-Regular', fontSize: 11, lineHeight: 15, color: '#FFFFFF', marginTop: 6 },
+  heroWrap: { paddingHorizontal: 10, paddingTop: 10 },
+  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 14 },
+  heroImg: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' },
+  heroCopy: { paddingLeft: 18 },
+  heroScript: { fontFamily: 'Italianno', fontSize: 58, lineHeight: 60, color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 8, textShadowOffset: { width: 0, height: 2 } },
+  heroTagline: { fontFamily: 'Inter-SemiBold', fontSize: 16, lineHeight: 20, color: '#FFFFFF', marginLeft: 38, marginTop: -6, textShadowColor: 'rgba(0,0,0,0.4)', textShadowRadius: 6, textShadowOffset: { width: 0, height: 1 } },
   tabsRow: { gap: 24, paddingHorizontal: 16 },
   tab: { minHeight: 40, justifyContent: 'center', borderBottomWidth: 3, borderBottomColor: 'transparent' },
   tabOn: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: GREEN },
-  searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -52, padding: 8, borderRadius: 22 },
+  searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -78, padding: 8, borderRadius: 22 },
   searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 14, paddingVertical: 10 },
   filterBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: GREEN },
