@@ -3,6 +3,7 @@ import { TouchableOpacity } from '@/components/ui/Pressable';
 import { TextSize } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
+import { InfoBanner } from '@/components/account/InfoBanner';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
@@ -75,6 +76,8 @@ export function PersonalInformationScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 28 }}>
         <View style={s.content}>
+          <InfoBanner title="Your personal details" text="Keep your contact details up to date." />
+          {/* Banner hidden (commented, not deleted)
           <View style={s.bannerWrap}>
             <ImageBackground source={BANNER} style={s.banner} imageStyle={s.bannerImage} resizeMode="cover">
               <View style={s.bannerCopy}>
@@ -84,6 +87,7 @@ export function PersonalInformationScreen() {
               </View>
             </ImageBackground>
           </View>
+          */}
 
           <View style={s.card}>
             <Text style={s.cardEyebrow}>YOUR PROFILE</Text>
