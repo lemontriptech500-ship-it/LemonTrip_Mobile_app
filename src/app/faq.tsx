@@ -36,7 +36,7 @@ export default function FaqScreen() {
     <SupportPage
       title="FAQ"
       subtitle="Answers to the questions we hear most."
-      eyebrow="LEMONTRIP / SUPPORT"
+      promo={{ title: 'Frequently asked questions', text: 'Answers to the questions we hear most.' }} eyebrow="LEMONTRIP / SUPPORT"
       onBack={back}
       hero={{ image: require('../../assets/images/Green Travel Help Banner.png'), topTitle: 'FAQ', onSettings: () => goTo('/settings') }}
       footer={<SupportButton variant="dark" label="Contact support" icon="mail-open-outline" onPress={() => goTo('/contact')} />}>

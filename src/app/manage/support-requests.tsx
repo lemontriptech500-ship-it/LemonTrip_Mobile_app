@@ -63,7 +63,7 @@ export default function SupportRequestsScreen() {
     <SupportPage
       title="My support requests"
       subtitle="Follow every request and its updates."
-      eyebrow="LEMONTRIP / SUPPORT"
+      promo={{ title: 'Your support requests', text: 'Follow the progress of every request.' }} eyebrow="LEMONTRIP / SUPPORT"
       onBack={() => goBackOr('/help')}
       hero={{ image: require('../../../assets/images/Emerald Customer Support Headset Banner.png'), topTitle: 'My support requests', onSettings: () => router.push('/settings' as never) }}
       footer={<SupportButton variant="dark" label="Contact support" icon="mail-open-outline" onPress={() => router.push('/contact')} />}>
