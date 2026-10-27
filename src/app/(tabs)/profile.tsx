@@ -136,7 +136,7 @@ export default function ProfileScreen() {
 
           {user ? (
             <TouchableOpacity accessibilityRole="button" onPress={confirmLogout} style={styles.logoutButton} activeOpacity={0.8}>
-              <Ionicons name="log-out-outline" size={20} color={BRAND} />
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
               <Text style={styles.logoutText}>Log out</Text>
             </TouchableOpacity>
           ) : null}
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   rowTitle: { color: Colors.textDark, fontFamily: INTER.semibold, fontSize: 15 },
   rowDetail: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 16, marginTop: 2 },
 
-  logoutButton: { minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 20, borderRadius: 16, borderWidth: 1.5, borderColor: BRAND, backgroundColor: Colors.surface },
-  logoutText: { color: BRAND, fontFamily: INTER.extrabold, fontSize: 14 },
+  logoutButton: { minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 20, borderRadius: 16, borderWidth: 1.5, borderColor: Colors.error, backgroundColor: Colors.surface },
+  logoutText: { color: Colors.error, fontFamily: INTER.extrabold, fontSize: 14 },
   footer: { marginTop: 20, color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, textAlign: 'center' },
 });
