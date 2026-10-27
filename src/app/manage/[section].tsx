@@ -97,7 +97,7 @@ export default function ManageScreen() {
           <SupportCard>
             <SupportHeading eyebrow="ON THIS DEVICE" title="Saved travellers" />
             {travellerStore.items.map((item, index) => (
-              <SupportItem
+              <SupportItem tone="mint"
                 key={item.id}
                 icon="person-outline"
                 title={`${item.firstName} ${item.lastName}`}
@@ -139,12 +139,12 @@ export default function ManageScreen() {
         <SupportCard>
           <SupportHeading eyebrow="TRAVEL SERVICES" title="Choose a service" />
           {visibleServices.map((service, index) => (
-            <SupportItem key={service.title} icon={service.icon} title={service.title} detail={service.description} last={index === visibleServices.length - 1} onPress={() => router.push(service.route)} />
+            <SupportItem tone="mint" key={service.title} icon={service.icon} title={service.title} detail={service.description} last={index === visibleServices.length - 1} onPress={() => router.push(service.route)} />
           ))}
           {!visibleServices.length ? <Text style={s.body}>No matching service. Try another search.</Text> : null}
         </SupportCard>
         <SupportCard>
-          <SupportItem icon="bookmark-outline" title="Saved searches" detail="Repeat a search in one tap" onPress={() => goTo('/manage/saved-searches')} last />
+          <SupportItem tone="mint" icon="bookmark-outline" title="Saved searches" detail="Repeat a search in one tap" onPress={() => goTo('/manage/saved-searches')} last />
         </SupportCard>
       </>
     );
@@ -152,13 +152,13 @@ export default function ManageScreen() {
     content = (
       <>
         <SupportCard>
-          <SupportItem icon="options-outline" title="Notification settings" detail="Choose which updates you receive" onPress={() => goTo('/manage/notification-settings')} last />
+          <SupportItem tone="mint" icon="options-outline" title="Notification settings" detail="Choose which updates you receive" onPress={() => goTo('/manage/notification-settings')} last />
         </SupportCard>
         {bookings.length ? (
           <SupportCard>
             <SupportHeading eyebrow="YOUR TRIPS" title="Trip updates" />
             {bookings.map((booking, index) => (
-              <SupportItem key={booking.id} icon="airplane-outline" title={booking.itemName} detail={`${booking.status ?? 'Booking update'} · ${booking.tripDate ?? booking.bookedAt}`} last={index === bookings.length - 1} onPress={() => router.push({ pathname: '/booking/[id]', params: { id: booking.id } })} />
+              <SupportItem tone="mint" key={booking.id} icon="airplane-outline" title={booking.itemName} detail={`${booking.status ?? 'Booking update'} · ${booking.tripDate ?? booking.bookedAt}`} last={index === bookings.length - 1} onPress={() => router.push({ pathname: '/booking/[id]', params: { id: booking.id } })} />
             ))}
           </SupportCard>
         ) : (
@@ -172,7 +172,7 @@ export default function ManageScreen() {
         <SupportCard>
           <SupportHeading eyebrow="STAY INFORMED" title="Choose your updates" />
           {(Object.keys(updates) as (keyof typeof updates)[]).map((key, index, all) => (
-            <SupportItem
+            <SupportItem tone="mint"
               key={key}
               icon={updateLabels[key].icon}
               title={updateLabels[key].title}
@@ -194,7 +194,7 @@ export default function ManageScreen() {
           {optionList.map((option, index) => {
             const selected = option === selectedOption;
             return (
-              <SupportItem
+              <SupportItem tone="mint"
                 key={option}
                 icon={section === 'language' ? 'language-outline' : 'cash-outline'}
                 title={option}
@@ -224,8 +224,8 @@ export default function ManageScreen() {
         </SupportCard>
         <SupportNotice icon="shield-checkmark-outline">{!user ? 'Sign in to manage your account.' : 'Email and phone are used for booking updates. To change them, contact support so we can verify the change.'}</SupportNotice>
         <SupportCard>
-          <SupportItem icon="key-outline" title="Change password" detail="Update your sign-in password" onPress={() => goTo('/change-password')} />
-          <SupportItem icon="headset-outline" title="Account support" detail="Need help changing your details?" onPress={() => goTo('/contact')} last />
+          <SupportItem tone="mint" icon="key-outline" title="Change password" detail="Update your sign-in password" onPress={() => goTo('/change-password')} />
+          <SupportItem tone="mint" icon="headset-outline" title="Account support" detail="Need help changing your details?" onPress={() => goTo('/contact')} last />
         </SupportCard>
       </>
     );  } else if (section === 'personal-information') {
@@ -245,9 +245,9 @@ export default function ManageScreen() {
       <>
         <SupportCard>
           <SupportHeading eyebrow="PROTECT" title="Keep your account close" />
-          <SupportItem icon="phone-portrait-outline" title="Phone verification / OTP sign-in" detail="Sign in with a one-time SMS code" onPress={() => router.push({ pathname: '/login', params: { mode: 'phone' } })} />
-          <SupportItem icon="key-outline" title="Password recovery" detail="Help accessing your account" onPress={() => goTo('/forgot-password')} />
-          <SupportItem icon="shield-checkmark-outline" title="Privacy policy" onPress={() => goTo('/privacy')} last />
+          <SupportItem tone="mint" icon="phone-portrait-outline" title="Phone verification / OTP sign-in" detail="Sign in with a one-time SMS code" onPress={() => router.push({ pathname: '/login', params: { mode: 'phone' } })} />
+          <SupportItem tone="mint" icon="key-outline" title="Password recovery" detail="Help accessing your account" onPress={() => goTo('/forgot-password')} />
+          <SupportItem tone="mint" icon="shield-checkmark-outline" title="Privacy policy" onPress={() => goTo('/privacy')} last />
         </SupportCard>
         <SupportNotice icon="shield-checkmark-outline">Your authentication and verification use the existing LemonTrip account service. Never share an OTP.</SupportNotice>
       </>

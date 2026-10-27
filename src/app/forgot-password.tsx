@@ -1,6 +1,6 @@
 import { useAppLanguage } from '@/utils/intl';
-import { SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
-import { Field, Notice, PrimaryButton } from '@/components/trains/TrainUi';
+import { SupportButton, SupportCard, SupportHeading, SupportItem, SupportNotice, SupportPage, goTo } from '@/components/support/SupportKit';
+import { Field, Notice } from '@/components/trains/TrainUi';
 import { Text } from '@/components/ui/Text';
 import { Colors } from '@/constants/colors';
 import { Ui } from '@/constants/theme';
@@ -43,8 +43,9 @@ export default function AccountRecoveryScreen() {
       title="Let's get you back in."
       subtitle="Reset your LemonTrip password by email."
       eyebrow="ACCOUNT RECOVERY"
-      onBack={() => router.replace('/login')}
+      onBack={() => router.replace('/login')} promo={{ title: 'Forgot your password?', text: 'Enter the email on your account and we will send you a reset link.' }} hero={{ image: require('../../assets/images/Green Travel Help Banner.png'), topTitle: 'Forgot password' }}
     >
+      {/* Hero hidden (commented, not deleted)
       <View style={s.hero}>
         <View style={s.heroIcon}>
           <Ionicons name="key-outline" size={30} color={Colors.primaryDark} />
@@ -52,6 +53,7 @@ export default function AccountRecoveryScreen() {
         <Text style={s.heroTitle}>Forgot your password?</Text>
         <Text style={s.heroText}>Enter the email on your account and we will send you a reset link.</Text>
       </View>
+      */}
 
       <SupportCard>
         <SupportHeading eyebrow="RESET BY EMAIL" title="Your account email" />
@@ -70,7 +72,7 @@ export default function AccountRecoveryScreen() {
           icon="mail-outline"
           error={error}
         />
-        <PrimaryButton label={sent ? 'Send again' : 'Send reset link'} onPress={() => void submit()} loading={loading} />
+        <SupportButton variant="dark" label={sent ? 'Send again' : 'Send reset link'} onPress={() => void submit()} loading={loading} />
       </SupportCard>
 
       {sent ? (
@@ -81,20 +83,20 @@ export default function AccountRecoveryScreen() {
 
       <SupportCard>
         <SupportHeading eyebrow="OTHER OPTIONS" title="Need another way in?" />
-        <SupportItem
+        <SupportItem tone="mint"
           icon="key-outline"
           title="I already have a reset code"
           detail="Paste the code from your email"
           onPress={() => router.push('/reset-password' as Href)}
         />
-        <SupportItem
+        <SupportItem tone="mint"
           icon="phone-portrait-outline"
           title="Sign in with phone OTP"
           detail="Use your verified phone number"
           onPress={() => router.replace({ pathname: '/login', params: { mode: 'phone' } } as Href)}
         />
-        <SupportItem icon="headset-outline" title="Get account support" onPress={() => goTo('/contact')} />
-        <SupportItem icon="log-in-outline" title="Back to log in" onPress={() => router.replace('/login')} last />
+        <SupportItem tone="mint" icon="headset-outline" title="Get account support" onPress={() => goTo('/contact')} />
+        <SupportItem tone="mint" icon="log-in-outline" title="Back to log in" onPress={() => router.replace('/login')} last />
       </SupportCard>
 
       <SupportNotice icon="shield-checkmark-outline">
