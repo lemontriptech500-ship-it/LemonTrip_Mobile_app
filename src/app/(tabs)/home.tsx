@@ -32,8 +32,12 @@ type QuickAction = { label: string; icon: IconName; route: Parameters<typeof rou
 const HERO_IMAGE = require('../../../assets/images/Hiker Overlooking Alpine Lake Valley.png');
 // Background photo for the AI Trip Planner banner (panoramic, hiker on the right).
 const AI_IMAGE = require('../../../assets/images/Hiker Overlooking Alpine Lake Valley.png');
-const AI_ASSET = Image.resolveAssetSource(AI_IMAGE);
-const AI_ASPECT = AI_ASSET?.width && AI_ASSET?.height ? AI_ASSET.width / AI_ASSET.height : 3;
+
+
+// const AI_ASSET = Image.resolveAssetSource(AI_IMAGE);
+// const AI_ASPECT = AI_ASSET?.width && AI_ASSET?.height ? AI_ASSET.width / AI_ASSET.height : 3;
+
+
 const AI_CARD_HEIGHT = 128;
 // How much to dim the hero photo: 0 = original, 0.3 = noticeably darker.
 const HERO_DIM = 0.3;
@@ -42,8 +46,8 @@ const HERO_DIM = 0.3;
 // Smaller HERO_HEIGHT = more zoomed out (more of the panorama visible). Larger HERO_OVERLAP = search card sits higher.
 const HERO_HEIGHT = 190;
 const HERO_OVERLAP = 70;
-const HERO_ASSET = Image.resolveAssetSource(HERO_IMAGE);
-const HERO_ASPECT = HERO_ASSET?.width && HERO_ASSET?.height ? HERO_ASSET.width / HERO_ASSET.height : 16 / 9;
+// const HERO_ASSET = Image.resolveAssetSource(HERO_IMAGE);
+// const HERO_ASPECT = HERO_ASSET?.width && HERO_ASSET?.height ? HERO_ASSET.width / HERO_ASSET.height : 16 / 9;
 const HERO_IMAGE_HEIGHT = HERO_HEIGHT; // photo runs the full hero height so nothing shows beside the search card
 // App logo shown at the top-left of the hero, before the location.
 const APP_LOGO = require('../../../assets/images/Glossy Lemon Trip Logo.png');
@@ -51,6 +55,25 @@ const APP_LOGO = require('../../../assets/images/Glossy Lemon Trip Logo.png');
 const SCRIPT_FONT = 'Italianno';
 // Inter (static weights, loaded in app/_layout.tsx) for all other text on this screen.
 const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
+
+
+function getImageSize(source: any): { width?: number; height?: number } {
+  try {
+    const resolve = (Image as any).resolveAssetSource;
+    if (typeof resolve === 'function') {
+      const asset = resolve(source);
+      return { width: asset?.width, height: asset?.height };
+    }
+  } catch {}
+  return {};
+}
+
+const AI_ASSET = getImageSize(AI_IMAGE);
+const AI_ASPECT = AI_ASSET.width && AI_ASSET.height ? AI_ASSET.width / AI_ASSET.height : 3;
+
+const HERO_ASSET = getImageSize(HERO_IMAGE);
+const HERO_ASPECT = HERO_ASSET.width && HERO_ASSET.height ? HERO_ASSET.width / HERO_ASSET.height : 16 / 9;
+
 
 // The six booking tabs shown inside the search card.
 const services: ServiceItem[] = [
