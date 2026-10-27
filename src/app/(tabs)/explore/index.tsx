@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
 
   // Hero: rounded photo card, script title top-left, search card overlapping the bottom edge
   heroWrap: { paddingHorizontal: 10, paddingTop: 10 },
-  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 14 },
+  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 44 },
   heroImg: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' },
   heroShade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.10)' },
   heroCopy: { paddingLeft: 18 },

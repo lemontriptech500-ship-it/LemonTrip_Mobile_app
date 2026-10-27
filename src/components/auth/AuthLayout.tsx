@@ -9,7 +9,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { getGoogleIdToken, signOutGoogleUser } from '@/utils/googleNativeAuth';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ActivityIndicator, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions, type TextInput as NativeTextInput } from 'react-native';
+import { ActivityIndicator, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, useWindowDimensions, type TextInput as NativeTextInput } from 'react-native';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -42,7 +42,8 @@ type AuthFieldProps = {
 /* ---------- layout ---------- */
 
 const INTER = { regular: 'Inter-Regular', medium: 'Inter-Medium', semibold: 'Inter-SemiBold', bold: 'Inter-Bold', extrabold: 'Inter-ExtraBold' } as const;
-const HERO = require('../../../assets/images/auth-hero.jpg');
+const HERO = require('../../../assets/images/Hot Air Balloons Over Mountain Lake.png');
+const LOGO = require('../../../assets/images/Glossy Lemon Trip Logo.png');
 
 export function AuthLayout({ title, subtitle, onBack, children }: AuthLayoutProps) {
   const { height } = useWindowDimensions();
@@ -55,12 +56,12 @@ export function AuthLayout({ title, subtitle, onBack, children }: AuthLayoutProp
         <ScrollView style={styles.formScroll} contentContainerStyle={styles.scrollGrow} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} bounces={false} overScrollMode="never">
           <View style={styles.column}>
             <ImageBackground source={HERO} resizeMode="cover" style={[styles.hero, { height: heroHeight }]}>
-              <View style={styles.heroShade} />
               <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={onBack} style={styles.heroBackBtn}>
                 <Ionicons name="arrow-back" size={20} color={Colors.primaryDark} />
               </TouchableOpacity>
+              <Image source={LOGO} resizeMode="contain" accessibilityLabel="LemonTrip" style={styles.heroLogo} />
               <View style={styles.heroCopy}>
-                <View style={styles.goldLine} />
+                {/* <View style={styles.goldLine} /> */}
                 {verify ? <Text style={styles.heroTitle}>{title}</Text> : (
                   <>
                     <Text style={styles.heroTitle}>Your Next Adventure</Text>
@@ -334,14 +335,14 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: Colors.background },
   scrollGrow: { flexGrow: 1 },
   column: { flexGrow: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
-  hero: { overflow: 'hidden', justifyContent: 'flex-end', paddingHorizontal: 24, paddingBottom: 46, backgroundColor: Colors.primaryDark },
-  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.25)' },
+  hero: { overflow: 'hidden', justifyContent: 'flex-end', paddingHorizontal: 24, paddingBottom: 47, backgroundColor: Colors.primaryDark },
   heroBackBtn: { position: 'absolute', top: 16, left: 20, width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22, backgroundColor: Colors.white },
+  heroLogo: { position: 'absolute', top: 12, right: 20, width: 58, height: 41 },
   heroCopy: { gap: 4 },
   goldLine: { width: 28, height: 2, marginVertical: 8, backgroundColor: Colors.accent },
-  heroTitle: { color: Colors.white, fontFamily: INTER.bold, fontSize: 28, lineHeight: 34 },
-  heroTitleGold: { color: Colors.accent },
-  heroSub: { color: Colors.white, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, lineHeight: 22, marginTop: 6, maxWidth: 340 },
+  heroTitle: { color: Colors.white, fontFamily: INTER.bold, fontSize: TextSize.displaySmall, lineHeight: 30 },
+  heroTitleGold: { color: Colors.white },
+  heroSub: { color: Colors.white, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 20, marginTop: 6, maxWidth: 340 },
   sheet: { flexGrow: 1, marginTop: -32, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 16, backgroundColor: Colors.surface },
   handle: { alignSelf: 'center', width: 54, height: 5, borderRadius: 3, marginBottom: 28, backgroundColor: Colors.border },
   arrowCircle: { position: 'absolute', right: 8, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.white },
@@ -379,7 +380,7 @@ const styles = StyleSheet.create({
   inputWrapFocused: { borderColor: Colors.primary, backgroundColor: Colors.surface },
   inputWrapError: { borderColor: Colors.error, backgroundColor: Colors.errorSoft },
   inputIcon: { marginLeft: 13 },
-  input: { minHeight: Ui.field.minHeight, flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: INTER.regular, fontSize: TextSize.bodyLarge, paddingLeft: 9, paddingRight: 12, paddingVertical: 10 },
+  input: { minHeight: Ui.field.minHeight, flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: INTER.regular, fontSize: TextSize.body, paddingLeft: 9, paddingRight: 12, paddingVertical: 10 },
   visibilityButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   errorText: { color: Colors.error, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, marginTop: 5 },
   hintText: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.caption, lineHeight: 17, marginTop: 5 },
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   otpHidden: { position: 'absolute', width: 1, height: 1, opacity: 0 },
   primaryButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: Ui.radius.button, backgroundColor: '#103D30' },
   primaryButtonOff: { opacity: 0.6 },
-  primaryButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: 19 },
+  primaryButtonText: { color: Colors.white, fontFamily: INTER.extrabold, fontSize: TextSize.bodyLarge },
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 16 },
   divider: { flex: 1, height: 1, backgroundColor: Colors.border },
   dividerText: { color: Colors.textLight, fontFamily: INTER.extrabold, fontSize: TextSize.micro, letterSpacing: 1 },

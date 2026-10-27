@@ -84,7 +84,7 @@ export default function SignupScreen() {
     <AuthLayout
       eyebrow="LEMONTRIP / CREATE ACCOUNT"
       title={verifying ? 'Verify your number' : 'Create your account'}
-      subtitle={verifying ? `Enter the six-digit code sent to ${normalizePhoneInput(phone) ?? phone}.` : 'Join LemonTrip and keep every trip in one place.'}
+      subtitle={verifying ? `Enter the six-digit code sent to ${normalizePhoneInput(phone) ?? phone}.` : 'Sign up to continue your journey'}
       onBack={handleBack}>
       {!phoneOtp.challenge ? (
         <>

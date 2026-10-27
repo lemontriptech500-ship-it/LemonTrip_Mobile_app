@@ -47,11 +47,11 @@ export default function PackagesListScreen() {
           </ScrollView>
           <View style={s.heroWrap}>
           <View style={s.hero}>
-            <Image source={require('../../../assets/images/Tropical Overwater Paradise at Sunset.png')} resizeMode="cover" style={s.heroImg} />
+            <Image source={require('../../../assets/images/Cappadocia Valley Balloon Vista.png')} resizeMode="cover" style={s.heroImg} />
             <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.10)' }} />
             <View style={s.heroCopy}>
-              <Text style={s.heroScript}>Packages</Text>
-              <Text style={s.heroTagline}>unforgettable journeys await</Text>
+              {/* <Text style={s.heroScript}>Packages</Text> */}
+              {/* <Text style={s.heroTagline}>unforgettable journeys await</Text> */}
             </View>
           </View>
           </View>
@@ -145,7 +145,7 @@ const s = StyleSheet.create({
   pad: { paddingHorizontal: 10, marginTop: 18 },
   tabsScroll: { backgroundColor: Colors.surface, flexGrow: 0 },
   heroWrap: { paddingHorizontal: 10, paddingTop: 10 },
-  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 14 },
+  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 89 },
   heroImg: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' },
   heroCopy: { paddingLeft: 18 },
   heroScript: { fontFamily: 'Italianno', fontSize: 58, lineHeight: 60, color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 8, textShadowOffset: { width: 0, height: 2 } },
@@ -155,7 +155,7 @@ const s = StyleSheet.create({
   tabOn: { borderBottomColor: Colors.accent },
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: GREEN },
-  searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -78, padding: 8, borderRadius: 22 },
+  searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -104, padding: 8, borderRadius: 22 },
   searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 14, paddingVertical: 10 },
   filterBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: GREEN },

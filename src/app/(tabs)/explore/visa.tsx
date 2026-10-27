@@ -92,12 +92,12 @@ export default function VisaScreen() {
             <Image source={require('../../../../assets/images/Passport to Paris Riverside.png')} resizeMode="cover" style={s.heroImg} />
             <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.10)' }} />
             <View style={s.heroCopy}>
-              <Text style={s.heroScript}>Visa</Text>
-              <Text style={s.heroTagline}>travel with confidence</Text>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={s.applications}>
+              {/* <Text style={s.heroScript}>Visa</Text> */}
+              {/* <Text style={s.heroTagline}>travel with confidence</Text> */}
+              {/* <TouchableOpacity accessibilityRole="button" accessibilityLabel="My visa applications" onPress={() => router.push('/(tabs)/explore/visa/applications')} style={s.applications}>
                 <Ionicons name="document-text-outline" size={18} color={GREEN} />
                 <Text style={s.applicationsText}>My applications</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
           </View>
@@ -171,18 +171,22 @@ const s = StyleSheet.create({
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: GREEN },
   heroWrap: { paddingHorizontal: 10, paddingTop: 10 },
-  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 14 },
+  // paddingTop matches the Offers screen so all tabs stay consistent
+  hero: { width: '100%', aspectRatio: 1.95, borderRadius: 24, overflow: 'hidden', backgroundColor: Colors.surfaceMuted, justifyContent: 'flex-start', paddingTop: 39 },
   heroImg: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' },
   heroCopy: { paddingLeft: 18 },
   heroScript: { fontFamily: 'Italianno', fontSize: 58, lineHeight: 60, color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 8, textShadowOffset: { width: 0, height: 2 } },
   heroTagline: { fontFamily: 'Inter-SemiBold', fontSize: 16, lineHeight: 20, color: '#FFFFFF', marginLeft: 38, marginTop: -6, textShadowColor: 'rgba(0,0,0,0.4)', textShadowRadius: 6, textShadowOffset: { width: 0, height: 1 } },
   applications: { minHeight: 38, alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, paddingHorizontal: 16, borderRadius: 20, backgroundColor: Colors.white, shadowColor: GREEN, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 3 },
   applicationsText: { fontFamily: 'Inter-ExtraBold', fontSize: 13, color: GREEN },
-  searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -58, padding: 8, borderRadius: 22 },
-  searchPill: { minHeight: 44, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
-  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 13, paddingVertical: 8 },
-  filterBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: GREEN },
-  headRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, marginTop: 16 },
+  // Same position and sizes as Packages / Offers
+  searchCard: { ...Ui.card, marginHorizontal: 10, marginTop: -64, padding: 8, borderRadius: 22 },
+  searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
+  searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 13, paddingVertical: 10 },
+  filterBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: GREEN },
+  // The search card (~64px tall) ends exactly at the bottom of the hero, so nothing
+  // of the hero is left showing below it and the heading only needs a normal gap.
+  headRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, marginTop: 18 },
   title: { fontFamily: 'Inter-ExtraBold', fontSize: 18, color: GREEN },
   seeAll: { minHeight: 36, flexDirection: 'row', alignItems: 'center', gap: 4 },
   seeAllText: { fontFamily: 'Inter-SemiBold', fontSize: 13, color: GREEN },
