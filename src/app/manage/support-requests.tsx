@@ -72,7 +72,7 @@ export default function SupportRequestsScreen() {
           <View style={s.bigIcon}><Ionicons name="lock-closed-outline" size={28} color={Colors.primaryDark} /></View>
           <Text style={s.centerTitle}>Sign in to view your requests</Text>
           <Text style={[s.body, s.centerText]}>Your support conversations are linked to your LemonTrip account.</Text>
-          <View style={s.fullWidth}><SupportButton label="Sign in" icon="arrow-forward" onPress={() => router.push('/login')} /></View>
+          <View style={s.fullWidth}><SupportButton variant="dark" label="Sign in" icon="arrow-forward" onPress={() => router.push('/login')} /></View>
         </SupportCard>
       ) : loading && !items.length ? (
         <SupportCard style={s.center}>

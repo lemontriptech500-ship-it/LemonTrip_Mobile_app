@@ -79,7 +79,7 @@ function AssistantChat() {
     <SupportPage
       title="Travel assistant"
       subtitle="Ask about trips, bookings and destinations."
-      eyebrow="LEMONTRIP / SUPPORT"
+      promo={{ title: 'Travel assistant', text: 'Ask about trips, bookings and destinations.' }} eyebrow="LEMONTRIP / SUPPORT"
       onBack={back}
       hero={{ image: require('../../assets/images/Emerald Travel Assistant Banner.png'), topTitle: 'Travel assistant', onSettings: () => router.push('/settings' as never) }}
       scrollRef={scroll}
