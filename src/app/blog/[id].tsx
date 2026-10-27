@@ -122,7 +122,7 @@ export default function BlogDetailScreen() {
           style={styles.ctaButton}
         >
           <Text style={styles.ctaButtonText}>{firstPackage ? 'View package' : 'Explore journeys'}</Text>
-          <Ionicons name="arrow-forward" size={18} color={Colors.primaryDark} />
+          <Ionicons name="arrow-forward" size={18} color={Colors.white} />
         </TouchableOpacity>
       </View>
         </View>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: Ui.space.page + 4, paddingTop: 16 },
   paragraph: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 24, marginBottom: 14 },
 
-  note: { marginHorizontal: 16, marginTop: 6, padding: 16, borderRadius: 20, backgroundColor: Colors.accentSoft },
+  note: { marginHorizontal: 16, marginTop: 6, padding: 16, borderRadius: 20, backgroundColor: Colors.surfaceMuted },
   noteTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.title, lineHeight: 24, fontWeight: FontWeight.extraBold, marginTop: 8 },
   noteText: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 4 },
 
@@ -161,13 +161,13 @@ const styles = StyleSheet.create({
   relatedMeta: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, marginTop: 3 },
   packageDestination: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold },
 
-  cta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginHorizontal: 16, marginTop: 16, padding: 18, borderRadius: 22, backgroundColor: Colors.primaryDark },
+  cta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginHorizontal: 16, marginTop: 16, padding: 18, borderRadius: 22, backgroundColor: Colors.surfaceMuted },
   ctaCopy: { flex: 1, minWidth: 0 },
-  ctaEyebrow: { color: Colors.accent, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
-  ctaTitle: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, marginTop: 4 },
-  ctaText: { color: Colors.onDarkMuted, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 4 },
-  ctaButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: Ui.radius.button, backgroundColor: Colors.accent },
-  ctaButtonText: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  ctaEyebrow: { color: '#1B6B4A', fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
+  ctaTitle: { color: Colors.primaryDark, fontFamily: FontFamily.sans, fontSize: TextSize.heading, fontWeight: FontWeight.extraBold, marginTop: 4 },
+  ctaText: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 20, marginTop: 4 },
+  ctaButton: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: Ui.radius.button, backgroundColor: '#103D30' },
+  ctaButtonText: { color: Colors.white, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
 
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   notFoundTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, marginTop: 9 },
