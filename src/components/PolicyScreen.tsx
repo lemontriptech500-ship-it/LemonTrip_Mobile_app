@@ -1,5 +1,8 @@
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { FontWeight, FontFamily } from '@/constants/typography';
+import { InfoBanner } from '@/components/account/InfoBanner';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text } from '@/components/ui/Text';
 import { AppScreen } from '@/components/AppScreen';
 import { Colors } from '@/constants/colors';
@@ -34,6 +37,8 @@ export function PolicyScreen({ title, introduction, sections }: PolicyProps) {
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={s.page} showsVerticalScrollIndicator={false}>
+        <InfoBanner title={title} text="Clear information for your journey." />
+        {/* Banner hidden (commented, not deleted)
         <View style={s.bannerWrap}>
           <View style={s.banner}>
             <Image source={BANNER} resizeMode="cover" style={s.bannerImg} />
@@ -44,6 +49,7 @@ export function PolicyScreen({ title, introduction, sections }: PolicyProps) {
             </View>
           </View>
         </View>
+        */}
 
         <View style={s.intro}>
           <View style={s.introIcon}><Ionicons name={privacy ? 'shield-checkmark-outline' : 'document-text-outline'} size={22} color={Colors.primaryDark} /></View>
@@ -116,9 +122,9 @@ const s = StyleSheet.create({
   sectionTitle: { flex: 1, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.textDark },
   sectionBody: { paddingHorizontal: 16, paddingBottom: 16, paddingLeft: 62 },
   copy: { fontFamily: FontFamily.sans, fontSize: TextSize.body, lineHeight: 23, color: Colors.textLight, marginBottom: 8 },
-  help: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: Ui.space.page, marginTop: 6, padding: 16, borderRadius: Ui.radius.card, backgroundColor: Colors.primaryDark },
-  helpTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: Colors.white },
-  helpText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.onDarkMuted, marginTop: 3 },
-  helpButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, borderRadius: 14, backgroundColor: Colors.accent },
-  helpButtonText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.primaryDark },
+  help: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: Ui.space.page, marginTop: 6, padding: 16, borderRadius: Ui.radius.card, backgroundColor: Colors.surfaceMuted },
+  helpTitle: { fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, fontWeight: FontWeight.extraBold, color: '#103D30' },
+  helpText: { fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, color: Colors.textLight, marginTop: 3 },
+  helpButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, borderRadius: 14, backgroundColor: '#103D30' },
+  helpButtonText: { fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold, color: Colors.white },
 });
