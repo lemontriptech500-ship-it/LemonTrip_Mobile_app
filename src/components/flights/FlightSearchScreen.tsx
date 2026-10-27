@@ -196,7 +196,7 @@ export default function FlightSearchScreen() {
             ) : null}
 
             {errorMsg ? <Text accessibilityRole="alert" style={s.error}>{errorMsg}</Text> : null}
-            <View style={{ marginTop: 14 }}><PrimaryButton label="Search flights" icon="search" loading={loading} onPress={submit} /></View>
+            <View style={{ marginTop: 14 }}><PrimaryButton variant="dark" label="Search flights" icon="search" loading={loading} onPress={submit} /></View>
           </Card>
 
           {hasSearched ? (

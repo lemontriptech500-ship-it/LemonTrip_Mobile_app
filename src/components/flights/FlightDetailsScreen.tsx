@@ -45,7 +45,7 @@ export default function FlightDetailsScreen() {
       <FlightShell onBack={goBack}>
         <ScrollView>
           <FlightBanner />
-          <EmptyState icon="airplane-outline" title="No flight selected" text="Search for a flight and select an offer to view its itinerary and fares." action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
+          <EmptyState icon="airplane-outline" title="No flight selected" text="Search for a flight and select an offer to view its itinerary and fares." action={<PrimaryButton variant="dark" label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
         </ScrollView>
       </FlightShell>
     );

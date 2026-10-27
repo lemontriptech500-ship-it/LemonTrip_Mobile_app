@@ -57,7 +57,7 @@ export default function FlightTravellersScreen() {
       <FlightShell onBack={() => goBackOr(FLIGHT_ROUTES.details)}>
         <ScrollView>
           <FlightBanner title="Traveller details" text="Names must match a valid government ID." />
-          <EmptyState icon="airplane-outline" title="No flight selected" text="Pick a flight and fare before adding travellers." action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
+          <EmptyState icon="airplane-outline" title="No flight selected" text="Pick a flight and fare before adding travellers." action={<PrimaryButton variant="dark" label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
         </ScrollView>
       </FlightShell>
     );

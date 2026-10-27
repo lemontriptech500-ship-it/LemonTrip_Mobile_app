@@ -52,7 +52,7 @@ export default function FlightConfirmationScreen() {
             icon="ticket-outline"
             title="No confirmed ticket yet"
             text="Complete a booking to see your e-ticket here."
-            action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
+            action={<PrimaryButton variant="dark" label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
           />
         </ScrollView>
       </FlightShell>
