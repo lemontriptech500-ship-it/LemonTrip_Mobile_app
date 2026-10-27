@@ -393,7 +393,7 @@ export default function ExploreScreen() {
 
           {/* Personalised panel */}
           <View style={styles.personalPanel}>
-            <Image source={require('../../../../assets/images/Trips Picked Background.jpeg')} resizeMode="cover" style={styles.personalBg} />
+            
             <Image source={require('../../../../assets/images/App Logo.png')} style={styles.personalLogo} resizeMode="contain" />
             <View style={styles.personalCopy}>
               <Text style={styles.personalTitle}>{user ? 'Trips picked for you' : 'Not sure where to go?'}</Text>
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
   emptyButton: { minHeight: 44,  paddingHorizontal: 16, paddingVertical: 10, borderRadius: Ui.radius.control, backgroundColor: Colors.primary },
 
   // Personal panel
-  personalPanel: { marginTop: 24, marginHorizontal: Ui.space.page, padding: 16, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, overflow: 'hidden', backgroundColor: Colors.accentSoft },
+  personalPanel: { marginTop: 24, marginHorizontal: Ui.space.page, padding: 16, flexDirection: 'row', gap: 14, alignItems: 'center', borderRadius: 22, overflow: 'hidden', backgroundColor: '#DCEFE5' },
   personalBg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   personalLogo: { width: 48, height: 48, borderRadius: 12 },
   personalCopy: { flex: 1, minWidth: 0, paddingRight: 70 },

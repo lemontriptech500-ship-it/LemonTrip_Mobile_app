@@ -405,13 +405,11 @@ export default function HomeScreen() {
         {/* AI Trip Planner */}
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="AI Trip Planner. Start planning" activeOpacity={0.92} style={styles.aiShadow} onPress={() => router.push('/ai-planner' as never)}>
           <View style={styles.aiCard}>
-            <Image source={AI_IMAGE} style={styles.aiImage} resizeMode="cover" />
-            <LinearGradient colors={['rgba(255,255,255,0.95)', 'rgba(255,255,255,0.78)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 0.72]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={StyleSheet.absoluteFill} pointerEvents="none" />
             <View style={styles.aiContent}>
               <View style={styles.aiHeader}>
-                <View style={styles.aiIcon}><Ionicons name="compass-outline" size={19} color="#2F6FD6" /></View>
+                <View style={styles.aiIcon}><Ionicons name="compass-outline" size={19} color="#103D30" /></View>
                 <Text style={styles.aiEyebrow} numberOfLines={1}>AI Trip Planner</Text>
-                <View style={styles.aiBadge}><Ionicons name="sparkles" size={10} color="#6B3FD1" /><Text style={styles.aiBadgeText}>AI Powered</Text></View>
+                <View style={styles.aiBadge}><Ionicons name="sparkles" size={10} color="#103D30" /><Text style={styles.aiBadgeText}>AI Powered</Text></View>
               </View>
               <Text style={styles.aiTitle}>Plan personalized trips in seconds.</Text>
               <Text style={styles.aiSub} numberOfLines={2}>Get AI-powered itineraries, budget suggestions and more.</Text>
@@ -791,13 +789,13 @@ const styles = StyleSheet.create({
   aiShadow: { marginHorizontal: 16, marginTop: 24, borderRadius: 18, ...cardShadow, shadowOpacity: 0.14 },
   // The photo keeps its natural proportions at the card height and is anchored right, so nothing is stretched or shifted.
   aiImage: { position: 'absolute', top: 0, right: 0, height: AI_CARD_HEIGHT, width: AI_CARD_HEIGHT * AI_ASPECT, minWidth: '100%' },
-  aiCard: { overflow: 'hidden', height: AI_CARD_HEIGHT, justifyContent: 'center', borderRadius: 18, backgroundColor: '#DCEBF2' },
+  aiCard: { overflow: 'hidden', height: AI_CARD_HEIGHT, justifyContent: 'center', borderRadius: 18, backgroundColor: '#DCEFE5' },
   aiContent: { padding: 12, maxWidth: '68%' },
   aiHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   aiIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 10, backgroundColor: '#FFFFFF' },
   aiEyebrow: { flexShrink: 1, color: '#0F2A24', fontFamily: INTER.extrabold, fontSize: TextSize.caption },
-  aiBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingVertical: 3, paddingHorizontal: 7, borderRadius: 9, backgroundColor: '#EEE6FF' },
-  aiBadgeText: { color: '#6B3FD1', fontFamily: INTER.bold, fontSize: 9 },
+  aiBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingVertical: 3, paddingHorizontal: 7, borderRadius: 9, backgroundColor: '#DCEFE5' },
+  aiBadgeText: { color: '#103D30', fontFamily: INTER.bold, fontSize: 9 },
   aiTitle: { marginTop: 7, color: Colors.primaryDark, fontFamily: INTER.extrabold, fontSize: 15, lineHeight: 19 },
   aiSub: { marginTop: 3, color: '#2F403A', fontFamily: INTER.regular, fontSize: 10.5, lineHeight: 14 },
   aiGo: { position: 'absolute', right: 12, top: 12, width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderRadius: 19, backgroundColor: Colors.primaryDark, borderWidth: 1, borderColor: 'rgba(255,255,255,0.6)' },
