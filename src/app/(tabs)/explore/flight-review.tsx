@@ -31,7 +31,7 @@ export default function FlightReviewScreen() {
       <FlightShell onBack={() => goBackOr(FLIGHT_ROUTES.seats)}>
         <ScrollView>
           <FlightBanner title="Review your booking" text="Check every detail before you pay." />
-          <EmptyState icon="document-text-outline" title="Nothing to review yet" text="Select a flight and add traveller details first." action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
+          <EmptyState icon="document-text-outline" title="Nothing to review yet" text="Select a flight and add traveller details first." action={<PrimaryButton variant="dark" label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />} />
         </ScrollView>
       </FlightShell>
     );

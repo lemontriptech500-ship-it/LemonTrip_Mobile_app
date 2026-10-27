@@ -52,7 +52,7 @@ export default function SeatsAddOnsScreen() {
             icon="airplane-outline"
             title="No flight selected"
             text="Pick a flight and fare first."
-            action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
+            action={<PrimaryButton variant="dark" label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
           />
         </ScrollView>
       </FlightShell>

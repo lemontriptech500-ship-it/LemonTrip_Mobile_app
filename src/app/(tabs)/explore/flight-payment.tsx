@@ -64,7 +64,7 @@ export default function FlightPaymentScreen() {
             icon="card-outline"
             title="No booking to pay for"
             text="Select a flight and add traveller details first."
-            action={<PrimaryButton label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
+            action={<PrimaryButton variant="dark" label="Search flights" onPress={() => replaceTo(FLIGHT_ROUTES.results)} />}
           />
         </ScrollView>
       </FlightShell>
