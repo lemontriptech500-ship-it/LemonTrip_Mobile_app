@@ -1,6 +1,8 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { FontWeight, FontFamily } from '@/constants/typography';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, hero: 32, display: 24 } as const;
 import { Text, TextInput } from '@/components/ui/Text';
 import { VisaHeader, visaCountryFlag } from '@/components/visa/VisaHeader';
 import { Colors } from '@/constants/colors';
@@ -157,7 +159,7 @@ export default function VisaApplicationScreen() {
   const nextStep = () => { if (step === 'service') changeStep('application'); else if (step === 'application') { const next = validateDetails(); setErrors(next); if (!Object.keys(next).length) changeStep('documents'); } else void submit(); };
   const openRecord = (view: 'tracking' | 'details') => router.replace({ pathname: '/visa-application/[id]', params: { id: reference, view } });
   return <SafeAreaView headerTone="light" style={styles.safe} edges={['top']}>
-    <VisaHeader title={reference ? 'Application Details' : step === 'service' ? 'Service Details' : step === 'application' ? 'Application' : 'Document Upload'} onBack={back} />
+    <VisaHeader contact title={reference ? 'Application Details' : step === 'service' ? 'Service Details' : step === 'application' ? 'Application' : 'Document Upload'} onBack={back} />
     <ScrollView ref={scroll} contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled">
       <View style={styles.content}>
         {loading ? <ActivityIndicator accessibilityLabel="Loading service" color={Colors.secondary} /> : loadError ? <View style={styles.card}><Text style={styles.error}>{loadError}</Text><TouchableOpacity accessibilityRole="button" style={styles.button} onPress={() => { setLoading(true); setLoadError(''); setLoadAttempt(value => value + 1); }}><Text style={styles.buttonText}>Try again</Text></TouchableOpacity></View> : destination ? reference ? <View style={styles.card}>
@@ -204,18 +206,18 @@ function Field(props: { label: string; value: string; onChangeText: (value: stri
 
 const styles = StyleSheet.create({
   safe: { flex: 1 }, page: { paddingBottom: 24 }, content: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: 16, gap: 12 },
-  card: { padding: 16, borderRadius: 8, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, gap: 10 },
+  card: { padding: 16, borderRadius: 22, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, gap: 10 },
   serviceHeading: { flexDirection: 'row', alignItems: 'center', gap: 12 }, flag: { fontSize: TextSize.hero }, grow: { flex: 1, minWidth: 0 },
   title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.title }, copy: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18 },
   featureIcons: { flexDirection: 'row', alignItems: 'center', gap: 8 }, requirement: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   label: { color: Colors.textDark, fontFamily: FontFamily.sans, fontWeight: FontWeight.bold, fontSize: TextSize.caption, marginBottom: 6 },
-  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, marginTop: 10, gap: 12, borderTopWidth: 1, borderTopColor: Colors.border }, price: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, flexShrink: 1 },
-  field: { marginBottom: 4 }, input: { minHeight: 44, borderWidth: 1, borderColor: Colors.borderStrong, borderRadius: 6, paddingHorizontal: 10, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, backgroundColor: Colors.background },
-  visaOption: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderWidth: 1, borderColor: Colors.border, borderRadius: 6 },
-  upload: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 8, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
-  uploadIcon: { width: 40, height: 44, borderRadius: 6, backgroundColor: Colors.surfaceMuted, justifyContent: 'center', alignItems: 'center' }, uploadTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
+  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, marginTop: 10, gap: 12, borderTopWidth: 1, borderTopColor: Colors.border }, price: { color: '#103D30', fontFamily: FontFamily.sans, fontSize: TextSize.title, fontWeight: FontWeight.extraBold, flexShrink: 1 },
+  field: { marginBottom: 4 }, input: { minHeight: 52, borderWidth: 1, borderColor: Colors.border, borderRadius: 16, paddingHorizontal: 10, color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, backgroundColor: Colors.background },
+  visaOption: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderWidth: 1, borderColor: Colors.border, borderRadius: 14 },
+  upload: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 18, backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  uploadIcon: { width: 40, height: 44, borderRadius: 12, backgroundColor: Colors.surfaceMuted, justifyContent: 'center', alignItems: 'center' }, uploadTitle: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold },
   remove: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-end', paddingHorizontal: 8 },
   footer: { padding: 16, backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border },
-  button: { width: '100%', maxWidth: 608, alignSelf: 'center', minHeight: 48, flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 8, backgroundColor: Colors.secondary }, buttonText: { color: Colors.white, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body }, disabled: { opacity: 0.5 },
-  secondaryButton: { minHeight: 44, justifyContent: 'center', alignItems: 'center' }, linkText: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, auth: { padding: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 8 }, error: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, marginTop: 6 }, reference: { color: Colors.secondary, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body },
+  button: { width: '100%', maxWidth: 608, alignSelf: 'center', minHeight: 52, flexDirection: 'row', gap: 10, justifyContent: 'center', alignItems: 'center', borderRadius: 999, backgroundColor: '#103D30' }, buttonText: { color: Colors.white, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body }, disabled: { opacity: 0.5 },
+  secondaryButton: { minHeight: 44, justifyContent: 'center', alignItems: 'center' }, linkText: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.body, fontWeight: FontWeight.extraBold }, auth: { padding: 12, backgroundColor: Colors.surfaceMuted, borderRadius: 16 }, error: { color: Colors.error, fontFamily: FontFamily.sans, fontSize: TextSize.caption, lineHeight: 18, marginTop: 6 }, reference: { color: Colors.secondary, fontFamily: FontFamily.sans, fontWeight: FontWeight.extraBold, fontSize: TextSize.body },
 });
