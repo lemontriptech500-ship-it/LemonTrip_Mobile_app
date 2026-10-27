@@ -186,11 +186,11 @@ export default function OffersScreen() {
           </ScrollView>
           <View style={styles.heroWrap}>
           <View style={styles.hero}>
-            <Image source={require('../../../assets/images/Tropical Overwater Bungalow Paradise.png')} resizeMode="cover" style={styles.heroImg} />
+            <Image source={require('../../../assets/images/Coastal Getaway Travel Sale.png')} resizeMode="cover" style={styles.heroImg} />
             <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.10)' }} />
             <View style={styles.heroCopy}>
-              <Text style={styles.heroScript}>Offers</Text>
-              <Text style={styles.heroTagline}>travel more, spend less</Text>
+              {/* <Text style={styles.heroScript}>Offers</Text> */}
+              {/* <Text style={styles.heroTagline}>travel more, spend less</Text> */}
             </View>
           </View>
           </View>
@@ -595,12 +595,12 @@ const styles = StyleSheet.create({
   tabText: { fontFamily: 'Inter-Medium', fontSize: 13, color: Colors.textDark },
   tabTextOn: { fontFamily: 'Inter-SemiBold', color: '#103D30' },
   heroWrap: { paddingHorizontal: 10, paddingTop: 10 },
-  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 14 },
+  hero: { width: '100%', aspectRatio: 1.7, borderRadius: 24, overflow: 'hidden', backgroundColor: '#103D30', justifyContent: 'flex-start', paddingTop: 69 },
   heroImg: { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' },
   heroCopy: { paddingLeft: 18 },
   heroScript: { fontFamily: 'Italianno', fontSize: 58, lineHeight: 60, color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 8, textShadowOffset: { width: 0, height: 2 } },
   heroTagline: { fontFamily: 'Inter-SemiBold', fontSize: 16, lineHeight: 20, color: '#FFFFFF', marginLeft: 38, marginTop: -6, textShadowColor: 'rgba(0,0,0,0.4)', textShadowRadius: 6, textShadowOffset: { width: 0, height: 1 } },
-  searchCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginHorizontal: 10, marginTop: -98, padding: 8, borderRadius: 22, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 2 },
+  searchCard: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border, marginHorizontal: 10, marginTop: -104, padding: 8, borderRadius: 22, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 2 },
   searchPill: { minHeight: 48, paddingLeft: 14, paddingRight: 5, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 24, backgroundColor: '#F7F9F7', borderWidth: 1, borderColor: Colors.border },
   searchInput: { flex: 1, minWidth: 0, color: Colors.textDark, fontFamily: 'Inter-Regular', fontSize: 13, paddingVertical: 10 },
   filterBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.primary },

@@ -32,6 +32,8 @@ type QuickAction = { label: string; icon: IconName; route: Parameters<typeof rou
 const HERO_IMAGE = require('../../../assets/images/Hiker Overlooking Alpine Lake Valley.png');
 // Background photo for the AI Trip Planner banner (panoramic, hiker on the right).
 const AI_IMAGE = require('../../../assets/images/Hiker Overlooking Alpine Lake Valley.png');
+// Background for the AI Trip Planner card (light mint leaf arcs). Change the extension if your file differs.
+const AI_CARD_BG = require('../../../assets/images/Minimal Mint Leaf Arcs.png');
 
 
 // const AI_ASSET = Image.resolveAssetSource(AI_IMAGE);
@@ -405,6 +407,7 @@ export default function HomeScreen() {
         {/* AI Trip Planner */}
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="AI Trip Planner. Start planning" activeOpacity={0.92} style={styles.aiShadow} onPress={() => router.push('/ai-planner' as never)}>
           <View style={styles.aiCard}>
+            <Image source={AI_CARD_BG} style={styles.aiBg} resizeMode="cover" />
             <View style={styles.aiContent}>
               <View style={styles.aiHeader}>
                 <View style={styles.aiIcon}><Ionicons name="compass-outline" size={19} color="#103D30" /></View>
@@ -555,7 +558,6 @@ function FlightPanel() {
         <View style={styles.dateCol}><DateField tile label="Departure" value={departureDate} placeholder="Add date" minDate={todayISO()} onChange={(date) => { setDepartureDate(date); if (returnDate && returnDate < date) setReturnDate(''); }} /></View>
         <View style={styles.dateCol}><DateField tile label="Return" value={returnDate} placeholder="Add Return" minDate={departureDate || todayISO()} onChange={(date) => { setReturnDate(date); if (date) setTripType('Round Trip'); }} /></View>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Travellers and class" onPress={() => setPickerOpen(true)} style={[styles.tile, styles.travellerTile]}>
-          <Ionicons name="person-outline" size={19} color={Colors.textLight} />
           <View style={styles.tileCopy}>
             <Text style={styles.tileLabel} numberOfLines={1}>Travellers</Text>
             <Text style={styles.tileValue} numberOfLines={1}>{travellers} · {cabinClass.replace('Premium Economy', 'Prem. Eco')}</Text>
@@ -676,7 +678,8 @@ const styles = StyleSheet.create({
   panelDescription: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 19 },
   panelHighlight: { alignSelf: 'flex-start', overflow: 'hidden', paddingHorizontal: 10, paddingVertical: 7, borderRadius: 14, backgroundColor: Colors.surfaceMuted, color: Colors.primary, fontFamily: INTER.bold, fontSize: TextSize.caption },
   tile: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, borderRadius: 14, borderWidth: 1, borderColor: Colors.border, backgroundColor: Colors.surface },
-  travellerTile: { flex: 0.5, minWidth: 0, paddingHorizontal: 9, gap: 6 },
+  // Narrower Travellers tile (no icon). Lower flex = shorter tile; the date tiles take the freed width.
+  travellerTile: { flex: 0.36, minWidth: 0, paddingHorizontal: 8, gap: 5 },
   dateCol: { flex: 0.4, minWidth: 0 },
   tileCopy: { flex: 1, minWidth: 0 },
   tileLabel: { color: Colors.textLight, fontFamily: INTER.regular, fontSize: TextSize.micro },
@@ -787,8 +790,8 @@ const styles = StyleSheet.create({
 
   // AI planner
   aiShadow: { marginHorizontal: 16, marginTop: 24, borderRadius: 18, ...cardShadow, shadowOpacity: 0.14 },
-  // The photo keeps its natural proportions at the card height and is anchored right, so nothing is stretched or shifted.
-  aiImage: { position: 'absolute', top: 0, right: 0, height: AI_CARD_HEIGHT, width: AI_CARD_HEIGHT * AI_ASPECT, minWidth: '100%' },
+  // Background image fills the whole card; the card's overflow + borderRadius round its corners.
+  aiBg: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   aiCard: { overflow: 'hidden', height: AI_CARD_HEIGHT, justifyContent: 'center', borderRadius: 18, backgroundColor: '#DCEFE5' },
   aiContent: { padding: 12, maxWidth: '68%' },
   aiHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
