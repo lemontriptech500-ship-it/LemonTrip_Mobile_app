@@ -1,19 +1,19 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize, FontWeight, FontFamily } from '@/constants/typography';
+import { FontWeight, FontFamily } from '@/constants/typography';
 import { Text } from '@/components/ui/Text';
 import { Ui } from '@/constants/theme';
 import { Colors } from '@/constants/colors';
 import { AppScreen as SafeAreaView } from '@/components/AppScreen';
-import { SupportPage, goBackOr, goTo } from '@/components/support/SupportKit';
+import { ServiceTopBar } from '@/components/ui/ServiceHeader';
 import type { BlogPost, Destination, TravelPackage } from '@/types/content';
 import { useContentItems } from '@/utils/contentApi';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
-// Same hero banner artwork as the Travel stories list.
-const BANNER = require('../../../assets/images/Emerald Travel Adventure Collage.png');
+// Same type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, display: 22 } as const;
 
 export default function BlogDetailScreen() {
   useAppLanguage();
@@ -45,13 +45,10 @@ export default function BlogDetailScreen() {
   const firstPackage = relatedPackages[0];
 
   return (
-    <SupportPage
-      eyebrow="THE LEMONTRIP JOURNAL"
-      title="Travel stories"
-      subtitle="Ideas, guides, and places worth taking the long way to."
-      onBack={() => goBackOr('/blog')}
-      hero={{ image: BANNER, topTitle: 'Travel stories', onSettings: () => goTo('/settings') }}
-    >
+    <SafeAreaView style={styles.safeArea}>
+      <ServiceTopBar title="Travel stories" fallback="/blog" />
+      <ScrollView contentContainerStyle={{ paddingBottom: 30 }} showsVerticalScrollIndicator={false}>
+        <View style={{ width: '100%', maxWidth: 760, alignSelf: 'center' }}>
       <Image source={{ uri: post.image }} resizeMode="cover" style={styles.cover} />
 
       <View style={styles.header}>
@@ -128,7 +125,9 @@ export default function BlogDetailScreen() {
           <Ionicons name="arrow-forward" size={18} color={Colors.primaryDark} />
         </TouchableOpacity>
       </View>
-    </SupportPage>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -138,7 +137,7 @@ const styles = StyleSheet.create({
   cover: { marginHorizontal: 16, height: 230, borderRadius: 22, backgroundColor: Colors.surfaceMuted },
   header: { paddingHorizontal: Ui.space.page + 4, paddingTop: 20 },
   category: { color: Colors.secondary, fontFamily: FontFamily.sans, fontSize: TextSize.caption, fontWeight: FontWeight.extraBold, letterSpacing: 0.8 },
-  title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.display, lineHeight: 34, fontWeight: FontWeight.extraBold, marginTop: 8 },
+  title: { color: Colors.textDark, fontFamily: FontFamily.sans, fontSize: TextSize.display, lineHeight: 28, fontWeight: FontWeight.extraBold, marginTop: 8 },
   excerpt: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.bodyLarge, lineHeight: 23, marginTop: 12 },
   metadata: { color: Colors.textLight, fontFamily: FontFamily.sans, fontSize: TextSize.body, marginTop: 14, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: Colors.border },
 
