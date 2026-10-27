@@ -1,6 +1,7 @@
 import { useAppLanguage } from '@/utils/intl';
 import { TouchableOpacity } from '@/components/ui/Pressable';
-import { TextSize } from '@/constants/typography';
+// Same slightly smaller type scale as Explore.
+const TextSize = { micro: 10, caption: 11, body: 13, bodyLarge: 14, title: 16, heading: 18, displaySmall: 20, display: 24 } as const;
 import { Text } from '@/components/ui/Text';
 import { SupportCard, SupportHeading, SupportItem, SupportPage, goTo } from '@/components/support/SupportKit';
 import { Colors } from '@/constants/colors';
@@ -25,7 +26,7 @@ export default function HelpScreen() {
 
   return (
     <SupportPage
-      eyebrow="LEMONTRIP SUPPORT"
+      promo={{ title: 'How can we help?', text: 'Answers, guides and a real team behind them.' }} eyebrow="LEMONTRIP SUPPORT"
       title="How can we help?"
       subtitle="Answers, guides and a real team behind them."
       hero={{ image: require('../../assets/images/Emerald Customer Support Headset Banner.png'), topTitle: 'Help & Support', onSettings: () => goTo('/settings') }}
@@ -84,7 +85,7 @@ export default function HelpScreen() {
 const s = StyleSheet.create({
   quick: { flexDirection: 'row', gap: 10, marginHorizontal: Ui.space.page, marginBottom: 14 },
   quickItem: { ...Ui.card, flex: 1, padding: 12, minHeight: 120 },
-  quickIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accentSoft, marginBottom: 8 },
+  quickIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceMuted, marginBottom: 8 },
   quickLabel: { fontFamily: INTER.bold, fontSize: TextSize.body, color: Colors.textDark },
   quickDetail: { fontFamily: INTER.regular, fontSize: TextSize.caption, color: Colors.textLight, marginTop: 2, paddingRight: 14 },
   quickChevron: { position: 'absolute', right: 10, top: 14 },
