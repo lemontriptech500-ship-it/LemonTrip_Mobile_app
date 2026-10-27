@@ -90,7 +90,7 @@ export default function ManageScreen() {
           <View style={s.gap} />
           <SupportField label="First name" placeholder="First name" value={firstName} onChangeText={setFirstName} autoCapitalize="words" />
           <SupportField label="Last name" placeholder="Last name" value={lastName} onChangeText={setLastName} autoCapitalize="words" />
-          <SupportButton label={editing ? 'Save changes' : 'Save traveller'} icon="checkmark" onPress={() => void saveTraveller()} />
+          <SupportButton label={editing ? 'Save changes' : 'Save traveller'} icon="checkmark" variant="dark" onPress={() => void saveTraveller()} />
           {editing ? <><View style={s.gap} /><SupportButton variant="soft" label="Cancel" onPress={() => { setEditing(null); setFirstName(''); setLastName(''); }} /></> : null}
         </SupportCard>
         {travellerStore.items.length ? (
@@ -118,7 +118,7 @@ export default function ManageScreen() {
         {searches.items.map((item) => (
           <SupportCard key={item.id}>
             <SupportHeading eyebrow={item.service.toUpperCase()} title={item.label} />
-            <SupportButton label="Search again" icon="search-outline" onPress={() => { const service = travelServices.find((service) => service.shortTitle.toLowerCase() === item.service.toLowerCase()); if (service) router.push({ pathname: typeof service.route === 'string' ? service.route as '/(tabs)/explore/flights' : '/services', params: item.service.toLowerCase() === 'flights' ? { search: item.query } : { query: item.query } }); }} />
+            <SupportButton label="Search again" icon="search-outline" variant="dark" onPress={() => { const service = travelServices.find((service) => service.shortTitle.toLowerCase() === item.service.toLowerCase()); if (service) router.push({ pathname: typeof service.route === 'string' ? service.route as '/(tabs)/explore/flights' : '/services', params: item.service.toLowerCase() === 'flights' ? { search: item.query } : { query: item.query } }); }} />
             <View style={s.buttonRow}>
               {section === 'recent-searches' ? <View style={s.flex}><SupportButton variant="soft" label="Save search" onPress={() => void searchStore.save([item, ...searchStore.items.filter((old) => old.query !== item.query)])} /></View> : null}
               <View style={s.flex}><SupportButton variant="outline" label="Remove" onPress={() => void searches.save(searches.items.filter((old) => old.id !== item.id))} /></View>
@@ -293,10 +293,10 @@ export default function ManageScreen() {
 function EmptyCard({ icon, title, copy, action, onPress }: { icon: IconName; title: string; copy: string; action?: string; onPress?: () => void }) {
   return (
     <SupportCard style={s.empty}>
-      <View style={s.emptyIcon}><Ionicons name={icon} size={30} color={Colors.primaryDark} /></View>
+      <View style={s.emptyIcon}><Ionicons name={icon} size={30} color={Colors.white} /></View>
       <Text style={s.emptyTitle}>{title}</Text>
       <Text style={[s.body, s.center]}>{copy}</Text>
-      {action && onPress ? <View style={s.emptyAction}><SupportButton label={action} icon="arrow-forward" onPress={onPress} /></View> : null}
+      {action && onPress ? <View style={s.emptyAction}><SupportButton label={action} icon="arrow-forward" variant="dark" onPress={onPress} /></View> : null}
     </SupportCard>
   );
 }
@@ -326,7 +326,7 @@ const s = StyleSheet.create({
   infoLabel: { ...Ui.eyebrow, color: Colors.textLight, marginBottom: 2 },
   infoValue: { fontFamily: 'Manrope', fontSize: 15, fontWeight: '800', color: Colors.textDark },
   empty: { alignItems: 'center', paddingVertical: 24 },
-  emptyIcon: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.accent, marginBottom: 12 },
+  emptyIcon: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#103D30', marginBottom: 12 },
   emptyTitle: { fontFamily: 'Manrope', fontSize: 18, fontWeight: '800', color: Colors.textDark, marginBottom: 6, textAlign: 'center' },
   emptyAction: { alignSelf: 'stretch', marginTop: 16 },
   hero: { overflow: 'hidden', alignItems: 'center', marginHorizontal: Ui.space.page, marginBottom: 12, paddingVertical: 16, paddingHorizontal: 18, borderRadius: Ui.radius.card, backgroundColor: Colors.successSoft },
