@@ -84,7 +84,7 @@ export default function SettingsScreen() {
 
           {user ? (
             <TouchableOpacity accessibilityRole="button" accessibilityLabel="Log out" onPress={confirmLogout} style={styles.logout} activeOpacity={0.8}>
-              <Ionicons name="log-out-outline" size={20} color={GREEN} />
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
               <Text style={styles.logoutText}>Log out</Text>
             </TouchableOpacity>
           ) : null}
@@ -159,6 +159,6 @@ const styles = StyleSheet.create({
   rowDetail: { fontFamily: INTER.regular, fontSize: TextSize.body, lineHeight: 18, color: Colors.textLight, marginTop: 2 },
   valuePill: { maxWidth: 120, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999, backgroundColor: Colors.successSoft },
   valueText: { fontFamily: INTER.semibold, fontSize: TextSize.body, color: GREEN },
-  logout: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, borderRadius: 26, borderWidth: 1, borderColor: GREEN, backgroundColor: Colors.surface },
-  logoutText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: GREEN },
+  logout: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, marginTop: 22, borderRadius: 26, borderWidth: 1, borderColor: Colors.error, backgroundColor: Colors.surface },
+  logoutText: { fontFamily: INTER.bold, fontSize: TextSize.bodyLarge, color: Colors.error },
 });
